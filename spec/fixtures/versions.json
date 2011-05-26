@@ -1,0 +1,12 @@
+[
+   {
+      "number" : "0.6.3",
+      "built_at" : "2010-12-23T05:00:00Z",
+      "summary" : "Test::Unit-based acceptance testing DSL",
+      "downloads_count" : 175,
+      "platform" : "ruby",
+      "authors" : "Evan David Light",
+      "description" : "Behaviour Driven Development derived from Cucumber but as an internal DSL with methods for reuse",
+      "prerelease" : false,
+   }
+]
