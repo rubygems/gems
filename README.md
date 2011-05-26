@@ -121,4 +121,4 @@ Submitting a Pull Request
 Copyright
 ---------
 Copyright (c) 2011 Erik Michaels-Ober.
-See [LICENSE](https://github.com/sferik/gems/blob/master/LICENSE.md) for details. [pending]
+See [LICENSE](https://github.com/sferik/gems/blob/master/LICENSE.md) for details.
