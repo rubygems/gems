@@ -26,7 +26,7 @@ Usage Examples
     puts Gems.search 'cucumber'
 
     # Returns an array of gem version details
-    puts Gems.versions 'coulda' [pending]
+    puts Gems.versions 'coulda'
 
     # Returns an array of gem dependency details for all versions of given gems
     puts Gems.dependencies ['rails', 'thor'] [pending]

@@ -28,4 +28,16 @@ describe Gems::Client do
       search.first.name.should == 'cucumber'
     end
   end
+
+  describe "#versions" do
+    before do
+      stub_get("/api/v1/versions/coulda.json").to_return(:body => fixture("coulda.json"))
+    end
+
+    it "should return an array of gem version details" do
+      versions = @client.versions 'coulda'
+      a_get("/api/v1/versions/coulda.json").should have_been_made
+      versions.first.number.should == '0.6.3'
+    end
+  end
 end

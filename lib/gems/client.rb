@@ -27,5 +27,16 @@ module Gems
     def search(query, options={})
       get("/api/v1/gems/search.json", options.merge(:query => query))
     end
+
+    # Returns an array of gem version details
+    #
+    # @param gem [String] The name of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @return [Hashie::Mash]
+    # @example
+    #   Gems.versions 'coulda'
+    def versions(gem, options={})
+      get("/api/v1/versions/#{gem}.json", options)
+    end
   end
 end
