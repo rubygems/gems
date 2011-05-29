@@ -40,4 +40,16 @@ describe Gems::Client do
       versions.first.number.should == '0.6.3'
     end
   end
+
+  describe "#dependencies" do
+    before do
+      stub_get("/api/v1/versions/coulda-0.6.3/downloads.json").to_return(:body => fixture("downloads.json"))
+    end
+
+    it "should return the number of downloads by day for a particular gem version" do
+      downloads = @client.downloads 'coulda', '0.6.3'
+      a_get("/api/v1/versions/coulda-0.6.3/downloads.json").should have_been_made
+      downloads["2011-11-01"].should == 0
+    end
+  end
 end

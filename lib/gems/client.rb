@@ -38,5 +38,17 @@ module Gems
     def versions(gem, options={})
       get("/api/v1/versions/#{gem}.json", options)
     end
+
+    # Returns the number of downloads by day for a particular gem version
+    #
+    # @param gem [String] The name of a gem.
+    # @param version [String] The version of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @return [Hashie::Mash]
+    # @example
+    #   Gems.downloads 'coulda', '0.6.3'
+    def downloads(gem, version, options={})
+      get("/api/v1/versions/#{gem}-#{version}/downloads.json", options)
+    end
   end
 end

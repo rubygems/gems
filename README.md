@@ -28,11 +28,11 @@ Usage Examples
     # Returns an array of gem version details
     puts Gems.versions 'coulda'
 
+    # Returns the number of downloads by day for a particular gem version
+    puts Gems.downloads 'coulda', '0.6.3'
+
     # Returns an array of gem dependency details for all versions of given gems
     puts Gems.dependencies ['rails', 'thor'] [pending]
-
-    # Returns the number of downloads by day for a particular gem version
-    puts Gems.downloads 'coulda', '0.6.3'  [pending]
 
     # The following method requires password authentication
     Gems.configure do |config| [pending]
