@@ -16,5 +16,16 @@ module Gems
     def info(gem, options={})
       get("/api/v1/gems/#{gem}.json", options)
     end
+
+    # Returns an array of active gems that match the query
+    #
+    # @param query [String] A term to search for.
+    # @param options [Hash] A customizable set of options.
+    # @return [Array<Hashie::Mash>]
+    # @example
+    #   Gems.search 'cucumber'
+    def search(query, options={})
+      get("/api/v1/gems/search.json", options.merge(:query => query))
+    end
   end
 end

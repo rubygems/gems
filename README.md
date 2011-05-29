@@ -12,7 +12,7 @@ Documentation
 
 Continuous Integration
 ----------------------
-[![Build Status](http://travis-ci.org/sferik/gems.png)](http://travis-ci.org/sferik/gems) [pending]
+[![Build Status](http://travis-ci.org/sferik/gems.png)](http://travis-ci.org/sferik/gems)
 
 Usage Examples
 --------------
@@ -23,7 +23,7 @@ Usage Examples
     puts Gems.info 'rails'
 
     # Returns an array of active gems that match the query
-    puts Gems.search 'cucumber' [pending]
+    puts Gems.search 'cucumber'
 
     # Returns an array of gem version details
     puts Gems.versions 'coulda' [pending]
