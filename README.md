@@ -20,7 +20,7 @@ Usage Examples
     require 'gems'
 
     # Returns some basic information about the rails gem
-    puts Gems.gem 'rails' [pending]
+    puts Gems.info 'rails'
 
     # Returns an array of active gems that match the query
     puts Gems.search 'cucumber' [pending]
