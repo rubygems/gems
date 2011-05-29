@@ -1,0 +1,1408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rubygems type="array">
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.1</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.6.3</requirements>
+        </dependency>
+        <dependency>
+          <name>hashie</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>json</name>
+          <requirements>~&gt; 1.5.1</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 1.0.2</requirements>
+        </dependency>
+        <dependency>
+          <name>rash</name>
+          <requirements>~&gt; 0.3.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.9</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>futures_pipeline</name>
+    <downloads type="integer">58</downloads>
+    <info>Ruby wrapper for the Futures, Inc. US Military Pipeline API</info>
+    <version-downloads type="integer">17</version-downloads>
+    <version>0.0.4</version>
+    <homepage-uri>https://github.com/codeforamerica/futures_pipeline</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/futures_pipeline-0.0.4.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/futures_pipeline</project-uri>
+    <authors>Erik Michaels-Ober, Ryan Resella</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array">
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.9</requirements>
+        </dependency>
+        <dependency>
+          <name>rdoc</name>
+          <requirements>= 3.5.1</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>multi_json</name>
+    <downloads type="integer">267487</downloads>
+    <info>A gem to provide swappable JSON backends utilizing Yajl::Ruby, the JSON gem, JSON pure, or a vendored version of okjson.</info>
+    <version-downloads type="integer">13367</version-downloads>
+    <version>1.0.3</version>
+    <homepage-uri>http://github.com/intridea/multi_json</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/multi_json-1.0.3.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/multi_json</project-uri>
+    <authors>Michael Bleigh, Josh Kalderimis, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rest-client</name>
+          <requirements>~&gt; 1.6.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json_pure</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-more</name>
+    <downloads type="integer">38853</downloads>
+    <info>Additional strategies for OmniAuth.</info>
+    <version-downloads type="integer">3017</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-more-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-more</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-openid</name>
+          <requirements>~&gt; 1.3.1</requirements>
+        </dependency>
+        <dependency>
+          <name>ruby-openid-apps-discovery</name>
+          <requirements>~&gt; 1.2.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-openid</name>
+    <downloads type="integer">100819</downloads>
+    <info>OpenID strategies for OmniAuth.</info>
+    <version-downloads type="integer">3179</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-openid-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-openid</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>addressable</name>
+          <requirements>= 2.2.4</requirements>
+        </dependency>
+        <dependency>
+          <name>net-ldap</name>
+          <requirements>~&gt; 0.2.2</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4.2</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>pyu-ruby-sasl</name>
+          <requirements>~&gt; 0.0.3.1</requirements>
+        </dependency>
+        <dependency>
+          <name>rubyntlm</name>
+          <requirements>~&gt; 0.1.1</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-enterprise</name>
+    <downloads type="integer">97142</downloads>
+    <info>Enterprise strategies for OmniAuth.</info>
+    <version-downloads type="integer">3025</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-enterprise-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-enterprise</project-uri>
+    <authors>James A. Rosen, Ping Yu, Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rest-client</name>
+          <requirements>~&gt; 1.6.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-basic</name>
+    <downloads type="integer">97205</downloads>
+    <info>HTTP Basic strategies for OmniAuth.</info>
+    <version-downloads type="integer">3047</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-basic-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-basic</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array">
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-core</name>
+    <downloads type="integer">124433</downloads>
+    <info>Core strategies for OmniAuth.</info>
+    <version-downloads type="integer">3929</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-core-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-core</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.1</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_xml</name>
+          <requirements>~&gt; 0.2.2</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oauth</name>
+          <requirements>~&gt; 0.4.0</requirements>
+        </dependency>
+        <dependency>
+          <name>oauth2</name>
+          <requirements>~&gt; 0.4.1</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>evernote</name>
+          <requirements>~&gt; 0.9</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oa-oauth</name>
+    <downloads type="integer">121699</downloads>
+    <info>OAuth strategies for OmniAuth.</info>
+    <version-downloads type="integer">3786</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oa-oauth-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oa-oauth</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>oa-basic</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-core</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-enterprise</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-more</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-oauth</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+        <dependency>
+          <name>oa-openid</name>
+          <requirements>= 0.2.6</requirements>
+        </dependency>
+      </runtime>
+      <development type="array"/>
+    </dependencies>
+    <name>omniauth</name>
+    <downloads type="integer">97906</downloads>
+    <info>OmniAuth is an authentication framework that that separates the concept of authentiation from the concept of identity, providing simple hooks for any application to have one or multiple authentication providers for a user.</info>
+    <version-downloads type="integer">3022</version-downloads>
+    <version>0.2.6</version>
+    <homepage-uri>http://github.com/intridea/omniauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/omniauth-0.2.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/omniauth</project-uri>
+    <authors>Michael Bleigh, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.1</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>&gt;= 0.0.5</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json_pure</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>oauth2</name>
+    <downloads type="integer">201440</downloads>
+    <info>A Ruby wrapper for the OAuth 2.0 protocol built with a similar style to the original OAuth gem.</info>
+    <version-downloads type="integer">20601</version-downloads>
+    <version>0.4.1</version>
+    <homepage-uri>http://github.com/intridea/oauth2</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/oauth2-0.4.1.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/oauth2</project-uri>
+    <authors>Michael Bleigh</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.5.4</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.3.1</requirements>
+        </dependency>
+        <dependency>
+          <name>hashie</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 0.0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_xml</name>
+          <requirements>~&gt; 0.2.0</requirements>
+        </dependency>
+        <dependency>
+          <name>simple_oauth</name>
+          <requirements>~&gt; 0.1.3</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>json</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.4</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.3</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.4</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>t</name>
+    <downloads type="integer">140</downloads>
+    <info>A Ruby wrapper for the Twitter REST and Search APIs</info>
+    <version-downloads type="integer">125</version-downloads>
+    <version>0.0.0</version>
+    <homepage-uri>https://github.com/jnunemaker/twitter</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/t-0.0.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/t</project-uri>
+    <authors>John Nunemaker, Wynn Netherland, Erik Michaels-Ober, Steve Richert</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>addressable</name>
+          <requirements>~&gt; 2.2.4</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.0</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.6.0</requirements>
+        </dependency>
+        <dependency>
+          <name>hashie</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rash</name>
+          <requirements>~&gt; 0.3.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json_pure</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>octokit</name>
+    <downloads type="integer">1716</downloads>
+    <info>Simple wrapper for the GitHub API v2</info>
+    <version-downloads type="integer">245</version-downloads>
+    <version>0.6.3</version>
+    <homepage-uri>http://wynnnetherland.com/projects/octokit/</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/octokit-0.6.3.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/octokit</project-uri>
+    <authors>Wynn Netherland, Adam Stacoviak, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array"/>
+    </dependencies>
+    <name>rails_admin</name>
+    <downloads type="integer">2360</downloads>
+    <info>This rubygem does not have a description or summary.</info>
+    <version-downloads type="integer">2360</version-downloads>
+    <version>0.0.0</version>
+    <homepage-uri>http://www.railsadmin.org/</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/rails_admin-0.0.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/rails_admin</project-uri>
+    <authors>Francesc Esplugas</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array"/>
+    </dependencies>
+    <name>rails-admin</name>
+    <downloads type="integer">344</downloads>
+    <info>This rubygem does not have a description or summary.</info>
+    <version-downloads type="integer">344</version-downloads>
+    <version>0.0.0</version>
+    <homepage-uri>http://www.railsadmin.org/</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/rails-admin-0.0.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/rails-admin</project-uri>
+    <authors>Francesc Esplugas</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>fakeweb</name>
+          <requirements>~&gt; 1.3</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>&gt;= 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rdoc</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.1</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.3</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>thor</name>
+    <downloads type="integer">2100427</downloads>
+    <info>A scripting framework that replaces rake, sake and rubigen</info>
+    <version-downloads type="integer">1240751</version-downloads>
+    <version>0.14.6</version>
+    <homepage-uri>http://github.com/wycats/thor</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/thor-0.14.6.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/thor</project-uri>
+    <authors>Yehuda Katz, Jos&#233; Valim</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>mocha</name>
+          <requirements>~&gt; 0.9</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>turn</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>simple_oauth</name>
+    <downloads type="integer">68628</downloads>
+    <info>Simply builds and verifies OAuth headers</info>
+    <version-downloads type="integer">9665</version-downloads>
+    <version>0.1.5</version>
+    <homepage-uri>http://github.com/laserlemon/simple_oauth</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/simple_oauth-0.1.5.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/simple_oauth</project-uri>
+    <authors>Steve Richert, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.5.4</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.3.1</requirements>
+        </dependency>
+        <dependency>
+          <name>hashie</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 0.0.5</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_xml</name>
+          <requirements>~&gt; 0.2.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>open311</name>
+    <downloads type="integer">745</downloads>
+    <info>A Ruby wrapper for the Open311 API v2.</info>
+    <version-downloads type="integer">44</version-downloads>
+    <version>0.1.2</version>
+    <homepage-uri>http://rubygems.org/gems/open311</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/open311-0.1.2.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/open311</project-uri>
+    <authors>Dan Melton, Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>addressable</name>
+          <requirements>~&gt; 2.2.4</requirements>
+        </dependency>
+        <dependency>
+          <name>multipart-post</name>
+          <requirements>~&gt; 1.1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rack</name>
+          <requirements>&gt;= 1.1.0, &lt; 2</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>faraday</name>
+    <downloads type="integer">274912</downloads>
+    <info>HTTP/REST API client library.</info>
+    <version-downloads type="integer">2751</version-downloads>
+    <version>0.7.0</version>
+    <homepage-uri>http://github.com/technoweenie/faraday</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/faraday-0.7.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/faraday</project-uri>
+    <authors>Rick Olson</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array"/>
+      <development type="array">
+        <dependency>
+          <name>libxml-ruby</name>
+          <requirements>~&gt; 1.1</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>multi_xml</name>
+    <downloads type="integer">80557</downloads>
+    <info>A gem to provide swappable XML backends utilizing LibXML, Nokogiri, or REXML.</info>
+    <version-downloads type="integer">36344</version-downloads>
+    <version>0.2.2</version>
+    <homepage-uri>http://rubygems.org/gems/multi_xml</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/multi_xml-0.2.2.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/multi_xml</project-uri>
+    <authors>Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json_pure</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_xml</name>
+          <requirements>~&gt; 0.2</requirements>
+        </dependency>
+        <dependency>
+          <name>oauth2</name>
+          <requirements>~&gt; 0.2</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rash</name>
+          <requirements>~&gt; 0.3</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>simple_oauth</name>
+          <requirements>~&gt; 0.1</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>faraday_middleware</name>
+    <downloads type="integer">77245</downloads>
+    <info>Various middleware for Faraday</info>
+    <version-downloads type="integer">15185</version-downloads>
+    <version>0.6.3</version>
+    <homepage-uri>http://wynnnetherland.com/projects/faraday-middleware/</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/faraday_middleware-0.6.3.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/faraday_middleware</project-uri>
+    <authors>Erik Michaels-Ober, Wynn Netherland</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.1</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.6.3</requirements>
+        </dependency>
+        <dependency>
+          <name>hashie</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_xml</name>
+          <requirements>~&gt; 0.2.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rash</name>
+          <requirements>~&gt; 0.3.0</requirements>
+        </dependency>
+        <dependency>
+          <name>simple_oauth</name>
+          <requirements>~&gt; 0.1.4</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>json</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>~&gt; 1.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>twitter</name>
+    <downloads type="integer">195067</downloads>
+    <info>A Ruby wrapper for the Twitter REST and Search APIs</info>
+    <version-downloads type="integer">7449</version-downloads>
+    <version>1.4.1</version>
+    <homepage-uri>https://github.com/jnunemaker/twitter</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/twitter-1.4.1.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/twitter</project-uri>
+    <authors>John Nunemaker, Wynn Netherland, Erik Michaels-Ober, Steve Richert</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>file-tail</name>
+          <requirements>&gt;= 1.0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rsdl</name>
+          <requirements>&gt;= 0.1.2</requirements>
+        </dependency>
+        <dependency>
+          <name>rubygame</name>
+          <requirements>&gt;= 2.6.2</requirements>
+        </dependency>
+      </runtime>
+      <development type="array"/>
+    </dependencies>
+    <name>racket</name>
+    <downloads type="integer">1369</downloads>
+    <info>Listen to your app.</info>
+    <version-downloads type="integer">398</version-downloads>
+    <version>0.1.0</version>
+    <homepage-uri>http://github.com/jm3/racket</homepage-uri>
+    <bug-tracker-uri></bug-tracker-uri>
+    <source-code-uri>http://github.com/jm3/app-racket</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/racket-0.1.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/racket</project-uri>
+    <authors>John Manoogian III, Erik Michaels-Ober</authors>
+    <mailing-list-uri></mailing-list-uri>
+    <documentation-uri></documentation-uri>
+    <wiki-uri></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>builder</name>
+          <requirements>~&gt; 2.1</requirements>
+        </dependency>
+        <dependency>
+          <name>merb-assets</name>
+          <requirements>~&gt; 1.1</requirements>
+        </dependency>
+        <dependency>
+          <name>merb-helpers</name>
+          <requirements>~&gt; 1.1</requirements>
+        </dependency>
+        <dependency>
+          <name>merb-slices</name>
+          <requirements>~&gt; 1.1</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>activerecord</name>
+          <requirements>~&gt; 2.3</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-aggregates</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-core</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-migrations</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-sqlite-adapter</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-types</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>dm-validations</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 1.3</requirements>
+        </dependency>
+        <dependency>
+          <name>sequel</name>
+          <requirements>~&gt; 3.18</requirements>
+        </dependency>
+        <dependency>
+          <name>webrat</name>
+          <requirements>~&gt; 0.7</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>merb-admin</name>
+    <downloads type="integer">20040</downloads>
+    <info>MerbAdmin is a Merb plugin that provides an easy-to-use interface for managing your data</info>
+    <version-downloads type="integer">210</version-downloads>
+    <version>0.8.8</version>
+    <homepage-uri>http://rubygems.org/gems/merb-admin</homepage-uri>
+    <bug-tracker-uri></bug-tracker-uri>
+    <source-code-uri>http://github.com/sferik/merb-admin</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/merb-admin-0.8.8.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/merb-admin</project-uri>
+    <authors>Erik Michaels-Ober</authors>
+    <mailing-list-uri></mailing-list-uri>
+    <documentation-uri></documentation-uri>
+    <wiki-uri></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>faraday</name>
+          <requirements>~&gt; 0.6.0</requirements>
+        </dependency>
+        <dependency>
+          <name>faraday_middleware</name>
+          <requirements>~&gt; 0.6.0</requirements>
+        </dependency>
+        <dependency>
+          <name>multi_json</name>
+          <requirements>~&gt; 0.0.5</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>json</name>
+          <requirements>~&gt; 1.5</requirements>
+        </dependency>
+        <dependency>
+          <name>maruku</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5</requirements>
+        </dependency>
+        <dependency>
+          <name>simplecov</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>webmock</name>
+          <requirements>~&gt; 1.6</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>~&gt; 0.6</requirements>
+        </dependency>
+        <dependency>
+          <name>ZenTest</name>
+          <requirements>~&gt; 4.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>mlb</name>
+    <downloads type="integer">11852</downloads>
+    <info>MLB.rb is a Ruby library for retrieving current Major League Baseball players, managers, teams, divisions, and leagues.</info>
+    <version-downloads type="integer">84</version-downloads>
+    <version>0.5.4</version>
+    <homepage-uri>http://rubygems.org/gems/mlb</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/mlb-0.5.4.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/mlb</project-uri>
+    <authors>Erik Michaels-Ober</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+</rubygems>
