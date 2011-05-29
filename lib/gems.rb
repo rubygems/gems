@@ -4,8 +4,8 @@ module Gems
   # Alias for Gems::Client.new
   #
   # @return [Gems::Client]
-  def self.new(options={})
-    Gems::Client.new(options)
+  def self.new
+    Gems::Client.new
   end
 
   # Delegate to Gems::Client
