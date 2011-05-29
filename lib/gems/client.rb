@@ -12,10 +12,9 @@ module Gems
     # @param options [Hash] A customizable set of options.
     # @return [Hashie::Mash]
     # @example
-    #   Gems.information 'rails'
-    def information(gem, options={})
+    #   Gems.info 'rails'
+    def info(gem, options={})
       get("/api/v1/gems/#{gem}.json", options)
     end
-    alias :info :information
   end
 end
