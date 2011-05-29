@@ -8,7 +8,7 @@ Installation
 
 Documentation
 -------------
-[http://rdoc.info/gems/gems](http://rdoc.info/gems/gems) [pending]
+[http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
 
 Continuous Integration
 ----------------------
