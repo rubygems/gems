@@ -25,7 +25,7 @@ module Gems
     # @example
     #   Gems.search 'cucumber'
     def search(query, options={})
-      get("/api/v1/gems/search.json", options.merge(:query => query))
+      get("/api/v1/search.json", options.merge(:query => query))
     end
 
     # Returns an array of gem version details

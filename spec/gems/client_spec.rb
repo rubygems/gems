@@ -19,12 +19,12 @@ describe Gems::Client do
 
   describe "#search" do
     before do
-      stub_get("/api/v1/gems/search.json?query=cucumber").to_return(:body => fixture("search.json"))
+      stub_get("/api/v1/search.json?query=cucumber").to_return(:body => fixture("search.json"))
     end
 
     it "should return an array of active gems that match the query" do
       search = @client.search 'cucumber'
-      a_get("/api/v1/gems/search.json?query=cucumber").should have_been_made
+      a_get("/api/v1/search.json?query=cucumber").should have_been_made
       search.first.name.should == 'cucumber'
     end
   end
