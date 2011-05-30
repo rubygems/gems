@@ -5,7 +5,13 @@ module Gems
     private
 
     def connection
-      Faraday.new(:url => 'http://rubygems.org') do |connection|
+      options = {
+        :headers => {'Accept' => 'application/json'},
+        :ssl => {:verify => false},
+        :url => 'https://rubygems.org',
+      }
+
+      Faraday.new(options) do |connection|
         connection.use Faraday::Request::UrlEncoded
         connection.use Faraday::Response::RaiseError
         connection.use Faraday::Response::Rashify
