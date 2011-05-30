@@ -7,11 +7,11 @@ require 'rspec'
 require 'webmock/rspec'
 
 def a_get(path)
-  a_request(:get, 'http://rubygems.org' + path)
+  a_request(:get, 'https://rubygems.org' + path)
 end
 
 def stub_get(path)
-  stub_request(:get, 'http://rubygems.org' + path)
+  stub_request(:get, 'https://rubygems.org' + path)
 end
 
 def fixture_path
