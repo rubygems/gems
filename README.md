@@ -4,7 +4,7 @@ Ruby wrapper for the RubyGems.org API.
 
 Installation
 ------------
-    gem install gems [pending]
+    gem install gems
 
 Documentation
 -------------
