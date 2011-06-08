@@ -13,7 +13,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'faraday_middleware', '~> 0.6.3'
   gem.add_runtime_dependency 'hashie', '~> 1.0.0'
   gem.add_runtime_dependency 'multi_json', '~> 1.0.3'
-  gem.add_runtime_dependency 'rash', '~> 0.3.0'
 
   gem.authors       = ["Erik Michaels-Ober"]
   gem.email         = ['sferik@gmail.com']
