@@ -50,5 +50,15 @@ module Gems
     def downloads(gem, version, options={})
       get("/api/v1/versions/#{gem}-#{version}/downloads.json", options)
     end
+
+    # Returns an array of hashes for all versions of given gems
+    #
+    # @param gems [Array] A list of gem names
+    # @return [Array]
+    # @example
+    #   Gems.dependencies 'rails', 'thor'
+    def dependencies(*gems)
+      get("/api/v1/dependencies", {:gems => gems.join(',')}, :marshal)
+    end
   end
 end

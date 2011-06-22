@@ -1,13 +1,13 @@
 module Gems
   module Request
-    def get(path, options={})
-      request(:get, path, options)
+    def get(path, options={}, format=:json)
+      request(:get, path, options, format)
     end
 
     private
 
-    def request(method, path, options)
-      response = connection.send(method) do |request|
+    def request(method, path, options, format)
+      response = connection(format).send(method) do |request|
         request.url(path, options)
       end
       response.body

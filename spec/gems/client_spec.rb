@@ -41,7 +41,7 @@ describe Gems::Client do
     end
   end
 
-  describe "#dependencies" do
+  describe "#downloads" do
     before do
       stub_get("/api/v1/versions/coulda-0.6.3/downloads.json").to_return(:body => fixture("downloads.json"))
     end
@@ -50,6 +50,18 @@ describe Gems::Client do
       downloads = @client.downloads 'coulda', '0.6.3'
       a_get("/api/v1/versions/coulda-0.6.3/downloads.json").should have_been_made
       downloads["2011-11-01"].should == 0
+    end
+  end
+
+  describe "#dependencies" do
+    before do
+      stub_get("/api/v1/dependencies?gems=rails,thor").to_return(:body => fixture("dependencies.json"))
+    end
+
+    it "should return an array of hashes for all versions of given gems" do
+      dependencies = @client.dependencies 'rails', 'thor'
+      a_get("/api/v1/dependencies?gems=rails,thor").should have_been_made
+      dependencies.first.number.should == "3.0.9"
     end
   end
 end
