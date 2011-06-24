@@ -14,10 +14,10 @@ module Gems
     end
 
     def formatted_path(path, format)
-      case format.to_sym
-      when :json, :xml
+      case format.to_s.downcase
+      when 'json', 'xml'
         [path, format].compact.join('.')
-      when :marshal
+      when 'marshal'
         path
       end
     end

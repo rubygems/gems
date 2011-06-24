@@ -15,12 +15,12 @@ module Gems
         connection.use Faraday::Request::UrlEncoded
         connection.use Faraday::Response::RaiseError
         connection.use Faraday::Response::Mashify
-        case format.to_sym
-        when :json
+        case format.to_s.downcase
+        when 'json'
           connection.use Faraday::Response::ParseJson
-        when :marshal
+        when 'marshal'
           connection.use Faraday::Response::ParseMarshal
-        when :xml
+        when 'xml'
           connection.use Faraday::Response::ParseXml
         end
         connection.adapter Faraday.default_adapter
