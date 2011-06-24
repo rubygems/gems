@@ -32,54 +32,55 @@ Usage Examples
     puts Gems.downloads 'coulda', '0.6.3'
 
     # Returns an array of gem dependency details for all versions of given gems
-    puts Gems.dependencies ['rails', 'thor'] [pending]
+    puts Gems.dependencies ['rails', 'thor']
 
     # The following method requires password authentication
-    Gems.configure do |config| [pending]
-      config.username 'nick@gemcutter.org'
-      config.password 'schwwwwing'
+    Gems.configure do |config|
+      config.format = :xml
+      config.username = 'nick@gemcutter.org' [TODO]
+      config.password = 'schwwwwing' [TODO]
     end
 
     # Retrieve your API key using HTTP basic auth
-    Gems.api_key [pending]
+    Gems.api_key [TODO]
 
     # The following methods require authentication
-    Gems.configure do |config| [pending]
+    Gems.configure do |config| [TODO]
       config.key '701243f217cdf23b1370c7b66b65ca97'
     end
 
     # List all gems that you own
-    puts Gems.gems [pending]
+    puts Gems.gems [TODO]
 
     # View all owners of a gem that you own
-    puts Gems.owners 'gemcutter' [pending]
+    puts Gems.owners 'gemcutter' [TODO]
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
-    puts Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [pending]
+    puts Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
 
     # Remove a user's permission to manage a RubyGem you own
-    puts Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [pending]
+    puts Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
 
     # List the webhooks registered under your account
-    puts Gems.web_hooks [pending]
+    puts Gems.web_hooks [TODO]
 
     # Add a webhook
-    puts Gems.add_web_hook 'rails', 'http://example.com' [pending]
+    puts Gems.add_web_hook 'rails', 'http://example.com' [TODO]
 
     # Remove a webhook
-    puts Gems.remove_web_hook 'rails', 'http://example.com' [pending]
+    puts Gems.remove_web_hook 'rails', 'http://example.com' [TODO]
 
     # Test fire a webhook.
-    puts Gems.fire_web_hook 'rails', 'http://example.com' [pending]
+    puts Gems.fire_web_hook 'rails', 'http://example.com' [TODO]
 
     # Submit a gem to RubyGems.org
-    puts Gems.push File.new 'gemcutter-0.2.1.gem' [pending]
+    puts Gems.push File.new 'gemcutter-0.2.1.gem' [TODO]
 
     # Remove a gem from RubyGems.org's index
-    puts Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10' [pending]
+    puts Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
 
     # Update a previously yanked gem back into RubyGems.org's index
-    puts Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10' [pending]
+    puts Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
 
 Contributing
 ------------

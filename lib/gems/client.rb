@@ -1,3 +1,4 @@
+require 'gems/configuration'
 require 'gems/connection'
 require 'gems/request'
 
@@ -5,6 +6,14 @@ module Gems
   class Client
     include Gems::Connection
     include Gems::Request
+    attr_accessor *Configuration::VALID_OPTIONS_KEYS
+
+    def initialize(options={})
+      options = Gems.options.merge(options)
+      Configuration::VALID_OPTIONS_KEYS.each do |key|
+        send("#{key}=", options[key])
+      end
+    end
 
     # Returns some basic information about the given gem
     #
@@ -14,7 +23,8 @@ module Gems
     # @example
     #   Gems.info 'rails'
     def info(gem, options={})
-      get("/api/v1/gems/#{gem}.json", options)
+      response = get("/api/v1/gems/#{gem}", options)
+      format.to_s.downcase == 'xml' ? response['rubygem'] : response
     end
 
     # Returns an array of active gems that match the query
@@ -25,7 +35,8 @@ module Gems
     # @example
     #   Gems.search 'cucumber'
     def search(query, options={})
-      get("/api/v1/search.json", options.merge(:query => query))
+      response = get("/api/v1/search", options.merge(:query => query))
+      format.to_s.downcase == 'xml' ? response['rubygems'] : response
     end
 
     # Returns an array of gem version details
@@ -36,7 +47,7 @@ module Gems
     # @example
     #   Gems.versions 'coulda'
     def versions(gem, options={})
-      get("/api/v1/versions/#{gem}.json", options)
+      get("/api/v1/versions/#{gem}", options, :json)
     end
 
     # Returns the number of downloads by day for a particular gem version
@@ -48,7 +59,7 @@ module Gems
     # @example
     #   Gems.downloads 'coulda', '0.6.3'
     def downloads(gem, version, options={})
-      get("/api/v1/versions/#{gem}-#{version}/downloads.json", options)
+      get("/api/v1/versions/#{gem}-#{version}/downloads", options, :json)
     end
 
     # Returns an array of hashes for all versions of given gems

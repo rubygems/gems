@@ -13,7 +13,7 @@
         </dependency>
         <dependency>
           <name>gherkin</name>
-          <requirements>&gt;= 2.3.8</requirements>
+          <requirements>~&gt; 2.4.1</requirements>
         </dependency>
         <dependency>
           <name>json</name>
@@ -27,11 +27,15 @@
       <development type="array">
         <dependency>
           <name>aruba</name>
-          <requirements>&gt;= 0.3.6</requirements>
+          <requirements>~&gt; 0.4.2</requirements>
+        </dependency>
+        <dependency>
+          <name>bcat</name>
+          <requirements>= 0.6.1</requirements>
         </dependency>
         <dependency>
           <name>capybara</name>
-          <requirements>&gt;= 1.0.0.beta1</requirements>
+          <requirements>&gt;= 1.0.0</requirements>
         </dependency>
         <dependency>
           <name>nokogiri</name>
@@ -51,11 +55,15 @@
         </dependency>
         <dependency>
           <name>rake</name>
-          <requirements>&gt;= 0.8.7</requirements>
+          <requirements>&gt;= 0.9.2</requirements>
         </dependency>
         <dependency>
           <name>ramaze</name>
           <requirements>&gt;= 0</requirements>
+        </dependency>
+        <dependency>
+          <name>rdiscount</name>
+          <requirements>= 1.6.8</requirements>
         </dependency>
         <dependency>
           <name>rspec</name>
@@ -63,15 +71,15 @@
         </dependency>
         <dependency>
           <name>simplecov</name>
-          <requirements>&gt;= 0.4.1</requirements>
+          <requirements>&gt;= 0.4.2</requirements>
         </dependency>
         <dependency>
           <name>sinatra</name>
-          <requirements>&gt;= 1.2.0</requirements>
+          <requirements>&gt;= 1.2.6</requirements>
         </dependency>
         <dependency>
           <name>spork</name>
-          <requirements>&gt;= 0.8.4</requirements>
+          <requirements>&gt;= 0.9.0.rc7</requirements>
         </dependency>
         <dependency>
           <name>syntax</name>
@@ -81,22 +89,128 @@
           <name>webrat</name>
           <requirements>&gt;= 0.7.3</requirements>
         </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>= 0.7.1</requirements>
+        </dependency>
       </development>
     </dependencies>
     <name>cucumber</name>
-    <downloads type="integer">689377</downloads>
+    <downloads type="integer">754236</downloads>
     <info>Behaviour Driven Development with elegance and joy</info>
-    <version-downloads type="integer">7724</version-downloads>
-    <version>0.10.3</version>
+    <version-downloads type="integer">5119</version-downloads>
+    <version>1.0.0</version>
     <homepage-uri>http://cukes.info</homepage-uri>
     <bug-tracker-uri>http://rspec.lighthouseapp.com/projects/16211/</bug-tracker-uri>
-    <source-code-uri>http://github.com/aslakhellesoy/cucumber/tree/master</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-0.10.3.gem</gem-uri>
+    <source-code-uri>http://github.com/cucumber/cucumber/tree/master</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber-1.0.0.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/cucumber</project-uri>
     <authors>Aslak Helles&#248;y</authors>
     <mailing-list-uri>http://groups.google.com/group/cukes</mailing-list-uri>
     <documentation-uri>http://cukes.info</documentation-uri>
-    <wiki-uri>http://wiki.github.com/aslakhellesoy/cucumber</wiki-uri>
+    <wiki-uri>http://wiki.github.com/cucumber/cucumber</wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>capybara</name>
+          <requirements>&gt;= 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>cucumber</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>nokogiri</name>
+          <requirements>&gt;= 1.4.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rack-test</name>
+          <requirements>&gt;= 0.5.7</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>aruba</name>
+          <requirements>&gt;= 0.4.1</requirements>
+        </dependency>
+        <dependency>
+          <name>bson_ext</name>
+          <requirements>&gt;= 1.3.1</requirements>
+        </dependency>
+        <dependency>
+          <name>bundler</name>
+          <requirements>&gt;= 1.0.15</requirements>
+        </dependency>
+        <dependency>
+          <name>coffee-script</name>
+          <requirements>&gt;= 2.2.0</requirements>
+        </dependency>
+        <dependency>
+          <name>database_cleaner</name>
+          <requirements>&gt;= 0.6.7</requirements>
+        </dependency>
+        <dependency>
+          <name>factory_girl</name>
+          <requirements>&gt;= 2.0.0.beta2</requirements>
+        </dependency>
+        <dependency>
+          <name>jquery-rails</name>
+          <requirements>&gt;= 1.0.9</requirements>
+        </dependency>
+        <dependency>
+          <name>mongoid</name>
+          <requirements>&gt;= 2.0.2</requirements>
+        </dependency>
+        <dependency>
+          <name>rails</name>
+          <requirements>&gt;= 3.1.0.rc4</requirements>
+        </dependency>
+        <dependency>
+          <name>rake</name>
+          <requirements>&gt;= 0.9.2</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>&gt;= 2.6.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec-rails</name>
+          <requirements>&gt;= 2.6.1</requirements>
+        </dependency>
+        <dependency>
+          <name>sass</name>
+          <requirements>&gt;= 3.1.1</requirements>
+        </dependency>
+        <dependency>
+          <name>sqlite3-ruby</name>
+          <requirements>&gt;= 1.3.3</requirements>
+        </dependency>
+        <dependency>
+          <name>turn</name>
+          <requirements>&gt;= 0.8.2</requirements>
+        </dependency>
+        <dependency>
+          <name>uglifier</name>
+          <requirements>&gt;= 0.5.4</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>cucumber-rails</name>
+    <downloads type="integer">423546</downloads>
+    <info>Cucumber Generators and Runtime for Rails</info>
+    <version-downloads type="integer">2778</version-downloads>
+    <version>1.0.0</version>
+    <homepage-uri>http://cukes.info</homepage-uri>
+    <bug-tracker-uri>http://github.com/aslakhellesoy/cucumber-rails/issues</bug-tracker-uri>
+    <source-code-uri>http://github.com/aslakhellesoy/cucumber-rails</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber-rails-1.0.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/cucumber-rails</project-uri>
+    <authors>Aslak Helles&#248;y, Dennis Bl&#246;te, Rob Holland</authors>
+    <mailing-list-uri>http://groups.google.com/group/cukes</mailing-list-uri>
+    <documentation-uri>http://cukes.info/</documentation-uri>
+    <wiki-uri>http://wiki.github.com/aslakhellesoy/cucumber-rails</wiki-uri>
   </rubygem>
   <rubygem>
     <dependencies>
@@ -113,9 +227,9 @@
       </development>
     </dependencies>
     <name>culerity</name>
-    <downloads type="integer">378923</downloads>
+    <downloads type="integer">406439</downloads>
     <info>Culerity integrates Cucumber and Celerity in order to test your application's full stack.</info>
-    <version-downloads type="integer">142154</version-downloads>
+    <version-downloads type="integer">165557</version-downloads>
     <version>0.2.15</version>
     <homepage-uri>http://github.com/langalex/culerity</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
@@ -131,93 +245,15 @@
     <dependencies>
       <runtime type="array">
         <dependency>
-          <name>capybara</name>
-          <requirements>&gt;= 1.0.0.beta1</requirements>
-        </dependency>
-        <dependency>
-          <name>cucumber</name>
-          <requirements>&gt;= 0.10.3</requirements>
-        </dependency>
-        <dependency>
-          <name>nokogiri</name>
-          <requirements>&gt;= 1.4.4</requirements>
-        </dependency>
-        <dependency>
-          <name>rack-test</name>
-          <requirements>&gt;= 0.5.7</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>aruba</name>
-          <requirements>&gt;= 0.3.6</requirements>
-        </dependency>
-        <dependency>
-          <name>bson_ext</name>
-          <requirements>&gt;= 1.3.0</requirements>
-        </dependency>
-        <dependency>
-          <name>bundler</name>
-          <requirements>&gt;= 1.0.13</requirements>
-        </dependency>
-        <dependency>
-          <name>database_cleaner</name>
-          <requirements>&gt;= 0.6.7</requirements>
-        </dependency>
-        <dependency>
-          <name>factory_girl</name>
-          <requirements>&gt;= 2.0.0.beta2</requirements>
-        </dependency>
-        <dependency>
-          <name>mongoid</name>
-          <requirements>&gt;= 2.0.2</requirements>
-        </dependency>
-        <dependency>
-          <name>rails</name>
-          <requirements>&gt;= 3.0.7</requirements>
-        </dependency>
-        <dependency>
-          <name>rake</name>
-          <requirements>= 0.8.7</requirements>
-        </dependency>
-        <dependency>
-          <name>rspec</name>
-          <requirements>&gt;= 2.6.0</requirements>
-        </dependency>
-        <dependency>
-          <name>rspec-rails</name>
-          <requirements>&gt;= 2.6.0</requirements>
-        </dependency>
-        <dependency>
-          <name>sqlite3-ruby</name>
-          <requirements>&gt;= 1.3.3</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>cucumber-rails</name>
-    <downloads type="integer">383178</downloads>
-    <info>Cucumber Generators and Runtime for Rails</info>
-    <version-downloads type="integer">2082</version-downloads>
-    <version>0.5.1</version>
-    <homepage-uri>http://cukes.info</homepage-uri>
-    <bug-tracker-uri>http://github.com/aslakhellesoy/cucumber-rails/issues</bug-tracker-uri>
-    <source-code-uri>http://github.com/aslakhellesoy/cucumber-rails</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-rails-0.5.1.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/cucumber-rails</project-uri>
-    <authors>Aslak Helles&#248;y, Dennis Bl&#246;te, Rob Holland</authors>
-    <mailing-list-uri>http://groups.google.com/group/cukes</mailing-list-uri>
-    <documentation-uri>http://cukes.info/</documentation-uri>
-    <wiki-uri>http://wiki.github.com/aslakhellesoy/cucumber-rails</wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
           <name>builder</name>
           <requirements>&gt;= 2.1.2</requirements>
         </dependency>
       </runtime>
       <development type="array">
+        <dependency>
+          <name>hoe</name>
+          <requirements>&gt;= 2.9.4</requirements>
+        </dependency>
         <dependency>
           <name>rubyforge</name>
           <requirements>&gt;= 2.0.4</requirements>
@@ -225,14 +261,14 @@
       </development>
     </dependencies>
     <name>ci_reporter</name>
-    <downloads type="integer">95813</downloads>
+    <downloads type="integer">109756</downloads>
     <info>CI::Reporter is an add-on to Test::Unit, RSpec and Cucumber that allows you to generate XML reports of your test, spec and/or feature runs. The resulting files can be read by a continuous integration system that understands Ant's JUnit report XML format, thus allowing your CI system to track test/spec successes and failures.</info>
-    <version-downloads type="integer">32014</version-downloads>
-    <version>1.6.4</version>
+    <version-downloads type="integer">2387</version-downloads>
+    <version>1.6.5</version>
     <homepage-uri>http://caldersphere.rubyforge.org/ci_reporter</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
     <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/ci_reporter-1.6.4.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/ci_reporter-1.6.5.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/ci_reporter</project-uri>
     <authors>Nick Sieger</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
@@ -243,6 +279,10 @@
     <dependencies>
       <runtime type="array">
         <dependency>
+          <name>mail</name>
+          <requirements>~&gt; 2.2</requirements>
+        </dependency>
+        <dependency>
           <name>rspec</name>
           <requirements>~&gt; 2.0</requirements>
         </dependency>
@@ -250,14 +290,14 @@
       <development type="array"/>
     </dependencies>
     <name>email_spec</name>
-    <downloads type="integer">94786</downloads>
+    <downloads type="integer">106798</downloads>
     <info>Easily test email in rspec and cucumber</info>
-    <version-downloads type="integer">17335</version-downloads>
-    <version>1.1.1</version>
+    <version-downloads type="integer">538</version-downloads>
+    <version>1.2.1</version>
     <homepage-uri>http://github.com/bmabey/email-spec/</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
     <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/email_spec-1.1.1.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/email_spec-1.2.1.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/email_spec</project-uri>
     <authors>Ben Mabey, Aaron Gibralter, Mischa Fierer</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
@@ -332,9 +372,9 @@
       </development>
     </dependencies>
     <name>pickle</name>
-    <downloads type="integer">87467</downloads>
+    <downloads type="integer">93373</downloads>
     <info>Easy model creation and reference in your cucumber features</info>
-    <version-downloads type="integer">7556</version-downloads>
+    <version-downloads type="integer">11003</version-downloads>
     <version>0.4.7</version>
     <homepage-uri>http://github.com/ianwhite/pickle</homepage-uri>
     <bug-tracker-uri>http://ianwhite.lighthouseapp.com/projects/25941-pickle</bug-tracker-uri>
@@ -365,9 +405,9 @@
       </development>
     </dependencies>
     <name>autotest-growl</name>
-    <downloads type="integer">70217</downloads>
+    <downloads type="integer">76044</downloads>
     <info>This gem aims to improve support for Growl notifications by autotest.</info>
-    <version-downloads type="integer">29503</version-downloads>
+    <version-downloads type="integer">34652</version-downloads>
     <version>0.2.9</version>
     <homepage-uri>http://www.bitcetera.com/products/autotest-growl</homepage-uri>
     <bug-tracker-uri>https://forge.bitcetera.com/projects/show/autotest-growl</bug-tracker-uri>
@@ -377,6 +417,35 @@
     <authors>Sven Schwyn</authors>
     <mailing-list-uri>https://forge.bitcetera.com/projects/autotest-growl/boards</mailing-list-uri>
     <documentation-uri>http://www.bitcetera.com/en/products/autotest-growl</documentation-uri>
+    <wiki-uri></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>capybara</name>
+          <requirements>&gt;= 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec-rails</name>
+          <requirements>&gt;= 2.5.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array"/>
+    </dependencies>
+    <name>steak</name>
+    <downloads type="integer">35457</downloads>
+    <info>Steak is a minimal extension of RSpec-Rails that adds several conveniences to do acceptance testing of Rails applications using Capybara. It's an alternative to Cucumber in plain Ruby.</info>
+    <version-downloads type="integer">502</version-downloads>
+    <version>2.0.0</version>
+    <homepage-uri>http://github.com/cavalle/steak</homepage-uri>
+    <bug-tracker-uri>http://github.com/cavalle/steak/issues</bug-tracker-uri>
+    <source-code-uri>http://github.com/cavalle/steak</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/steak-2.0.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/steak</project-uri>
+    <authors>Luismi Cavall&#233;</authors>
+    <mailing-list-uri>http://groups.google.com/group/steakrb</mailing-list-uri>
+    <documentation-uri>http://rdoc.info/projects/cavalle/steak</documentation-uri>
     <wiki-uri></wiki-uri>
   </rubygem>
   <rubygem>
@@ -462,9 +531,9 @@
       </development>
     </dependencies>
     <name>vcr</name>
-    <downloads type="integer">24824</downloads>
+    <downloads type="integer">28044</downloads>
     <info>VCR provides a simple API to record and replay your test suite's HTTP interactions.  It works with a variety of HTTP client libraries, HTTP stubbing libraries and testing frameworks.</info>
-    <version-downloads type="integer">537</version-downloads>
+    <version-downloads type="integer">2068</version-downloads>
     <version>1.10.0</version>
     <homepage-uri>http://github.com/myronmarston/vcr</homepage-uri>
     <bug-tracker-uri>https://github.com/myronmarston/vcr/issues</bug-tracker-uri>
@@ -480,119 +549,41 @@
     <dependencies>
       <runtime type="array">
         <dependency>
+          <name>bcat</name>
+          <requirements>&gt;= 0.6.1</requirements>
+        </dependency>
+        <dependency>
           <name>childprocess</name>
-          <requirements>&gt;= 0.1.7</requirements>
+          <requirements>&gt;= 0.1.9</requirements>
         </dependency>
         <dependency>
           <name>cucumber</name>
-          <requirements>&gt;= 0.10.0</requirements>
+          <requirements>&gt;= 0.10.7</requirements>
+        </dependency>
+        <dependency>
+          <name>rdiscount</name>
+          <requirements>&gt;= 1.6.8</requirements>
         </dependency>
         <dependency>
           <name>rspec</name>
-          <requirements>&gt;= 2.5.0</requirements>
+          <requirements>&gt;= 2.6.0</requirements>
         </dependency>
       </runtime>
       <development type="array"/>
     </dependencies>
     <name>aruba</name>
-    <downloads type="integer">15364</downloads>
+    <downloads type="integer">17344</downloads>
     <info>CLI Steps for Cucumber, hand-crafted for you in Aruba</info>
-    <version-downloads type="integer">929</version-downloads>
-    <version>0.3.6</version>
+    <version-downloads type="integer">142</version-downloads>
+    <version>0.4.2</version>
     <homepage-uri>http://github.com/aslakhellesoy/aruba</homepage-uri>
     <bug-tracker-uri>http://github.com/aslakhellesoy/aruba/issues</bug-tracker-uri>
     <source-code-uri>http://github.com/aslakhellesoy/aruba.git</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/aruba-0.3.6.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/aruba-0.4.2.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/aruba</project-uri>
     <authors>Aslak Helles&#248;y, David Chelimsky, Mike Sassak</authors>
     <mailing-list-uri>http://groups.google.com/group/cukes</mailing-list-uri>
     <documentation-uri>http://github.com/aslakhellesoy/aruba/blob/master/README.rdoc</documentation-uri>
-    <wiki-uri></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>dnssd</name>
-          <requirements>= 1.3.4</requirements>
-        </dependency>
-        <dependency>
-          <name>thor</name>
-          <requirements>&gt;= 0.14.0</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>cucumber</name>
-          <requirements>&gt;= 0.9.0</requirements>
-        </dependency>
-        <dependency>
-          <name>rr</name>
-          <requirements>&gt;= 0.10.11</requirements>
-        </dependency>
-        <dependency>
-          <name>rspec</name>
-          <requirements>&gt;= 2.5.0</requirements>
-        </dependency>
-        <dependency>
-          <name>yard</name>
-          <requirements>&gt;= 0.5.3</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>specjour</name>
-    <downloads type="integer">11806</downloads>
-    <info>    Specjour splits your RSpec suite across multiple machines, and multiple
-    cores per machine, to run super-parallel-fast!  Also works with Cucumber.
-</info>
-    <version-downloads type="integer">465</version-downloads>
-    <version>0.4.0</version>
-    <homepage-uri>https://github.com/sandro/specjour</homepage-uri>
-    <bug-tracker-uri nil="true"></bug-tracker-uri>
-    <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/specjour-0.4.0.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/specjour</project-uri>
-    <authors>Sandro Turriate</authors>
-    <mailing-list-uri nil="true"></mailing-list-uri>
-    <documentation-uri nil="true"></documentation-uri>
-    <wiki-uri nil="true"></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>gherkin</name>
-          <requirements>~&gt; 2.3</requirements>
-        </dependency>
-        <dependency>
-          <name>haml</name>
-          <requirements>&gt; 2.0</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>rake</name>
-          <requirements>&gt;= 0</requirements>
-        </dependency>
-        <dependency>
-          <name>rspec</name>
-          <requirements>~&gt; 2.5</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>stepdown</name>
-    <downloads type="integer">10964</downloads>
-    <info>Stepdown allows you to see where your most used Cucumber steps are, your unused steps and how they are clustered</info>
-    <version-downloads type="integer">20</version-downloads>
-    <version>0.5.0</version>
-    <homepage-uri>http://stepdown.lineonpoint.com</homepage-uri>
-    <bug-tracker-uri>https://github.com/seancaffery/step-down/issues</bug-tracker-uri>
-    <source-code-uri>https://github.com/seancaffery/step-down</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/stepdown-0.5.0.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/stepdown</project-uri>
-    <authors>Sean Caffery</authors>
-    <mailing-list-uri>http://groups.google.com/group/stepdowngem/topics</mailing-list-uri>
-    <documentation-uri>http://stepdown.lineonpoint.com</documentation-uri>
     <wiki-uri></wiki-uri>
   </rubygem>
   <rubygem>
@@ -627,9 +618,9 @@
       </development>
     </dependencies>
     <name>cuke4duke</name>
-    <downloads type="integer">11239</downloads>
+    <downloads type="integer">13615</downloads>
     <info>Write Cucumber Step Definitions in Java, Scala, Groovy, Rhino Javascript, Clojure or Ioke</info>
-    <version-downloads type="integer">157</version-downloads>
+    <version-downloads type="integer">566</version-downloads>
     <version>0.4.4</version>
     <homepage-uri>http://cukes.info</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
@@ -640,6 +631,96 @@
     <mailing-list-uri nil="true"></mailing-list-uri>
     <documentation-uri nil="true"></documentation-uri>
     <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>dnssd</name>
+          <requirements>= 1.3.4</requirements>
+        </dependency>
+        <dependency>
+          <name>thor</name>
+          <requirements>&gt;= 0.14.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>cucumber</name>
+          <requirements>&gt;= 0.9.0</requirements>
+        </dependency>
+        <dependency>
+          <name>rr</name>
+          <requirements>&gt;= 0.10.11</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>&gt;= 2.5.0</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>&gt;= 0.5.3</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>specjour</name>
+    <downloads type="integer">12456</downloads>
+    <info>    Specjour splits your RSpec suite across multiple machines, and multiple
+    cores per machine, to run super-parallel-fast!  Also works with Cucumber.
+</info>
+    <version-downloads type="integer">53</version-downloads>
+    <version>0.4.1</version>
+    <homepage-uri>https://github.com/sandro/specjour</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/specjour-0.4.1.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/specjour</project-uri>
+    <authors>Sandro Turriate</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>gherkin</name>
+          <requirements>~&gt; 2.3</requirements>
+        </dependency>
+        <dependency>
+          <name>haml</name>
+          <requirements>&gt; 2.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>rake</name>
+          <requirements>&gt;= 0</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.5.0</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>stepdown</name>
+    <downloads type="integer">11095</downloads>
+    <info>Stepdown allows you to see where your most used Cucumber steps are, your unused steps and how they are clustered</info>
+    <version-downloads type="integer">14</version-downloads>
+    <version>0.6.1</version>
+    <homepage-uri>http://stepdown.lineonpoint.com</homepage-uri>
+    <bug-tracker-uri>https://github.com/seancaffery/step-down/issues</bug-tracker-uri>
+    <source-code-uri>https://github.com/seancaffery/step-down</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/stepdown-0.6.1.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/stepdown</project-uri>
+    <authors>Sean Caffery</authors>
+    <mailing-list-uri>http://groups.google.com/group/stepdowngem/topics</mailing-list-uri>
+    <documentation-uri>http://stepdown.lineonpoint.com</documentation-uri>
+    <wiki-uri></wiki-uri>
   </rubygem>
   <rubygem>
     <dependencies>
@@ -685,14 +766,14 @@
       </development>
     </dependencies>
     <name>cucumber-nagios</name>
-    <downloads type="integer">10124</downloads>
+    <downloads type="integer">11001</downloads>
     <info>cucumber-nagios helps you write behavioural tests for your systems and infrastructure, that can be plugged into Nagios.</info>
-    <version-downloads type="integer">376</version-downloads>
-    <version>0.9.0</version>
+    <version-downloads type="integer">208</version-downloads>
+    <version>0.9.2</version>
     <homepage-uri>http://cucumber-nagios.org/</homepage-uri>
     <bug-tracker-uri>http://github.com/auxesis/cucumber-nagios/issues</bug-tracker-uri>
     <source-code-uri>http://github.com/auxesis/cucumber-nagios</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-nagios-0.9.0.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber-nagios-0.9.2.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/cucumber-nagios</project-uri>
     <authors>Lindsay Holmwood</authors>
     <mailing-list-uri></mailing-list-uri>
@@ -704,20 +785,20 @@
       <runtime type="array">
         <dependency>
           <name>nokogiri</name>
-          <requirements>&gt;= 1.4.4</requirements>
+          <requirements>&gt;= 1.4.1</requirements>
         </dependency>
       </runtime>
       <development type="array"/>
     </dependencies>
     <name>cuporter</name>
-    <downloads type="integer">7043</downloads>
+    <downloads type="integer">7445</downloads>
     <info>Scrapes Cucumber *.feature files to build reports on tag usage and test inventory</info>
-    <version-downloads type="integer">28</version-downloads>
-    <version>0.3.6</version>
+    <version-downloads type="integer">33</version-downloads>
+    <version>0.3.9</version>
     <homepage-uri>http://github.com/twcamper/cuporter</homepage-uri>
     <bug-tracker-uri></bug-tracker-uri>
     <source-code-uri></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cuporter-0.3.6.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/cuporter-0.3.9.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/cuporter</project-uri>
     <authors>Tim Camper</authors>
     <mailing-list-uri></mailing-list-uri>
@@ -730,9 +811,9 @@
       <development type="array"/>
     </dependencies>
     <name>coulda</name>
-    <downloads type="integer">6922</downloads>
+    <downloads type="integer">7463</downloads>
     <info>Behaviour Driven Development derived from Cucumber but as an internal DSL with methods for reuse</info>
-    <version-downloads type="integer">598</version-downloads>
+    <version-downloads type="integer">808</version-downloads>
     <version>0.6.3</version>
     <homepage-uri>http://coulda.tiggerpalace.com</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
@@ -740,6 +821,48 @@
     <gem-uri>http://rubygems.org/gems/coulda-0.6.3.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/coulda</project-uri>
     <authors>Evan David Light</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>cucumber</name>
+          <requirements>&gt;= 0.10</requirements>
+        </dependency>
+        <dependency>
+          <name>guard</name>
+          <requirements>&gt;= 0.4.0</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0</requirements>
+        </dependency>
+        <dependency>
+          <name>guard-rspec</name>
+          <requirements>~&gt; 0.4</requirements>
+        </dependency>
+        <dependency>
+          <name>rspec</name>
+          <requirements>~&gt; 2.6</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>guard-cucumber</name>
+    <downloads type="integer">6836</downloads>
+    <info>Guard::Cucumber automatically run your features (much like autotest)</info>
+    <version-downloads type="integer">615</version-downloads>
+    <version>0.5.0</version>
+    <homepage-uri>http://github.com/netzpirat/guard-cucumber</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/guard-cucumber-0.5.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/guard-cucumber</project-uri>
+    <authors>Michael Kessler</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
     <documentation-uri nil="true"></documentation-uri>
     <wiki-uri nil="true"></wiki-uri>
@@ -755,9 +878,9 @@
       </development>
     </dependencies>
     <name>rspactor</name>
-    <downloads type="integer">6142</downloads>
+    <downloads type="integer">6507</downloads>
     <info>RSpactor is a command line tool to automatically run your changed specs &amp; cucumber features (much like autotest).</info>
-    <version-downloads type="integer">1319</version-downloads>
+    <version-downloads type="integer">1391</version-downloads>
     <version>0.6.4</version>
     <homepage-uri>http://github.com/thibaudgg/rspactor</homepage-uri>
     <bug-tracker-uri>http://github.com/thibaudgg/rspactor/issues</bug-tracker-uri>
@@ -817,9 +940,9 @@
       </development>
     </dependencies>
     <name>branston</name>
-    <downloads type="integer">6042</downloads>
+    <downloads type="integer">6399</downloads>
     <info>An agile user story tracker that generates gherkin files and step definitions for use with the cucumber testing framework.</info>
-    <version-downloads type="integer">29</version-downloads>
+    <version-downloads type="integer">40</version-downloads>
     <version>0.6.6</version>
     <homepage-uri>http://github.com/futurechimp/branston</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
@@ -851,9 +974,9 @@
       </development>
     </dependencies>
     <name>pickler</name>
-    <downloads type="integer">6259</downloads>
+    <downloads type="integer">6561</downloads>
     <info>Synchronize between Cucumber and Pivotal Tracker</info>
-    <version-downloads type="integer">1277</version-downloads>
+    <version-downloads type="integer">1513</version-downloads>
     <version>0.2.0</version>
     <homepage-uri>http://github.com/tpope/pickler</homepage-uri>
     <bug-tracker-uri>http://github.com/tpope/pickler/issues</bug-tracker-uri>
@@ -871,14 +994,14 @@
       <development type="array"/>
     </dependencies>
     <name>cucumber_factory</name>
-    <downloads type="integer">5798</downloads>
+    <downloads type="integer">6262</downloads>
     <info>Cucumber Factory allows you to create ActiveRecord models from your Cucumber features without writing step definitions for each model.</info>
-    <version-downloads type="integer">928</version-downloads>
-    <version>1.7.4</version>
+    <version-downloads type="integer">59</version-downloads>
+    <version>1.8.0</version>
     <homepage-uri>http://github.com/makandra/cucumber_factory</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
     <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber_factory-1.7.4.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber_factory-1.8.0.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/cucumber_factory</project-uri>
     <authors>Henning Koch</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
@@ -931,6 +1054,14 @@
           <requirements>&gt;= 0</requirements>
         </dependency>
         <dependency>
+          <name>guard</name>
+          <requirements>&gt;= 0</requirements>
+        </dependency>
+        <dependency>
+          <name>guard-test</name>
+          <requirements>&gt;= 0</requirements>
+        </dependency>
+        <dependency>
           <name>rack-test</name>
           <requirements>&gt;= 0</requirements>
         </dependency>
@@ -949,19 +1080,56 @@
       </development>
     </dependencies>
     <name>testbot</name>
-    <downloads type="integer">5364</downloads>
+    <downloads type="integer">5832</downloads>
     <info>Testbot is a test distribution tool that works with Rails, RSpec, RSpec2, Test::Unit and Cucumber.</info>
-    <version-downloads type="integer">96</version-downloads>
-    <version>0.5.6</version>
+    <version-downloads type="integer">20</version-downloads>
+    <version>0.5.7</version>
     <homepage-uri>http://github.com/joakimk/testbot</homepage-uri>
     <bug-tracker-uri>https://github.com/joakimk/testbot/issues</bug-tracker-uri>
     <source-code-uri>https://github.com/joakimk/testbot</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/testbot-0.5.6.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/testbot-0.5.7.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/testbot</project-uri>
     <authors>Joakim Kolsj&#246;</authors>
     <mailing-list-uri></mailing-list-uri>
     <documentation-uri>https://github.com/joakimk/testbot</documentation-uri>
     <wiki-uri>https://github.com/joakimk/testbot/wiki</wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>cucumber</name>
+          <requirements>&gt;= 0.7.5</requirements>
+        </dependency>
+        <dependency>
+          <name>gherkin</name>
+          <requirements>&gt;= 2.2.9</requirements>
+        </dependency>
+        <dependency>
+          <name>yard</name>
+          <requirements>&gt;= 0.6.3</requirements>
+        </dependency>
+      </runtime>
+      <development type="array"/>
+    </dependencies>
+    <name>cucumber-in-the-yard</name>
+    <downloads type="integer">5373</downloads>
+    <info> 
+    Cucumber-In-The-Yard is a YARD extension that processes Cucumber Features, Scenarios, Steps,
+    Step Definitions, Transforms, and Tags and provides a documentation interface that allows you
+    easily view and investigate the test suite.  This tools hopes to bridge the gap of being able
+    to provide your feature descriptions to your Product Owners and Stakeholders.  </info>
+    <version-downloads type="integer">381</version-downloads>
+    <version>1.7.8</version>
+    <homepage-uri>http://github.com/burtlo/Cucumber-In-The-Yard</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber-in-the-yard-1.7.8.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/cucumber-in-the-yard</project-uri>
+    <authors>Franklin Webber</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
   </rubygem>
   <rubygem>
     <dependencies>
@@ -986,9 +1154,9 @@
       <development type="array"/>
     </dependencies>
     <name>iCuke</name>
-    <downloads type="integer">5177</downloads>
+    <downloads type="integer">5507</downloads>
     <info>Cucumber support for iPhone applications</info>
-    <version-downloads type="integer">787</version-downloads>
+    <version-downloads type="integer">837</version-downloads>
     <version>0.6.3</version>
     <homepage-uri>http://github.com/unboxed/iCuke</homepage-uri>
     <bug-tracker-uri></bug-tracker-uri>
@@ -999,43 +1167,6 @@
     <mailing-list-uri></mailing-list-uri>
     <documentation-uri></documentation-uri>
     <wiki-uri>http://wiki.github.com/unboxed/icuke</wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>cucumber</name>
-          <requirements>&gt;= 0.7.5</requirements>
-        </dependency>
-        <dependency>
-          <name>gherkin</name>
-          <requirements>&gt;= 2.2.9</requirements>
-        </dependency>
-        <dependency>
-          <name>yard</name>
-          <requirements>&gt;= 0.6.3</requirements>
-        </dependency>
-      </runtime>
-      <development type="array"/>
-    </dependencies>
-    <name>cucumber-in-the-yard</name>
-    <downloads type="integer">4949</downloads>
-    <info> 
-    Cucumber-In-The-Yard is a YARD extension that processes Cucumber Features, Scenarios, Steps,
-    Step Definitions, Transforms, and Tags and provides a documentation interface that allows you
-    easily view and investigate the test suite.  This tools hopes to bridge the gap of being able
-    to provide your feature descriptions to your Product Owners and Stakeholders.  </info>
-    <version-downloads type="integer">325</version-downloads>
-    <version>1.7.8</version>
-    <homepage-uri>http://github.com/burtlo/Cucumber-In-The-Yard</homepage-uri>
-    <bug-tracker-uri nil="true"></bug-tracker-uri>
-    <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-in-the-yard-1.7.8.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/cucumber-in-the-yard</project-uri>
-    <authors>Franklin Webber</authors>
-    <mailing-list-uri nil="true"></mailing-list-uri>
-    <documentation-uri nil="true"></documentation-uri>
-    <wiki-uri nil="true"></wiki-uri>
   </rubygem>
   <rubygem>
     <dependencies>
@@ -1065,9 +1196,9 @@
       </development>
     </dependencies>
     <name>sandwich</name>
-    <downloads type="integer">4892</downloads>
+    <downloads type="integer">5113</downloads>
     <info>Yup, cucumber helpers</info>
-    <version-downloads type="integer">381</version-downloads>
+    <version-downloads type="integer">397</version-downloads>
     <version>0.0.20</version>
     <homepage-uri>http://github.com/david/sandwich</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
@@ -1075,124 +1206,6 @@
     <gem-uri>http://rubygems.org/gems/sandwich-0.0.20.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/sandwich</project-uri>
     <authors>David Leal</authors>
-    <mailing-list-uri nil="true"></mailing-list-uri>
-    <documentation-uri nil="true"></documentation-uri>
-    <wiki-uri nil="true"></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>rake</name>
-          <requirements>~&gt; 0.8.7</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>bundler</name>
-          <requirements>~&gt; 1.0.0</requirements>
-        </dependency>
-        <dependency>
-          <name>cucumber</name>
-          <requirements>~&gt; 0.6.4</requirements>
-        </dependency>
-        <dependency>
-          <name>ronn</name>
-          <requirements>~&gt; 0.5</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>shoe</name>
-    <downloads type="integer">4458</downloads>
-    <info>Configuration-free Rake tasks that read your gemspec. These tasks re-use built-in Rubygems functionality so you can be confident you're shipping what you think you are.</info>
-    <version-downloads type="integer">66</version-downloads>
-    <version>0.8.0</version>
-    <homepage-uri>http://github.com/matthewtodd/shoe</homepage-uri>
-    <bug-tracker-uri></bug-tracker-uri>
-    <source-code-uri>http://github.com/matthewtodd/shoe</source-code-uri>
-    <gem-uri>http://rubygems.org/gems/shoe-0.8.0.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/shoe</project-uri>
-    <authors>Matthew Todd</authors>
-    <mailing-list-uri></mailing-list-uri>
-    <documentation-uri>http://rubydoc.info/gems/shoe/frames</documentation-uri>
-    <wiki-uri></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>cucumber</name>
-          <requirements>~&gt; 0.10.0</requirements>
-        </dependency>
-        <dependency>
-          <name>guard</name>
-          <requirements>~&gt; 0.3.0</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>bundler</name>
-          <requirements>~&gt; 1.0.10</requirements>
-        </dependency>
-        <dependency>
-          <name>guard-rspec</name>
-          <requirements>~&gt; 0.3.1</requirements>
-        </dependency>
-        <dependency>
-          <name>rspec</name>
-          <requirements>~&gt; 2.5.0</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>guard-cucumber</name>
-    <downloads type="integer">4334</downloads>
-    <info>Guard::Cucumber automatically run your features (much like autotest)</info>
-    <version-downloads type="integer">369</version-downloads>
-    <version>0.3.2</version>
-    <homepage-uri>http://github.com/netzpirat/guard-cucumber</homepage-uri>
-    <bug-tracker-uri nil="true"></bug-tracker-uri>
-    <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/guard-cucumber-0.3.2.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/guard-cucumber</project-uri>
-    <authors>Michael Kessler</authors>
-    <mailing-list-uri nil="true"></mailing-list-uri>
-    <documentation-uri nil="true"></documentation-uri>
-    <wiki-uri nil="true"></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>background_process</name>
-          <requirements>&gt;= 0</requirements>
-        </dependency>
-        <dependency>
-          <name>builder</name>
-          <requirements>&gt;= 2.0.0</requirements>
-        </dependency>
-        <dependency>
-          <name>cucumber</name>
-          <requirements>&gt;= 0.9.3</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>rspec</name>
-          <requirements>&gt;= 2.0.0</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>aruba-jbb</name>
-    <downloads type="integer">4208</downloads>
-    <info>Fork of Aruba, Cucumber steps for testing CLI applications.</info>
-    <version-downloads type="integer">62</version-downloads>
-    <version>0.2.6.14</version>
-    <homepage-uri>http://github.com/byrnejb/aruba</homepage-uri>
-    <bug-tracker-uri nil="true"></bug-tracker-uri>
-    <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/aruba-jbb-0.2.6.14.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/aruba-jbb</project-uri>
-    <authors>Aslak Helles&#248;y, David Chelimsky, James B. Byrne, Mike Sassak</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
     <documentation-uri nil="true"></documentation-uri>
     <wiki-uri nil="true"></wiki-uri>
@@ -1229,16 +1242,92 @@
       </development>
     </dependencies>
     <name>fuubar-cucumber</name>
-    <downloads type="integer">4024</downloads>
+    <downloads type="integer">4746</downloads>
     <info>the instafailing Cucumber progress bar formatter</info>
-    <version-downloads type="integer">2339</version-downloads>
-    <version>0.0.9</version>
+    <version-downloads type="integer">314</version-downloads>
+    <version>0.0.10</version>
     <homepage-uri>http://github.com/martinciu/fuubar-cucumber</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
     <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/fuubar-cucumber-0.0.9.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/fuubar-cucumber-0.0.10.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/fuubar-cucumber</project-uri>
     <authors>Marcin Ciunelis</authors>
+    <mailing-list-uri nil="true"></mailing-list-uri>
+    <documentation-uri nil="true"></documentation-uri>
+    <wiki-uri nil="true"></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>rake</name>
+          <requirements>~&gt; 0.8.7</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>bundler</name>
+          <requirements>~&gt; 1.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>cucumber</name>
+          <requirements>~&gt; 0.6.4</requirements>
+        </dependency>
+        <dependency>
+          <name>ronn</name>
+          <requirements>~&gt; 0.5</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>shoe</name>
+    <downloads type="integer">4648</downloads>
+    <info>Configuration-free Rake tasks that read your gemspec. These tasks re-use built-in Rubygems functionality so you can be confident you're shipping what you think you are.</info>
+    <version-downloads type="integer">77</version-downloads>
+    <version>0.8.0</version>
+    <homepage-uri>http://github.com/matthewtodd/shoe</homepage-uri>
+    <bug-tracker-uri></bug-tracker-uri>
+    <source-code-uri>http://github.com/matthewtodd/shoe</source-code-uri>
+    <gem-uri>http://rubygems.org/gems/shoe-0.8.0.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/shoe</project-uri>
+    <authors>Matthew Todd</authors>
+    <mailing-list-uri></mailing-list-uri>
+    <documentation-uri>http://rubydoc.info/gems/shoe/frames</documentation-uri>
+    <wiki-uri></wiki-uri>
+  </rubygem>
+  <rubygem>
+    <dependencies>
+      <runtime type="array">
+        <dependency>
+          <name>background_process</name>
+          <requirements>&gt;= 0</requirements>
+        </dependency>
+        <dependency>
+          <name>builder</name>
+          <requirements>&gt;= 2.0.0</requirements>
+        </dependency>
+        <dependency>
+          <name>cucumber</name>
+          <requirements>&gt;= 0.10.3</requirements>
+        </dependency>
+      </runtime>
+      <development type="array">
+        <dependency>
+          <name>rspec</name>
+          <requirements>&gt;= 2.0.0</requirements>
+        </dependency>
+      </development>
+    </dependencies>
+    <name>aruba-jbb</name>
+    <downloads type="integer">4563</downloads>
+    <info>Fork of Aruba, Cucumber steps for testing CLI applications.</info>
+    <version-downloads type="integer">24</version-downloads>
+    <version>0.2.7.01</version>
+    <homepage-uri>http://github.com/byrnejb/aruba</homepage-uri>
+    <bug-tracker-uri nil="true"></bug-tracker-uri>
+    <source-code-uri nil="true"></source-code-uri>
+    <gem-uri>http://rubygems.org/gems/aruba-jbb-0.2.7.01.gem</gem-uri>
+    <project-uri>http://rubygems.org/gems/aruba-jbb</project-uri>
+    <authors>Aslak Helles&#248;y, David Chelimsky, James B. Byrne, Mike Sassak</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
     <documentation-uri nil="true"></documentation-uri>
     <wiki-uri nil="true"></wiki-uri>
@@ -1266,9 +1355,9 @@
       <development type="array"/>
     </dependencies>
     <name>cuke4nuke</name>
-    <downloads type="integer">3917</downloads>
+    <downloads type="integer">4098</downloads>
     <info>Runs Cucumber with .NET step definitions.</info>
-    <version-downloads type="integer">617</version-downloads>
+    <version-downloads type="integer">671</version-downloads>
     <version>0.4.0</version>
     <homepage-uri>http://github.com/richardlawrence/Cuke4Nuke</homepage-uri>
     <bug-tracker-uri>http://github.com/richardlawrence/Cuke4Nuke/issues</bug-tracker-uri>
@@ -1291,50 +1380,16 @@
       <development type="array"/>
     </dependencies>
     <name>cucumber-sinatra</name>
-    <downloads type="integer">3395</downloads>
+    <downloads type="integer">3635</downloads>
     <info>This little gem will help you to initialize a cucumber environment for a sinatra application. It will generate the required files from templates.</info>
-    <version-downloads type="integer">188</version-downloads>
-    <version>0.3.1</version>
+    <version-downloads type="integer">13</version-downloads>
+    <version>0.4.0</version>
     <homepage-uri>http://github.com/bernd/cucumber-sinatra</homepage-uri>
     <bug-tracker-uri nil="true"></bug-tracker-uri>
     <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-sinatra-0.3.1.gem</gem-uri>
+    <gem-uri>http://rubygems.org/gems/cucumber-sinatra-0.4.0.gem</gem-uri>
     <project-uri>http://rubygems.org/gems/cucumber-sinatra</project-uri>
     <authors>Bernd Ahlers</authors>
-    <mailing-list-uri nil="true"></mailing-list-uri>
-    <documentation-uri nil="true"></documentation-uri>
-    <wiki-uri nil="true"></wiki-uri>
-  </rubygem>
-  <rubygem>
-    <dependencies>
-      <runtime type="array">
-        <dependency>
-          <name>cucumber</name>
-          <requirements>~&gt; 0.9</requirements>
-        </dependency>
-        <dependency>
-          <name>webrat</name>
-          <requirements>~&gt; 0.7</requirements>
-        </dependency>
-      </runtime>
-      <development type="array">
-        <dependency>
-          <name>rspec</name>
-          <requirements>~&gt; 1.3</requirements>
-        </dependency>
-      </development>
-    </dependencies>
-    <name>cucumber-screenshot</name>
-    <downloads type="integer">3359</downloads>
-    <info>Extension for Cucumber (http://cukes.info/) that makes it easy to take HTML snapshots and also to use Webkit to capture PNG screenshots of your web application during tests</info>
-    <version-downloads type="integer">566</version-downloads>
-    <version>0.3.4</version>
-    <homepage-uri>http://github.com/mocoso/cucumber-screenshot</homepage-uri>
-    <bug-tracker-uri nil="true"></bug-tracker-uri>
-    <source-code-uri nil="true"></source-code-uri>
-    <gem-uri>http://rubygems.org/gems/cucumber-screenshot-0.3.4.gem</gem-uri>
-    <project-uri>http://rubygems.org/gems/cucumber-screenshot</project-uri>
-    <authors>Joel Chippindale</authors>
     <mailing-list-uri nil="true"></mailing-list-uri>
     <documentation-uri nil="true"></documentation-uri>
     <wiki-uri nil="true"></wiki-uri>

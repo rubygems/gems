@@ -2,10 +2,11 @@ require 'faraday_middleware'
 
 module Gems
   module Connection
-    private
-
-    def connection(format=:json)
+    def connection(format=format)
       options = {
+        :headers => {
+          'User-Agent' => user_agent,
+        },
         :ssl => {:verify => false},
         :url => 'https://rubygems.org',
       }
@@ -14,9 +15,14 @@ module Gems
         connection.use Faraday::Request::UrlEncoded
         connection.use Faraday::Response::RaiseError
         connection.use Faraday::Response::Mashify
-        connection.use Faraday::Response::ParseXml if :xml == format
-        connection.use Faraday::Response::ParseJson if :json == format
-        connection.use Faraday::Response::ParseMarshal if :marshal == format
+        case format.to_sym
+        when :json
+          connection.use Faraday::Response::ParseJson
+        when :marshal
+          connection.use Faraday::Response::ParseMarshal
+        when :xml
+          connection.use Faraday::Response::ParseXml
+        end
         connection.adapter Faraday.default_adapter
       end
     end
