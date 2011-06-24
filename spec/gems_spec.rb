@@ -27,4 +27,41 @@ describe Gems do
       Gems.new.should be_a Gems::Client
     end
   end
+
+  describe ".format" do
+    it "should return the default format" do
+      Gems.format.should == Gems::Configuration::DEFAULT_FORMAT
+    end
+  end
+
+  describe ".format=" do
+    it "should set the format" do
+      Gems.format = 'xml'
+      Gems.format.should == 'xml'
+    end
+  end
+
+  describe ".user_agent" do
+    it "should return the default user agent" do
+      Gems.user_agent.should == Gems::Configuration::DEFAULT_USER_AGENT
+    end
+  end
+
+  describe ".user_agent=" do
+    it "should set the user_agent" do
+      Gems.user_agent = 'Custom User Agent'
+      Gems.user_agent.should == 'Custom User Agent'
+    end
+  end
+
+  describe ".configure" do
+    Gems::Configuration::VALID_OPTIONS_KEYS.each do |key|
+      it "should set the #{key}" do
+        Gems.configure do |config|
+          config.send("#{key}=", key)
+          Gems.send(key).should == key
+        end
+      end
+    end
+  end
 end
