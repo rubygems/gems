@@ -5,7 +5,7 @@ module Gems
     def connection(format=format)
       options = {
         :headers => {
-          'User-Agent' => user_agent,
+          :user_agent => user_agent,
         },
         :ssl => {:verify => false},
         :url => 'https://rubygems.org',
