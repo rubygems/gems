@@ -45,7 +45,7 @@ Usage Examples
     Gems.api_key
 
     # The following methods require authentication
-    Gems.configure do |config| [TODO]
+    Gems.configure do |config|
       config.key '701243f217cdf23b1370c7b66b65ca97'
     end
 

@@ -11,6 +11,8 @@ module Gems
         :url => 'https://rubygems.org',
       }
 
+      options[:headers].merge!({:authorization => key}) if key
+
       connection = Faraday.new(options) do |connection|
         connection.use Faraday::Request::UrlEncoded
         connection.use Faraday::Response::Mashify
