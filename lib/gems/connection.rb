@@ -11,9 +11,8 @@ module Gems
         :url => 'https://rubygems.org',
       }
 
-      Faraday.new(options) do |connection|
+      connection = Faraday.new(options) do |connection|
         connection.use Faraday::Request::UrlEncoded
-        connection.use Faraday::Response::RaiseError
         connection.use Faraday::Response::Mashify
         case format.to_s.downcase
         when 'json'
@@ -23,8 +22,11 @@ module Gems
         when 'xml'
           connection.use Faraday::Response::ParseXml
         end
+        connection.use Faraday::Response::RaiseError
         connection.adapter Faraday.default_adapter
       end
+      connection.basic_auth username, password if username && password
+      connection
     end
   end
 end

@@ -37,8 +37,8 @@ Usage Examples
     # The following method requires password authentication
     Gems.configure do |config|
       config.format = :xml
-      config.username = 'nick@gemcutter.org' [TODO]
-      config.password = 'schwwwwing' [TODO]
+      config.username = 'nick@gemcutter.org'
+      config.password = 'schwwwwing'
     end
 
     # Retrieve your API key using HTTP basic auth

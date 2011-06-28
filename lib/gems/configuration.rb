@@ -5,7 +5,9 @@ module Gems
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = [
       :format,
+      :password,
       :user_agent,
+      :username,
     ]
 
     # The response format appended to the path if none is set
@@ -38,7 +40,9 @@ module Gems
     # Reset all configuration options to defaults
     def reset
       self.format     = DEFAULT_FORMAT
+      self.password   = nil
       self.user_agent = DEFAULT_USER_AGENT
+      self.username   = nil
       self
     end
   end
