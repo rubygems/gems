@@ -50,7 +50,7 @@ Usage Examples
     end
 
     # List all gems that you own
-    puts Gems.gems [TODO]
+    puts Gems.gems
 
     # View all owners of a gem that you own
     puts Gems.owners 'gemcutter' [TODO]

@@ -80,5 +80,18 @@ module Gems
     def api_key
       get('/api/v1/api_key', {}, :raw)
     end
+
+    # List all gems that you own
+    #
+    # @return [Array]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.gems
+    def gems
+      response = get("/api/v1/gems")
+      format.to_s.downcase == 'xml' ? response['rubygems'] : response
+    end
   end
 end

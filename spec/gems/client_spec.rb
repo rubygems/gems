@@ -5,7 +5,8 @@ describe Gems::Client do
     context ".new(:format => '#{format}')" do
       before do
         Gems.configure do |config|
-          config.format = format
+          config.format   = format
+          config.key      = '701243f217cdf23b1370c7b66b65ca97'
           config.username = 'nick@gemcutter.org'
           config.password = 'schwwwwing'
         end
@@ -100,6 +101,20 @@ describe Gems::Client do
           a_get("/api/v1/api_key").
             should have_been_made
           api_key.should == "701243f217cdf23b1370c7b66b65ca97"
+        end
+      end
+
+      describe ".gems" do
+        before do
+          stub_get("/api/v1/gems.#{format}").
+            to_return(:body => fixture("gems.#{format}"))
+        end
+
+        it "should list all gems that you own" do
+          gems = Gems.gems
+          a_get("/api/v1/gems.#{format}").
+            should have_been_made
+          gems.first.name.should == "congress"
         end
       end
     end
