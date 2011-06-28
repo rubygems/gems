@@ -18,48 +18,44 @@ module Gems
     # Returns some basic information about the given gem
     #
     # @param gem [String] The name of a gem.
-    # @param options [Hash] A customizable set of options.
     # @return [Hashie::Mash]
     # @example
     #   Gems.info 'rails'
-    def info(gem, options={})
-      response = get("/api/v1/gems/#{gem}", options)
+    def info(gem)
+      response = get("/api/v1/gems/#{gem}")
       format.to_s.downcase == 'xml' ? response['rubygem'] : response
     end
 
     # Returns an array of active gems that match the query
     #
     # @param query [String] A term to search for.
-    # @param options [Hash] A customizable set of options.
     # @return [Array<Hashie::Mash>]
     # @example
     #   Gems.search 'cucumber'
-    def search(query, options={})
-      response = get("/api/v1/search", options.merge(:query => query))
+    def search(query)
+      response = get("/api/v1/search", {:query => query})
       format.to_s.downcase == 'xml' ? response['rubygems'] : response
     end
 
     # Returns an array of gem version details
     #
     # @param gem [String] The name of a gem.
-    # @param options [Hash] A customizable set of options.
     # @return [Hashie::Mash]
     # @example
     #   Gems.versions 'coulda'
-    def versions(gem, options={})
-      get("/api/v1/versions/#{gem}", options, :json)
+    def versions(gem)
+      get("/api/v1/versions/#{gem}", {}, :json)
     end
 
     # Returns the number of downloads by day for a particular gem version
     #
     # @param gem [String] The name of a gem.
     # @param version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
     # @return [Hashie::Mash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3'
-    def downloads(gem, version, options={})
-      get("/api/v1/versions/#{gem}-#{version}/downloads", options, :json)
+    def downloads(gem, version)
+      get("/api/v1/versions/#{gem}-#{version}/downloads", {}, :json)
     end
 
     # Returns an array of hashes for all versions of given gems
@@ -69,7 +65,20 @@ module Gems
     # @example
     #   Gems.dependencies 'rails', 'thor'
     def dependencies(*gems)
-      get("/api/v1/dependencies", {:gems => gems.join(',')}, :marshal)
+      get('/api/v1/dependencies', {:gems => gems.join(',')}, :marshal)
+    end
+
+    # Retrieve your API key using HTTP basic auth
+    #
+    # @return String
+    # @example
+    #   Gems.configure do |config|
+    #     config.username = 'nick@gemcutter.org'
+    #     config.password = 'schwwwwing'
+    #   end
+    #   Gems.api_key
+    def api_key
+      get('/api/v1/api_key', {}, :raw)
     end
   end
 end

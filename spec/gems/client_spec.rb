@@ -4,7 +4,15 @@ describe Gems::Client do
   %w(json xml).each do |format|
     context ".new(:format => '#{format}')" do
       before do
-        @client = Gems::Client.new(:format => format)
+        Gems.configure do |config|
+          config.format = format
+          config.username = 'nick@gemcutter.org'
+          config.password = 'schwwwwing'
+        end
+      end
+
+      after do
+        Gems.reset
       end
 
       describe ".info" do
@@ -14,7 +22,7 @@ describe Gems::Client do
         end
 
         it "should return some basic information about the given gem" do
-          info = @client.info 'rails'
+          info = Gems.info 'rails'
           a_get("/api/v1/gems/rails.#{format}").
             should have_been_made
           info.name.should == 'rails'
@@ -29,7 +37,7 @@ describe Gems::Client do
         end
 
         it "should return an array of active gems that match the query" do
-          search = @client.search 'cucumber'
+          search = Gems.search 'cucumber'
           a_get("/api/v1/search.#{format}").
             with(:query => {"query" => "cucumber"}).
             should have_been_made
@@ -44,7 +52,7 @@ describe Gems::Client do
         end
 
         it "should return an array of gem version details" do
-          versions = @client.versions 'coulda'
+          versions = Gems.versions 'coulda'
           a_get("/api/v1/versions/coulda.json").
             should have_been_made
           versions.first.number.should == '0.6.3'
@@ -58,7 +66,7 @@ describe Gems::Client do
         end
 
         it "should return the number of downloads by day for a particular gem version" do
-          downloads = @client.downloads 'coulda', '0.6.3'
+          downloads = Gems.downloads 'coulda', '0.6.3'
           a_get("/api/v1/versions/coulda-0.6.3/downloads.json").
             should have_been_made
           downloads["2011-06-22"].should == 8
@@ -73,11 +81,25 @@ describe Gems::Client do
         end
 
         it "should return an array of hashes for all versions of given gems" do
-          dependencies = @client.dependencies 'rails', 'thor'
+          dependencies = Gems.dependencies 'rails', 'thor'
           a_get("/api/v1/dependencies").
             with(:query => {"gems" => "rails,thor"}).
             should have_been_made
           dependencies.first.number.should == "3.0.9"
+        end
+      end
+
+      describe ".api_key" do
+        before do
+          stub_get("/api/v1/api_key").
+            to_return(:body => fixture("api_key"))
+        end
+
+        it "should retrieve an API key" do
+          api_key = Gems.api_key
+          a_get("/api/v1/api_key").
+            should have_been_made
+          api_key.should == "701243f217cdf23b1370c7b66b65ca97"
         end
       end
     end

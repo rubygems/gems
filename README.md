@@ -42,7 +42,7 @@ Usage Examples
     end
 
     # Retrieve your API key using HTTP basic auth
-    Gems.api_key [TODO]
+    Gems.api_key
 
     # The following methods require authentication
     Gems.configure do |config| [TODO]

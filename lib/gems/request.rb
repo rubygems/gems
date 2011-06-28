@@ -17,7 +17,7 @@ module Gems
       case format.to_s.downcase
       when 'json', 'xml'
         [path, format].compact.join('.')
-      when 'marshal'
+      when 'marshal', 'raw'
         path
       end
     end
