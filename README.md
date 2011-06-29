@@ -53,7 +53,7 @@ Usage Examples
     puts Gems.gems
 
     # View all owners of a gem that you own
-    puts Gems.owners 'gemcutter' [TODO]
+    puts Gems.owners 'gemcutter'
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
     puts Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]

@@ -93,5 +93,18 @@ module Gems
       response = get("/api/v1/gems")
       format.to_s.downcase == 'xml' ? response['rubygems'] : response
     end
+
+    # View all owners of a gem that you own
+    #
+    # @param gem [String] The name of a gem.
+    # @return [Array]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.owners('gemcutter')
+    def owners(gem)
+      get("/api/v1/gems/#{gem}/owners", {}, :json)
+    end
   end
 end

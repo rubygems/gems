@@ -117,6 +117,20 @@ describe Gems::Client do
           gems.first.name.should == "congress"
         end
       end
+
+      describe ".owners" do
+        before do
+          stub_get("/api/v1/gems/gems/owners.json").
+            to_return(:body => fixture("owners.json"))
+        end
+
+        it "should list all owners of a gem" do
+          owners = Gems.owners("gems")
+          a_get("/api/v1/gems/gems/owners.json").
+            should have_been_made
+          owners.first.email.should == "sferik@gmail.com"
+        end
+      end
     end
   end
 end
