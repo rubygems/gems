@@ -60,31 +60,31 @@ Usage Examples
     puts Gems.owners 'gemcutter'
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
-    puts Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
+    Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
 
     # Remove a user's permission to manage a RubyGem you own
-    puts Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
+    Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
 
     # List the webhooks registered under your account
     puts Gems.web_hooks
 
     # Add a webhook
-    puts Gems.add_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.add_web_hook 'rails', 'http://example.com' [TODO]
 
     # Remove a webhook
-    puts Gems.remove_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.remove_web_hook 'rails', 'http://example.com' [TODO]
 
     # Test fire a webhook.
-    puts Gems.fire_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.fire_web_hook 'rails', 'http://example.com' [TODO]
 
     # Submit a gem to RubyGems.org
-    puts Gems.push File.new 'gemcutter-0.2.1.gem' [TODO]
+    Gems.push File.new 'gemcutter-0.2.1.gem' [TODO]
 
     # Remove a gem from RubyGems.org's index
-    puts Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
+    Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
 
     # Update a previously yanked gem back into RubyGems.org's index
-    puts Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
+    Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
 
 Contributing
 ------------
