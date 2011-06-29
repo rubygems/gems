@@ -29,7 +29,12 @@ Usage Examples
     puts Gems.versions 'coulda'
 
     # Returns the number of downloads by day for a particular gem version
+    # for the past 90 days
     puts Gems.downloads 'coulda', '0.6.3'
+
+    # Returns the number of downloads by day for a particular gem version
+    # for the past year
+    puts Gems.downloads 'coulda', '0.6.3', Date.today - 365, Date.today
 
     # Returns an array of gem dependency details for all versions of given gems
     puts Gems.dependencies ['rails', 'thor']

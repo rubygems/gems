@@ -1,3 +1,4 @@
+require 'date'
 require 'gems/configuration'
 require 'gems/connection'
 require 'gems/request'
@@ -51,11 +52,17 @@ module Gems
     #
     # @param gem [String] The name of a gem.
     # @param version [String] The version of a gem.
+    # @param from [Date] Search start date.
+    # @param to [Date] Search end date.
     # @return [Hashie::Mash]
     # @example
-    #   Gems.downloads 'coulda', '0.6.3'
-    def downloads(gem, version)
-      get("/api/v1/versions/#{gem}-#{version}/downloads", {}, :json)
+    #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
+    def downloads(gem, version, from=nil, to=Date.today)
+      if from
+        get("/api/v1/versions/#{gem}-#{version}/downloads/search", {:from => from.to_s, :to => to.to_s}, :json)
+      else
+        get("/api/v1/versions/#{gem}-#{version}/downloads", {}, :json)
+      end
     end
 
     # Returns an array of hashes for all versions of given gems
