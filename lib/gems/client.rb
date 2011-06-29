@@ -106,5 +106,17 @@ module Gems
     def owners(gem)
       get("/api/v1/gems/#{gem}/owners", {}, :json)
     end
+
+    # List the webhooks registered under your account
+    #
+    # @return [Hashie::Mash]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.web_hooks
+    def web_hooks
+      get("/api/v1/web_hooks", {}, :json)
+    end
   end
 end

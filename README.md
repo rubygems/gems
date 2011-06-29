@@ -61,7 +61,7 @@ Usage Examples
     puts Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
 
     # List the webhooks registered under your account
-    puts Gems.web_hooks [TODO]
+    puts Gems.web_hooks
 
     # Add a webhook
     puts Gems.add_web_hook 'rails', 'http://example.com' [TODO]

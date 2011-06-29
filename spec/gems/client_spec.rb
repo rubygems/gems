@@ -131,6 +131,20 @@ describe Gems::Client do
           owners.first.email.should == "sferik@gmail.com"
         end
       end
+
+      describe ".web_hooks" do
+        before do
+          stub_get("/api/v1/web_hooks.json").
+            to_return(:body => fixture("web_hooks.json"))
+        end
+
+        it "should list the webhooks registered under your account" do
+          web_hooks = Gems.web_hooks
+          a_get("/api/v1/web_hooks.json").
+            should have_been_made
+          web_hooks.rails.first.url.should == "http://example.com"
+        end
+      end
     end
   end
 end
