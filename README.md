@@ -34,17 +34,16 @@ Usage Examples
     # Returns an array of gem dependency details for all versions of given gems
     puts Gems.dependencies ['rails', 'thor']
 
-    # The following method requires password authentication
+    # Retrieve your API key using HTTP basic authentication
     Gems.configure do |config|
-      config.format = :xml
       config.username = 'nick@gemcutter.org'
       config.password = 'schwwwwing'
     end
-
-    # Retrieve your API key using HTTP basic auth
     Gems.api_key
 
-    # The following methods require authentication
+    # You can also find your API key at https://rubygems.org/profile/edit
+    # We will attempt to load your API key from ~/.gem/credentails
+    # You may also specify a custom API key
     Gems.configure do |config|
       config.key '701243f217cdf23b1370c7b66b65ca97'
     end

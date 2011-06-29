@@ -1,4 +1,5 @@
 require 'gems/version'
+require 'yaml'
 
 module Gems
   module Configuration
@@ -15,6 +16,13 @@ module Gems
     #
     # @note JSON is preferred over XML because it is more concise and faster to parse.
     DEFAULT_FORMAT = :json
+
+    # Attempt to automatically load credentials
+    DEFAULT_KEY = begin
+      YAML.load(File.read(File.expand_path("~/.gem/credentials")))[:rubygems_api_key]
+    rescue Errno::ENOENT
+      nil
+    end
 
     # The value sent in the 'User-Agent' header if none is set
     DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}".freeze
@@ -41,7 +49,7 @@ module Gems
     # Reset all configuration options to defaults
     def reset
       self.format     = DEFAULT_FORMAT
-      self.key        = nil
+      self.key        = DEFAULT_KEY
       self.password   = nil
       self.user_agent = DEFAULT_USER_AGENT
       self.username   = nil
