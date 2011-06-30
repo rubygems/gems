@@ -6,12 +6,28 @@ require 'gems'
 require 'rspec'
 require 'webmock/rspec'
 
+def a_delete(path)
+  a_request(:delete, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
 def a_get(path)
   a_request(:get, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
 end
 
+def a_post(path)
+  a_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
+def stub_delete(path)
+  stub_request(:delete, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
 def stub_get(path)
   stub_request(:get, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
+def stub_post(path)
+  stub_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
 end
 
 def fixture_path

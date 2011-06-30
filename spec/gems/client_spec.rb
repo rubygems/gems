@@ -179,6 +179,38 @@ describe Gems::Client do
           web_hooks.rails.first.url.should == "http://example.com"
         end
       end
+
+      describe ".add_owner" do
+        before do
+          stub_post("/api/v1/gems/gems/owners").
+            with(:body => {:email => "sferik@gmail.com"}).
+            to_return(:body => fixture("add_owner.json"))
+        end
+
+        it "should add an owner to a RubyGem" do
+          owner = Gems.add_owner("gems", "sferik@gmail.com")
+          a_post("/api/v1/gems/gems/owners").
+            with(:body => {:email => "sferik@gmail.com"}).
+            should have_been_made
+          owner.should == "Owner added successfully."
+        end
+      end
+
+      describe ".remove_owner" do
+        before do
+          stub_delete("/api/v1/gems/gems/owners").
+            with(:query => {:email => "sferik@gmail.com"}).
+            to_return(:body => fixture("remove_owner.json"))
+        end
+
+        it "should remove an owner from a RubyGem" do
+          owner = Gems.remove_owner("gems", "sferik@gmail.com")
+          a_delete("/api/v1/gems/gems/owners").
+            with(:query => {:email => "sferik@gmail.com"}).
+            should have_been_made
+          owner.should == "Owner removed successfully."
+        end
+      end
     end
   end
 end

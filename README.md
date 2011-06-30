@@ -60,10 +60,10 @@ Usage Examples
     puts Gems.owners 'gemcutter'
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
-    Gems.add_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
+    Gems.add_owner 'josh@technicalpickles.com', 'gemcutter'
 
     # Remove a user's permission to manage a RubyGem you own
-    Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter' [TODO]
+    Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter'
 
     # List the webhooks registered under your account
     puts Gems.web_hooks

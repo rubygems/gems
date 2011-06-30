@@ -77,7 +77,7 @@ module Gems
 
     # Retrieve your API key using HTTP basic auth
     #
-    # @return String
+    # @return [String]
     # @example
     #   Gems.configure do |config|
     #     config.username = 'nick@gemcutter.org'
@@ -124,6 +124,34 @@ module Gems
     #   Gems.web_hooks
     def web_hooks
       get("/api/v1/web_hooks", {}, :json)
+    end
+
+    # Add an owner to a RubyGem you own, giving that user permission to manage it
+    #
+    # @param gem [String] The name of a gem.
+    # @param owner [String] The email address of the user you want to add.
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.add_owner("gemcutter", "josh@technicalpickles.com")
+    def add_owner(gem, owner)
+      post("/api/v1/gems/#{gem}/owners", {:email => owner}, :raw)
+    end
+
+    # Remove a user's permission to manage a RubyGem you own
+    #
+    # @param gem [String] The name of a gem.
+    # @param owner [String] The email address of the user you want to remove.
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.remove_owner("gemcutter", "josh@technicalpickles.com")
+    def remove_owner(gem, owner)
+      delete("/api/v1/gems/#{gem}/owners", {:email => owner}, :raw)
     end
   end
 end
