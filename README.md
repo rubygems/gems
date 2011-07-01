@@ -69,13 +69,13 @@ Usage Examples
     puts Gems.web_hooks
 
     # Add a webhook
-    Gems.add_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.add_web_hook 'rails', 'http://example.com'
 
     # Remove a webhook
-    Gems.remove_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.remove_web_hook 'rails', 'http://example.com'
 
     # Test fire a webhook.
-    Gems.fire_web_hook 'rails', 'http://example.com' [TODO]
+    Gems.fire_web_hook 'rails', 'http://example.com'
 
     # Submit a gem to RubyGems.org
     Gems.push File.new 'gemcutter-0.2.1.gem' [TODO]

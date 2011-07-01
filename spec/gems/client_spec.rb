@@ -166,20 +166,6 @@ describe Gems::Client do
         end
       end
 
-      describe ".web_hooks" do
-        before do
-          stub_get("/api/v1/web_hooks.json").
-            to_return(:body => fixture("web_hooks.json"))
-        end
-
-        it "should list the webhooks registered under your account" do
-          web_hooks = Gems.web_hooks
-          a_get("/api/v1/web_hooks.json").
-            should have_been_made
-          web_hooks.rails.first.url.should == "http://example.com"
-        end
-      end
-
       describe ".add_owner" do
         before do
           stub_post("/api/v1/gems/gems/owners").
@@ -209,6 +195,68 @@ describe Gems::Client do
             with(:query => {:email => "sferik@gmail.com"}).
             should have_been_made
           owner.should == "Owner removed successfully."
+        end
+      end
+
+      describe ".web_hooks" do
+        before do
+          stub_get("/api/v1/web_hooks.json").
+            to_return(:body => fixture("web_hooks.json"))
+        end
+
+        it "should list the webhooks registered under your account" do
+          web_hooks = Gems.web_hooks
+          a_get("/api/v1/web_hooks.json").
+            should have_been_made
+          web_hooks.rails.first.url.should == "http://example.com"
+        end
+      end
+
+      describe ".add_web_hook" do
+        before do
+          stub_post("/api/v1/web_hooks").
+            with(:body => {:gem_name => "*", :url => "http://example.com"}).
+            to_return(:body => fixture("add_web_hook"))
+        end
+
+        it "should add a web hook" do
+          add_web_hook = Gems.add_web_hook("*", "http://example.com")
+          a_post("/api/v1/web_hooks").
+            with(:body => {:gem_name => "*", :url => "http://example.com"}).
+            should have_been_made
+          add_web_hook.should == "Successfully created webhook for all gems to http://example.com"
+        end
+      end
+
+      describe ".remove_web_hook" do
+        before do
+          stub_delete("/api/v1/web_hooks/remove").
+            with(:query => {:gem_name => "*", :url => "http://example.com"}).
+            to_return(:body => fixture("remove_web_hook"))
+        end
+
+        it "should remove a web hook" do
+          remove_web_hook = Gems.remove_web_hook("*", "http://example.com")
+          a_delete("/api/v1/web_hooks/remove").
+            with(:query => {:gem_name => "*", :url => "http://example.com"}).
+            should have_been_made
+          remove_web_hook.should == "Successfully removed webhook for all gems to http://example.com"
+        end
+      end
+
+      describe ".fire_web_hook" do
+        before do
+          stub_post("/api/v1/web_hooks/fire").
+            with(:body => {:gem_name => "*", :url => "http://example.com"}).
+            to_return(:body => fixture("fire_web_hook"))
+        end
+
+        it "should fire a web hook" do
+          fire_web_hook = Gems.fire_web_hook("*", "http://example.com")
+          a_post("/api/v1/web_hooks/fire").
+            with(:body => {:gem_name => "*", :url => "http://example.com"}).
+            should have_been_made
+          fire_web_hook.should == "Successfully deployed webhook for gemcutter to http://example.com"
         end
       end
     end

@@ -114,18 +114,6 @@ module Gems
       get("/api/v1/gems/#{gem}/owners", {}, :json)
     end
 
-    # List the webhooks registered under your account
-    #
-    # @return [Hashie::Mash]
-    # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
-    #   Gems.web_hooks
-    def web_hooks
-      get("/api/v1/web_hooks", {}, :json)
-    end
-
     # Add an owner to a RubyGem you own, giving that user permission to manage it
     #
     # @param gem [String] The name of a gem.
@@ -152,6 +140,60 @@ module Gems
     #   Gems.remove_owner("gemcutter", "josh@technicalpickles.com")
     def remove_owner(gem, owner)
       delete("/api/v1/gems/#{gem}/owners", {:email => owner}, :raw)
+    end
+
+    # List the webhooks registered under your account
+    #
+    # @return [Hashie::Mash]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.web_hooks
+    def web_hooks
+      get("/api/v1/web_hooks", {}, :json)
+    end
+
+    # Create a webhook
+    #
+    # @param gem [String] The name of a gem. Specify "*" to add the hook to all your gems.
+    # @param url [String] The URL of the web hook.
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.add_web_hook("rails", "http://example.com")
+    def add_web_hook(gem, url)
+      post("/api/v1/web_hooks", {:gem_name => gem, :url => url}, :raw)
+    end
+
+    # Remove a webhook
+    #
+    # @param gem [String] The name of a gem. Specify "*" to remove the hook from all your gems.
+    # @param url [String] The URL of the web hook.
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.remove_web_hook("rails", "http://example.com")
+    def remove_web_hook(gem, url)
+      delete("/api/v1/web_hooks/remove", {:gem_name => gem, :url => url}, :raw)
+    end
+
+    # Test fire a webhook
+    #
+    # @param gem [String] The name of a gem. Specify "*" to fire the hook for all your gems.
+    # @param url [String] The URL of the web hook.
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
+    #   end
+    #   Gems.fire_web_hook("rails", "http://example.com")
+    def fire_web_hook(gem, url)
+      post("/api/v1/web_hooks/fire", {:gem_name => gem, :url => url}, :raw)
     end
   end
 end
