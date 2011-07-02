@@ -289,6 +289,20 @@ describe Gems::Client do
     end
   end
 
+  describe ".push" do
+    before do
+      stub_post("/api/v1/gems").
+        to_return(:body => fixture("push"))
+    end
+
+    it "should submit a gem to RubyGems.org" do
+      push = Gems.push(File.new(File.expand_path("../../fixtures/gems-0.0.8.gem", __FILE__), "rb"))
+      a_post("/api/v1/gems").
+        should have_been_made
+      push.should == "Successfully registered gem: gems (0.0.8)"
+    end
+  end
+
   describe ".yank" do
     context "with no version specified" do
       before do

@@ -1,31 +1,37 @@
+require 'rubygems'
+
 module Gems
   module Request
-    def delete(path, options={}, format=format)
-      request(:delete, path, options, format)
+    def delete(path, options={}, format=format, content_type=nil)
+      request(:delete, path, options, format, content_type)
     end
 
-    def get(path, options={}, format=format)
-      request(:get, path, options, format)
+    def get(path, options={}, format=format, content_type=nil)
+      request(:get, path, options, format, content_type)
     end
 
-    def post(path, options={}, format=format)
-      request(:post, path, options, format)
+    def post(path, options={}, format=format, content_type=nil)
+      request(:post, path, options, format, content_type)
     end
 
-    def put(path, options={}, format=format)
-      request(:put, path, options, format)
+    def put(path, options={}, format=format, content_type=nil)
+      request(:put, path, options, format, content_type)
     end
 
     private
 
-    def request(method, path, options, format)
-      response = connection(format).send(method) do |request|
+    def request(method, path, options, format, content_type)
+      content_length = case content_type
+      when 'application/octet-stream'
+        options.size
+      end
+      response = connection(content_length, content_type, format).send(method) do |request|
         case method
         when :delete, :get
           request.url(formatted_path(path, format), options)
         when :post, :put
           request.path = formatted_path(path, format)
-          request.body = options unless options.empty?
+          request.body = options unless options == {}
         end
       end
       response.body

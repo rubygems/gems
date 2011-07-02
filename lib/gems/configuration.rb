@@ -17,14 +17,15 @@ module Gems
     # Set the default response format appended to the path
     #
     # @note JSON is preferred over XML because it is more concise and faster to parse.
-    DEFAULT_FORMAT = :json
+    DEFAULT_FORMAT = :json.freeze
 
-    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : 'https://rubygems.org'
+    # Set the default API endpoint
+    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'].freeze : 'https://rubygems.org'.freeze
 
     # Set the default credentials
-    DEFAULT_KEY = Gem.configuration.rubygems_api_key
+    DEFAULT_KEY = Gem.configuration.rubygems_api_key.freeze
 
-    # Set the default value sent in the 'User-Agent' header
+    # Set the default 'User-Agent' HTTP header
     DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}".freeze
 
     attr_accessor *VALID_OPTIONS_KEYS

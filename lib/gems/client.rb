@@ -173,6 +173,16 @@ module Gems
       post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url}, :raw)
     end
 
+    # Submit a gem to RubyGems.org
+    #
+    # @param gem [File] A built gem.
+    # @return [String]
+    # @example
+    #   Gems.push(File.new("pkg/gemcutter-0.2.1.gem"))
+    def push(gem)
+      post("/api/v1/gems", gem.read, :raw, 'application/octet-stream')
+    end
+
     # Remove a gem from RubyGems.org's index
     #
     # @param gem_name [String] The name of a gem.

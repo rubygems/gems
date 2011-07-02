@@ -76,6 +76,9 @@ Usage Examples
     # Test fire a webhook.
     Gems.fire_web_hook 'rails', 'http://example.com'
 
+    # Submit a gem to RubyGems.org.
+    Gems.push File.new 'gemcutter-0.2.1.gem'
+
     # Remove a gem from RubyGems.org's index.
     # Defaults to the latest version if no version is specified.
     Gems.yank 'bills', '0.0.1'

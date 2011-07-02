@@ -2,7 +2,7 @@ require 'faraday_middleware'
 
 module Gems
   module Connection
-    def connection(format=format)
+    def connection(content_length=nil, content_type=nil, format=foramt)
       options = {
         :headers => {
           :user_agent => user_agent,
@@ -11,10 +11,12 @@ module Gems
         :url => host,
       }
 
+      options[:headers].merge!({:content_length => content_length}) if content_length
+      options[:headers].merge!({:content_type => content_type}) if content_type
       options[:headers].merge!({:authorization => key}) if key
 
       connection = Faraday.new(options) do |connection|
-        connection.use Faraday::Request::UrlEncoded
+        connection.use Faraday::Request::UrlEncoded unless content_type
         case format.to_s.downcase
         when 'json'
           connection.use Faraday::Response::ParseJson
