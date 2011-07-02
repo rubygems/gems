@@ -18,7 +18,7 @@ describe Gems::Client do
           info = Gems.info 'rails'
           a_get("/api/v1/gems/rails.#{format}").
             should have_been_made
-          info.name.should == 'rails'
+          info['name'].should == 'rails'
         end
       end
     end
@@ -39,7 +39,7 @@ describe Gems::Client do
           a_get("/api/v1/search.#{format}").
             with(:query => {"query" => "cucumber"}).
             should have_been_made
-          search.first.name.should == 'cucumber'
+          search.first['name'].should == 'cucumber'
         end
       end
     end
@@ -55,7 +55,7 @@ describe Gems::Client do
       versions = Gems.versions 'coulda'
       a_get("/api/v1/versions/coulda.json").
         should have_been_made
-      versions.first.number.should == '0.6.3'
+      versions.first['number'].should == '0.6.3'
     end
   end
 
@@ -72,7 +72,7 @@ describe Gems::Client do
         downloads = Gems.downloads 'coulda'
         a_get("/api/v1/versions/coulda-3.0.9/downloads.json").
           should have_been_made
-        downloads["2011-06-22"].should == 8
+        downloads['2011-06-22'].should == 8
       end
     end
 
@@ -86,7 +86,7 @@ describe Gems::Client do
         downloads = Gems.downloads 'coulda', '0.6.3'
         a_get("/api/v1/versions/coulda-0.6.3/downloads.json").
           should have_been_made
-        downloads["2011-06-22"].should == 8
+        downloads['2011-06-22'].should == 8
       end
     end
 
@@ -102,7 +102,7 @@ describe Gems::Client do
         a_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
           with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s}).
           should have_been_made
-        downloads["2011-06-22"].should == 8
+        downloads['2011-06-22'].should == 8
       end
     end
 
@@ -118,7 +118,7 @@ describe Gems::Client do
         a_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
           with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"}).
           should have_been_made
-        downloads["2011-06-22"].should == 8
+        downloads['2011-06-22'].should == 8
       end
     end
   end
@@ -135,7 +135,7 @@ describe Gems::Client do
       a_get("/api/v1/dependencies").
         with(:query => {"gems" => "rails,thor"}).
         should have_been_made
-      dependencies.first.number.should == "3.0.9"
+      dependencies.first[:number].should == "3.0.9"
     end
   end
 
@@ -170,7 +170,7 @@ describe Gems::Client do
           gems = Gems.gems
           a_get("/api/v1/gems.#{format}").
             should have_been_made
-          gems.first.name.should == "congress"
+          gems.first['name'].should == "congress"
         end
       end
     end
@@ -189,7 +189,7 @@ describe Gems::Client do
           owners = Gems.owners("gems")
           a_get("/api/v1/gems/gems/owners.#{format}").
             should have_been_made
-          owners.first.email.should == "sferik@gmail.com"
+          owners.first['email'].should == "sferik@gmail.com"
         end
       end
     end
@@ -237,7 +237,7 @@ describe Gems::Client do
       web_hooks = Gems.web_hooks
       a_get("/api/v1/web_hooks.json").
         should have_been_made
-      web_hooks.rails.first.url.should == "http://example.com"
+      web_hooks['rails'].first['url'].should == "http://example.com"
     end
   end
 

@@ -15,7 +15,6 @@ module Gems
 
       connection = Faraday.new(options) do |connection|
         connection.use Faraday::Request::UrlEncoded
-        connection.use Faraday::Response::Mashify
         case format.to_s.downcase
         when 'json'
           connection.use Faraday::Response::ParseJson
