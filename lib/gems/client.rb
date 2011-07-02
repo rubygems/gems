@@ -171,5 +171,31 @@ module Gems
     def fire_web_hook(gem_name, url)
       post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url}, :raw)
     end
+
+    # Remove a gem from RubyGems.org's index
+    #
+    # @param gem_name [String] The name of a gem.
+    # @param gem_version [String] The version of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @option options [String] :platform
+    # @return [String]
+    # @example
+    #   Gems.yank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
+    def yank(gem_name, gem_version, options={})
+      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
+    end
+
+    # Update a previously yanked gem back into RubyGems.org's index
+    #
+    # @param gem_name [String] The name of a gem.
+    # @param gem_version [String] The version of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @option options [String] :platform
+    # @return [String]
+    # @example
+    #   Gems.unyank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
+    def unyank(gem_name, gem_version, options={})
+      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
+    end
   end
 end

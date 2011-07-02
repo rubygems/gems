@@ -18,6 +18,10 @@ def a_post(path)
   a_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
 end
 
+def a_put(path)
+  a_request(:put, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
 def stub_delete(path)
   stub_request(:delete, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
 end
@@ -28,6 +32,10 @@ end
 
 def stub_post(path)
   stub_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+end
+
+def stub_put(path)
+  stub_request(:put, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
 end
 
 def fixture_path

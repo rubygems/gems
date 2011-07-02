@@ -77,14 +77,11 @@ Usage Examples
     # Test fire a webhook.
     Gems.fire_web_hook 'rails', 'http://example.com'
 
-    # Submit a gem to RubyGems.org
-    Gems.push File.new 'gemcutter-0.2.1.gem' [TODO]
-
     # Remove a gem from RubyGems.org's index
-    Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
+    Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10'
 
     # Update a previously yanked gem back into RubyGems.org's index
-    Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10' [TODO]
+    Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10'
 
 Contributing
 ------------

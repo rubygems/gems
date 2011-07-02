@@ -276,4 +276,36 @@ describe Gems::Client do
       fire_web_hook.should == "Successfully deployed webhook for gemcutter to http://example.com"
     end
   end
+
+  describe ".yank" do
+    before do
+      stub_delete("/api/v1/gems/yank").
+        with(:query => {:gem_name => "gems", :version => "0.0.8"}).
+        to_return(:body => fixture("yank"))
+    end
+
+    it "should remove a gem from RubyGems.org's index" do
+      yank = Gems.yank("gems", "0.0.8")
+      a_delete("/api/v1/gems/yank").
+        with(:query => {:gem_name => "gems", :version => "0.0.8"}).
+        should have_been_made
+      yank.should == "Successfully yanked gem: gems (0.0.8)"
+    end
+  end
+
+  describe ".unyank" do
+    before do
+      stub_put("/api/v1/gems/unyank").
+        with(:body => {:gem_name => "gems", :version => "0.0.8"}).
+        to_return(:body => fixture("unyank"))
+    end
+
+    it "should update a previously yanked gem back into RubyGems.org's index" do
+      unyank = Gems.unyank("gems", "0.0.8")
+      a_put("/api/v1/gems/unyank").
+        with(:body => {:gem_name => "gems", :version => "0.0.8"}).
+        should have_been_made
+      unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+    end
+  end
 end

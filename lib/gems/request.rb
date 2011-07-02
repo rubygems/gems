@@ -12,6 +12,10 @@ module Gems
       request(:post, path, options, format)
     end
 
+    def put(path, options={}, format=format)
+      request(:put, path, options, format)
+    end
+
     private
 
     def request(method, path, options, format)
@@ -19,7 +23,7 @@ module Gems
         case method
         when :delete, :get
           request.url(formatted_path(path, format), options)
-        when :post
+        when :post, :put
           request.path = formatted_path(path, format)
           request.body = options unless options.empty?
         end
