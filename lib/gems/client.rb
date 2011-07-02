@@ -92,9 +92,6 @@ module Gems
     #
     # @return [Array]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.gems
     def gems
       response = get("/api/v1/gems")
@@ -106,9 +103,6 @@ module Gems
     # @param gem_name [String] The name of a gem.
     # @return [Array]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.owners('gemcutter')
     def owners(gem_name)
       get("/api/v1/gems/#{gem_name}/owners", {}, :json)
@@ -120,9 +114,6 @@ module Gems
     # @param owner [String] The email address of the user you want to add.
     # @return [String]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.add_owner("gemcutter", "josh@technicalpickles.com")
     def add_owner(gem_name, owner)
       post("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
@@ -134,9 +125,6 @@ module Gems
     # @param owner [String] The email address of the user you want to remove.
     # @return [String]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.remove_owner("gemcutter", "josh@technicalpickles.com")
     def remove_owner(gem_name, owner)
       delete("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
@@ -146,9 +134,6 @@ module Gems
     #
     # @return [Hashie::Mash]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.web_hooks
     def web_hooks
       get("/api/v1/web_hooks", {}, :json)
@@ -160,9 +145,6 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.add_web_hook("rails", "http://example.com")
     def add_web_hook(gem_name, url)
       post("/api/v1/web_hooks", {:gem_name => gem_name, :url => url}, :raw)
@@ -174,9 +156,6 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.remove_web_hook("rails", "http://example.com")
     def remove_web_hook(gem_name, url)
       delete("/api/v1/web_hooks/remove", {:gem_name => gem_name, :url => url}, :raw)
@@ -188,9 +167,6 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.configure do |config|
-    #     config.key = '701243f217cdf23b1370c7b66b65ca97'
-    #   end
     #   Gems.fire_web_hook("rails", "http://example.com")
     def fire_web_hook(gem_name, url)
       post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url}, :raw)
