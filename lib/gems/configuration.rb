@@ -7,6 +7,7 @@ module Gems
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = [
       :format,
+      :host,
       :key,
       :password,
       :user_agent,
@@ -17,6 +18,8 @@ module Gems
     #
     # @note JSON is preferred over XML because it is more concise and faster to parse.
     DEFAULT_FORMAT = :json
+
+    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : 'https://rubygems.org'
 
     # Set the default credentials
     DEFAULT_KEY = Gem.configuration.rubygems_api_key
@@ -46,6 +49,7 @@ module Gems
     # Reset all configuration options to defaults
     def reset
       self.format     = DEFAULT_FORMAT
+      self.host       = DEFAULT_HOST
       self.key        = DEFAULT_KEY
       self.password   = nil
       self.user_agent = DEFAULT_USER_AGENT

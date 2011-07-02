@@ -3,14 +3,8 @@ require 'helper'
 describe Gems do
   context "when delegating to a client" do
     before do
-      Gems.configure do |config|
-        config.username = 'nick@gemcutter.org'
-        config.password = 'schwwwwing'
-      end
-      stub_get("/api/v1/gems/rails.json").to_return(:body => fixture("rails.json"))
-    end
-
-    after do
+      stub_get("/api/v1/gems/rails.json").
+        to_return(:body => fixture("rails.json"))
       Gems.reset
     end
 

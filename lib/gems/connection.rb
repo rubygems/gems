@@ -8,7 +8,7 @@ module Gems
           :user_agent => user_agent,
         },
         :ssl => {:verify => false},
-        :url => 'https://rubygems.org',
+        :url => host,
       }
 
       options[:headers].merge!({:authorization => key}) if key

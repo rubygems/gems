@@ -2,14 +2,6 @@ require 'helper'
 
 describe Gems::Client do
   before do
-    Gems.configure do |config|
-      config.key      = '701243f217cdf23b1370c7b66b65ca97'
-      config.username = 'nick@gemcutter.org'
-      config.password = 'schwwwwing'
-    end
-  end
-
-  after do
     Gems.reset
   end
 
@@ -149,13 +141,17 @@ describe Gems::Client do
 
   describe ".api_key" do
     before do
-      stub_get("/api/v1/api_key").
+      Gems.configure do |config|
+        config.username = 'nick@gemcutter.org'
+        config.password = 'schwwwwing'
+      end
+      stub_get("https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key").
         to_return(:body => fixture("api_key"))
     end
 
     it "should retrieve an API key" do
       api_key = Gems.api_key
-      a_get("/api/v1/api_key").
+      a_get("https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key").
         should have_been_made
       api_key.should == "701243f217cdf23b1370c7b66b65ca97"
     end

@@ -6,36 +6,40 @@ require 'gems'
 require 'rspec'
 require 'webmock/rspec'
 
-def a_delete(path)
-  a_request(:delete, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def rubygems_url(url)
+  url =~ /^http/ ? url : 'https://rubygems.org' + url
 end
 
-def a_get(path)
-  a_request(:get, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def a_delete(url)
+  a_request(:delete, rubygems_url(url))
 end
 
-def a_post(path)
-  a_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def a_get(url)
+  a_request(:get, rubygems_url(url))
 end
 
-def a_put(path)
-  a_request(:put, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def a_post(url)
+  a_request(:post, rubygems_url(url))
 end
 
-def stub_delete(path)
-  stub_request(:delete, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def a_put(url)
+  a_request(:put, rubygems_url(url))
 end
 
-def stub_get(path)
-  stub_request(:get, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def stub_delete(url)
+  stub_request(:delete, rubygems_url(url))
 end
 
-def stub_post(path)
-  stub_request(:post, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def stub_get(url)
+  stub_request(:get, rubygems_url(url))
 end
 
-def stub_put(path)
-  stub_request(:put, 'https://nick%40gemcutter.org:schwwwwing@rubygems.org' + path)
+def stub_post(url)
+  stub_request(:post, rubygems_url(url))
+end
+
+def stub_put(url)
+  stub_request(:put, rubygems_url(url))
 end
 
 def fixture_path
