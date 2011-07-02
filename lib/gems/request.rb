@@ -29,7 +29,7 @@ module Gems
 
     def formatted_path(path, format)
       case format.to_s.downcase
-      when 'json', 'xml'
+      when 'json', 'xml', 'yaml'
         [path, format].compact.join('.')
       when 'marshal', 'raw'
         path

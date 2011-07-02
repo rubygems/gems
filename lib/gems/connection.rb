@@ -23,6 +23,8 @@ module Gems
           connection.use Faraday::Response::ParseMarshal
         when 'xml'
           connection.use Faraday::Response::ParseXml
+        when 'yaml'
+          connection.use Faraday::Response::ParseYaml
         end
         connection.use Faraday::Response::RaiseError
         connection.adapter Faraday.default_adapter

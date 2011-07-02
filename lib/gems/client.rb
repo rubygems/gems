@@ -105,7 +105,7 @@ module Gems
     # @example
     #   Gems.owners('gemcutter')
     def owners(gem_name)
-      get("/api/v1/gems/#{gem_name}/owners", {}, :json)
+      get("/api/v1/gems/#{gem_name}/owners")
     end
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
