@@ -1,4 +1,5 @@
 require 'gems/version'
+require 'rubygems'
 require 'yaml'
 
 module Gems
@@ -12,19 +13,15 @@ module Gems
       :username,
     ]
 
-    # The response format appended to the path if none is set
+    # Set the default response format appended to the path
     #
     # @note JSON is preferred over XML because it is more concise and faster to parse.
     DEFAULT_FORMAT = :json
 
-    # Attempt to automatically load credentials
-    DEFAULT_KEY = begin
-      YAML.load(File.read(File.expand_path("~/.gem/credentials")))[:rubygems_api_key]
-    rescue Errno::ENOENT
-      nil
-    end
+    # Set the default credentials
+    DEFAULT_KEY = Gem.configuration.rubygems_api_key
 
-    # The value sent in the 'User-Agent' header if none is set
+    # Set the default value sent in the 'User-Agent' header
     DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}".freeze
 
     attr_accessor *VALID_OPTIONS_KEYS
