@@ -43,7 +43,7 @@ Usage Examples
       config.username = 'nick@gemcutter.org'
       config.password = 'schwwwwing'
     end
-    Gems.api_key
+    puts Gems.api_key
 
     # The following methods require authentication.
     # By default, we load your API key from ~/.gem/credentails

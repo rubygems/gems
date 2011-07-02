@@ -19,7 +19,7 @@ module Gems
     # Returns some basic information about the given gem
     #
     # @param gem_name [String] The name of a gem.
-    # @return [Hashie::Mash]
+    # @return [Hash]
     # @example
     #   Gems.info 'rails'
     def info(gem_name)
@@ -30,7 +30,7 @@ module Gems
     # Returns an array of active gems that match the query
     #
     # @param query [String] A term to search for.
-    # @return [Array<Hashie::Mash>]
+    # @return [Array<Hash>]
     # @example
     #   Gems.search 'cucumber'
     def search(query)
@@ -41,7 +41,7 @@ module Gems
     # Returns an array of gem version details
     #
     # @param gem_name [String] The name of a gem.
-    # @return [Hashie::Mash]
+    # @return [Hash]
     # @example
     #   Gems.versions 'coulda'
     def versions(gem_name)
@@ -54,7 +54,7 @@ module Gems
     # @param gem_version [String] The version of a gem.
     # @param from [Date] Search start date.
     # @param to [Date] Search end date.
-    # @return [Hashie::Mash]
+    # @return [Hash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
     def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
@@ -133,7 +133,7 @@ module Gems
 
     # List the webhooks registered under your account
     #
-    # @return [Hashie::Mash]
+    # @return [Hash]
     # @example
     #   Gems.web_hooks
     def web_hooks
