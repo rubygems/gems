@@ -57,7 +57,8 @@ module Gems
     # @return [Hashie::Mash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
-    def downloads(gem_name, gem_version, from=nil, to=Date.today)
+    def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
+      gem_version ||= info(gem_name).version
       if from
         get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search", {:from => from.to_s, :to => to.to_s}, :json)
       else
@@ -181,7 +182,8 @@ module Gems
     # @return [String]
     # @example
     #   Gems.yank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
-    def yank(gem_name, gem_version, options={})
+    def yank(gem_name, gem_version=nil, options={})
+      gem_version ||= info(gem_name).version
       delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
     end
 
@@ -194,7 +196,8 @@ module Gems
     # @return [String]
     # @example
     #   Gems.unyank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
-    def unyank(gem_name, gem_version, options={})
+    def unyank(gem_name, gem_version=nil, options={})
+      gem_version ||= info(gem_name).version
       put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
     end
   end

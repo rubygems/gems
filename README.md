@@ -19,69 +19,70 @@ Usage Examples
     require 'rubygems'
     require 'gems'
 
-    # Returns some basic information about the rails gem
+    # Returns some basic information about rails.
     puts Gems.info 'rails'
 
-    # Returns an array of active gems that match the query
+    # Returns an array of active gems that match the query.
     puts Gems.search 'cucumber'
 
-    # Returns an array of gem version details
+    # Returns an array of version details for coulda.
     puts Gems.versions 'coulda'
 
-    # Returns the number of downloads by day for a particular gem version
-    # for the past 90 days
+    # Returns the number of downloads by day for a particular gem version for the past 90 days.
+    # Defaults to the latest version if no version is specified.
     puts Gems.downloads 'coulda', '0.6.3'
 
-    # Returns the number of downloads by day for a particular gem version
-    # for the past year
+    # Returns the number of downloads by day for a particular gem version for the past year.
     puts Gems.downloads 'coulda', '0.6.3', Date.today - 365, Date.today
 
-    # Returns an array of gem dependency details for all versions of given gems
+    # Returns an array of gem dependency details for all versions of all the given gems.
     puts Gems.dependencies ['rails', 'thor']
 
-    # Retrieve your API key using HTTP basic authentication
+    # Retrieve your API key using HTTP basic authentication.
     Gems.configure do |config|
       config.username = 'nick@gemcutter.org'
       config.password = 'schwwwwing'
     end
     Gems.api_key
 
-    # You can also find your API key at https://rubygems.org/profile/edit
-    # We will attempt to load your API key from ~/.gem/credentails
-    # You may also specify a custom API key
+    # The following methods require authentication.
+    # By default, we load your API key from ~/.gem/credentails
+    # You can override this default by specifying a custom API key.
     Gems.configure do |config|
       config.key '701243f217cdf23b1370c7b66b65ca97'
     end
 
-    # List all gems that you own
+    # List all gems that you own.
     puts Gems.gems
 
-    # View all owners of a gem that you own
+    # View all owners of a gem that you own.
     puts Gems.owners 'gemcutter'
 
-    # Add an owner to a RubyGem you own, giving that user permission to manage it
+    # Add an owner to a RubyGem you own, giving that user permission to manage it.
     Gems.add_owner 'josh@technicalpickles.com', 'gemcutter'
 
-    # Remove a user's permission to manage a RubyGem you own
+    # Remove a user's permission to manage a RubyGem you own.
     Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter'
 
-    # List the webhooks registered under your account
+    # List the webhooks registered under your account.
     puts Gems.web_hooks
 
-    # Add a webhook
+    # Add a webhook.
     Gems.add_web_hook 'rails', 'http://example.com'
 
-    # Remove a webhook
+    # Remove a webhook.
     Gems.remove_web_hook 'rails', 'http://example.com'
 
     # Test fire a webhook.
     Gems.fire_web_hook 'rails', 'http://example.com'
 
-    # Remove a gem from RubyGems.org's index
-    Gems.yank 'bills', '0.0.1', :platform => 'x86-darwin-10'
+    # Remove a gem from RubyGems.org's index.
+    # Defaults to the latest version if no version is specified.
+    Gems.yank 'bills', '0.0.1'
 
-    # Update a previously yanked gem back into RubyGems.org's index
-    Gems.unyank 'bills', '0.0.1', :platform => 'x86-darwin-10'
+    # Update a previously yanked gem back into RubyGems.org's index.
+    # Defaults to the latest version if no version is specified.
+    Gems.unyank 'bills', '0.0.1'
 
 Contributing
 ------------

@@ -68,6 +68,22 @@ describe Gems::Client do
   end
 
   describe ".downloads" do
+    context "with no dates or version specified" do
+      before do
+        stub_get("/api/v1/gems/coulda.json").
+          to_return(:body => fixture("rails.json"))
+        stub_get("/api/v1/versions/coulda-3.0.9/downloads.json").
+          to_return(:body => fixture("downloads.json"))
+      end
+
+      it "should return the number of downloads by day for a particular gem version" do
+        downloads = Gems.downloads 'coulda'
+        a_get("/api/v1/versions/coulda-3.0.9/downloads.json").
+          should have_been_made
+        downloads["2011-06-22"].should == 8
+      end
+    end
+
     context "with no dates specified" do
       before do
         stub_get("/api/v1/versions/coulda-0.6.3/downloads.json").
@@ -278,34 +294,74 @@ describe Gems::Client do
   end
 
   describe ".yank" do
-    before do
-      stub_delete("/api/v1/gems/yank").
-        with(:query => {:gem_name => "gems", :version => "0.0.8"}).
-        to_return(:body => fixture("yank"))
+    context "with no version specified" do
+      before do
+        stub_get("/api/v1/gems/gems.json").
+          to_return(:body => fixture("rails.json"))
+        stub_delete("/api/v1/gems/yank").
+          with(:query => {:gem_name => "gems", :version => "3.0.9"}).
+          to_return(:body => fixture("yank"))
+      end
+
+      it "should remove a gem from RubyGems.org's index" do
+        yank = Gems.yank("gems")
+        a_delete("/api/v1/gems/yank").
+          with(:query => {:gem_name => "gems", :version => "3.0.9"}).
+          should have_been_made
+        yank.should == "Successfully yanked gem: gems (0.0.8)"
+      end
     end
 
-    it "should remove a gem from RubyGems.org's index" do
-      yank = Gems.yank("gems", "0.0.8")
-      a_delete("/api/v1/gems/yank").
-        with(:query => {:gem_name => "gems", :version => "0.0.8"}).
-        should have_been_made
-      yank.should == "Successfully yanked gem: gems (0.0.8)"
+    context "with a version specified" do
+      before do
+        stub_delete("/api/v1/gems/yank").
+          with(:query => {:gem_name => "gems", :version => "0.0.8"}).
+          to_return(:body => fixture("yank"))
+      end
+
+      it "should remove a gem from RubyGems.org's index" do
+        yank = Gems.yank("gems", "0.0.8")
+        a_delete("/api/v1/gems/yank").
+          with(:query => {:gem_name => "gems", :version => "0.0.8"}).
+          should have_been_made
+        yank.should == "Successfully yanked gem: gems (0.0.8)"
+      end
     end
   end
 
   describe ".unyank" do
-    before do
-      stub_put("/api/v1/gems/unyank").
-        with(:body => {:gem_name => "gems", :version => "0.0.8"}).
-        to_return(:body => fixture("unyank"))
+    context "with no version specified" do
+      before do
+        stub_get("/api/v1/gems/gems.json").
+          to_return(:body => fixture("rails.json"))
+        stub_put("/api/v1/gems/unyank").
+          with(:body => {:gem_name => "gems", :version => "3.0.9"}).
+          to_return(:body => fixture("unyank"))
+      end
+
+      it "should update a previously yanked gem back into RubyGems.org's index" do
+        unyank = Gems.unyank("gems")
+        a_put("/api/v1/gems/unyank").
+          with(:body => {:gem_name => "gems", :version => "3.0.9"}).
+          should have_been_made
+        unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+      end
     end
 
-    it "should update a previously yanked gem back into RubyGems.org's index" do
-      unyank = Gems.unyank("gems", "0.0.8")
-      a_put("/api/v1/gems/unyank").
-        with(:body => {:gem_name => "gems", :version => "0.0.8"}).
-        should have_been_made
-      unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+    context "with a version specified" do
+      before do
+        stub_put("/api/v1/gems/unyank").
+          with(:body => {:gem_name => "gems", :version => "0.0.8"}).
+          to_return(:body => fixture("unyank"))
+      end
+
+      it "should update a previously yanked gem back into RubyGems.org's index" do
+        unyank = Gems.unyank("gems", "0.0.8")
+        a_put("/api/v1/gems/unyank").
+          with(:body => {:gem_name => "gems", :version => "0.0.8"}).
+          should have_been_made
+        unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+      end
     end
   end
 end
