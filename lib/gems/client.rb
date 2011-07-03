@@ -104,7 +104,7 @@ module Gems
     # @param gem_name [String] The name of a gem.
     # @return [Array]
     # @example
-    #   Gems.owners('gemcutter')
+    #   Gems.owners 'gemcutter'
     def owners(gem_name)
       get("/api/v1/gems/#{gem_name}/owners")
     end
@@ -115,7 +115,7 @@ module Gems
     # @param owner [String] The email address of the user you want to add.
     # @return [String]
     # @example
-    #   Gems.add_owner("gemcutter", "josh@technicalpickles.com")
+    #   Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
     def add_owner(gem_name, owner)
       post("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
     end
@@ -126,7 +126,7 @@ module Gems
     # @param owner [String] The email address of the user you want to remove.
     # @return [String]
     # @example
-    #   Gems.remove_owner("gemcutter", "josh@technicalpickles.com")
+    #   Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
     def remove_owner(gem_name, owner)
       delete("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
     end
@@ -146,7 +146,7 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.add_web_hook("rails", "http://example.com")
+    #   Gems.add_web_hook 'rails', 'http://example.com'
     def add_web_hook(gem_name, url)
       post("/api/v1/web_hooks", {:gem_name => gem_name, :url => url}, :raw)
     end
@@ -157,7 +157,7 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.remove_web_hook("rails", "http://example.com")
+    #   Gems.remove_web_hook 'rails', 'http://example.com'
     def remove_web_hook(gem_name, url)
       delete("/api/v1/web_hooks/remove", {:gem_name => gem_name, :url => url}, :raw)
     end
@@ -168,7 +168,7 @@ module Gems
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
-    #   Gems.fire_web_hook("rails", "http://example.com")
+    #   Gems.fire_web_hook 'rails', 'http://example.com'
     def fire_web_hook(gem_name, url)
       post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url}, :raw)
     end
@@ -178,7 +178,7 @@ module Gems
     # @param gem [File] A built gem.
     # @return [String]
     # @example
-    #   Gems.push(File.new("pkg/gemcutter-0.2.1.gem"))
+    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem', 'rb'
     def push(gem)
       post("/api/v1/gems", gem.read, :raw, 'application/octet-stream')
     end
@@ -191,7 +191,7 @@ module Gems
     # @option options [String] :platform
     # @return [String]
     # @example
-    #   Gems.yank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
+    #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
     def yank(gem_name, gem_version=nil, options={})
       gem_version ||= info(gem_name)['version']
       delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
@@ -205,7 +205,7 @@ module Gems
     # @option options [String] :platform
     # @return [String]
     # @example
-    #   Gems.unyank("gemcutter", "0.2.1", {:platform => "x86-darwin-10"})
+    #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
     def unyank(gem_name, gem_version=nil, options={})
       gem_version ||= info(gem_name)['version']
       put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)

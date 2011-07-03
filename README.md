@@ -28,11 +28,11 @@ Usage Examples
     # Returns an array of version details for coulda.
     puts Gems.versions 'coulda'
 
-    # Returns the number of downloads by day for a particular gem version for the past 90 days.
+    # Returns the number of downloads by day for coulda 0.6.3 for the past 90 days.
     # Defaults to the latest version if no version is specified.
     puts Gems.downloads 'coulda', '0.6.3'
 
-    # Returns the number of downloads by day for a particular gem version for the past year.
+    # Returns the number of downloads by day for coulda 0.6.3 for the past year.
     puts Gems.downloads 'coulda', '0.6.3', Date.today - 365, Date.today
 
     # Returns an array of gem dependency details for all versions of all the given gems.
