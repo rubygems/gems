@@ -20,7 +20,7 @@ module Gems
     DEFAULT_FORMAT = :json.freeze
 
     # Set the default API endpoint
-    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'].freeze : 'https://rubygems.org'.freeze
+    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'].freeze : Gem.host.freeze
 
     # Set the default credentials
     DEFAULT_KEY = Gem.configuration.rubygems_api_key.freeze
