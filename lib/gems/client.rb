@@ -1,13 +1,11 @@
 require 'date'
 require 'gems/configuration'
-require 'gems/connection'
 require 'gems/request'
 require 'multi_json'
 require 'yaml'
 
 module Gems
   class Client
-    include Gems::Connection
     include Gems::Request
     attr_accessor *Configuration::VALID_OPTIONS_KEYS
 
@@ -185,7 +183,7 @@ module Gems
     # @param gem [File] A built gem.
     # @return [String]
     # @example
-    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem', 'rb'
+    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
     def push(gem)
       post("/api/v1/gems", gem.read, 'application/octet-stream')
     end
