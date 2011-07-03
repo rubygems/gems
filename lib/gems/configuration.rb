@@ -6,18 +6,12 @@ module Gems
   module Configuration
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = [
-      :format,
       :host,
       :key,
       :password,
       :user_agent,
       :username,
     ]
-
-    # Set the default response format appended to the path
-    #
-    # @note JSON is preferred over XML because it is more concise and faster to parse.
-    DEFAULT_FORMAT = :json.freeze
 
     # Set the default API endpoint
     DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'].freeze : Gem.host.freeze
@@ -49,7 +43,6 @@ module Gems
 
     # Reset all configuration options to defaults
     def reset
-      self.format     = DEFAULT_FORMAT
       self.host       = DEFAULT_HOST
       self.key        = DEFAULT_KEY
       self.password   = nil

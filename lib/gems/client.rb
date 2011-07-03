@@ -2,6 +2,8 @@ require 'date'
 require 'gems/configuration'
 require 'gems/connection'
 require 'gems/request'
+require 'multi_json'
+require 'yaml'
 
 module Gems
   class Client
@@ -23,8 +25,8 @@ module Gems
     # @example
     #   Gems.info 'rails'
     def info(gem_name)
-      response = get("/api/v1/gems/#{gem_name}")
-      format.to_s.downcase == 'xml' ? response['rubygem'] : response
+      response = get("/api/v1/gems/#{gem_name}.json")
+      MultiJson.decode(response)
     end
 
     # Returns an array of active gems that match the query
@@ -34,8 +36,8 @@ module Gems
     # @example
     #   Gems.search 'cucumber'
     def search(query)
-      response = get("/api/v1/search", {:query => query})
-      format.to_s.downcase == 'xml' ? response['rubygems'] : response
+      response = get("/api/v1/search.json", {:query => query})
+      MultiJson.decode(response)
     end
 
     # Returns an array of gem version details
@@ -45,7 +47,8 @@ module Gems
     # @example
     #   Gems.versions 'coulda'
     def versions(gem_name)
-      get("/api/v1/versions/#{gem_name}", {}, :json)
+      response = get("/api/v1/versions/#{gem_name}.json")
+      MultiJson.decode(response)
     end
 
     # Returns the number of downloads by day for a particular gem version
@@ -59,11 +62,12 @@ module Gems
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
     def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
       gem_version ||= info(gem_name)['version']
-      if from
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search", {:from => from.to_s, :to => to.to_s}, :json)
+      response = if from
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
       else
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads", {}, :json)
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
       end
+      MultiJson.decode(response)
     end
 
     # Returns an array of hashes for all versions of given gems
@@ -73,7 +77,8 @@ module Gems
     # @example
     #   Gems.dependencies 'rails', 'thor'
     def dependencies(*gems)
-      get('/api/v1/dependencies', {:gems => gems.join(',')}, :marshal)
+      response = get('/api/v1/dependencies', {:gems => gems.join(',')})
+      Marshal.load(response)
     end
 
     # Retrieve your API key using HTTP basic auth
@@ -86,7 +91,7 @@ module Gems
     #   end
     #   Gems.api_key
     def api_key
-      get('/api/v1/api_key', {}, :raw)
+      get('/api/v1/api_key')
     end
 
     # List all gems that you own
@@ -95,8 +100,8 @@ module Gems
     # @example
     #   Gems.gems
     def gems
-      response = get("/api/v1/gems")
-      format.to_s.downcase == 'xml' ? response['rubygems'] : response
+      response = get("/api/v1/gems.json")
+      MultiJson.decode(response)
     end
 
     # View all owners of a gem that you own
@@ -106,7 +111,8 @@ module Gems
     # @example
     #   Gems.owners 'gemcutter'
     def owners(gem_name)
-      get("/api/v1/gems/#{gem_name}/owners")
+      response = get("/api/v1/gems/#{gem_name}/owners.yaml")
+      YAML.load(response)
     end
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
@@ -117,7 +123,7 @@ module Gems
     # @example
     #   Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
     def add_owner(gem_name, owner)
-      post("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
+      post("/api/v1/gems/#{gem_name}/owners", {:email => owner})
     end
 
     # Remove a user's permission to manage a RubyGem you own
@@ -128,7 +134,7 @@ module Gems
     # @example
     #   Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
     def remove_owner(gem_name, owner)
-      delete("/api/v1/gems/#{gem_name}/owners", {:email => owner}, :raw)
+      delete("/api/v1/gems/#{gem_name}/owners", {:email => owner})
     end
 
     # List the webhooks registered under your account
@@ -137,7 +143,8 @@ module Gems
     # @example
     #   Gems.web_hooks
     def web_hooks
-      get("/api/v1/web_hooks", {}, :json)
+      response = get("/api/v1/web_hooks.json")
+      MultiJson.decode(response)
     end
 
     # Create a webhook
@@ -148,7 +155,7 @@ module Gems
     # @example
     #   Gems.add_web_hook 'rails', 'http://example.com'
     def add_web_hook(gem_name, url)
-      post("/api/v1/web_hooks", {:gem_name => gem_name, :url => url}, :raw)
+      post("/api/v1/web_hooks", {:gem_name => gem_name, :url => url})
     end
 
     # Remove a webhook
@@ -159,7 +166,7 @@ module Gems
     # @example
     #   Gems.remove_web_hook 'rails', 'http://example.com'
     def remove_web_hook(gem_name, url)
-      delete("/api/v1/web_hooks/remove", {:gem_name => gem_name, :url => url}, :raw)
+      delete("/api/v1/web_hooks/remove", {:gem_name => gem_name, :url => url})
     end
 
     # Test fire a webhook
@@ -170,7 +177,7 @@ module Gems
     # @example
     #   Gems.fire_web_hook 'rails', 'http://example.com'
     def fire_web_hook(gem_name, url)
-      post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url}, :raw)
+      post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url})
     end
 
     # Submit a gem to RubyGems.org
@@ -180,7 +187,7 @@ module Gems
     # @example
     #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem', 'rb'
     def push(gem)
-      post("/api/v1/gems", gem.read, :raw, 'application/octet-stream')
+      post("/api/v1/gems", gem.read, 'application/octet-stream')
     end
 
     # Remove a gem from RubyGems.org's index
@@ -194,7 +201,7 @@ module Gems
     #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
     def yank(gem_name, gem_version=nil, options={})
       gem_version ||= info(gem_name)['version']
-      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
+      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version))
     end
 
     # Update a previously yanked gem back into RubyGems.org's index
@@ -208,7 +215,7 @@ module Gems
     #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
     def unyank(gem_name, gem_version=nil, options={})
       gem_version ||= info(gem_name)['version']
-      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version), :raw)
+      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version))
     end
   end
 end

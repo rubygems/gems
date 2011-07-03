@@ -30,16 +30,16 @@ describe Gems do
     end
   end
 
-  describe ".format" do
-    it "should return the default format" do
-      Gems.format.should == Gems::Configuration::DEFAULT_FORMAT
+  describe ".host" do
+    it "should return the default host" do
+      Gems.host.should == Gems::Configuration::DEFAULT_HOST
     end
   end
 
-  describe ".format=" do
-    it "should set the format" do
-      Gems.format = 'xml'
-      Gems.format.should == 'xml'
+  describe ".host=" do
+    it "should set the host" do
+      Gems.host = 'http://localhost:3000'
+      Gems.host.should == 'http://localhost:3000'
     end
   end
 
@@ -50,7 +50,7 @@ describe Gems do
   end
 
   describe ".user_agent=" do
-    it "should set the user_agent" do
+    it "should set the user agent" do
       Gems.user_agent = 'Custom User Agent'
       Gems.user_agent.should == 'Custom User Agent'
     end

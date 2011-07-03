@@ -6,42 +6,32 @@ describe Gems::Client do
   end
 
   describe ".info" do
-    %w(json xml).each do |format|
-      context "with format #{format}" do
-        before do
-          Gems.format = format
-          stub_get("/api/v1/gems/rails.#{format}").
-            to_return(:body => fixture("rails.#{format}"))
-        end
+    before do
+      stub_get("/api/v1/gems/rails.json").
+        to_return(:body => fixture("rails.json"))
+    end
 
-        it "should return some basic information about the given gem" do
-          info = Gems.info 'rails'
-          a_get("/api/v1/gems/rails.#{format}").
-            should have_been_made
-          info['name'].should == 'rails'
-        end
-      end
+    it "should return some basic information about the given gem" do
+      info = Gems.info 'rails'
+      a_get("/api/v1/gems/rails.json").
+        should have_been_made
+      info['name'].should == 'rails'
     end
   end
 
   describe ".search" do
-    %w(json xml).each do |format|
-      context "with format #{format}" do
-        before do
-          Gems.format = format
-          stub_get("/api/v1/search.#{format}").
-            with(:query => {"query" => "cucumber"}).
-            to_return(:body => fixture("search.#{format}"))
-        end
+    before do
+      stub_get("/api/v1/search.json").
+        with(:query => {"query" => "cucumber"}).
+        to_return(:body => fixture("search.json"))
+    end
 
-        it "should return an array of active gems that match the query" do
-          search = Gems.search 'cucumber'
-          a_get("/api/v1/search.#{format}").
-            with(:query => {"query" => "cucumber"}).
-            should have_been_made
-          search.first['name'].should == 'cucumber'
-        end
-      end
+    it "should return an array of active gems that match the query" do
+      search = Gems.search 'cucumber'
+      a_get("/api/v1/search.json").
+        with(:query => {"query" => "cucumber"}).
+        should have_been_made
+      search.first['name'].should == 'cucumber'
     end
   end
 
@@ -158,40 +148,30 @@ describe Gems::Client do
   end
 
   describe ".gems" do
-    %w(json xml).each do |format|
-      context "with format #{format}" do
-        before do
-          Gems.format = format
-          stub_get("/api/v1/gems.#{format}").
-            to_return(:body => fixture("gems.#{format}"))
-        end
+    before do
+      stub_get("/api/v1/gems.json").
+        to_return(:body => fixture("gems.json"))
+    end
 
-        it "should list all gems that you own" do
-          gems = Gems.gems
-          a_get("/api/v1/gems.#{format}").
-            should have_been_made
-          gems.first['name'].should == "congress"
-        end
-      end
+    it "should list all gems that you own" do
+      gems = Gems.gems
+      a_get("/api/v1/gems.json").
+        should have_been_made
+      gems.first['name'].should == "congress"
     end
   end
 
   describe ".owners" do
-    %w(json yaml).each do |format|
-      context "with format #{format}" do
-        before do
-          Gems.format = format
-          stub_get("/api/v1/gems/gems/owners.#{format}").
-            to_return(:body => fixture("owners.#{format}"))
-        end
+    before do
+      stub_get("/api/v1/gems/gems/owners.yaml").
+        to_return(:body => fixture("owners.yaml"))
+    end
 
-        it "should list all owners of a gem" do
-          owners = Gems.owners("gems")
-          a_get("/api/v1/gems/gems/owners.#{format}").
-            should have_been_made
-          owners.first['email'].should == "sferik@gmail.com"
-        end
-      end
+    it "should list all owners of a gem" do
+      owners = Gems.owners("gems")
+      a_get("/api/v1/gems/gems/owners.yaml").
+        should have_been_made
+      owners.first['email'].should == "sferik@gmail.com"
     end
   end
 

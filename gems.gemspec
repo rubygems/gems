@@ -10,9 +10,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'webmock', '~> 1.6'
   gem.add_development_dependency 'yard', '~> 0.7'
   gem.add_runtime_dependency 'faraday', '~> 0.6.1'
-  gem.add_runtime_dependency 'faraday_middleware', '~> 0.6.5'
   gem.add_runtime_dependency 'multi_json', '~> 1.0.3'
-  gem.add_runtime_dependency 'multi_xml', '~> 0.2.2'
 
   gem.authors       = ["Erik Michaels-Ober"]
   gem.email         = ['sferik@gmail.com']

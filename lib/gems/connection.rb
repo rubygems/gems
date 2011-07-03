@@ -1,8 +1,8 @@
-require 'faraday_middleware'
+require 'faraday'
 
 module Gems
   module Connection
-    def connection(content_length=nil, content_type=nil, format=foramt)
+    def connection(content_length=nil, content_type=nil)
       options = {
         :headers => {
           :user_agent => user_agent,
@@ -17,16 +17,6 @@ module Gems
 
       connection = Faraday.new(options) do |connection|
         connection.use Faraday::Request::UrlEncoded unless content_type
-        case format.to_s.downcase
-        when 'json'
-          connection.use Faraday::Response::ParseJson
-        when 'marshal'
-          connection.use Faraday::Response::ParseMarshal
-        when 'xml'
-          connection.use Faraday::Response::ParseXml
-        when 'yaml'
-          connection.use Faraday::Response::ParseYaml
-        end
         connection.use Faraday::Response::RaiseError
         connection.adapter Faraday.default_adapter
       end
