@@ -23,8 +23,8 @@ module Gems
     # @example
     #   Gems.info 'rails'
     def info(gem_name)
-      response = get("/api/v1/gems/#{gem_name}.json")
-      MultiJson.decode(response)
+      response = get("/api/v1/gems/#{gem_name}.yaml")
+      YAML.load(response)
     end
 
     # Returns an array of active gems that match the query
@@ -34,8 +34,8 @@ module Gems
     # @example
     #   Gems.search 'cucumber'
     def search(query)
-      response = get("/api/v1/search.json", {:query => query})
-      MultiJson.decode(response)
+      response = get("/api/v1/search.yaml", {:query => query})
+      YAML.load(response)
     end
 
     # Returns an array of gem version details
@@ -98,8 +98,8 @@ module Gems
     # @example
     #   Gems.gems
     def gems
-      response = get("/api/v1/gems.json")
-      MultiJson.decode(response)
+      response = get("/api/v1/gems.yaml")
+      YAML.load(response)
     end
 
     # View all owners of a gem that you own

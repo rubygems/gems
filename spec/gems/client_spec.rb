@@ -7,13 +7,13 @@ describe Gems::Client do
 
   describe ".info" do
     before do
-      stub_get("/api/v1/gems/rails.json").
-        to_return(:body => fixture("rails.json"))
+      stub_get("/api/v1/gems/rails.yaml").
+        to_return(:body => fixture("rails.yaml"))
     end
 
     it "should return some basic information about the given gem" do
       info = Gems.info 'rails'
-      a_get("/api/v1/gems/rails.json").
+      a_get("/api/v1/gems/rails.yaml").
         should have_been_made
       info['name'].should == 'rails'
     end
@@ -21,14 +21,14 @@ describe Gems::Client do
 
   describe ".search" do
     before do
-      stub_get("/api/v1/search.json").
+      stub_get("/api/v1/search.yaml").
         with(:query => {"query" => "cucumber"}).
-        to_return(:body => fixture("search.json"))
+        to_return(:body => fixture("search.yaml"))
     end
 
     it "should return an array of active gems that match the query" do
       search = Gems.search 'cucumber'
-      a_get("/api/v1/search.json").
+      a_get("/api/v1/search.yaml").
         with(:query => {"query" => "cucumber"}).
         should have_been_made
       search.first['name'].should == 'cucumber'
@@ -52,8 +52,8 @@ describe Gems::Client do
   describe ".downloads" do
     context "with no dates or version specified" do
       before do
-        stub_get("/api/v1/gems/coulda.json").
-          to_return(:body => fixture("rails.json"))
+        stub_get("/api/v1/gems/coulda.yaml").
+          to_return(:body => fixture("rails.yaml"))
         stub_get("/api/v1/versions/coulda-3.0.9/downloads.json").
           to_return(:body => fixture("downloads.json"))
       end
@@ -149,15 +149,15 @@ describe Gems::Client do
 
   describe ".gems" do
     before do
-      stub_get("/api/v1/gems.json").
-        to_return(:body => fixture("gems.json"))
+      stub_get("/api/v1/gems.yaml").
+        to_return(:body => fixture("gems.yaml"))
     end
 
     it "should list all gems that you own" do
       gems = Gems.gems
-      a_get("/api/v1/gems.json").
+      a_get("/api/v1/gems.yaml").
         should have_been_made
-      gems.first['name'].should == "congress"
+      gems.first['name'].should == "exchb"
     end
   end
 
@@ -286,8 +286,8 @@ describe Gems::Client do
   describe ".yank" do
     context "with no version specified" do
       before do
-        stub_get("/api/v1/gems/gems.json").
-          to_return(:body => fixture("rails.json"))
+        stub_get("/api/v1/gems/gems.yaml").
+          to_return(:body => fixture("rails.yaml"))
         stub_delete("/api/v1/gems/yank").
           with(:query => {:gem_name => "gems", :version => "3.0.9"}).
           to_return(:body => fixture("yank"))
@@ -322,8 +322,8 @@ describe Gems::Client do
   describe ".unyank" do
     context "with no version specified" do
       before do
-        stub_get("/api/v1/gems/gems.json").
-          to_return(:body => fixture("rails.json"))
+        stub_get("/api/v1/gems/gems.yaml").
+          to_return(:body => fixture("rails.yaml"))
         stub_put("/api/v1/gems/unyank").
           with(:body => {:gem_name => "gems", :version => "3.0.9"}).
           to_return(:body => fixture("unyank"))

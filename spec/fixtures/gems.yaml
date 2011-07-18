@@ -1,0 +1,1072 @@
+--- 
+- name: exchb
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: multi_json
+      requirements: ~> 1.0.3
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 171
+  info: Ruby wrapper for the Exchange Bitcoins Trade API. Exchange Bitcoins is a bitcoin exchange.
+  version: 0.5.0
+  version_downloads: 21
+  homepage_uri: https://github.com/sferik/exchb
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/exchb
+  gem_uri: http://rubygems.org/gems/exchb-0.5.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: congress
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 1.0.3
+    - name: rash
+      requirements: ~> 0.3.0
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 58
+  info: Ruby wrapper for the Real-Time Congress API. The Real-Time Congress API is a RESTful API over the artifacts of Congress, in as close to real-time as possible.
+  version: 0.0.2
+  version_downloads: 34
+  homepage_uri: https://github.com/sferik/congress
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/congress
+  gem_uri: http://rubygems.org/gems/congress-0.0.2.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: tradehill
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: multi_json
+      requirements: ~> 1.0.3
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 438
+  info: Ruby wrapper for the TradeHill API. TradeHill is a Bitcoin exchange that supports 26 currencies.
+  version: 0.7.1
+  version_downloads: 29
+  homepage_uri: https://github.com/sferik/tradehill
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/tradehill
+  gem_uri: http://rubygems.org/gems/tradehill-0.7.1.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: mtgox
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: multi_json
+      requirements: ~> 1.0.3
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 376
+  info: Ruby wrapper for the Mt. Gox Trade API. Mt. Gox allows you to trade US Dollars (USD) for Bitcoins (BTC) or Bitcoins for US Dollars.
+  version: 0.7.0
+  version_downloads: 27
+  homepage_uri: https://github.com/sferik/mtgox
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/mtgox
+  gem_uri: http://rubygems.org/gems/mtgox-0.7.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: gems
+  dependencies: 
+    runtime: 
+    - name: multi_json
+      requirements: ~> 1.0.3
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 475
+  info: Ruby wrapper for the RubyGems.org API
+  version: 0.3.0
+  version_downloads: 21
+  homepage_uri: https://github.com/sferik/gems
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/gems
+  gem_uri: http://rubygems.org/gems/gems-0.3.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: futures_pipeline
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 1.0.2
+    - name: rash
+      requirements: ~> 0.3.0
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 196
+  info: Ruby wrapper for the Futures, Inc. US Military Pipeline API
+  version: 0.1.0
+  version_downloads: 40
+  homepage_uri: https://github.com/codeforamerica/futures_pipeline
+  authors: Erik Michaels-Ober, Ryan Resella
+  project_uri: http://rubygems.org/gems/futures_pipeline
+  gem_uri: http://rubygems.org/gems/futures_pipeline-0.1.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: multi_json
+  dependencies: 
+    runtime: []
+
+    development: 
+    - name: rake
+      requirements: ~> 0.9
+    - name: rdoc
+      requirements: = 3.5.1
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+  downloads: 407631
+  info: A gem to provide swappable JSON backends utilizing Yajl::Ruby, the JSON gem, JSON pure, or a vendored version of okjson.
+  version: 1.0.3
+  version_downloads: 124222
+  homepage_uri: http://github.com/intridea/multi_json
+  authors: Michael Bleigh, Josh Kalderimis, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/multi_json
+  gem_uri: http://rubygems.org/gems/multi_json-1.0.3.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-more
+  dependencies: 
+    runtime: 
+    - name: multi_json
+      requirements: ~> 1.0.0
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: rest-client
+      requirements: ~> 1.6.0
+    development: 
+    - name: json_pure
+      requirements: ~> 1.5
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 69524
+  info: Additional strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 24281
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-more
+  gem_uri: http://rubygems.org/gems/oa-more-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-openid
+  dependencies: 
+    runtime: 
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: rack-openid
+      requirements: ~> 1.3.1
+    - name: ruby-openid-apps-discovery
+      requirements: ~> 1.2.0
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 137192
+  info: OpenID strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 25324
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-openid
+  gem_uri: http://rubygems.org/gems/oa-openid-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-enterprise
+  dependencies: 
+    runtime: 
+    - name: addressable
+      requirements: = 2.2.4
+    - name: net-ldap
+      requirements: ~> 0.2.2
+    - name: nokogiri
+      requirements: ~> 1.4.2
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: pyu-ruby-sasl
+      requirements: ~> 0.0.3.1
+    - name: rubyntlm
+      requirements: ~> 0.1.1
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 131172
+  info: Enterprise strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 24378
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: James A. Rosen, Ping Yu, Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-enterprise
+  gem_uri: http://rubygems.org/gems/oa-enterprise-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-basic
+  dependencies: 
+    runtime: 
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: rest-client
+      requirements: ~> 1.6.0
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 131231
+  info: HTTP Basic strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 24377
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-basic
+  gem_uri: http://rubygems.org/gems/oa-basic-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-core
+  dependencies: 
+    runtime: []
+
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 168900
+  info: Core strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 31276
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-core
+  gem_uri: http://rubygems.org/gems/oa-core-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oa-oauth
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: multi_json
+      requirements: ~> 1.0.0
+    - name: multi_xml
+      requirements: ~> 0.2.2
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: oauth
+      requirements: ~> 0.4.0
+    - name: oauth2
+      requirements: ~> 0.4.1
+    development: 
+    - name: evernote
+      requirements: ~> 0.9
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rack-test
+      requirements: ~> 0.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 165303
+  info: OAuth strategies for OmniAuth.
+  version: 0.2.6
+  version_downloads: 30466
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/oa-oauth
+  gem_uri: http://rubygems.org/gems/oa-oauth-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: omniauth
+  dependencies: 
+    runtime: 
+    - name: oa-basic
+      requirements: = 0.2.6
+    - name: oa-core
+      requirements: = 0.2.6
+    - name: oa-enterprise
+      requirements: = 0.2.6
+    - name: oa-more
+      requirements: = 0.2.6
+    - name: oa-oauth
+      requirements: = 0.2.6
+    - name: oa-openid
+      requirements: = 0.2.6
+    development: []
+
+  downloads: 133258
+  info: OmniAuth is an authentication framework that that separates the concept of authentiation from the concept of identity, providing simple hooks for any application to have one or multiple authentication providers for a user.
+  version: 0.2.6
+  version_downloads: 24380
+  homepage_uri: http://github.com/intridea/omniauth
+  authors: Michael Bleigh, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/omniauth
+  gem_uri: http://rubygems.org/gems/omniauth-0.2.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: oauth2
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: multi_json
+      requirements: ">= 0.0.5"
+    development: 
+    - name: json_pure
+      requirements: ~> 1.5
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 260242
+  info: A Ruby wrapper for the OAuth 2.0 protocol built with a similar style to the original OAuth gem.
+  version: 0.4.1
+  version_downloads: 59143
+  homepage_uri: http://github.com/intridea/oauth2
+  authors: Michael Bleigh
+  project_uri: http://rubygems.org/gems/oauth2
+  gem_uri: http://rubygems.org/gems/oauth2-0.4.1.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: t
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.5.4
+    - name: faraday_middleware
+      requirements: ~> 0.3.1
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 0.0.5
+    - name: multi_xml
+      requirements: ~> 0.2.0
+    - name: simple_oauth
+      requirements: ~> 0.1.3
+    development: 
+    - name: bundler
+      requirements: ~> 1.0
+    - name: json
+      requirements: ~> 1.4
+    - name: maruku
+      requirements: ~> 0.6
+    - name: nokogiri
+      requirements: ~> 1.4
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.4
+    - name: simplecov
+      requirements: ~> 0.3
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.6
+    - name: ZenTest
+      requirements: ~> 4.4
+  downloads: 188
+  info: A Ruby wrapper for the Twitter REST and Search APIs
+  version: 0.0.0
+  version_downloads: 173
+  homepage_uri: https://github.com/jnunemaker/twitter
+  authors: John Nunemaker, Wynn Netherland, Erik Michaels-Ober, Steve Richert
+  project_uri: http://rubygems.org/gems/t
+  gem_uri: http://rubygems.org/gems/t-0.0.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: octokit
+  dependencies: 
+    runtime: 
+    - name: addressable
+      requirements: ~> 2.2.6
+    - name: faraday
+      requirements: ~> 0.7.3
+    - name: faraday_middleware
+      requirements: ~> 0.7.0.rc1
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 1.0.2
+    development: 
+    - name: nokogiri
+      requirements: ~> 1.4
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yajl-ruby
+      requirements: ~> 0.8
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 2894
+  info: Simple wrapper for the GitHub API v2
+  version: 0.6.4
+  version_downloads: 283
+  homepage_uri: https://github.com/pengwynn/octokit
+  authors: Wynn Netherland, Adam Stacoviak, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/octokit
+  gem_uri: http://rubygems.org/gems/octokit-0.6.4.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: rails_admin
+  dependencies: 
+    runtime: []
+
+    development: []
+
+  downloads: 3016
+  info: This rubygem does not have a description or summary.
+  version: 0.0.0
+  version_downloads: 3016
+  homepage_uri: http://www.railsadmin.org/
+  authors: Francesc Esplugas
+  project_uri: http://rubygems.org/gems/rails_admin
+  gem_uri: http://rubygems.org/gems/rails_admin-0.0.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: rails-admin
+  dependencies: 
+    runtime: []
+
+    development: []
+
+  downloads: 435
+  info: This rubygem does not have a description or summary.
+  version: 0.0.0
+  version_downloads: 435
+  homepage_uri: http://www.railsadmin.org/
+  authors: Francesc Esplugas
+  project_uri: http://rubygems.org/gems/rails-admin
+  gem_uri: http://rubygems.org/gems/rails-admin-0.0.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: thor
+  dependencies: 
+    runtime: []
+
+    development: 
+    - name: bundler
+      requirements: ~> 1.0
+    - name: fakeweb
+      requirements: ~> 1.3
+    - name: rake
+      requirements: ">= 0.8"
+    - name: rdoc
+      requirements: ~> 2.5
+    - name: rspec
+      requirements: ~> 2.1
+    - name: simplecov
+      requirements: ~> 0.3
+  downloads: 2511491
+  info: A scripting framework that replaces rake, sake and rubigen
+  version: 0.14.6
+  version_downloads: 1642906
+  homepage_uri: http://github.com/wycats/thor
+  authors: "Yehuda Katz, Jos\xC3\xA9 Valim"
+  project_uri: http://rubygems.org/gems/thor
+  gem_uri: http://rubygems.org/gems/thor-0.14.6.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: simple_oauth
+  dependencies: 
+    runtime: []
+
+    development: 
+    - name: bundler
+      requirements: ~> 1.0
+    - name: mocha
+      requirements: ~> 0.9
+    - name: rake
+      requirements: ~> 0.8
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: turn
+      requirements: ~> 0.8
+    - name: yard
+      requirements: ~> 0.6
+  downloads: 95214
+  info: Simply builds and verifies OAuth headers
+  version: 0.1.5
+  version_downloads: 32657
+  homepage_uri: http://github.com/laserlemon/simple_oauth
+  authors: Steve Richert, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/simple_oauth
+  gem_uri: http://rubygems.org/gems/simple_oauth-0.1.5.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: open311
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.0
+    - name: faraday_middleware
+      requirements: ~> 0.6.0
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 1.0.0
+    - name: multi_xml
+      requirements: ~> 0.2.0
+    development: 
+    - name: json_pure
+      requirements: ~> 1.5
+    - name: maruku
+      requirements: ~> 0.6
+    - name: nokogiri
+      requirements: ~> 1.4
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.5
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 955
+  info: A Ruby wrapper for the Open311 API v2.
+  version: 0.2.0
+  version_downloads: 34
+  homepage_uri: https://github.com/codeforamerica/open311
+  authors: Dan Melton, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/open311
+  gem_uri: http://rubygems.org/gems/open311-0.2.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: faraday
+  dependencies: 
+    runtime: 
+    - name: addressable
+      requirements: ~> 2.2.6
+    - name: multipart-post
+      requirements: ~> 1.1.0
+    - name: rack
+      requirements: ">= 1.1.0, < 2"
+    development: 
+    - name: rake
+      requirements: ~> 0.9
+    - name: test-unit
+      requirements: ~> 2.3
+    - name: webmock
+      requirements: ~> 1.6
+  downloads: 361378
+  info: HTTP/REST API client library.
+  version: 0.7.4
+  version_downloads: 2002
+  homepage_uri: http://github.com/technoweenie/faraday
+  authors: Rick Olson
+  project_uri: http://rubygems.org/gems/faraday
+  gem_uri: http://rubygems.org/gems/faraday-0.7.4.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: multi_xml
+  dependencies: 
+    runtime: []
+
+    development: 
+    - name: libxml-ruby
+      requirements: ~> 1.1
+    - name: maruku
+      requirements: ~> 0.6
+    - name: nokogiri
+      requirements: ~> 1.4
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: yard
+      requirements: ~> 0.6
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 125751
+  info: A gem to provide swappable XML backends utilizing LibXML, Nokogiri, or REXML.
+  version: 0.2.2
+  version_downloads: 79804
+  homepage_uri: http://rubygems.org/gems/multi_xml
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/multi_xml
+  gem_uri: http://rubygems.org/gems/multi_xml-0.2.2.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: faraday_middleware
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.0
+    development: 
+    - name: json_pure
+      requirements: ~> 1.5
+    - name: multi_json
+      requirements: ~> 1.0
+    - name: multi_xml
+      requirements: ~> 0.2
+    - name: oauth2
+      requirements: ~> 0.2
+    - name: rake
+      requirements: ~> 0.9
+    - name: rash
+      requirements: ~> 0.3
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: simple_oauth
+      requirements: ~> 0.1
+  downloads: 106961
+  info: Various middleware for Faraday
+  version: 0.6.5
+  version_downloads: 10487
+  homepage_uri: https://github.com/pengwynn/faraday_middleware
+  authors: Erik Michaels-Ober, Wynn Netherland
+  project_uri: http://rubygems.org/gems/faraday_middleware
+  gem_uri: http://rubygems.org/gems/faraday_middleware-0.6.5.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: twitter
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.1
+    - name: faraday_middleware
+      requirements: ~> 0.6.3
+    - name: hashie
+      requirements: ~> 1.0.0
+    - name: multi_json
+      requirements: ~> 1.0.0
+    - name: multi_xml
+      requirements: ~> 0.2.0
+    - name: simple_oauth
+      requirements: ~> 0.1.5
+    development: 
+    - name: maruku
+      requirements: ~> 0.6
+    - name: nokogiri
+      requirements: ~> 1.4
+    - name: rake
+      requirements: ~> 0.9
+    - name: rspec
+      requirements: ~> 2.6
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.7
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 226450
+  info: A Ruby wrapper for the Twitter REST and Search APIs
+  version: 1.6.0
+  version_downloads: 5261
+  homepage_uri: https://github.com/jnunemaker/twitter
+  authors: John Nunemaker, Wynn Netherland, Erik Michaels-Ober, Steve Richert
+  project_uri: http://rubygems.org/gems/twitter
+  gem_uri: http://rubygems.org/gems/twitter-1.6.0.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: racket
+  dependencies: 
+    runtime: 
+    - name: file-tail
+      requirements: ">= 1.0.4"
+    - name: rsdl
+      requirements: ">= 0.1.2"
+    - name: rubygame
+      requirements: ">= 2.6.2"
+    development: []
+
+  downloads: 1513
+  info: Listen to your app.
+  version: 0.1.0
+  version_downloads: 436
+  homepage_uri: http://github.com/jm3/racket
+  authors: John Manoogian III, Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/racket
+  gem_uri: http://rubygems.org/gems/racket-0.1.0.gem
+  source_code_uri: http://github.com/jm3/app-racket
+  bug_tracker_uri: ""
+  wiki_uri: ""
+  documentation_uri: ""
+  mailing_list_uri: ""
+- name: merb-admin
+  dependencies: 
+    runtime: 
+    - name: builder
+      requirements: ~> 2.1
+    - name: merb-assets
+      requirements: ~> 1.1
+    - name: merb-helpers
+      requirements: ~> 1.1
+    - name: merb-slices
+      requirements: ~> 1.1
+    development: 
+    - name: activerecord
+      requirements: ~> 2.3
+    - name: dm-aggregates
+      requirements: ~> 1.0
+    - name: dm-core
+      requirements: ~> 1.0
+    - name: dm-migrations
+      requirements: ~> 1.0
+    - name: dm-sqlite-adapter
+      requirements: ~> 1.0
+    - name: dm-types
+      requirements: ~> 1.0
+    - name: dm-validations
+      requirements: ~> 1.0
+    - name: rspec
+      requirements: ~> 1.3
+    - name: sequel
+      requirements: ~> 3.18
+    - name: webrat
+      requirements: ~> 0.7
+  downloads: 21658
+  info: MerbAdmin is a Merb plugin that provides an easy-to-use interface for managing your data
+  version: 0.8.8
+  version_downloads: 296
+  homepage_uri: http://rubygems.org/gems/merb-admin
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/merb-admin
+  gem_uri: http://rubygems.org/gems/merb-admin-0.8.8.gem
+  source_code_uri: http://github.com/sferik/merb-admin
+  bug_tracker_uri: ""
+  wiki_uri: ""
+  documentation_uri: ""
+  mailing_list_uri: ""
+- name: linkedin
+  dependencies: 
+    runtime: 
+    - name: nokogiri
+      requirements: ~> 1.4.4
+    - name: oauth
+      requirements: ~> 0.4.0
+    development: 
+    - name: rake
+      requirements: ~> 0.8.7
+    - name: rspec
+      requirements: ~> 2.4.0
+    - name: webmock
+      requirements: ~> 1.6.0
+  downloads: 12758
+  info: Ruby wrapper for the LinkedIn API
+  version: 0.2.2
+  version_downloads: 3951
+  homepage_uri: http://github.com/pengwynn/linkedin
+  authors: Wynn Netherland, Josh Kalderimis
+  project_uri: http://rubygems.org/gems/linkedin
+  gem_uri: http://rubygems.org/gems/linkedin-0.2.2.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+- name: mlb
+  dependencies: 
+    runtime: 
+    - name: faraday
+      requirements: ~> 0.6.0
+    - name: faraday_middleware
+      requirements: ~> 0.6.0
+    - name: multi_json
+      requirements: ~> 0.0.5
+    development: 
+    - name: bundler
+      requirements: ~> 1.0
+    - name: json
+      requirements: ~> 1.5
+    - name: maruku
+      requirements: ~> 0.6
+    - name: rake
+      requirements: ~> 0.8
+    - name: rspec
+      requirements: ~> 2.5
+    - name: simplecov
+      requirements: ~> 0.4
+    - name: webmock
+      requirements: ~> 1.6
+    - name: yard
+      requirements: ~> 0.6
+    - name: ZenTest
+      requirements: ~> 4.5
+  downloads: 12695
+  info: MLB.rb is a Ruby library for retrieving current Major League Baseball players, managers, teams, divisions, and leagues.
+  version: 0.5.4
+  version_downloads: 144
+  homepage_uri: http://rubygems.org/gems/mlb
+  authors: Erik Michaels-Ober
+  project_uri: http://rubygems.org/gems/mlb
+  gem_uri: http://rubygems.org/gems/mlb-0.5.4.gem
+  source_code_uri: 
+  bug_tracker_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 

@@ -3,14 +3,14 @@ require 'helper'
 describe Gems do
   context "when delegating to a client" do
     before do
-      stub_get("/api/v1/gems/rails.json").
-        to_return(:body => fixture("rails.json"))
+      stub_get("/api/v1/gems/rails.yaml").
+        to_return(:body => fixture("rails.yaml"))
       Gems.reset
     end
 
     it "should get the correct resource" do
       Gems.info('rails')
-      a_get("/api/v1/gems/rails.json").should have_been_made
+      a_get("/api/v1/gems/rails.yaml").should have_been_made
     end
 
     it "should return the same results as a client" do
