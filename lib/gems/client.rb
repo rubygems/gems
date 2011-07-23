@@ -18,6 +18,7 @@ module Gems
 
     # Returns some basic information about the given gem
     #
+    # @authenticated false
     # @param gem_name [String] The name of a gem.
     # @return [Hash]
     # @example
@@ -29,6 +30,7 @@ module Gems
 
     # Returns an array of active gems that match the query
     #
+    # @authenticated false
     # @param query [String] A term to search for.
     # @return [Array<Hash>]
     # @example
@@ -40,6 +42,7 @@ module Gems
 
     # Returns an array of gem version details
     #
+    # @authenticated false
     # @param gem_name [String] The name of a gem.
     # @return [Hash]
     # @example
@@ -51,6 +54,7 @@ module Gems
 
     # Returns the number of downloads by day for a particular gem version
     #
+    # @authenticated false
     # @param gem_name [String] The name of a gem.
     # @param gem_version [String] The version of a gem.
     # @param from [Date] Search start date.
@@ -74,6 +78,7 @@ module Gems
 
     # Returns an array of hashes for all versions of given gems
     #
+    # @authenticated false
     # @param gems [Array] A list of gem names
     # @return [Array]
     # @example
@@ -85,6 +90,7 @@ module Gems
 
     # Retrieve your API key using HTTP basic auth
     #
+    # @authenticated true
     # @return [String]
     # @example
     #   Gems.configure do |config|
@@ -98,6 +104,7 @@ module Gems
 
     # List all gems that you own
     #
+    # @authenticated true
     # @return [Array]
     # @example
     #   Gems.gems
@@ -108,6 +115,7 @@ module Gems
 
     # View all owners of a gem that you own
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem.
     # @return [Array]
     # @example
@@ -119,6 +127,7 @@ module Gems
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem.
     # @param owner [String] The email address of the user you want to add.
     # @return [String]
@@ -130,6 +139,7 @@ module Gems
 
     # Remove a user's permission to manage a RubyGem you own
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem.
     # @param owner [String] The email address of the user you want to remove.
     # @return [String]
@@ -141,6 +151,7 @@ module Gems
 
     # List the webhooks registered under your account
     #
+    # @authenticated true
     # @return [Hash]
     # @example
     #   Gems.web_hooks
@@ -151,6 +162,7 @@ module Gems
 
     # Create a webhook
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem. Specify "*" to add the hook to all your gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
@@ -162,6 +174,7 @@ module Gems
 
     # Remove a webhook
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem. Specify "*" to remove the hook from all your gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
@@ -173,6 +186,7 @@ module Gems
 
     # Test fire a webhook
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem. Specify "*" to fire the hook for all your gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
@@ -184,6 +198,7 @@ module Gems
 
     # Submit a gem to RubyGems.org
     #
+    # @authenticated true
     # @param gem [File] A built gem.
     # @return [String]
     # @example
@@ -194,6 +209,7 @@ module Gems
 
     # Remove a gem from RubyGems.org's index
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem.
     # @param gem_version [String] The version of a gem.
     # @param options [Hash] A customizable set of options.
@@ -208,6 +224,7 @@ module Gems
 
     # Update a previously yanked gem back into RubyGems.org's index
     #
+    # @authenticated true
     # @param gem_name [String] The name of a gem.
     # @param gem_version [String] The version of a gem.
     # @param options [Hash] A customizable set of options.
