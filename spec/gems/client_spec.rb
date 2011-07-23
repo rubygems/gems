@@ -50,6 +50,20 @@ describe Gems::Client do
   end
 
   describe ".downloads" do
+    context "with no dates, version, or gem name specified" do
+      before do
+        stub_get("/api/v1/downloads.json").
+          to_return(:body => fixture("total.json"))
+      end
+
+      it "should return the total number of downloads on rubygems.org" do
+        downloads = Gems.downloads
+        a_get("/api/v1/downloads.json").
+          should have_been_made
+        downloads['total'].should == 242660588
+      end
+    end
+
     context "with no dates or version specified" do
       before do
         stub_get("/api/v1/gems/coulda.yaml").

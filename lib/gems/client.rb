@@ -58,12 +58,16 @@ module Gems
     # @return [Hash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
-    def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
-      gem_version ||= info(gem_name)['version']
-      response = if from
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
+    def downloads(gem_name=nil, gem_version=nil, from=nil, to=Date.today)
+      if gem_name
+        gem_version ||= info(gem_name)['version']
+        response = if from
+          get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
+        else
+          get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
+        end
       else
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
+        response = get("/api/v1/downloads.json")
       end
       MultiJson.decode(response)
     end
