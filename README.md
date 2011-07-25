@@ -28,6 +28,11 @@ Usage Examples
     # Returns an array of version details for coulda.
     puts Gems.versions 'coulda'
 
+    # Returns the total number of downloads for rails_admin 0.0.0.
+    # Defaults to the latest version if no version is specified.
+    # Defaults to RubyGems.org if no gem name is specified.
+    puts Gems.downloads 'rails_admin', '0.0.0'
+
     # Returns the number of downloads by day for coulda 0.6.3 for the past 90 days.
     # Defaults to the latest version if no version is specified.
     puts Gems.downloads 'coulda', '0.6.3'

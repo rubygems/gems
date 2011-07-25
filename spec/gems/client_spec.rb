@@ -49,20 +49,58 @@ describe Gems::Client do
     end
   end
 
-  describe ".downloads" do
-    context "with no dates, version, or gem name specified" do
+  describe ".total_downloads" do
+    context "with no version or gem name specified" do
       before do
-        stub_get("/api/v1/downloads.json").
-          to_return(:body => fixture("total.json"))
+        stub_get("/api/v1/downloads.yaml").
+          to_return(:body => fixture("total_downloads.yaml"))
       end
 
-      it "should return the total number of downloads on rubygems.org" do
-        downloads = Gems.downloads
-        a_get("/api/v1/downloads.json").
+      it "should return the total number of downloads on RubyGems.org" do
+        downloads = Gems.total_downloads
+        a_get("/api/v1/downloads.yaml").
           should have_been_made
-        downloads['total'].should == 242660588
+        downloads[:total].should == 244368950
       end
     end
+
+    context "with no version specified" do
+      before do
+        stub_get("/api/v1/gems/rails_admin.yaml").
+          to_return(:body => fixture("rails.yaml"))
+        stub_get("/api/v1/downloads/rails_admin-3.0.9.yaml").
+          to_return(:body => fixture("rails_admin-0.0.0.yaml"))
+      end
+
+      it "should the total number of downloads for the specified gem" do
+        downloads = Gems.total_downloads('rails_admin')
+        a_get("/api/v1/gems/rails_admin.yaml").
+          should have_been_made
+        a_get("/api/v1/downloads/rails_admin-3.0.9.yaml").
+          should have_been_made
+        downloads[:version_downloads].should == 3142
+        downloads[:total_downloads].should == 3142
+      end
+    end
+
+    context "with a version specified" do
+      before do
+        stub_get("/api/v1/downloads/rails_admin-0.0.0.yaml").
+          to_return(:body => fixture("rails_admin-0.0.0.yaml"))
+      end
+
+      it "should the total number of downloads for the specified gem" do
+        downloads = Gems.total_downloads('rails_admin', '0.0.0')
+        a_get("/api/v1/downloads/rails_admin-0.0.0.yaml").
+          should have_been_made
+        downloads[:version_downloads].should == 3142
+        downloads[:total_downloads].should == 3142
+      end
+    end
+
+  end
+
+  describe ".downloads" do
 
     context "with no dates or version specified" do
       before do

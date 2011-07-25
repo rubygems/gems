@@ -52,6 +52,24 @@ module Gems
       MultiJson.decode(response)
     end
 
+    # Returns the total number of downloads for a particular gem
+    #
+    # @authenticated false
+    # @param gem_name [String] The name of a gem.
+    # @param gem_version [String] The version of a gem.
+    # @return [Hash]
+    # @example
+    #   Gems.total_downloads 'rails_admin', '0.0.0'
+    def total_downloads(gem_name=nil, gem_version=nil)
+      if gem_name
+        gem_version ||= info(gem_name)['version']
+        response = get("/api/v1/downloads/#{gem_name}-#{gem_version}.yaml")
+      else
+        response = get("/api/v1/downloads.yaml")
+      end
+      YAML.load(response)
+    end
+
     # Returns the number of downloads by day for a particular gem version
     #
     # @authenticated false
@@ -62,16 +80,12 @@ module Gems
     # @return [Hash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
-    def downloads(gem_name=nil, gem_version=nil, from=nil, to=Date.today)
-      if gem_name
-        gem_version ||= info(gem_name)['version']
-        response = if from
-          get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
-        else
-          get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
-        end
+    def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
+      gem_version ||= info(gem_name)['version']
+      response = if from
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
       else
-        response = get("/api/v1/downloads.json")
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
       end
       MultiJson.decode(response)
     end
