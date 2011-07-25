@@ -223,15 +223,15 @@ describe Gems::Client do
 
   describe ".web_hooks" do
     before do
-      stub_get("/api/v1/web_hooks.json").
-        to_return(:body => fixture("web_hooks.json"))
+      stub_get("/api/v1/web_hooks.yaml").
+        to_return(:body => fixture("web_hooks.yaml"))
     end
 
-    it "should list the webhooks registered under your account" do
+    it "should list the web hooks registered under your account" do
       web_hooks = Gems.web_hooks
-      a_get("/api/v1/web_hooks.json").
+      a_get("/api/v1/web_hooks.yaml").
         should have_been_made
-      web_hooks['rails'].first['url'].should == "http://example.com"
+      web_hooks['all gems'].first['url'].should == "http://example.com"
     end
   end
 

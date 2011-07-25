@@ -156,8 +156,8 @@ module Gems
     # @example
     #   Gems.web_hooks
     def web_hooks
-      response = get("/api/v1/web_hooks.json")
-      MultiJson.decode(response)
+      response = get("/api/v1/web_hooks.yaml")
+      YAML.load(response)
     end
 
     # Create a webhook
