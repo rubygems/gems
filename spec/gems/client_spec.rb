@@ -106,13 +106,15 @@ describe Gems::Client do
       before do
         stub_get("/api/v1/gems/coulda.yaml").
           to_return(:body => fixture("rails.yaml"))
-        stub_get("/api/v1/versions/coulda-3.0.9/downloads.json").
-          to_return(:body => fixture("downloads.json"))
+        stub_get("/api/v1/versions/coulda-3.0.9/downloads.yaml").
+          to_return(:body => fixture("downloads.yaml"))
       end
 
       it "should return the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda'
-        a_get("/api/v1/versions/coulda-3.0.9/downloads.json").
+        a_get("/api/v1/gems/coulda.yaml").
+          should have_been_made
+        a_get("/api/v1/versions/coulda-3.0.9/downloads.yaml").
           should have_been_made
         downloads['2011-06-22'].should == 8
       end
@@ -120,13 +122,13 @@ describe Gems::Client do
 
     context "with no dates specified" do
       before do
-        stub_get("/api/v1/versions/coulda-0.6.3/downloads.json").
-          to_return(:body => fixture("downloads.json"))
+        stub_get("/api/v1/versions/coulda-0.6.3/downloads.yaml").
+          to_return(:body => fixture("downloads.yaml"))
       end
 
       it "should return the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3'
-        a_get("/api/v1/versions/coulda-0.6.3/downloads.json").
+        a_get("/api/v1/versions/coulda-0.6.3/downloads.yaml").
           should have_been_made
         downloads['2011-06-22'].should == 8
       end
@@ -134,14 +136,14 @@ describe Gems::Client do
 
     context "with from date specified" do
       before do
-        stub_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
+        stub_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
           with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s}).
-          to_return(:body => fixture("downloads.json"))
+          to_return(:body => fixture("downloads.yaml"))
       end
 
       it "should return the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01')
-        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
+        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
           with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s}).
           should have_been_made
         downloads['2011-06-22'].should == 8
@@ -150,14 +152,14 @@ describe Gems::Client do
 
     context "with from and to dates specified" do
       before do
-        stub_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
+        stub_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
           with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"}).
-          to_return(:body => fixture("downloads.json"))
+          to_return(:body => fixture("downloads.yaml"))
       end
 
       it "should return the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01'), Date.parse('2011-06-28')
-        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.json").
+        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
           with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"}).
           should have_been_made
         downloads['2011-06-22'].should == 8
@@ -231,7 +233,7 @@ describe Gems::Client do
     before do
       stub_post("/api/v1/gems/gems/owners").
         with(:body => {:email => "sferik@gmail.com"}).
-        to_return(:body => fixture("add_owner.json"))
+        to_return(:body => fixture("add_owner"))
     end
 
     it "should add an owner to a RubyGem" do
@@ -247,7 +249,7 @@ describe Gems::Client do
     before do
       stub_delete("/api/v1/gems/gems/owners").
         with(:query => {:email => "sferik@gmail.com"}).
-        to_return(:body => fixture("remove_owner.json"))
+        to_return(:body => fixture("remove_owner"))
     end
 
     it "should remove an owner from a RubyGem" do

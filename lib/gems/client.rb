@@ -83,11 +83,11 @@ module Gems
     def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
       gem_version ||= info(gem_name)['version']
       response = if from
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", {:from => from.to_s, :to => to.to_s})
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.yaml", {:from => from.to_s, :to => to.to_s})
       else
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
+        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.yaml")
       end
-      MultiJson.decode(response)
+      YAML.load(response)
     end
 
     # Returns an array of hashes for all versions of given gems
