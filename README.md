@@ -12,7 +12,7 @@ Documentation
 
 Continuous Integration
 ----------------------
-[![Build Status](http://travis-ci.org/sferik/gems.png)](http://travis-ci.org/sferik/gems)
+[![Build Status](https://secure.travis-ci.org/sferik/gems.png)](http://travis-ci.org/sferik/gems)
 
 Usage Examples
 --------------
