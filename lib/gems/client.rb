@@ -1,7 +1,7 @@
 require 'date'
 require 'gems/configuration'
 require 'gems/request'
-require 'multi_json'
+require 'json'
 require 'yaml'
 
 module Gems
@@ -49,7 +49,7 @@ module Gems
     #   Gems.versions 'coulda'
     def versions(gem_name)
       response = get("/api/v1/versions/#{gem_name}.json")
-      MultiJson.decode(response)
+      JSON.parse(response)
     end
 
     # Returns the total number of downloads for a particular gem
