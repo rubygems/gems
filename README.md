@@ -12,7 +12,7 @@ Documentation
 
 Continuous Integration
 ----------------------
-[![Build Status](https://secure.travis-ci.org/sferik/gems.png)](http://travis-ci.org/sferik/gems)
+[![Build Status](https://secure.travis-ci.org/rubygems/gems.png)](http://travis-ci.org/rubygems/gems)
 
 Usage Examples
 --------------
@@ -105,12 +105,12 @@ Here are some ways *you* can contribute:
 * by writing specifications
 * by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
 * by refactoring code
-* by closing [issues](https://github.com/sferik/gems/issues)
+* by closing [issues](https://github.com/rubygems/gems/issues)
 * by reviewing patches
 
 Submitting an Issue
 -------------------
-We use the [GitHub issue tracker](https://github.com/sferik/gems/issues) to track bugs and
+We use the [GitHub issue tracker](https://github.com/rubygems/gems/issues) to track bugs and
 features. Before submitting a bug report or feature request, check to make sure it hasn't already
 been submitted. You can indicate support for an existing issuse by voting it up. When submitting a
 bug report, please include a [Gist](https://gist.github.com/) that includes a stack trace and any
@@ -132,7 +132,8 @@ Submitting a Pull Request
 Supported Rubies
 ----------------
 This library aims to support and is [tested
-against](http://travis-ci.org/sferik/gems) the following Ruby implementations:
+against](http://travis-ci.org/rubygems/gems) the following Ruby
+implementations:
 
 * Ruby 1.9.1
 * Ruby 1.9.2
@@ -154,4 +155,4 @@ time of a major release, support for that Ruby version may be dropped.
 Copyright
 ---------
 Copyright (c) 2011 Erik Michaels-Ober.
-See [LICENSE](https://github.com/sferik/gems/blob/master/LICENSE.md) for details.
+See [LICENSE](https://github.com/rubygems/gems/blob/master/LICENSE.md) for details.

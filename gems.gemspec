@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
   gem.email                 = ['sferik@gmail.com']
   gem.description           = %q{Ruby wrapper for the RubyGems.org API}
   gem.summary               = gem.description
-  gem.homepage              = 'https://github.com/sferik/gems'
+  gem.homepage              = 'https://github.com/rubygems/gems'
 
   gem.executables           = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files                 = `git ls-files`.split("\n")
