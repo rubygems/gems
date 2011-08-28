@@ -37,15 +37,15 @@ describe Gems::Client do
 
   describe ".versions" do
     before do
-      stub_get("/api/v1/versions/coulda.json").
-        to_return(:body => fixture("coulda.json"))
+      stub_get("/api/v1/versions/script_helpers.yaml").
+        to_return(:body => fixture("script_helpers.yaml"))
     end
 
     it "should return an array of gem version details" do
-      versions = Gems.versions 'coulda'
-      a_get("/api/v1/versions/coulda.json").
+      versions = Gems.versions 'script_helpers'
+      a_get("/api/v1/versions/script_helpers.yaml").
         should have_been_made
-      versions.first['number'].should == '0.6.3'
+      versions.first['number'].should == '0.1.0'
     end
   end
 

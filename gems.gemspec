@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.homepage    = 'https://github.com/rubygems/gems'
   gem.name        = 'gems'
   gem.require_paths = ['lib']
-  gem.required_ruby_version = '>= 1.9'
   gem.summary     = gem.description
   gem.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.version     = Gems::VERSION
