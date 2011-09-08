@@ -8,7 +8,7 @@ Ruby wrapper for the RubyGems.org API.
 [http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
 
 ## <a name="ci">Continuous Integration</a>
-[![Build Status](https://travis-ci.org/rubygems/gems.png)](http://travis-ci.org/rubygems/gems)
+[![Build Status](https://secure.travis-ci.org/rubygems/gems.png)](http://travis-ci.org/rubygems/gems)
 
 ## <a name="examples">Usage Examples</a>
     require 'rubygems'
