@@ -100,6 +100,23 @@ describe Gems::Client do
 
   end
 
+  describe ".most_downloaded" do
+    context "with nothing specified" do
+      before do
+        stub_get("/api/v1/downloads/all.yaml").
+	  to_return(:body => fixture("most_downloaded.yaml"))
+      end
+
+      it "should return the most downloaded versions" do
+        most_downloaded = Gems.most_downloaded
+        a_get("/api/v1/downloads/all.yaml").
+          should have_been_made
+        most_downloaded[:gems].first.first['full_name'].should == "abstract-1.0.0"
+        most_downloaded[:gems].first[1].should == 1
+      end
+    end
+  end
+
   describe ".downloads" do
 
     context "with no dates or version specified" do
