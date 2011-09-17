@@ -69,6 +69,17 @@ module Gems
       YAML.load(response)
     end
 
+    # Returns an array of the most downloaded gem versions of all time
+    #
+    # @authenticated false
+    # @return [Hash]
+    # @example
+    #   Gems.most_downloaded
+    def most_downloaded
+      response = get("/api/v1/downloads/all.yaml")
+      YAML.load(response)
+    end
+
     # Returns the number of downloads by day for a particular gem version
     #
     # @authenticated false
