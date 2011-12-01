@@ -8,9 +8,16 @@ Ruby wrapper for the RubyGems.org API.
 [http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
 
 ## <a name="ci"></a>Continuous Integration
-[![Build Status](https://secure.travis-ci.org/rubygems/gems.png)](http://travis-ci.org/rubygems/gems)
+[![Build Status](https://secure.travis-ci.org/rubygems/gems.png)][ci]
 
-## <a name="examples"></a>Usage Examples
+[ci]: http://travis-ci.org/rubygems/gems
+
+## <a name="dependencies"></a>Dependency Status
+[![Dependency Status](https://gemnasium.com/rubygems/gems.png)][gemnasium]
+
+[gemnasium]: https://gemnasium.com/rubygems/gems
+
+# <a name="examples"></a>Usage Examples
     require 'rubygems'
     require 'gems'
 
@@ -122,16 +129,19 @@ operating system. Ideally, a bug report should include a pull request with faili
 9. Submit a pull request. Please do not include changes to the gemspec, version, or history file. (If you want to create your own version for some reason, please do so in a separate commit.)
 
 ## <a name="versions"></a>Supported Ruby Versions
-This library aims to support and is [tested
-against](http://travis-ci.org/rubygems/gems) the following Ruby
+This library aims to support and is [tested against][ci] the following Ruby
 implementations:
 
 * Ruby 1.8.7
-* Ruby 1.9.1
 * Ruby 1.9.2
-* [JRuby](http://www.jruby.org/)
-* [Rubinius](http://rubini.us/)
-* [Ruby Enterprise Edition](http://www.rubyenterpriseedition.com/)
+* Ruby 1.9.3
+* [JRuby][]
+* [Rubinius][]
+* [Ruby Enterprise Edition][ree]
+
+[jruby]: http://www.jruby.org/
+[rubinius]: http://rubini.us/
+[ree]: http://www.rubyenterpriseedition.com/)
 
 If something doesn't work on one of these interpreters, it should be considered
 a bug.
@@ -148,5 +158,6 @@ timely fashion. If critical issues for a particular implementation exist at the
 time of a major release, support for that Ruby version may be dropped.
 
 ## <a name="copyright"></a>Copyright
-Copyright (c) 2011 Erik Michaels-Ober.
-See [LICENSE](https://github.com/rubygems/gems/blob/master/LICENSE.md) for details.
+Copyright (c) 2011 Erik Michaels-Ober. See [LICENSE][] for details.
+
+[license]: https://github.com/rubygems/gems/blob/master/LICENSE.md
