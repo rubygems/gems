@@ -13,7 +13,7 @@ Ruby wrapper for the RubyGems.org API.
 [ci]: http://travis-ci.org/rubygems/gems
 
 ## <a name="dependencies"></a>Dependency Status
-[![Dependency Status](https://gemnasium.com/rubygems/gems.png)][gemnasium]
+[![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
 
 [gemnasium]: https://gemnasium.com/rubygems/gems
 
