@@ -7,10 +7,10 @@ Ruby wrapper for the RubyGems.org API.
 ## <a name="documentation"></a>Documentation
 [http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
 
-## <a name="ci"></a>Continuous Integration
-[![Build Status](https://secure.travis-ci.org/rubygems/gems.png)][ci]
+## <a name="build"></a>Build Status
+[![Build Status](https://secure.travis-ci.org/rubygems/gems.png?branch=master)][travis]
 
-[ci]: http://travis-ci.org/rubygems/gems
+[travis]: http://travis-ci.org/rubygems/gems
 
 ## <a name="dependencies"></a>Dependency Status
 [![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
@@ -129,7 +129,7 @@ operating system. Ideally, a bug report should include a pull request with faili
 9. Submit a pull request. Please do not include changes to the gemspec, version, or history file. (If you want to create your own version for some reason, please do so in a separate commit.)
 
 ## <a name="versions"></a>Supported Ruby Versions
-This library aims to support and is [tested against][ci] the following Ruby
+This library aims to support and is [tested against][travis] the following Ruby
 implementations:
 
 * Ruby 1.8.7
