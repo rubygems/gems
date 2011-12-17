@@ -1,21 +1,14 @@
-# Gems
+# Gems [![Build Status](https://secure.travis-ci.org/rubygems/gems.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
 Ruby wrapper for the RubyGems.org API.
+
+[travis]: http://travis-ci.org/rubygems/gems
+[gemnasium]: https://gemnasium.com/rubygems/gems
 
 ## <a name="installation"></a>Installation
     gem install gems
 
 ## <a name="documentation"></a>Documentation
 [http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
-
-## <a name="build"></a>Build Status
-[![Build Status](https://secure.travis-ci.org/rubygems/gems.png?branch=master)][travis]
-
-[travis]: http://travis-ci.org/rubygems/gems
-
-## <a name="dependencies"></a>Dependency Status
-[![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
-
-[gemnasium]: https://gemnasium.com/rubygems/gems
 
 # <a name="examples"></a>Usage Examples
     require 'rubygems'
