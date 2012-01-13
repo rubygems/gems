@@ -1,11 +1,14 @@
 require 'helper'
 
 describe Gems do
+  after do
+    Gems.reset
+  end
+
   context "when delegating to a client" do
     before do
       stub_get("/api/v1/gems/rails.yaml").
         to_return(:body => fixture("rails.yaml"))
-      Gems.reset
     end
 
     it "should get the correct resource" do
@@ -66,4 +69,5 @@ describe Gems do
       end
     end
   end
+
 end

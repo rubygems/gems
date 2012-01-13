@@ -1,7 +1,7 @@
 require 'helper'
 
 describe Gems::Client do
-  before do
+  after do
     Gems.reset
   end
 
@@ -425,4 +425,5 @@ describe Gems::Client do
       end
     end
   end
+
 end
