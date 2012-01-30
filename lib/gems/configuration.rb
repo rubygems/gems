@@ -14,13 +14,13 @@ module Gems
     ]
 
     # Set the default API endpoint
-    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'].freeze : Gem.host.freeze
+    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : "https://rubygems.org"
 
     # Set the default credentials
-    DEFAULT_KEY = Gem.configuration.rubygems_api_key.freeze
+    DEFAULT_KEY = Gem.configuration.rubygems_api_key
 
     # Set the default 'User-Agent' HTTP header
-    DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}".freeze
+    DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}"
 
     attr_accessor *VALID_OPTIONS_KEYS
 
