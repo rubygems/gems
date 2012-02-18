@@ -426,4 +426,32 @@ describe Gems::Client do
     end
   end
 
+  describe ".latest" do
+    before do
+      stub_get("/api/v1/activity/latest.yaml").
+        to_return(:body => fixture("latest.yaml"))
+    end
+
+    it "should return some basic information about the given gem" do
+      latest = Gems.latest
+      a_get("/api/v1/activity/latest.yaml").
+        should have_been_made
+      latest.first['name'].should == 'seanwalbran-rpm_contrib'
+    end
+  end
+
+  describe ".just_updated" do
+    before do
+      stub_get("/api/v1/activity/just_updated.yaml").
+        to_return(:body => fixture("just_updated.yaml"))
+    end
+
+    it "should return some basic information about the given gem" do
+      just_updated = Gems.just_updated
+      a_get("/api/v1/activity/just_updated.yaml").
+        should have_been_made
+      just_updated.first['name'].should == 'rspec-tag_matchers'
+    end
+  end
+
 end

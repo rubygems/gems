@@ -1,0 +1,1098 @@
+---
+- name: seanwalbran-rpm_contrib
+  downloads: 3
+  version: 2.1.6.1
+  version_downloads: 3
+  authors: Bill Kayser, Jon Guymon
+  info: ! 'Community contributed instrumentation for various frameworks based on
+
+    the New Relic Ruby monitoring gem newrelic_rpm.
+
+'
+  project_uri: http://rubygems.org/gems/seanwalbran-rpm_contrib
+  gem_uri: http://rubygems.org/gems/seanwalbran-rpm_contrib-2.1.6.1.gem
+  homepage_uri: http://github.com/newrelic/rpm_contrib
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: newrelic_rpm
+      requirements: ! '>= 3.1.1'
+    - name: newrelic_rpm
+      requirements: ! '>= 3.1.1'
+- name: annotations
+  downloads: 7
+  version: 0.1.0
+  version_downloads: 7
+  authors: David Demaree
+  info: Source code annotations, extracted from Rails.
+  project_uri: http://rubygems.org/gems/annotations
+  gem_uri: http://rubygems.org/gems/annotations-0.1.0.gem
+  homepage_uri: http://github.com/ddemaree/annotations
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: rake
+      requirements: ! '>= 0'
+- name: ndl_search
+  downloads: 5
+  version: 0.0.0
+  version_downloads: 5
+  authors: Mao Tsunekawa
+  info: ndl_search.rb is a wrapper library for NDL Search OpenSearch API
+  project_uri: http://rubygems.org/gems/ndl_search
+  gem_uri: http://rubygems.org/gems/ndl_search-0.0.0.gem
+  homepage_uri: http://github.com/tsunekawa/ndl_search
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: bundler
+      requirements: ~> 1.0.0
+    - name: jeweler
+      requirements: ~> 1.8.3
+    - name: rcov
+      requirements: ! '>= 0'
+    - name: rdoc
+      requirements: ~> 3.12
+    - name: rspec
+      requirements: ~> 2.8.0
+    runtime:
+    - name: rest-client
+      requirements: ! '>= 0'
+- name: quick_magick_hooopo
+  downloads: 6
+  version: 0.8.1
+  version_downloads: 6
+  authors: Ahmed ElDawy
+  info: QuickMagick allows you to access ImageMagick command line functions using
+    Ruby interface.
+  project_uri: http://rubygems.org/gems/quick_magick_hooopo
+  gem_uri: http://rubygems.org/gems/quick_magick_hooopo-0.8.1.gem
+  homepage_uri: http://quickmagick.rubyforge.org/
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: monospace_tag_text_formatter
+  downloads: 7
+  version: 0.0.3
+  version_downloads: 7
+  authors: Jacek Mikrut
+  info: Extension to monospace_text_formatter Gem. Treats HTML-like tags as zero-length
+    and ensures they are properly closed during text truncation/splitting and reopened
+    after line wrapping.
+  project_uri: http://rubygems.org/gems/monospace_tag_text_formatter
+  gem_uri: http://rubygems.org/gems/monospace_tag_text_formatter-0.0.3.gem
+  homepage_uri: http://github.com/jacekmikrut/monospace_tag_text_formatter
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ~> 2.0
+    runtime:
+    - name: monospace_text_formatter
+      requirements: = 0.0.3
+- name: give4each
+  downloads: 12
+  version: 0.0.1
+  version_downloads: 12
+  authors: pasberth
+  info: This rubygem does not have a description or summary.
+  project_uri: http://rubygems.org/gems/give4each
+  gem_uri: http://rubygems.org/gems/give4each-0.0.1.gem
+  homepage_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: hoe
+      requirements: ~> 2.13
+    - name: rdoc
+      requirements: ~> 3.10
+    runtime: []
+- name: ajax_pagination
+  downloads: 10
+  version: 0.0.1
+  version_downloads: 10
+  authors: Ronald Ping Man Chan
+  info: Handles AJAX pagination for you, by hooking up the links you want to load
+    content with javascript in designated page containers. Each webpage can have multiple
+    page containers, each with a different set of pagination links. The page containers
+    can be nested. Degrades gracefully when javascript is disabled.
+  project_uri: http://rubygems.org/gems/ajax_pagination
+  gem_uri: http://rubygems.org/gems/ajax_pagination-0.0.1.gem
+  homepage_uri: https://github.com/ronalchn/ajax_pagination
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime:
+    - name: jquery-historyjs
+      requirements: ! '>= 0'
+    - name: jquery-rails
+      requirements: ! '>= 1.0'
+    - name: rails
+      requirements: ! '>= 3.1'
+- name: points-scraper
+  downloads: 10
+  version: 0.0.1
+  version_downloads: 10
+  authors: TADA Tadashi
+  info: ! 'getting mileages/points by web scraping shopping sites: T-SITE.'
+  project_uri: http://rubygems.org/gems/points-scraper
+  gem_uri: http://rubygems.org/gems/points-scraper-0.0.1.gem
+  homepage_uri: https://github.com/tdtds/points-scraper
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: mechanize
+      requirements: ! '>= 0'
+    - name: pit
+      requirements: ! '>= 0'
+- name: fluent-plugin-growthforecast
+  downloads: 10
+  version: 0.1.0
+  version_downloads: 10
+  authors: TAGOMORI Satoshi
+  info: Plugin to post numbers to GrowthForecast (by kazeburo)
+  project_uri: http://rubygems.org/gems/fluent-plugin-growthforecast
+  gem_uri: http://rubygems.org/gems/fluent-plugin-growthforecast-0.1.0.gem
+  homepage_uri: http://github.com/tagomoris/fluent-plugin-growthforecast
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: bundler
+      requirements: ~> 1.0.0
+    - name: jeweler
+      requirements: ~> 1.6.4
+    - name: rake
+      requirements: ! '>= 0.9.2'
+    - name: shoulda
+      requirements: ! '>= 0'
+    - name: simplecov
+      requirements: ! '>= 0.5.4'
+    - name: simplecov
+      requirements: ! '>= 0'
+    runtime:
+    - name: fluentd
+      requirements: ~> 0.10.8
+    - name: fluentd
+      requirements: ! '>= 0'
+    - name: rdoc
+      requirements: ! '>= 0'
+- name: rl_hiya_mikhail_grishko
+  downloads: 12
+  version: 0.0.1
+  version_downloads: 12
+  authors: Mikhail Grishko
+  info: The library opens up the String class and adds a method writesize, which returns
+    the size of the string.
+  project_uri: http://rubygems.org/gems/rl_hiya_mikhail_grishko
+  gem_uri: http://rubygems.org/gems/rl_hiya_mikhail_grishko-0.0.1.gem
+  homepage_uri: https://github.com/mikhailaleksandrovi4
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: truth-table
+  downloads: 14
+  version: '0.1'
+  version_downloads: 14
+  authors: Les Fletcher
+  info: Generate a truth table for a logical expression
+  project_uri: http://rubygems.org/gems/truth-table
+  gem_uri: http://rubygems.org/gems/truth-table-0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: test-unit
+      requirements: ~> 2.2.0
+    runtime: []
+- name: sunscraper
+  downloads: 17
+  version: 1.0.0
+  version_downloads: 17
+  authors: Peter Zotov
+  info: A WebKit-based, JavaScript-capable HTML scraper.
+  project_uri: http://rubygems.org/gems/sunscraper
+  gem_uri: http://rubygems.org/gems/sunscraper-1.0.0.gem
+  homepage_uri: http://github.com/roundlake/sunscraper
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime:
+    - name: ffi
+      requirements: ! '>= 1.0.11'
+- name: subtitle-library
+  downloads: 18
+  version: 0.0.1
+  version_downloads: 18
+  authors: HaNdyMaN89
+  info: A subtitle library which can manipulate SubRip, MicroDVD and SubViewer formats.
+  project_uri: http://rubygems.org/gems/subtitle-library
+  gem_uri: http://rubygems.org/gems/subtitle-library-0.0.1.gem
+  homepage_uri: https://github.com/HaNdyMaN89/subtitle-library
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: fakefs
+      requirements: ! '>= 0.4.0'
+    - name: rspec
+      requirements: ! '>= 2'
+    runtime: []
+- name: soundwave
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: David Demaree
+  info: A simple static website generator
+  project_uri: http://rubygems.org/gems/soundwave
+  gem_uri: http://rubygems.org/gems/soundwave-0.0.1.gem
+  homepage_uri: http://github.com/ddemaree/soundwave
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: bundler
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ~> 2.8.0
+    runtime:
+    - name: activesupport
+      requirements: ! '>= 3.1.0'
+    - name: fssm
+      requirements: ! '>= 0'
+    - name: mustache
+      requirements: ! '>= 0'
+    - name: tilt
+      requirements: ! '>= 0'
+- name: konacha
+  downloads: 21
+  version: 0.9.0
+  version_downloads: 21
+  authors: John Firebaugh
+  info: Unit test your Rails JavaScript with the mocha test framework and chai assertion
+    library
+  project_uri: http://rubygems.org/gems/konacha
+  gem_uri: http://rubygems.org/gems/konacha-0.9.0.gem
+  homepage_uri: http://github.com/jfirebaugh/konacha
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: capybara-firebug
+      requirements: ~> 1.1
+    - name: coffee-script
+      requirements: ! '>= 0'
+    - name: ejs
+      requirements: ! '>= 0'
+    - name: rspec-rails
+      requirements: ! '>= 0'
+    runtime:
+    - name: capybara
+      requirements: ! '>= 0'
+    - name: jquery-rails
+      requirements: ! '>= 0'
+    - name: rails
+      requirements: ~> 3.1
+- name: red_socket
+  downloads: 23
+  version: 0.0.1
+  version_downloads: 23
+  authors: Mariusz Wyrozebski
+  info: red-socket.com is a service providing push notifications to clients listening
+    to websockets. Gem is a wrapper for the service to allow pushing messages.
+  project_uri: http://rubygems.org/gems/red_socket
+  gem_uri: http://rubygems.org/gems/red_socket-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: em-http-request
+      requirements: ! '>= 0'
+    - name: eventmachine
+      requirements: ! '>= 0'
+    - name: rake
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime: []
+- name: windbag
+  downloads: 21
+  version: 0.0.1
+  version_downloads: 21
+  authors: Logan Koester
+  info: Windbag is the event notification system extracted from MLG Starcraft Arena
+  project_uri: http://rubygems.org/gems/windbag
+  gem_uri: http://rubygems.org/gems/windbag-0.0.1.gem
+  homepage_uri: http://github.com/agoragames/windbag
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: database_cleaner
+      requirements: ! '>= 0'
+    - name: factory_girl_rails
+      requirements: ! '>= 0'
+    - name: guard
+      requirements: ! '>= 0'
+    - name: guard-rspec
+      requirements: ! '>= 0'
+    - name: rspec-rails
+      requirements: ! '>= 0'
+    - name: shoulda-matchers
+      requirements: ! '>= 0'
+    - name: sqlite3
+      requirements: ! '>= 0'
+    runtime:
+    - name: rails
+      requirements: ~> 3.1.3
+- name: rl_hiya_belnicoff_marcelo
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: Marcelo Belnicoff
+  info: The library implement de class hiya
+  project_uri: http://rubygems.org/gems/rl_hiya_belnicoff_marcelo
+  gem_uri: http://rubygems.org/gems/rl_hiya_belnicoff_marcelo-0.0.1.gem
+  homepage_uri: http://rubylearning.org/
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: nerd_quiz
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: Simeon F. Willbanks
+  info: Test your nerd skills by answering NerdPursuit questions!
+  project_uri: http://rubygems.org/gems/nerd_quiz
+  gem_uri: http://rubygems.org/gems/nerd_quiz-0.0.1.gem
+  homepage_uri: http://www.simeonfosterwillbanks.com
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: fsgrowl
+  downloads: 23
+  version: 0.1.0
+  version_downloads: 23
+  authors: Gilles Devaux
+  info: Growl notifier for Formspring.me
+  project_uri: http://rubygems.org/gems/fsgrowl
+  gem_uri: http://rubygems.org/gems/fsgrowl-0.1.0.gem
+  homepage_uri: http://rubygems.org/gems/fsgrowl
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rake
+      requirements: ! '>= 0'
+    runtime:
+    - name: daemons
+      requirements: ! '>= 0'
+    - name: json
+      requirements: ! '>= 0'
+    - name: nokogiri
+      requirements: ! '>= 0'
+- name: my_string_extend_MAB
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: Satish Talim
+  info: The library opens up the String class and adds a method writesize, which returns
+    the size of the string.
+  project_uri: http://rubygems.org/gems/my_string_extend_MAB
+  gem_uri: http://rubygems.org/gems/my_string_extend_MAB-0.0.1.gem
+  homepage_uri: http://rubylearning.org/
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: make_resourceful
+  downloads: 25
+  version: '1.0'
+  version_downloads: 25
+  authors: Hampton Catlin
+  info: ! '      Take back control of your Controllers. Make them awesome. Make them
+    sleek. Make them resourceful.
+
+'
+  project_uri: http://rubygems.org/gems/make_resourceful
+  gem_uri: http://rubygems.org/gems/make_resourceful-1.0.gem
+  homepage_uri: http://github.com/hcatlin/make_resourceful
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: action_kit_api
+  downloads: 25
+  version: 0.1.0
+  version_downloads: 25
+  authors: Sam Stelfox
+  info: Provides encapsulated object access through the ActionKit API
+  project_uri: http://rubygems.org/gems/action_kit_api
+  gem_uri: http://rubygems.org/gems/action_kit_api-0.1.0.gem
+  homepage_uri: http://democracyforamerica.com/
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: cucumber
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime: []
+- name: padrino-flash
+  downloads: 21
+  version: 0.1.0
+  version_downloads: 21
+  authors: Benjamin Bloch
+  info: A plugin for the Padrino web framework which adds support for Rails like flash
+    messages
+  project_uri: http://rubygems.org/gems/padrino-flash
+  gem_uri: http://rubygems.org/gems/padrino-flash-0.1.0.gem
+  homepage_uri: https://github.com/Cirex/padrino-flash
+  wiki_uri: ''
+  documentation_uri: ''
+  mailing_list_uri: ''
+  source_code_uri: https://github.com/Cirex/padrino-flash
+  bug_tracker_uri: https://github.com/Cirex/padrino-flash/issues
+  dependencies:
+    development:
+    - name: rack-test
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ! '>= 2.0.0'
+    - name: rspec-html-matchers
+      requirements: ! '>= 0'
+    runtime:
+    - name: padrino-core
+      requirements: ! '>= 0'
+    - name: padrino-helpers
+      requirements: ! '>= 0'
+- name: assertions-eb
+  downloads: 26
+  version: 1.7.2
+  version_downloads: 26
+  authors: DesigningPatterns, Expected Behavior
+  info: This project adds some additional assertions to Test::Unit::Assertions, including
+    assert_raise_message (allowing verification of error messages) and assert_greater_than.
+  project_uri: http://rubygems.org/gems/assertions-eb
+  gem_uri: http://rubygems.org/gems/assertions-eb-1.7.2.gem
+  homepage_uri: http://www.expectedbehavior.com
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: financial_services
+  downloads: 4
+  version: 0.0.1
+  version_downloads: 4
+  authors: Bruce Martin
+  info: Agris to .Net AgrisServices Interface
+  project_uri: http://rubygems.org/gems/financial_services
+  gem_uri: http://rubygems.org/gems/financial_services-0.0.1.gem
+  homepage_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: rails
+      requirements: ~> 3.2.1
+- name: FacebookParser
+  downloads: 25
+  version: 0.1.2
+  version_downloads: 25
+  authors: Nicholas Pufal
+  info: This gem was made in 2 hours for an experiemntal project, so yes, it's pretty
+    simple yet, but I hope is still useful.'
+  project_uri: http://rubygems.org/gems/FacebookParser
+  gem_uri: http://rubygems.org/gems/FacebookParser-0.1.2.gem
+  homepage_uri: https://github.com/nicholaspufal/facebookparser
+  wiki_uri: ''
+  documentation_uri: https://github.com/nicholaspufal/facebookparser
+  mailing_list_uri: ''
+  source_code_uri: ''
+  bug_tracker_uri: ''
+  dependencies:
+    development: []
+    runtime:
+    - name: httparty
+      requirements: ! '>= 0'
+- name: jashmenn-method_cache
+  downloads: 24
+  version: 0.7.1.0
+  version_downloads: 24
+  authors: Justin Balthrop
+  info: Simple memcache-based memoization library for Ruby
+  project_uri: http://rubygems.org/gems/jashmenn-method_cache
+  gem_uri: http://rubygems.org/gems/jashmenn-method_cache-0.7.1.0.gem
+  homepage_uri: http://github.com/ninjudd/method_cache
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: ruby-notes
+  downloads: 23
+  version: 1.0.0
+  version_downloads: 23
+  authors: Martin Asenov
+  info: Ruby notes is a console lne tool that let you keep reminders/notes and afterwards
+    search within them and export the result to various formats.
+  project_uri: http://rubygems.org/gems/ruby-notes
+  gem_uri: http://rubygems.org/gems/ruby-notes-1.0.0.gem
+  homepage_uri: https://github.com/asenovm/Ruby-Notes
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: welcome_cycle
+  downloads: 24
+  version: 0.0.4
+  version_downloads: 24
+  authors: Luke Brown, Chris Stainthorpe
+  info: The idea behind this gem is to abstract out the logic of sending out welcome
+    emails during a free trial.
+  project_uri: http://rubygems.org/gems/welcome_cycle
+  gem_uri: http://rubygems.org/gems/welcome_cycle-0.0.4.gem
+  homepage_uri: ''
+  wiki_uri: ''
+  documentation_uri: ''
+  mailing_list_uri: ''
+  source_code_uri: https://github.com/customersure/welcome_cycle
+  bug_tracker_uri: ''
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime:
+    - name: rails
+      requirements: ! '>= 3.0.10'
+- name: openshifter
+  downloads: 24
+  version: '0.1'
+  version_downloads: 24
+  authors: Marek Jelen
+  info: Simplify deployments of Sinatra applications using JRuby to OpenShift
+  project_uri: http://rubygems.org/gems/openshifter
+  gem_uri: http://rubygems.org/gems/openshifter-0.1.gem
+  homepage_uri: http://github.com/marekjelen/openshifter
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: yack
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: Florian Motlik
+  info: Churn through Yaml file via callbacks. Define rules for specific parameters,
+    load the yaml file and get callbacks if the routes match
+  project_uri: http://rubygems.org/gems/yack
+  gem_uri: http://rubygems.org/gems/yack-0.0.1.gem
+  homepage_uri: https://github.com/flomotlik/yack
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: yaml_db_arel
+  downloads: 25
+  version: 0.2.2
+  version_downloads: 25
+  authors: Adam Wiggins, Orion Henry
+  info: ! '
+
+    YamlDb is a database-independent format for dumping and restoring data.  It complements
+    the the database-independent schema format found in db/schema.rb.  The data is
+    saved into db/data.yml.
+
+    This can be used as a replacement for mysqldump or pg_dump, but only for the databases
+    typically used by Rails apps.  Users, permissions, schemas, triggers, and other
+    advanced database features are not supported - by design.
+
+    Any database that has an ActiveRecord adapter should work
+
+'
+  project_uri: http://rubygems.org/gems/yaml_db_arel
+  gem_uri: http://rubygems.org/gems/yaml_db_arel-0.2.2.gem
+  homepage_uri: http://github.com/ludicast/yaml_db
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: em-test
+  downloads: 28
+  version: 0.0.1
+  version_downloads: 28
+  authors: Paweł Pacana
+  info: Simple TDD API for testing asynchronous EventMachine code. Extracted from
+    em-spec to remove dependencies.
+  project_uri: http://rubygems.org/gems/em-test
+  gem_uri: http://rubygems.org/gems/em-test-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: eventmachine
+      requirements: ! '>= 1.0.0.beta.1'
+- name: refinerycms-footer-menu
+  downloads: 24
+  version: '1.0'
+  version_downloads: 24
+  authors: Marian Andre
+  info: Ruby on Rails Footer Menu engine for Refinery CMS
+  project_uri: http://rubygems.org/gems/refinerycms-footer-menu
+  gem_uri: http://rubygems.org/gems/refinerycms-footer-menu-1.0.gem
+  homepage_uri: http://github.com/bitflut/refinerycms-footer-menu
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: refinerycms-testing
+      requirements: ~> 2.0.0
+    runtime:
+    - name: refinerycms-core
+      requirements: ~> 2.0.0
+- name: collectd-interface
+  downloads: 31
+  version: 0.1.0
+  version_downloads: 31
+  authors: Victor Penso
+  info: Web and REST interface to data stored by Collectd.
+  project_uri: http://rubygems.org/gems/collectd-interface
+  gem_uri: http://rubygems.org/gems/collectd-interface-0.1.0.gem
+  homepage_uri: https://github.com/vpenso/collectd-interface
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: maruku
+      requirements: ! '>= 0.6'
+    - name: sinatra
+      requirements: ! '>= 1.3'
+- name: jsr166y
+  downloads: 24
+  version: '20120125'
+  version_downloads: 24
+  authors: Charles Oliver Nutter
+  info: A gem wrapping the jsr166y.jar file for Java 7's java.util.concurrent features
+  project_uri: http://rubygems.org/gems/jsr166y
+  gem_uri: http://rubygems.org/gems/jsr166y-20120125.gem
+  homepage_uri: http://github.com/headius/jsr166y-gem
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: yast
+  downloads: 22
+  version: 0.0.1
+  version_downloads: 22
+  authors: Thomas Smestad
+  info: Gem to use Yast API
+  project_uri: http://rubygems.org/gems/yast
+  gem_uri: http://rubygems.org/gems/yast-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: builder
+      requirements: ! '>= 0'
+    - name: xml-simple
+      requirements: ! '>= 0'
+- name: sidekiq-mailer
+  downloads: 23
+  version: 0.1.0
+  version_downloads: 23
+  authors: André Arko
+  info: Module for Rails mailers that sends the mail in the background. Adapted from
+    the resque_mailer gem.
+  project_uri: http://rubygems.org/gems/sidekiq-mailer
+  gem_uri: http://rubygems.org/gems/sidekiq-mailer-0.1.0.gem
+  homepage_uri: http://github.com/indirect/sidekiq-mailer
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ~> 2.8.0
+    runtime:
+    - name: sidekiq
+      requirements: ~> 0.6
+- name: uhl-cap-recipes
+  downloads: 23
+  version: 0.1.0
+  version_downloads: 23
+  authors: crazycode
+  info: capistrano recipes for my works
+  project_uri: http://rubygems.org/gems/uhl-cap-recipes
+  gem_uri: http://rubygems.org/gems/uhl-cap-recipes-0.1.0.gem
+  homepage_uri: http://github.com/crazycode/uhl-cap-recipes
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: addressable
+      requirements: ! '>= 0'
+    - name: capistrano
+      requirements: ! '>= 0'
+    - name: json
+      requirements: ! '>= 0'
+- name: twitter_to_csv
+  downloads: 25
+  version: 0.0.1
+  version_downloads: 25
+  authors: Andrew Cantino
+  info: Dump the Twitter streaming API to a CSV or JSON file
+  project_uri: http://rubygems.org/gems/twitter_to_csv
+  gem_uri: http://rubygems.org/gems/twitter_to_csv-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: em-http-request
+      requirements: ! '>= 0'
+    - name: fastercsv
+      requirements: ! '>= 0'
+    - name: twitter-stream
+      requirements: ! '>= 0'
+    - name: unsupervised-language-detection
+      requirements: ! '>= 0'
+- name: taglib-heroku
+  downloads: 24
+  version: '1.7'
+  version_downloads: 24
+  authors: PJ Kelly
+  info: Ruby wrapper for installing Taglib on Heroku
+  project_uri: http://rubygems.org/gems/taglib-heroku
+  gem_uri: http://rubygems.org/gems/taglib-heroku-1.7.gem
+  homepage_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: cmake-heroku
+      requirements: ! '>= 0'
+- name: cmake-heroku
+  downloads: 28
+  version: 2.8.7
+  version_downloads: 28
+  authors: PJ Kelly
+  info: Ruby wrapper for installing Cmake on Heroku
+  project_uri: http://rubygems.org/gems/cmake-heroku
+  gem_uri: http://rubygems.org/gems/cmake-heroku-2.8.7.gem
+  homepage_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: cmake
+  downloads: 32
+  version: 2.8.7
+  version_downloads: 32
+  authors: PJ Kelly
+  info: CMake Ruby Wrapper
+  project_uri: http://rubygems.org/gems/cmake
+  gem_uri: http://rubygems.org/gems/cmake-2.8.7.gem
+  homepage_uri: 
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: faucet
+  downloads: 23
+  version: 0.1.0
+  version_downloads: 23
+  authors: Dan Shipper
+  info: Schedule emails to be sent at a later date from your Rails app.
+  project_uri: http://rubygems.org/gems/faucet
+  gem_uri: http://rubygems.org/gems/faucet-0.1.0.gem
+  homepage_uri: http://www.danshipper.com
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: sqlite3
+      requirements: ! '>= 0'
+    runtime:
+    - name: rails
+      requirements: ~> 3.1
+- name: dummy-gem
+  downloads: 1
+  version: 0.0.1
+  version_downloads: 1
+  authors: Michael Rykov
+  info: ! '    No need for alarm - this is only a test
+
+'
+  project_uri: http://rubygems.org/gems/dummy-gem
+  gem_uri: http://rubygems.org/gems/dummy-gem-0.0.1.gem
+  homepage_uri: http://www.google.com
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime: []
+- name: time_tag_in_words
+  downloads: 23
+  version: 0.0.1
+  version_downloads: 23
+  authors: Jason L Perry
+  info: Example rails plugin for a talk on publishing ruby gems
+  project_uri: http://rubygems.org/gems/time_tag_in_words
+  gem_uri: http://rubygems.org/gems/time_tag_in_words-0.0.1.gem
+  homepage_uri: https://github.com/TampaRuby/time_tag_in_words
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: sqlite3
+      requirements: ! '>= 0'
+    runtime:
+    - name: rails
+      requirements: ~> 3
+- name: action_pusher
+  downloads: 28
+  version: 0.0.1
+  version_downloads: 28
+  authors: Logan Koester
+  info: Render views to Pusher from anywhere in your application
+  project_uri: http://rubygems.org/gems/action_pusher
+  gem_uri: http://rubygems.org/gems/action_pusher-0.0.1.gem
+  homepage_uri: https://github.com/agoragames/action_pusher
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: pusher
+      requirements: ! '>= 0'
+    - name: rails
+      requirements: ! '>= 3.1'
+- name: riaction_genie
+  downloads: 27
+  version: 0.0.1
+  version_downloads: 27
+  authors: Chris Eberz
+  info: Engine to manually trigger IActionable events
+  project_uri: http://rubygems.org/gems/riaction_genie
+  gem_uri: http://rubygems.org/gems/riaction_genie-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: haml
+      requirements: ! '>= 0'
+    - name: rails
+      requirements: = 3.0.11
+    - name: rake
+      requirements: = 0.8.7
+    - name: riaction
+      requirements: = 1.1.0
+    - name: ruby-iactionable
+      requirements: = 0.0.2
+- name: iced-coffee-script
+  downloads: 27
+  version: 2.2.0
+  version_downloads: 27
+  authors: Max Krohn
+  info: ! '    Ruby IcedCoffeeScript is a bridge to the JS CoffeeScript compiler.
+
+'
+  project_uri: http://rubygems.org/gems/iced-coffee-script
+  gem_uri: http://rubygems.org/gems/iced-coffee-script-2.2.0.gem
+  homepage_uri: http://github.com/maxtaco/ruby-coffee-script
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: execjs
+      requirements: ! '>= 0'
+    - name: iced-coffee-script-source
+      requirements: ! '>= 0'

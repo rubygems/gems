@@ -260,5 +260,30 @@ module Gems
       gem_version ||= info(gem_name)['version']
       put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version))
     end
+
+    # Pulls the 50 gems most recently added to RubyGems.org (for the first time). Returns an array of the XML or JSON representation of the gems
+    #
+    # @authenticated false
+    # @param options [Hash] A customizable set of options.
+    # @return [Array]
+    # @example
+    #   Gem.latest
+    def latest(options={})
+      response = get("/api/v1/activity/latest.yaml", options)
+      YAML.load(response)
+    end
+
+    # Pulls the 50 most recently updated gems. Returns an array of the XML or JSON representation of the gem versions
+    #
+    # @authenticated false
+    # @param options [Hash] A customizable set of options.
+    # @return [Array]
+    # @example
+    #   Gem.just_updated
+    def just_updated(options={})
+      response = get("/api/v1/activity/just_updated.yaml", options)
+      YAML.load(response)
+    end
+
   end
 end
