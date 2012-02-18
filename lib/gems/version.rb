@@ -1,3 +1,3 @@
 module Gems
-  VERSION = "0.5.1" unless defined? ::Gems::VERSION
+  VERSION = "0.6.0" unless defined? ::Gems::VERSION
 end
