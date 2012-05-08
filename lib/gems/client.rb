@@ -39,6 +39,63 @@ module Gems
       YAML.load(response)
     end
 
+    # List all gems that you own
+    #
+    # @authenticated true
+    # @param user_handle [String] The handle of a user.
+    # @return [Array]
+    # @example
+    #   Gems.gems
+    def gems(user_handle=nil)
+      response = if user_handle
+        get("/api/v1/owners/#{user_handle}/gems.yaml")
+      else
+        get("/api/v1/gems.yaml")
+      end
+      YAML.load(response)
+    end
+
+    # Submit a gem to RubyGems.org
+    #
+    # @authenticated true
+    # @param gem [File] A built gem.
+    # @return [String]
+    # @example
+    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
+    def push(gem)
+      post("/api/v1/gems", gem.read, 'application/octet-stream')
+    end
+
+    # Remove a gem from RubyGems.org's index
+    #
+    # @authenticated true
+    # @param gem_name [String] The name of a gem.
+    # @param gem_version [String] The version of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @option options [String] :platform
+    # @return [String]
+    # @example
+    #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
+    def yank(gem_name, gem_version=nil, options={})
+      gem_version ||= info(gem_name)['version']
+      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version))
+    end
+
+    # Update a previously yanked gem back into RubyGems.org's index
+    #
+    # @authenticated true
+    # @param gem_name [String] The name of a gem.
+    # @param gem_version [String] The version of a gem.
+    # @param options [Hash] A customizable set of options.
+    # @option options [String] :platform
+    # @return [String]
+    # @example
+    #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
+    def unyank(gem_name, gem_version=nil, options={})
+      gem_version ||= info(gem_name)['version']
+      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version))
+    end
+
     # Returns an array of gem version details
     #
     # @authenticated false
@@ -58,26 +115,37 @@ module Gems
     # @param gem_version [String] The version of a gem.
     # @return [Hash]
     # @example
-    #   Gems.total_downloads 'rails_admin', '0.0.0'
+    #   Gems.total_downloads 'rails_admin', '0.0.1'
     def total_downloads(gem_name=nil, gem_version=nil)
-      if gem_name
+      response = if gem_name
         gem_version ||= info(gem_name)['version']
-        response = get("/api/v1/downloads/#{gem_name}-#{gem_version}.yaml")
+        get("/api/v1/downloads/#{gem_name}-#{gem_version}.yaml")
       else
-        response = get("/api/v1/downloads.yaml")
+        get("/api/v1/downloads.yaml")
       end
       YAML.load(response)
     end
 
-    # Returns an array of the most downloaded gem versions of all time
+    # Returns an array containing the top 50 downloaded gem versions for today
     #
     # @authenticated false
-    # @return [Hash]
+    # @return [Array]
+    # @example
+    #   Gems.most_downloaded_today
+    def most_downloaded_today
+      response = get("/api/v1/downloads/top.yaml")
+      YAML.load(response)[:gems]
+    end
+
+    # Returns an array containing the top 50 downloaded gem versions of all time
+    #
+    # @authenticated false
+    # @return [Array]
     # @example
     #   Gems.most_downloaded
     def most_downloaded
       response = get("/api/v1/downloads/all.yaml")
-      YAML.load(response)
+      YAML.load(response)[:gems]
     end
 
     # Returns the number of downloads by day for a particular gem version
@@ -97,43 +165,6 @@ module Gems
       else
         get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.yaml")
       end
-      YAML.load(response)
-    end
-
-    # Returns an array of hashes for all versions of given gems
-    #
-    # @authenticated false
-    # @param gems [Array] A list of gem names
-    # @return [Array]
-    # @example
-    #   Gems.dependencies 'rails', 'thor'
-    def dependencies(*gems)
-      response = get('/api/v1/dependencies', {:gems => gems.join(',')})
-      Marshal.load(response)
-    end
-
-    # Retrieve your API key using HTTP basic auth
-    #
-    # @authenticated true
-    # @return [String]
-    # @example
-    #   Gems.configure do |config|
-    #     config.username = 'nick@gemcutter.org'
-    #     config.password = 'schwwwwing'
-    #   end
-    #   Gems.api_key
-    def api_key
-      get('/api/v1/api_key')
-    end
-
-    # List all gems that you own
-    #
-    # @authenticated true
-    # @return [Array]
-    # @example
-    #   Gems.gems
-    def gems
-      response = get("/api/v1/gems.yaml")
       YAML.load(response)
     end
 
@@ -220,48 +251,7 @@ module Gems
       post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url})
     end
 
-    # Submit a gem to RubyGems.org
-    #
-    # @authenticated true
-    # @param gem [File] A built gem.
-    # @return [String]
-    # @example
-    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-    def push(gem)
-      post("/api/v1/gems", gem.read, 'application/octet-stream')
-    end
-
-    # Remove a gem from RubyGems.org's index
-    #
-    # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
-    # @return [String]
-    # @example
-    #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def yank(gem_name, gem_version=nil, options={})
-      gem_version ||= info(gem_name)['version']
-      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version))
-    end
-
-    # Update a previously yanked gem back into RubyGems.org's index
-    #
-    # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
-    # @return [String]
-    # @example
-    #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def unyank(gem_name, gem_version=nil, options={})
-      gem_version ||= info(gem_name)['version']
-      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version))
-    end
-
-    # Pulls the 50 gems most recently added to RubyGems.org (for the first time). Returns an array of the XML or JSON representation of the gems
+    # Returns the 50 gems most recently added to RubyGems.org (for the first time)
     #
     # @authenticated false
     # @param options [Hash] A customizable set of options.
@@ -273,7 +263,7 @@ module Gems
       YAML.load(response)
     end
 
-    # Pulls the 50 most recently updated gems. Returns an array of the XML or JSON representation of the gem versions
+    # Returns the 50 most recently updated gems
     #
     # @authenticated false
     # @param options [Hash] A customizable set of options.
@@ -283,6 +273,32 @@ module Gems
     def just_updated(options={})
       response = get("/api/v1/activity/just_updated.yaml", options)
       YAML.load(response)
+    end
+
+    # Retrieve your API key using HTTP basic auth
+    #
+    # @authenticated true
+    # @return [String]
+    # @example
+    #   Gems.configure do |config|
+    #     config.username = 'nick@gemcutter.org'
+    #     config.password = 'schwwwwing'
+    #   end
+    #   Gems.api_key
+    def api_key
+      get('/api/v1/api_key')
+    end
+
+    # Returns an array of hashes for all versions of given gems
+    #
+    # @authenticated false
+    # @param gems [Array] A list of gem names
+    # @return [Array]
+    # @example
+    #   Gems.dependencies 'rails', 'thor'
+    def dependencies(*gems)
+      response = get('/api/v1/dependencies', {:gems => gems.join(',')})
+      Marshal.load(response)
     end
 
   end
