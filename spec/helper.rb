@@ -8,6 +8,12 @@ require 'gems'
 require 'rspec'
 require 'webmock/rspec'
 
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+end
+
 def rubygems_url(url)
   url =~ /^http/ ? url : 'https://rubygems.org' + url
 end

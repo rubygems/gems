@@ -10,11 +10,10 @@ describe Gems::Client do
       stub_get("/api/v1/gems/rails.yaml").
         to_return(:body => fixture("rails.yaml"))
     end
-    it "should return some basic information about the given gem" do
+    it "returns some basic information about the given gem" do
       info = Gems.info 'rails'
-      a_get("/api/v1/gems/rails.yaml").
-        should have_been_made
-      info['name'].should == 'rails'
+      expect(a_get("/api/v1/gems/rails.yaml")).to have_been_made
+      expect(info['name']).to eq 'rails'
     end
   end
 
@@ -24,12 +23,10 @@ describe Gems::Client do
         with(:query => {"query" => "cucumber"}).
         to_return(:body => fixture("search.yaml"))
     end
-    it "should return an array of active gems that match the query" do
+    it "returns an array of active gems that match the query" do
       search = Gems.search 'cucumber'
-      a_get("/api/v1/search.yaml").
-        with(:query => {"query" => "cucumber"}).
-        should have_been_made
-      search.first['name'].should == 'cucumber'
+      expect(a_get("/api/v1/search.yaml").with(:query => {"query" => "cucumber"})).to have_been_made
+      expect(search.first['name']).to eq 'cucumber'
     end
   end
 
@@ -39,11 +36,10 @@ describe Gems::Client do
         stub_get("/api/v1/gems.yaml").
           to_return(:body => fixture("gems.yaml"))
       end
-      it "should list all gems that you own" do
+      it "lists all gems that you own" do
         gems = Gems.gems
-        a_get("/api/v1/gems.yaml").
-          should have_been_made
-        gems.first['name'].should == "exchb"
+        expect(a_get("/api/v1/gems.yaml")).to have_been_made
+        expect(gems.first['name']).to eq "exchb"
       end
     end
     context "with a user handle specified" do
@@ -51,11 +47,10 @@ describe Gems::Client do
         stub_get("/api/v1/owners/sferik/gems.yaml").
           to_return(:body => fixture("gems.yaml"))
       end
-      it "should list all gems that the specified user owns" do
+      it "lists all gems that the specified user owns" do
         gems = Gems.gems("sferik")
-        a_get("/api/v1/owners/sferik/gems.yaml").
-          should have_been_made
-        gems.first['name'].should == "exchb"
+        expect(a_get("/api/v1/owners/sferik/gems.yaml")).to have_been_made
+        expect(gems.first['name']).to eq "exchb"
       end
     end
   end
@@ -65,11 +60,10 @@ describe Gems::Client do
       stub_post("/api/v1/gems").
         to_return(:body => fixture("push"))
     end
-    it "should submit a gem to RubyGems.org" do
+    it "submits a gem to RubyGems.org" do
       push = Gems.push(File.new(File.expand_path("../../fixtures/gems-0.0.8.gem", __FILE__), "rb"))
-      a_post("/api/v1/gems").
-        should have_been_made
-      push.should == "Successfully registered gem: gems (0.0.8)"
+      expect(a_post("/api/v1/gems")).to have_been_made
+      expect(push).to eq "Successfully registered gem: gems (0.0.8)"
     end
   end
 
@@ -82,12 +76,10 @@ describe Gems::Client do
           with(:query => {:gem_name => "gems", :version => "3.0.9"}).
           to_return(:body => fixture("yank"))
       end
-      it "should remove a gem from RubyGems.org's index" do
+      it "removes a gem from RubyGems.org's index" do
         yank = Gems.yank("gems")
-        a_delete("/api/v1/gems/yank").
-          with(:query => {:gem_name => "gems", :version => "3.0.9"}).
-          should have_been_made
-        yank.should == "Successfully yanked gem: gems (0.0.8)"
+        expect(a_delete("/api/v1/gems/yank").with(:query => {:gem_name => "gems", :version => "3.0.9"})).to have_been_made
+        expect(yank).to eq "Successfully yanked gem: gems (0.0.8)"
       end
     end
     context "with a version specified" do
@@ -96,12 +88,10 @@ describe Gems::Client do
           with(:query => {:gem_name => "gems", :version => "0.0.8"}).
           to_return(:body => fixture("yank"))
       end
-      it "should remove a gem from RubyGems.org's index" do
+      it "removes a gem from RubyGems.org's index" do
         yank = Gems.yank("gems", "0.0.8")
-        a_delete("/api/v1/gems/yank").
-          with(:query => {:gem_name => "gems", :version => "0.0.8"}).
-          should have_been_made
-        yank.should == "Successfully yanked gem: gems (0.0.8)"
+        expect(a_delete("/api/v1/gems/yank").with(:query => {:gem_name => "gems", :version => "0.0.8"})).to have_been_made
+        expect(yank).to eq "Successfully yanked gem: gems (0.0.8)"
       end
     end
   end
@@ -115,12 +105,10 @@ describe Gems::Client do
           with(:body => {:gem_name => "gems", :version => "3.0.9"}).
           to_return(:body => fixture("unyank"))
       end
-      it "should update a previously yanked gem back into RubyGems.org's index" do
+      it "updates a previously yanked gem back into RubyGems.org's index" do
         unyank = Gems.unyank("gems")
-        a_put("/api/v1/gems/unyank").
-          with(:body => {:gem_name => "gems", :version => "3.0.9"}).
-          should have_been_made
-        unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+        expect(a_put("/api/v1/gems/unyank").with(:body => {:gem_name => "gems", :version => "3.0.9"})).to have_been_made
+        expect(unyank).to eq "Successfully unyanked gem: gems (0.0.8)"
       end
     end
     context "with a version specified" do
@@ -129,12 +117,10 @@ describe Gems::Client do
           with(:body => {:gem_name => "gems", :version => "0.0.8"}).
           to_return(:body => fixture("unyank"))
       end
-      it "should update a previously yanked gem back into RubyGems.org's index" do
+      it "updates a previously yanked gem back into RubyGems.org's index" do
         unyank = Gems.unyank("gems", "0.0.8")
-        a_put("/api/v1/gems/unyank").
-          with(:body => {:gem_name => "gems", :version => "0.0.8"}).
-          should have_been_made
-        unyank.should == "Successfully unyanked gem: gems (0.0.8)"
+        expect(a_put("/api/v1/gems/unyank").with(:body => {:gem_name => "gems", :version => "0.0.8"})).to have_been_made
+        expect(unyank).to eq "Successfully unyanked gem: gems (0.0.8)"
       end
     end
   end
@@ -144,11 +130,10 @@ describe Gems::Client do
       stub_get("/api/v1/versions/script_helpers.yaml").
         to_return(:body => fixture("script_helpers.yaml"))
     end
-    it "should return an array of gem version details" do
+    it "returns an array of gem version details" do
       versions = Gems.versions 'script_helpers'
-      a_get("/api/v1/versions/script_helpers.yaml").
-        should have_been_made
-      versions.first['number'].should == '0.1.0'
+      expect(a_get("/api/v1/versions/script_helpers.yaml")).to have_been_made
+      expect(versions.first['number']).to eq '0.1.0'
     end
   end
 
@@ -158,11 +143,10 @@ describe Gems::Client do
         stub_get("/api/v1/downloads.yaml").
           to_return(:body => fixture("total_downloads.yaml"))
       end
-      it "should return the total number of downloads on RubyGems.org" do
+      it "returns the total number of downloads on RubyGems.org" do
         downloads = Gems.total_downloads
-        a_get("/api/v1/downloads.yaml").
-          should have_been_made
-        downloads[:total].should == 244368950
+        expect(a_get("/api/v1/downloads.yaml")).to have_been_made
+        expect(downloads[:total]).to eq 244368950
       end
     end
     context "with no version specified" do
@@ -172,14 +156,12 @@ describe Gems::Client do
         stub_get("/api/v1/downloads/rails_admin-3.0.9.yaml").
           to_return(:body => fixture("rails_admin-0.0.0.yaml"))
       end
-      it "should the total number of downloads for the specified gem" do
+      it "returns the total number of downloads for the specified gem" do
         downloads = Gems.total_downloads('rails_admin')
-        a_get("/api/v1/gems/rails_admin.yaml").
-          should have_been_made
-        a_get("/api/v1/downloads/rails_admin-3.0.9.yaml").
-          should have_been_made
-        downloads[:version_downloads].should == 3142
-        downloads[:total_downloads].should == 3142
+        expect(a_get("/api/v1/gems/rails_admin.yaml")).to have_been_made
+        expect(a_get("/api/v1/downloads/rails_admin-3.0.9.yaml")).to have_been_made
+        expect(downloads[:version_downloads]).to eq 3142
+        expect(downloads[:total_downloads]).to eq 3142
       end
     end
     context "with a version specified" do
@@ -187,12 +169,11 @@ describe Gems::Client do
         stub_get("/api/v1/downloads/rails_admin-0.0.0.yaml").
           to_return(:body => fixture("rails_admin-0.0.0.yaml"))
       end
-      it "should the total number of downloads for the specified gem" do
+      it "returns the total number of downloads for the specified gem" do
         downloads = Gems.total_downloads('rails_admin', '0.0.0')
-        a_get("/api/v1/downloads/rails_admin-0.0.0.yaml").
-          should have_been_made
-        downloads[:version_downloads].should == 3142
-        downloads[:total_downloads].should == 3142
+        expect(a_get("/api/v1/downloads/rails_admin-0.0.0.yaml")).to have_been_made
+        expect(downloads[:version_downloads]).to eq 3142
+        expect(downloads[:total_downloads]).to eq 3142
       end
     end
   end
@@ -203,12 +184,11 @@ describe Gems::Client do
         stub_get("/api/v1/downloads/top.yaml").
           to_return(:body => fixture("most_downloaded_today.yaml"))
       end
-      it "should return the most downloaded versions today" do
+      it "returns the most downloaded versions today" do
         most_downloaded = Gems.most_downloaded_today
-        a_get("/api/v1/downloads/top.yaml").
-          should have_been_made
-        most_downloaded.first.first['full_name'].should == "rake-0.9.2.2"
-        most_downloaded.first.last.should == 9801
+        expect(a_get("/api/v1/downloads/top.yaml")).to have_been_made
+        expect(most_downloaded.first.first['full_name']).to eq "rake-0.9.2.2"
+        expect(most_downloaded.first.last).to eq 9801
       end
     end
   end
@@ -219,12 +199,11 @@ describe Gems::Client do
         stub_get("/api/v1/downloads/all.yaml").
           to_return(:body => fixture("most_downloaded.yaml"))
       end
-      it "should return the most downloaded versions" do
+      it "returns the most downloaded versions" do
         most_downloaded = Gems.most_downloaded
-        a_get("/api/v1/downloads/all.yaml").
-          should have_been_made
-        most_downloaded.first.first['full_name'].should == "abstract-1.0.0"
-        most_downloaded.first.last.should == 1
+        expect(a_get("/api/v1/downloads/all.yaml")).to have_been_made
+        expect(most_downloaded.first.first['full_name']).to eq "abstract-1.0.0"
+        expect(most_downloaded.first.last).to eq 1
       end
     end
   end
@@ -237,13 +216,11 @@ describe Gems::Client do
         stub_get("/api/v1/versions/coulda-3.0.9/downloads.yaml").
           to_return(:body => fixture("downloads.yaml"))
       end
-      it "should return the number of downloads by day for a particular gem version" do
+      it "returns the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda'
-        a_get("/api/v1/gems/coulda.yaml").
-          should have_been_made
-        a_get("/api/v1/versions/coulda-3.0.9/downloads.yaml").
-          should have_been_made
-        downloads['2011-06-22'].should == 8
+        expect(a_get("/api/v1/gems/coulda.yaml")).to have_been_made
+        expect(a_get("/api/v1/versions/coulda-3.0.9/downloads.yaml")).to have_been_made
+        expect(downloads['2011-06-22']).to eq 8
       end
     end
     context "with no dates specified" do
@@ -251,11 +228,10 @@ describe Gems::Client do
         stub_get("/api/v1/versions/coulda-0.6.3/downloads.yaml").
           to_return(:body => fixture("downloads.yaml"))
       end
-      it "should return the number of downloads by day for a particular gem version" do
+      it "returns the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3'
-        a_get("/api/v1/versions/coulda-0.6.3/downloads.yaml").
-          should have_been_made
-        downloads['2011-06-22'].should == 8
+        expect(a_get("/api/v1/versions/coulda-0.6.3/downloads.yaml")).to have_been_made
+        expect(downloads['2011-06-22']).to eq 8
       end
     end
     context "with from date specified" do
@@ -264,12 +240,10 @@ describe Gems::Client do
           with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s}).
           to_return(:body => fixture("downloads.yaml"))
       end
-      it "should return the number of downloads by day for a particular gem version" do
+      it "returns the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01')
-        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
-          with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s}).
-          should have_been_made
-        downloads['2011-06-22'].should == 8
+        expect(a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").with(:query => {"from" => "2011-01-01", "to" => Date.today.to_s})).to have_been_made
+        expect(downloads['2011-06-22']).to eq 8
       end
     end
     context "with from and to dates specified" do
@@ -278,12 +252,10 @@ describe Gems::Client do
           with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"}).
           to_return(:body => fixture("downloads.yaml"))
       end
-      it "should return the number of downloads by day for a particular gem version" do
+      it "returns the number of downloads by day for a particular gem version" do
         downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01'), Date.parse('2011-06-28')
-        a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").
-          with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"}).
-          should have_been_made
-        downloads['2011-06-22'].should == 8
+        expect(a_get("/api/v1/versions/coulda-0.6.3/downloads/search.yaml").with(:query => {"from" => "2011-01-01", "to" => "2011-06-28"})).to have_been_made
+        expect(downloads['2011-06-22']).to eq 8
       end
     end
   end
@@ -293,11 +265,10 @@ describe Gems::Client do
       stub_get("/api/v1/gems/gems/owners.yaml").
         to_return(:body => fixture("owners.yaml"))
     end
-    it "should list all owners of a gem" do
+    it "lists all owners of a gem" do
       owners = Gems.owners("gems")
-      a_get("/api/v1/gems/gems/owners.yaml").
-        should have_been_made
-      owners.first['email'].should == "sferik@gmail.com"
+      expect(a_get("/api/v1/gems/gems/owners.yaml")).to have_been_made
+      expect(owners.first['email']).to eq "sferik@gmail.com"
     end
   end
 
@@ -307,12 +278,10 @@ describe Gems::Client do
         with(:body => {:email => "sferik@gmail.com"}).
         to_return(:body => fixture("add_owner"))
     end
-    it "should add an owner to a RubyGem" do
+    it "adds an owner to a RubyGem" do
       owner = Gems.add_owner("gems", "sferik@gmail.com")
-      a_post("/api/v1/gems/gems/owners").
-        with(:body => {:email => "sferik@gmail.com"}).
-        should have_been_made
-      owner.should == "Owner added successfully."
+      expect(a_post("/api/v1/gems/gems/owners").with(:body => {:email => "sferik@gmail.com"})).to have_been_made
+      expect(owner).to eq "Owner added successfully."
     end
   end
 
@@ -322,12 +291,10 @@ describe Gems::Client do
         with(:query => {:email => "sferik@gmail.com"}).
         to_return(:body => fixture("remove_owner"))
     end
-    it "should remove an owner from a RubyGem" do
+    it "removes an owner from a RubyGem" do
       owner = Gems.remove_owner("gems", "sferik@gmail.com")
-      a_delete("/api/v1/gems/gems/owners").
-        with(:query => {:email => "sferik@gmail.com"}).
-        should have_been_made
-      owner.should == "Owner removed successfully."
+      expect(a_delete("/api/v1/gems/gems/owners").with(:query => {:email => "sferik@gmail.com"})).to have_been_made
+      expect(owner).to eq "Owner removed successfully."
     end
   end
 
@@ -336,11 +303,10 @@ describe Gems::Client do
       stub_get("/api/v1/web_hooks.yaml").
         to_return(:body => fixture("web_hooks.yaml"))
     end
-    it "should list the web hooks registered under your account" do
+    it "lists the web hooks registered under your account" do
       web_hooks = Gems.web_hooks
-      a_get("/api/v1/web_hooks.yaml").
-        should have_been_made
-      web_hooks['all gems'].first['url'].should == "http://example.com"
+      expect(a_get("/api/v1/web_hooks.yaml")).to have_been_made
+      expect(web_hooks['all gems'].first['url']).to eq "http://example.com"
     end
   end
 
@@ -350,12 +316,10 @@ describe Gems::Client do
         with(:body => {:gem_name => "*", :url => "http://example.com"}).
         to_return(:body => fixture("add_web_hook"))
     end
-    it "should add a web hook" do
+    it "adds a web hook" do
       add_web_hook = Gems.add_web_hook("*", "http://example.com")
-      a_post("/api/v1/web_hooks").
-        with(:body => {:gem_name => "*", :url => "http://example.com"}).
-        should have_been_made
-      add_web_hook.should == "Successfully created webhook for all gems to http://example.com"
+      expect(a_post("/api/v1/web_hooks").with(:body => {:gem_name => "*", :url => "http://example.com"})).to have_been_made
+      expect(add_web_hook).to eq "Successfully created webhook for all gems to http://example.com"
     end
   end
 
@@ -365,12 +329,10 @@ describe Gems::Client do
         with(:query => {:gem_name => "*", :url => "http://example.com"}).
         to_return(:body => fixture("remove_web_hook"))
     end
-    it "should remove a web hook" do
+    it "removes a web hook" do
       remove_web_hook = Gems.remove_web_hook("*", "http://example.com")
-      a_delete("/api/v1/web_hooks/remove").
-        with(:query => {:gem_name => "*", :url => "http://example.com"}).
-        should have_been_made
-      remove_web_hook.should == "Successfully removed webhook for all gems to http://example.com"
+      expect(a_delete("/api/v1/web_hooks/remove").with(:query => {:gem_name => "*", :url => "http://example.com"})).to have_been_made
+      expect(remove_web_hook).to eq "Successfully removed webhook for all gems to http://example.com"
     end
   end
 
@@ -380,12 +342,10 @@ describe Gems::Client do
         with(:body => {:gem_name => "*", :url => "http://example.com"}).
         to_return(:body => fixture("fire_web_hook"))
     end
-    it "should fire a web hook" do
+    it "fires a web hook" do
       fire_web_hook = Gems.fire_web_hook("*", "http://example.com")
-      a_post("/api/v1/web_hooks/fire").
-        with(:body => {:gem_name => "*", :url => "http://example.com"}).
-        should have_been_made
-      fire_web_hook.should == "Successfully deployed webhook for gemcutter to http://example.com"
+      expect(a_post("/api/v1/web_hooks/fire").with(:body => {:gem_name => "*", :url => "http://example.com"})).to have_been_made
+      expect(fire_web_hook).to eq "Successfully deployed webhook for gemcutter to http://example.com"
     end
   end
 
@@ -394,11 +354,10 @@ describe Gems::Client do
       stub_get("/api/v1/activity/latest.yaml").
         to_return(:body => fixture("latest.yaml"))
     end
-    it "should return some basic information about the given gem" do
+    it "returns some basic information about the given gem" do
       latest = Gems.latest
-      a_get("/api/v1/activity/latest.yaml").
-        should have_been_made
-      latest.first['name'].should == 'seanwalbran-rpm_contrib'
+      expect(a_get("/api/v1/activity/latest.yaml")).to have_been_made
+      expect(latest.first['name']).to eq 'seanwalbran-rpm_contrib'
     end
   end
 
@@ -407,11 +366,10 @@ describe Gems::Client do
       stub_get("/api/v1/activity/just_updated.yaml").
         to_return(:body => fixture("just_updated.yaml"))
     end
-    it "should return some basic information about the given gem" do
+    it "returns some basic information about the given gem" do
       just_updated = Gems.just_updated
-      a_get("/api/v1/activity/just_updated.yaml").
-        should have_been_made
-      just_updated.first['name'].should == 'rspec-tag_matchers'
+      expect(a_get("/api/v1/activity/just_updated.yaml")).to have_been_made
+      expect(just_updated.first['name']).to eq 'rspec-tag_matchers'
     end
   end
 
@@ -424,11 +382,10 @@ describe Gems::Client do
       stub_get("https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key").
         to_return(:body => fixture("api_key"))
     end
-    it "should retrieve an API key" do
+    it "retrieves an API key" do
       api_key = Gems.api_key
-      a_get("https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key").
-        should have_been_made
-      api_key.should == "701243f217cdf23b1370c7b66b65ca97"
+      expect(a_get("https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key")).to have_been_made
+      expect(api_key).to eq "701243f217cdf23b1370c7b66b65ca97"
     end
   end
 
@@ -438,12 +395,10 @@ describe Gems::Client do
         with(:query => {"gems" => "rails,thor"}).
         to_return(:body => fixture("dependencies"))
     end
-    it "should return an array of hashes for all versions of given gems" do
+    it "returns an array of hashes for all versions of given gems" do
       dependencies = Gems.dependencies 'rails', 'thor'
-      a_get("/api/v1/dependencies").
-        with(:query => {"gems" => "rails,thor"}).
-        should have_been_made
-      dependencies.first[:number].should == "3.0.9"
+      expect(a_get("/api/v1/dependencies").with(:query => {"gems" => "rails,thor"})).to have_been_made
+      expect(dependencies.first[:number]).to eq "3.0.9"
     end
   end
 
