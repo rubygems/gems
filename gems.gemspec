@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.files      += Dir.glob("lib/**/*.rb")
   spec.files      += Dir.glob("spec/**/*")
   spec.homepage    = 'https://github.com/rubygems/gems'
+  spec.licenses    = ['MIT']
   spec.name        = 'gems'
   spec.require_paths = ['lib']
   spec.summary     = spec.description
