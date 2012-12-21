@@ -1,21 +1,20 @@
 # encoding: utf-8
 require File.expand_path('../lib/gems/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.add_development_dependency 'kaminari'
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'simplecov'
-  gem.add_development_dependency 'webmock'
-  gem.add_development_dependency 'yard'
-  gem.authors     = ["Erik Michaels-Ober"]
-  gem.description = %q{Ruby wrapper for the RubyGems.org API}
-  gem.email       = ['sferik@gmail.com']
-  gem.files       = `git ls-files`.split("\n")
-  gem.homepage    = 'https://github.com/rubygems/gems'
-  gem.name        = 'gems'
-  gem.require_paths = ['lib']
-  gem.summary     = gem.description
-  gem.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.version     = Gems::VERSION
+Gem::Specification.new do |spec|
+  spec.add_development_dependency 'kaminari'
+  spec.add_development_dependency 'simplecov'
+  spec.authors     = ["Erik Michaels-Ober"]
+  spec.description = %q{Ruby wrapper for the RubyGems.org API}
+  spec.email       = ['sferik@gmail.com']
+  spec.files       = `git ls-files`.split("\n")
+  spec.files       = %w(.yardopts CONTRIBUTING.md LICENSE.md README.md Rakefile gems.gemspec)
+  spec.files      += Dir.glob("lib/**/*.rb")
+  spec.files      += Dir.glob("spec/**/*")
+  spec.homepage    = 'https://github.com/rubygems/gems'
+  spec.name        = 'gems'
+  spec.require_paths = ['lib']
+  spec.summary     = spec.description
+  spec.test_files  = Dir.glob("spec/**/*")
+  spec.version     = Gems::VERSION
 end

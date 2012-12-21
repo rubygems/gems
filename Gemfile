@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
 
-platforms :jruby do
-  gem 'jruby-openssl', '~> 0.7'
+gem 'rake'
+gem 'yard'
+gem 'jruby-openssl', :platforms => :jruby
+
+group :test do
+  gem 'rspec'
+  gem 'webmock'
 end
 
 gemspec
