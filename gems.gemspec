@@ -2,7 +2,7 @@
 require File.expand_path('../lib/gems/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.add_development_dependency 'maruku'
+  gem.add_development_dependency 'kaminari'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'simplecov'
