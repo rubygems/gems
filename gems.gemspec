@@ -2,8 +2,6 @@
 require File.expand_path('../lib/gems/version', __FILE__)
 
 Gem::Specification.new do |spec|
-  spec.add_development_dependency 'kaminari'
-  spec.add_development_dependency 'simplecov'
   spec.authors     = ["Erik Michaels-Ober"]
   spec.description = %q{Ruby wrapper for the RubyGems.org API}
   spec.email       = ['sferik@gmail.com']
