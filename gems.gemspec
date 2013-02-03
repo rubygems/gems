@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.licenses    = ['MIT']
   spec.name        = 'gems'
   spec.require_paths = ['lib']
-  spec.signing_key = '/Users/sferik/.gem/private_key.pem'
+  spec.signing_key = File.expand_path("~/.gem/private_key.pem") if $0 =~ /gem\z/
   spec.summary     = spec.description
   spec.test_files  = Dir.glob("spec/**/*")
   spec.version     = Gems::VERSION
