@@ -6,7 +6,7 @@ require 'gems/version'
 Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.0'
   spec.authors     = ["Erik Michaels-Ober"]
-  spec.cert_chain  = ['public_cert.pem']
+  spec.cert_chain  = ['certs/sferik.pem']
   spec.description = %q{Ruby wrapper for the RubyGems.org API}
   spec.email       = ['sferik@gmail.com']
   spec.files       = `git ls-files`.split("\n")
