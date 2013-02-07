@@ -12,6 +12,16 @@ Ruby wrapper for the RubyGems.org API.
 ## Installation
     gem install gems
 
+To ensure the code you're installing hasn't been tampered with, it's
+recommended that you verify the signature. To do this, you need to add my
+public key as a trusted certificate (you only need to do this once):
+
+    gem cert --add <(curl -Ls https://gist.github.com/sferik/4701180/raw/public_cert.pem)
+
+Then, install the gem with the high security trust policy:
+
+    gem install gems -P HighSecurity
+
 ## Documentation
 [http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
 
