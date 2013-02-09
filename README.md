@@ -148,6 +148,6 @@ fashion. If critical issues for a particular implementation exist at the time
 of a major release, support for that Ruby version may be dropped.
 
 ## Copyright
-Copyright (c) 2011 Erik Michaels-Ober. See [LICENSE][] for details.
+Copyright (c) 2011-2013 Erik Michaels-Ober. See [LICENSE][] for details.
 
 [license]: LICENSE.md
