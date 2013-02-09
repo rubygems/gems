@@ -1,11 +1,14 @@
 # Gems
+
 [![Gem Version](https://badge.fury.io/rb/gems.png)][gem]
 [![Build Status](https://secure.travis-ci.org/rubygems/gems.png?branch=master)][travis]
 [![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
+[![Code Climate](https://codeclimate.com/github/rubygems/gems.png)][codeclimate]
 
 [gem]: https://rubygems.org/gems/gems
 [travis]: http://travis-ci.org/rubygems/gems
 [gemnasium]: https://gemnasium.com/rubygems/gems
+[codeclimate]: https://codeclimate.com/github/rubygems/gems
 
 Ruby wrapper for the RubyGems.org API.
 
