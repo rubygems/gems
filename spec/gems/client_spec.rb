@@ -19,13 +19,19 @@ describe Gems::Client do
 
   describe "#search" do
     before do
-      stub_get("/api/v1/search.yaml").
-        with(:query => {"query" => "cucumber"}).
-        to_return(:body => fixture("search.yaml"))
+      4.times do |page|
+        stub_get("/api/v1/search.yaml").
+          with(:query => {"query" => "cucumber", :page => "#{page + 1}"}).
+          to_return(:body => fixture("search_page#{page + 1}.yaml"))
+      end
     end
     it "returns an array of active gems that match the query" do
       search = Gems.search 'cucumber'
-      expect(a_get("/api/v1/search.yaml").with(:query => {"query" => "cucumber"})).to have_been_made
+      4.times do |page|
+        expect(a_get("/api/v1/search.yaml").
+               with(:query => {"query" => "cucumber", :page => "#{page + 1}"})).
+               to have_been_made
+      end
       expect(search.first['name']).to eq 'cucumber'
     end
   end
