@@ -402,4 +402,24 @@ describe Gems::Client do
     end
   end
 
+  describe "#reverse_dependencies" do
+    before do
+      stub_get("/api/v1/gems/rspec/reverse_dependencies.yaml").
+        to_return(:body => fixture("reverse_dependencies.yaml"))
+
+      stub_get("/api/v1/gems/rspec/reverse_dependencies.yaml").
+        with(:query => {"short" => "true"}).
+        to_return(:body => fixture("reverse_dependencies_short.yaml"))
+    end
+
+    it "returns an array of hashes for all gems which are reverse dependencies to the given gem" do
+      reverse_dependencies = Gems.reverse_dependencies 'rspec'
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.yaml")).to have_been_made
+    end
+
+    it "returns an array of names for all gems which are reverse dependencies to the given gem" do
+      reverse_dependencies = Gems.reverse_dependencies 'rspec', :short => true
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.yaml").with(:query => {"short" => "true"})).to have_been_made
+    end
+  end
 end
