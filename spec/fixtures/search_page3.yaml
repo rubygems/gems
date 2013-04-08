@@ -1,0 +1,481 @@
+---
+- name: guard-cucumber-js
+  downloads: 991
+  version: 0.0.2
+  version_downloads: 523
+  platform: ruby
+  authors: James Harton
+  info: Guard gem for cucumber.js
+  project_uri: http://rubygems.org/gems/guard-cucumber-js
+  gem_uri: http://rubygems.org/gems/guard-cucumber-js-0.0.2.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: bundler
+      requirements: ! '>= 1.0'
+    runtime:
+    - name: guard
+      requirements: ! '>= 0.10.0'
+- name: cucumber-usual_suspects
+  downloads: 827
+  version: 0.0.1
+  version_downloads: 827
+  platform: ruby
+  authors: Matt Wynne
+  info: Identities for Cucumber step definitions
+  project_uri: http://rubygems.org/gems/cucumber-usual_suspects
+  gem_uri: http://rubygems.org/gems/cucumber-usual_suspects-0.0.1.gem
+  homepage_uri: http://github.com/mattwynne/cucumber-usual_suspects
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: aruba
+      requirements: ! '>= 0'
+    runtime:
+    - name: cucumber
+      requirements: ~> 0.10.2
+- name: cucumber_fm-core
+  downloads: 807
+  version: '0.1'
+  version_downloads: 807
+  platform: ruby
+  authors: Michał Czyż [@cs3b]
+  info: Use it with cucumber_fm-plugin (<= Rails 3.0) or cucumber_fm-engine (>= Rails
+    3.1)
+  project_uri: http://rubygems.org/gems/cucumber_fm-core
+  gem_uri: http://rubygems.org/gems/cucumber_fm-core-0.1.gem
+  homepage_uri: http://cucumber.fm
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime:
+    - name: diff-lcs
+      requirements: ! '>= 0'
+- name: cucumber-debug
+  downloads: 851
+  version: 0.0.1
+  version_downloads: 851
+  platform: ruby
+  authors: David Padilla
+  info: Launch a browser snapshot for cucumber failed scenarios
+  project_uri: http://rubygems.org/gems/cucumber-debug
+  gem_uri: http://rubygems.org/gems/cucumber-debug-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: https://github.com/crowdint/cucumber-debug/wiki
+  documentation_uri: https://github.com/crowdint/cucumber-debug
+  mailing_list_uri: ''
+  source_code_uri: https://github.com/crowdint/cucumber-debug
+  bug_tracker_uri: https://github.com/crowdint/cucumber-debug/issues
+  dependencies:
+    development:
+    - name: rake
+      requirements: ! '>= 0'
+    runtime:
+    - name: cucumber-rails
+      requirements: ! '>= 0'
+    - name: launchy
+      requirements: ! '>= 0'
+- name: js-log-cucumber
+  downloads: 699
+  version: 1.0.2
+  version_downloads: 699
+  platform: ruby
+  authors: Aslak Hellesøy
+  info: Behaviour Driven Development with elegance and joy
+  project_uri: http://rubygems.org/gems/js-log-cucumber
+  gem_uri: http://rubygems.org/gems/js-log-cucumber-1.0.2.gem
+  homepage_uri: http://cukes.info
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: aruba
+      requirements: ~> 0.4.2
+    - name: bcat
+      requirements: = 0.6.1
+    - name: capybara
+      requirements: ! '>= 1.0.0'
+    - name: nokogiri
+      requirements: ! '>= 1.4.4'
+    - name: prawn
+      requirements: = 0.8.4
+    - name: prawn-layout
+      requirements: = 0.8.4
+    - name: rack-test
+      requirements: ! '>= 0.5.7'
+    - name: rake
+      requirements: ! '>= 0.9.2'
+    - name: ramaze
+      requirements: ! '>= 0'
+    - name: rdiscount
+      requirements: = 1.6.8
+    - name: rspec
+      requirements: ! '>= 2.6.0'
+    - name: simplecov
+      requirements: ! '>= 0.4.2'
+    - name: sinatra
+      requirements: ! '>= 1.2.6'
+    - name: spork
+      requirements: ! '>= 0.9.0.rc7'
+    - name: syntax
+      requirements: ! '>= 1.0.0'
+    - name: webrat
+      requirements: ! '>= 0.7.3'
+    - name: yard
+      requirements: = 0.7.1
+    runtime:
+    - name: builder
+      requirements: ! '>= 2.1.2'
+    - name: diff-lcs
+      requirements: ! '>= 1.1.2'
+    - name: gherkin
+      requirements: ~> 2.4.5
+    - name: json
+      requirements: ! '>= 1.4.6'
+    - name: term-ansicolor
+      requirements: ! '>= 1.0.5'
+- name: kbaum-cucumber
+  downloads: 623
+  version: 0.4.5.pre
+  version_downloads: 623
+  platform: ruby
+  authors: Aslak Hellesøy
+  info: A BDD tool written in Ruby
+  project_uri: http://rubygems.org/gems/kbaum-cucumber
+  gem_uri: http://rubygems.org/gems/kbaum-cucumber-0.4.5.pre.gem
+  homepage_uri: http://cukes.info
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: nokogiri
+      requirements: = 1.4.0
+    - name: prawn
+      requirements: = 0.5.1
+    - name: rspec
+      requirements: = 1.2.9
+    - name: spork
+      requirements: = 0.7.3
+    runtime:
+    - name: builder
+      requirements: = 2.1.2
+    - name: diff-lcs
+      requirements: = 1.1.2
+    - name: polyglot
+      requirements: = 0.2.9
+    - name: term-ansicolor
+      requirements: = 1.0.4
+    - name: treetop
+      requirements: = 1.4.2
+- name: cucumber-value
+  downloads: 653
+  version: 0.0.1
+  version_downloads: 653
+  platform: ruby
+  authors: Colin Humphreys
+  info: Assert the value of Cucumber features
+  project_uri: http://rubygems.org/gems/cucumber-value
+  gem_uri: http://rubygems.org/gems/cucumber-value-0.0.1.gem
+  homepage_uri: https://github.com/hatofmonkeys/cucumber-value
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: aruba
+      requirements: ! '>= 0'
+    - name: cucumber
+      requirements: ! '>= 0'
+    - name: guard
+      requirements: ! '>= 0'
+    - name: guard-cucumber
+      requirements: ! '>= 0'
+    - name: guard-rspec
+      requirements: ! '>= 0'
+    - name: rake
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ! '>= 0'
+    - name: simplecov
+      requirements: ! '>= 0'
+    - name: yard
+      requirements: ! '>= 0'
+    runtime:
+    - name: cucumber
+      requirements: ! '>= 0'
+- name: cucumber_timing_presenter
+  downloads: 641
+  version: 1.0.0.0
+  version_downloads: 641
+  platform: ruby
+  authors: Ryan Boucher
+  info: A cucumber formatter that generates html documents showing which steps are
+    contributing to slow build times
+  project_uri: http://rubygems.org/gems/cucumber_timing_presenter
+  gem_uri: http://rubygems.org/gems/cucumber_timing_presenter-1.0.0.0.gem
+  homepage_uri: http://github.com/distributedlife/cucumber_timings_presenter
+  wiki_uri: ''
+  documentation_uri: ''
+  mailing_list_uri: ''
+  source_code_uri: ''
+  bug_tracker_uri: ''
+  dependencies:
+    development: []
+    runtime:
+    - name: cucumber
+      requirements: ! '>= 0'
+- name: cucumber-voip
+  downloads: 686
+  version: 0.1.0
+  version_downloads: 686
+  platform: ruby
+  authors: Ben Langfeld
+  info: Automated functional testing of voice applications is typically difficult
+    and expensive. Not so when we can specify our systems using Cucumber.
+  project_uri: http://rubygems.org/gems/cucumber-voip
+  gem_uri: http://rubygems.org/gems/cucumber-voip-0.1.0.gem
+  homepage_uri: https://github.com/benlangfeld/cucumber-voip
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: bundler
+      requirements: ! '>= 1.0.0'
+    - name: guard-cucumber
+      requirements: ! '>= 0'
+    - name: rake
+      requirements: ! '>= 0'
+    - name: yard
+      requirements: ! '>= 0.6.0'
+    runtime:
+    - name: activesupport
+      requirements: ! '>= 3.0.10'
+    - name: cucumber
+      requirements: ! '>= 1.0.2'
+    - name: rspec-rayo
+      requirements: ! '>= 0.3.0'
+- name: stefl-cucumber
+  downloads: 548
+  version: 0.10.1
+  version_downloads: 546
+  platform: ruby
+  authors: Aslak Hellesøy
+  info: Behaviour Driven Development with elegance and joy
+  project_uri: http://rubygems.org/gems/stefl-cucumber
+  gem_uri: http://rubygems.org/gems/stefl-cucumber-0.10.1.gem
+  homepage_uri: http://cukes.info
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: aruba
+      requirements: ~> 0.2.8
+    - name: nokogiri
+      requirements: ~> 1.4.4
+    - name: prawn
+      requirements: = 0.8.4
+    - name: prawn-layout
+      requirements: = 0.8.4
+    - name: rake
+      requirements: ~> 0.8.7
+    - name: rspec
+      requirements: ~> 2.3.0
+    - name: simplecov
+      requirements: ~> 0.3.7
+    - name: spork
+      requirements: ~> 0.8.4
+    - name: syntax
+      requirements: ~> 1.0.0
+    runtime:
+    - name: builder
+      requirements: ! '>= 2.1.2'
+    - name: diff-lcs
+      requirements: ~> 1.1.2
+    - name: gherkin
+      requirements: ~> 2.3.3
+    - name: json
+      requirements: ! '>= 1.4'
+    - name: term-ansicolor
+      requirements: ~> 1.0.5
+- name: cucumber_analytics
+  downloads: 1841
+  version: 0.0.9
+  version_downloads: 90
+  platform: ruby
+  authors: Eric Kessler
+  info: Static analysis of Cucumber tests made easy.
+  project_uri: http://rubygems.org/gems/cucumber_analytics
+  gem_uri: http://rubygems.org/gems/cucumber_analytics-0.0.9.gem
+  homepage_uri: https://github.com/enkessler/cucumber_analytics
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: cucumber
+      requirements: ! '>= 0'
+    - name: rake
+      requirements: ! '>= 0'
+    - name: rspec
+      requirements: ! '>= 0'
+    - name: simplecov
+      requirements: ! '>= 0'
+    runtime: []
+- name: cucumber-profiler
+  downloads: 487
+  version: 1.0.0
+  version_downloads: 487
+  platform: ruby
+  authors: Michael Blumberg
+  info: A way to profile the performance of your cucumber features
+  project_uri: http://rubygems.org/gems/cucumber-profiler
+  gem_uri: http://rubygems.org/gems/cucumber-profiler-1.0.0.gem
+  homepage_uri: https://github.com/mblum14/cucumber-profiler
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: cucumber
+      requirements: ~> 1.2.1
+- name: cucumber-nc
+  downloads: 422
+  version: 0.0.1
+  version_downloads: 422
+  platform: ruby
+  authors: Jon Frisby, Odin Dutton
+  info: https://github.com/MrJoy/cucumber-nc
+  project_uri: http://rubygems.org/gems/cucumber-nc
+  gem_uri: http://rubygems.org/gems/cucumber-nc-0.0.1.gem
+  homepage_uri: https://github.com/MrJoy/cucumber-nc
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: cucumber
+      requirements: ~> 1.2
+    - name: terminal-notifier
+      requirements: ~> 1.4.2
+- name: cucumber-the
+  downloads: 530
+  version: 1.0.0
+  version_downloads: 530
+  platform: ruby
+  authors: Magnus Bergmark
+  info: Adds quick access to instances to help you write more fluid steps.
+  project_uri: http://rubygems.org/gems/cucumber-the
+  gem_uri: http://rubygems.org/gems/cucumber-the-1.0.0.gem
+  homepage_uri: ''
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development:
+    - name: rspec
+      requirements: ! '>= 0'
+    runtime:
+    - name: cucumber
+      requirements: ~> 1.2
+- name: cucumber-console
+  downloads: 779
+  version: 0.2.1
+  version_downloads: 579
+  platform: ruby
+  authors: Nicolas Viennot
+  info: Run Cucumber tests in your console
+  project_uri: http://rubygems.org/gems/cucumber-console
+  gem_uri: http://rubygems.org/gems/cucumber-console-0.2.1.gem
+  homepage_uri: http://github.com/nviennot/cucumber-console
+  wiki_uri: 
+  documentation_uri: 
+  mailing_list_uri: 
+  source_code_uri: 
+  bug_tracker_uri: 
+  dependencies:
+    development: []
+    runtime:
+    - name: rails-env-switcher
+      requirements: ! '>= 0'
+- name: cucumber_tree
+  downloads: 116
+  version: 0.0.1
+  version_downloads: 116
+  platform: ruby
+  authors: Gabriel Reis
+  info: Organize your features in a tree directory and don't waste your CPU time running
+    the same steps over and over.
+  project_uri: http://rubygems.org/gems/cucumber_tree
+  gem_uri: http://rubygems.org/gems/cucumber_tree-0.0.1.gem
+  homepage_uri: ''
+  wiki_uri: ''
+  documentation_uri: ''
+  mailing_list_uri: ''
+  source_code_uri: https://github.com/greis/cucumber_tree
+  bug_tracker_uri: ''
+  dependencies:
+    development:
+    - name: aruba
+      requirements: ! '>= 0.5.0'
+    - name: bundler
+      requirements: ! '>= 1.1.0'
+    - name: coffee-rails
+      requirements: ! '>= 3.2.2'
+    - name: jquery-rails
+      requirements: ! '>= 2.0.2'
+    - name: pg
+      requirements: ! '>= 0.14.1'
+    - name: rails
+      requirements: ! '>= 3.2.8'
+    - name: sass-rails
+      requirements: ! '>= 3.2.5'
+    - name: sqlite3
+      requirements: ! '>= 1.3.6'
+    - name: uglifier
+      requirements: ! '>= 1.2.4'
+    runtime:
+    - name: cucumber-rails
+      requirements: ! '>= 1.3.0'
+    - name: database_cleaner
+      requirements: ! '>= 0.7.2'
+    - name: rspec
+      requirements: ! '>= 2.9.0'
