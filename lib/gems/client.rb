@@ -301,19 +301,15 @@ module Gems
       Marshal.load(response)
     end
 
-    # Returns an array (names or info hashes) of all the reverse dependencies to the given gem.
+    # Returns an array of all the reverse dependencies to the given gem.
     #
     # @authenticated false
     # @param gem_name [String] The name of a gem
     # @param options [Hash] A customizable set of options.
-    # @option options [Boolean] :short Choose between an detailed or short output.
     # @return [Array]
     # @example
     #   Gems.reverse_dependencies 'money'
     def reverse_dependencies(gem_name, options={})
-      # Be sure that param is converted to String
-      options[:short] = options[:short].to_s if options.has_key? :short
-
       get("/api/v1/gems/#{gem_name}/reverse_dependencies.yaml", options)
     end
   end
