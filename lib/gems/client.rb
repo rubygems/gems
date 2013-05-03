@@ -310,7 +310,8 @@ module Gems
     # @example
     #   Gems.reverse_dependencies 'money'
     def reverse_dependencies(gem_name, options={})
-      get("/api/v1/gems/#{gem_name}/reverse_dependencies.yaml", options)
+      response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.yaml", options)
+      YAML.load(response)
     end
   end
 end
