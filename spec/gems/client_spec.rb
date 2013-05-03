@@ -411,6 +411,7 @@ describe Gems::Client do
     it "returns an array of names for all gems which are reverse dependencies to the given gem" do
       reverse_dependencies = Gems.reverse_dependencies 'rspec'
       expect(a_get("/api/v1/gems/rspec/reverse_dependencies.yaml")).to have_been_made
+      expect(reverse_dependencies).to be_an_instance_of Array
     end
   end
 end
