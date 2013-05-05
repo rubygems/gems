@@ -1,3 +1,3 @@
 module Gems
-  VERSION = "0.8.0" unless defined?(Gems::VERSION)
+  VERSION = "0.8.1" unless defined?(Gems::VERSION)
 end
