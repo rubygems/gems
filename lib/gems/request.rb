@@ -52,7 +52,7 @@ module Gems
       when Net::HTTPSuccess
         response.body
       when Net::HTTPRedirection
-        request(method, path, data, content_type, 'https://bundler.rubygems.org')
+        request(method, path, data, content_type, response['location'])
       end
     end
 
