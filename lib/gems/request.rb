@@ -22,7 +22,7 @@ module Gems
 
     private
 
-    def request(method, path, data, content_type)
+    def request(method, path, data, content_type, host=host)
       path = [path, hash_to_query_string(data)[/.+/]].compact.join('?') if [:delete, :get].include? method
       uri = URI.parse [host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
@@ -48,7 +48,12 @@ module Gems
       end
       connection.start
       response = connection.request request
-      response.body
+      case response
+      when Net::HTTPSuccess
+        response.body
+      when Net::HTTPRedirection
+        request(method, path, data, content_type, 'https://bundler.rubygems.org')
+      end
     end
 
     def hash_to_query_string(hash)
