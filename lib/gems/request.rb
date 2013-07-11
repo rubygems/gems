@@ -22,9 +22,9 @@ module Gems
 
     private
 
-    def request(method, path, data, content_type)
+    def request(method, path, data, content_type, request_host = host)
       path = [path, hash_to_query_string(data)[/.+/]].compact.join('?') if [:delete, :get].include? method
-      uri = URI.parse [host, path].join
+      uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
       request = request_class.new uri.request_uri
       request.add_field 'Authorization', key if key
@@ -48,13 +48,25 @@ module Gems
       end
       connection.start
       response = connection.request request
-      response.body
+      body_from_response(response, method, content_type)
     end
 
     def hash_to_query_string(hash)
       hash.keys.inject('') do |query_string, key|
         query_string << '&' unless key == hash.keys.first
         query_string << "#{URI.encode(key.to_s)}=#{URI.encode(hash[key])}"
+      end
+    end
+
+    def body_from_response(response, method, content_type)
+      case response
+      when Net::HTTPRedirection
+        redirect_url = response['location']
+        uri = URI.parse(redirect_url)
+        host_with_scheme = [uri.scheme,uri.host].join('://')
+        request(method, uri.request_uri, {}, content_type, host_with_scheme)
+      else
+        response.body
       end
     end
   end
