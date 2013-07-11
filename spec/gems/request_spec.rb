@@ -14,13 +14,16 @@ describe Gems::Request do
 
       stub_get("/api/v1/dependencies").
         with(:query => {"gems" => "rails,thor"}).
-        to_return(:body => response_body, :headers => {:code => response_code, :location => response_location})
+        to_return(:body => response_body, :status => 302, :headers => {:location => response_location})
+      stub_request(:get, "https://bundler.rubygems.org/api/v1/dependencies").
+        with(:query => {"gems" => "rails,thor"}).
+         to_return(:body => fixture('dependencies'), :status => 200, :headers => {})
+
     end
     it "returns an array of hashes for all versions of given gems" do
-      expect {
-        dependencies = Gems.dependencies 'rails', 'thor'
-      }.not_to raise_error(TypeError)
+      dependencies = Gems.dependencies 'rails', 'thor'
       expect(a_get("/api/v1/dependencies").with(:query => {"gems" => "rails,thor"})).to have_been_made
+      expect(a_get("https://bundler.rubygems.org/api/v1/dependencies").with(:query => {"gems" => "rails,thor"})).to have_been_made
       expect(dependencies.first[:number]).to eq "3.0.9"
     end
   end
