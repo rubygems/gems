@@ -4,20 +4,20 @@ require 'uri'
 
 module Gems
   module Request
-    def delete(path, data={}, content_type='application/x-www-form-urlencoded')
-      request(:delete, path, data, content_type)
+    def delete(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+      request(:delete, path, data, content_type, request_host)
     end
 
-    def get(path, data={}, content_type='application/x-www-form-urlencoded')
-      request(:get, path, data, content_type)
+    def get(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+      request(:get, path, data, content_type, request_host)
     end
 
-    def post(path, data={}, content_type='application/x-www-form-urlencoded')
-      request(:post, path, data, content_type)
+    def post(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+      request(:post, path, data, content_type, request_host)
     end
 
-    def put(path, data={}, content_type='application/x-www-form-urlencoded')
-      request(:put, path, data, content_type)
+    def put(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+      request(:put, path, data, content_type, request_host)
     end
 
     private
