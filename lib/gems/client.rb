@@ -55,15 +55,16 @@ module Gems
       YAML.load(response)
     end
 
-    # Submit a gem to RubyGems.org
+    # Submit a gem to RubyGems.org or another host
     #
     # @authenticated true
     # @param gem [File] A built gem.
+    # @param host [String] A RubyGems compatible host to use.
     # @return [String]
     # @example
     #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-    def push(gem)
-      post("/api/v1/gems", gem.read, 'application/octet-stream')
+    def push(gem, host=Configuration::DEFAULT_HOST)
+      post("/api/v1/gems", gem.read, 'application/octet-stream', host)
     end
 
     # Remove a gem from RubyGems.org's index
