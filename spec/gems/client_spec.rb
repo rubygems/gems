@@ -56,14 +56,29 @@ describe Gems::Client do
   end
 
   describe "#push" do
-    before do
-      stub_post("/api/v1/gems").
-        to_return(:body => fixture("push"))
+    context "without the host parameter" do
+      before do
+        stub_post("/api/v1/gems").
+          to_return(:body => fixture("push"))
+      end
+
+      it "submits a gem to RubyGems.org" do
+        push = Gems.push(File.new(File.expand_path("../../fixtures/gems-0.0.8.gem", __FILE__), "rb"))
+        expect(a_post("/api/v1/gems")).to have_been_made
+        expect(push).to eq "Successfully registered gem: gems (0.0.8)"
+      end
     end
-    it "submits a gem to RubyGems.org" do
-      push = Gems.push(File.new(File.expand_path("../../fixtures/gems-0.0.8.gem", __FILE__), "rb"))
-      expect(a_post("/api/v1/gems")).to have_been_made
-      expect(push).to eq "Successfully registered gem: gems (0.0.8)"
+
+    context "with the host parameter" do
+      before do
+        stub_post("http://example.com/api/v1/gems").
+          to_return(:body => fixture("push"))
+      end
+      it "submits a gem to the passed host" do
+        push = Gems.push(File.new(File.expand_path("../../fixtures/gems-0.0.8.gem", __FILE__), "rb"), host='http://example.com')
+        expect(a_post("http://example.com/api/v1/gems"))
+        expect(push).to eq "Successfully registered gem: gems (0.0.8)"
+      end
     end
   end
 
