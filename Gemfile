@@ -11,4 +11,10 @@ group :test do
   gem 'webmock'
 end
 
+platforms :rbx do
+  gem 'rubinius-coverage', '~> 2.0'
+  gem 'rubysl', '~> 2.0'
+  gem 'rubysl-json', '~> 2.0'
+end
+
 gemspec
