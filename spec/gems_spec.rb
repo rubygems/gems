@@ -22,8 +22,11 @@ describe Gems do
   end
 
   describe '.respond_to?' do
-    it "takes an optional argument" do
-      expect(Gems.respond_to?(:new, true)).to be_true
+    it "returns true if a method exists" do
+      expect(Gems).to respond_to(:new)
+    end
+    it "returns false if a method doesn't exist" do
+      expect(Gems).not_to respond_to(:foo)
     end
   end
 

@@ -17,8 +17,12 @@ module Gems
       new.send(method, *args, &block)
     end
 
-    def respond_to?(method, include_private=false)
-      new.respond_to?(method, include_private) || super(method, include_private)
+    def respond_to?(method_name, include_private=false)
+      new.respond_to?(method_name, include_private) || super(method_name, include_private)
+    end
+
+    def respond_to_missing?(method_name, include_private=false)
+      new.respond_to?(method_name, include_private) || super(method_name, include_private)
     end
   end
 end
