@@ -14,7 +14,7 @@ module Gems
     ]
 
     # Set the default API endpoint
-    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : "https://rubygems.org"
+    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : 'https://rubygems.org'
 
     # Set the default credentials
     DEFAULT_KEY = Gem.configuration.rubygems_api_key
@@ -22,7 +22,7 @@ module Gems
     # Set the default 'User-Agent' HTTP header
     DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}"
 
-    attr_accessor *VALID_OPTIONS_KEYS
+    attr_accessor(*VALID_OPTIONS_KEYS)
 
     # When this module is extended, set all configuration options to their default values
     def self.extended(base)
@@ -37,7 +37,7 @@ module Gems
     # Create a hash of options and their values
     def options
       options = {}
-      VALID_OPTIONS_KEYS.each{|k| options[k] = send(k)}
+      VALID_OPTIONS_KEYS.each { |k| options[k] = send(k) }
       options
     end
 

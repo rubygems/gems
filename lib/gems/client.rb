@@ -6,9 +6,9 @@ require 'yaml'
 module Gems
   class Client
     include Gems::Request
-    attr_accessor *Configuration::VALID_OPTIONS_KEYS
+    attr_accessor(*Configuration::VALID_OPTIONS_KEYS)
 
-    def initialize(options={})
+    def initialize(options = {})
       options = Gems.options.merge(options)
       Configuration::VALID_OPTIONS_KEYS.each do |key|
         send("#{key}=", options[key])
@@ -35,7 +35,7 @@ module Gems
     # @example
     #   Gems.search 'cucumber'
     def search(query)
-      response = get("/api/v1/search.yaml", {:query => query})
+      response = get('/api/v1/search.yaml', :query => query)
       YAML.load(response)
     end
 
@@ -46,12 +46,8 @@ module Gems
     # @return [Array]
     # @example
     #   Gems.gems
-    def gems(user_handle=nil)
-      response = if user_handle
-        get("/api/v1/owners/#{user_handle}/gems.yaml")
-      else
-        get("/api/v1/gems.yaml")
-      end
+    def gems(user_handle = nil)
+      response = user_handle ? get("/api/v1/owners/#{user_handle}/gems.yaml") : get('/api/v1/gems.yaml')
       YAML.load(response)
     end
 
@@ -63,8 +59,8 @@ module Gems
     # @return [String]
     # @example
     #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-    def push(gem, host=Configuration::DEFAULT_HOST)
-      post("/api/v1/gems", gem.read, 'application/octet-stream', host)
+    def push(gem, host = Configuration::DEFAULT_HOST)
+      post('/api/v1/gems', gem.read, 'application/octet-stream', host)
     end
 
     # Remove a gem from RubyGems.org's index
@@ -77,9 +73,9 @@ module Gems
     # @return [String]
     # @example
     #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def yank(gem_name, gem_version=nil, options={})
+    def yank(gem_name, gem_version = nil, options = {})
       gem_version ||= info(gem_name)['version']
-      delete("/api/v1/gems/yank", options.merge(:gem_name => gem_name, :version => gem_version))
+      delete('/api/v1/gems/yank', options.merge(:gem_name => gem_name, :version => gem_version))
     end
 
     # Update a previously yanked gem back into RubyGems.org's index
@@ -92,9 +88,9 @@ module Gems
     # @return [String]
     # @example
     #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def unyank(gem_name, gem_version=nil, options={})
+    def unyank(gem_name, gem_version = nil, options = {})
       gem_version ||= info(gem_name)['version']
-      put("/api/v1/gems/unyank", options.merge(:gem_name => gem_name, :version => gem_version))
+      put('/api/v1/gems/unyank', options.merge(:gem_name => gem_name, :version => gem_version))
     end
 
     # Returns an array of gem version details
@@ -117,13 +113,8 @@ module Gems
     # @return [Hash]
     # @example
     #   Gems.total_downloads 'rails_admin', '0.0.1'
-    def total_downloads(gem_name=nil, gem_version=nil)
-      response = if gem_name
-        gem_version ||= info(gem_name)['version']
-        get("/api/v1/downloads/#{gem_name}-#{gem_version}.yaml")
-      else
-        get("/api/v1/downloads.yaml")
-      end
+    def total_downloads(gem_name = nil, gem_version = nil)
+      response = gem_name ? get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name)['version']}.yaml") : get('/api/v1/downloads.yaml')
       YAML.load(response)
     end
 
@@ -134,7 +125,7 @@ module Gems
     # @example
     #   Gems.most_downloaded_today
     def most_downloaded_today
-      response = get("/api/v1/downloads/top.yaml")
+      response = get('/api/v1/downloads/top.yaml')
       YAML.load(response)[:gems]
     end
 
@@ -145,7 +136,7 @@ module Gems
     # @example
     #   Gems.most_downloaded
     def most_downloaded
-      response = get("/api/v1/downloads/all.yaml")
+      response = get('/api/v1/downloads/all.yaml')
       YAML.load(response)[:gems]
     end
 
@@ -159,13 +150,9 @@ module Gems
     # @return [Hash]
     # @example
     #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
-    def downloads(gem_name, gem_version=nil, from=nil, to=Date.today)
+    def downloads(gem_name, gem_version = nil, from = nil, to = Date.today)
       gem_version ||= info(gem_name)['version']
-      response = if from
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.yaml", {:from => from.to_s, :to => to.to_s})
-      else
-        get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.yaml")
-      end
+      response = from ? get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.yaml", :from => from.to_s, :to => to.to_s) : get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.yaml")
       YAML.load(response)
     end
 
@@ -190,7 +177,7 @@ module Gems
     # @example
     #   Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
     def add_owner(gem_name, owner)
-      post("/api/v1/gems/#{gem_name}/owners", {:email => owner})
+      post("/api/v1/gems/#{gem_name}/owners", :email => owner)
     end
 
     # Remove a user's permission to manage a RubyGem you own
@@ -202,7 +189,7 @@ module Gems
     # @example
     #   Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
     def remove_owner(gem_name, owner)
-      delete("/api/v1/gems/#{gem_name}/owners", {:email => owner})
+      delete("/api/v1/gems/#{gem_name}/owners", :email => owner)
     end
 
     # List the webhooks registered under your account
@@ -212,7 +199,7 @@ module Gems
     # @example
     #   Gems.web_hooks
     def web_hooks
-      response = get("/api/v1/web_hooks.yaml")
+      response = get('/api/v1/web_hooks.yaml')
       YAML.load(response)
     end
 
@@ -225,7 +212,7 @@ module Gems
     # @example
     #   Gems.add_web_hook 'rails', 'http://example.com'
     def add_web_hook(gem_name, url)
-      post("/api/v1/web_hooks", {:gem_name => gem_name, :url => url})
+      post('/api/v1/web_hooks', :gem_name => gem_name, :url => url)
     end
 
     # Remove a webhook
@@ -237,7 +224,7 @@ module Gems
     # @example
     #   Gems.remove_web_hook 'rails', 'http://example.com'
     def remove_web_hook(gem_name, url)
-      delete("/api/v1/web_hooks/remove", {:gem_name => gem_name, :url => url})
+      delete('/api/v1/web_hooks/remove', :gem_name => gem_name, :url => url)
     end
 
     # Test fire a webhook
@@ -249,7 +236,7 @@ module Gems
     # @example
     #   Gems.fire_web_hook 'rails', 'http://example.com'
     def fire_web_hook(gem_name, url)
-      post("/api/v1/web_hooks/fire", {:gem_name => gem_name, :url => url})
+      post('/api/v1/web_hooks/fire', :gem_name => gem_name, :url => url)
     end
 
     # Returns the 50 gems most recently added to RubyGems.org (for the first time)
@@ -259,8 +246,8 @@ module Gems
     # @return [Array]
     # @example
     #   Gem.latest
-    def latest(options={})
-      response = get("/api/v1/activity/latest.yaml", options)
+    def latest(options = {})
+      response = get('/api/v1/activity/latest.yaml', options)
       YAML.load(response)
     end
 
@@ -271,8 +258,8 @@ module Gems
     # @return [Array]
     # @example
     #   Gem.just_updated
-    def just_updated(options={})
-      response = get("/api/v1/activity/just_updated.yaml", options)
+    def just_updated(options = {})
+      response = get('/api/v1/activity/just_updated.yaml', options)
       YAML.load(response)
     end
 
@@ -298,7 +285,7 @@ module Gems
     # @example
     #   Gems.dependencies 'rails', 'thor'
     def dependencies(*gems)
-      response = get('/api/v1/dependencies', {:gems => gems.join(',')})
+      response = get('/api/v1/dependencies', :gems => gems.join(','))
       Marshal.load(response)
     end
 
@@ -310,7 +297,7 @@ module Gems
     # @return [Array]
     # @example
     #   Gems.reverse_dependencies 'money'
-    def reverse_dependencies(gem_name, options={})
+    def reverse_dependencies(gem_name, options = {})
       response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.yaml", options)
       YAML.load(response)
     end

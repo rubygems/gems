@@ -7,7 +7,7 @@ module Gems
     # Alias for Gems::Client.new
     #
     # @return [Gems::Client]
-    def new(options={})
+    def new(options = {})
       Gems::Client.new(options)
     end
 
@@ -17,11 +17,11 @@ module Gems
       new.send(method, *args, &block)
     end
 
-    def respond_to?(method_name, include_private=false)
+    def respond_to?(method_name, include_private = false)
       new.respond_to?(method_name, include_private) || super(method_name, include_private)
     end
 
-    def respond_to_missing?(method_name, include_private=false)
+    def respond_to_missing?(method_name, include_private = false)
       new.respond_to?(method_name, include_private) || super(method_name, include_private)
     end
   end

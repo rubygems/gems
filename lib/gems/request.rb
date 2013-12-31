@@ -4,25 +4,25 @@ require 'uri'
 
 module Gems
   module Request
-    def delete(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+    def delete(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
       request(:delete, path, data, content_type, request_host)
     end
 
-    def get(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+    def get(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
       request(:get, path, data, content_type, request_host)
     end
 
-    def post(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+    def post(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
       request(:post, path, data, content_type, request_host)
     end
 
-    def put(path, data={}, content_type='application/x-www-form-urlencoded', request_host = host)
+    def put(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
       request(:put, path, data, content_type, request_host)
     end
 
-    private
+  private
 
-    def request(method, path, data, content_type, request_host = host)
+    def request(method, path, data, content_type, request_host = host) # rubocop:disable CyclomaticComplexity, MethodLength, ParameterLists
       path = [path, hash_to_query_string(data)[/.+/]].compact.join('?') if [:delete, :get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
@@ -52,7 +52,7 @@ module Gems
     end
 
     def hash_to_query_string(hash)
-      hash.keys.inject('') do |query_string, key|
+      hash.keys.reduce('') do |query_string, key|
         query_string << '&' unless key == hash.keys.first
         query_string << "#{URI.encode(key.to_s)}=#{URI.encode(hash[key])}"
       end
@@ -63,7 +63,7 @@ module Gems
       when Net::HTTPRedirection
         redirect_url = response['location']
         uri = URI.parse(redirect_url)
-        host_with_scheme = [uri.scheme,uri.host].join('://')
+        host_with_scheme = [uri.scheme, uri.host].join('://')
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
       else
         response.body
