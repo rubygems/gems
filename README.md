@@ -5,12 +5,14 @@
 [![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
 [![Code Climate](https://codeclimate.com/github/rubygems/gems.png)][codeclimate]
 [![Coverage Status](https://coveralls.io/repos/rubygems/gems/badge.png?branch=master)][coveralls]
+[![Gittip](http://img.shields.io/gittip/gems.png)][gittip]
 
 [gem]: https://rubygems.org/gems/gems
 [travis]: http://travis-ci.org/rubygems/gems
 [gemnasium]: https://gemnasium.com/rubygems/gems
 [codeclimate]: https://codeclimate.com/github/rubygems/gems
 [coveralls]: https://coveralls.io/r/rubygems/gems
+[gittip]: https://www.gittip.com/gems/
 
 Ruby wrapper for the RubyGems.org API.
 
