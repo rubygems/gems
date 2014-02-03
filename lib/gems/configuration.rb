@@ -43,11 +43,10 @@ module Gems
 
     # Reset all configuration options to defaults
     def reset
+      self.username, self.password = nil, nil
       self.host       = DEFAULT_HOST
       self.key        = DEFAULT_KEY
-      self.password   = nil
       self.user_agent = DEFAULT_USER_AGENT
-      self.username   = nil
       self
     end
   end
