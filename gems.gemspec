@@ -21,4 +21,5 @@ Gem::Specification.new do |spec|
   spec.summary     = spec.description
   spec.test_files  = Dir.glob('spec/**/*')
   spec.version     = Gems::VERSION
+  spec.add_dependency 'json', '~> 1.8'
 end

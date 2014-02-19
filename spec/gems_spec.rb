@@ -7,13 +7,13 @@ describe Gems do
 
   context 'when delegating to a client' do
     before do
-      stub_get('/api/v1/gems/rails.yaml').
-        to_return(:body => fixture('rails.yaml'))
+      stub_get('/api/v1/gems/rails.json').
+        to_return(:body => fixture('rails.json'))
     end
 
     it 'gets the correct resource' do
       Gems.info('rails')
-      expect(a_get('/api/v1/gems/rails.yaml')).to have_been_made
+      expect(a_get('/api/v1/gems/rails.json')).to have_been_made
     end
 
     it 'returns the same results as a client' do
