@@ -59,10 +59,8 @@ module Gems
     end
 
     def body_from_response(response, method, content_type)
-      case response
-      when Net::HTTPRedirection
-        redirect_url = response['location']
-        uri = URI.parse(redirect_url)
+      if response.is_a?(Net::HTTPRedirection)
+        uri = URI.parse(response['location'])
         host_with_scheme = [uri.scheme, uri.host].join('://')
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
       else

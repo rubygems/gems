@@ -11,7 +11,7 @@ ParameterLists:
 
 MethodLength:
   CountComments: false
-  Max: 5
+  Max: 7
 
 # Avoid more than `Max` levels of nesting.
 BlockNesting:
