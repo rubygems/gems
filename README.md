@@ -1,11 +1,11 @@
 # Gems
 
-[![Gem Version](https://badge.fury.io/rb/gems.png)][gem]
-[![Build Status](https://secure.travis-ci.org/rubygems/gems.png?branch=master)][travis]
-[![Dependency Status](https://gemnasium.com/rubygems/gems.png?travis)][gemnasium]
-[![Code Climate](https://codeclimate.com/github/rubygems/gems.png)][codeclimate]
-[![Coverage Status](https://coveralls.io/repos/rubygems/gems/badge.png?branch=master)][coveralls]
-[![Gittip](http://img.shields.io/gittip/gems.png)][gittip]
+[![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
+[![Build Status](http://img.shields.io/travis/rubygems/gems.svg)][travis]
+[![Dependency Status](http://img.shields.io/gemnasium/rubygems/gems.svg)][gemnasium]
+[![Code Climate](http://img.shields.io/codeclimate/github/rubygems/gems.svg)][codeclimate]
+[![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
+[![Gittip](http://img.shields.io/gittip/gems.svg)][gittip]
 
 [gem]: https://rubygems.org/gems/gems
 [travis]: http://travis-ci.org/rubygems/gems
