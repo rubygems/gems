@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json', '~> 1.8'
   spec.add_development_dependency 'bundler', '~> 1.0'
   spec.authors       = ['Erik Michaels-Ober']
-  spec.description   = %q(Ruby wrapper for the RubyGems.org API)
+  spec.description   = 'Ruby wrapper for the RubyGems.org API'
   spec.email         = ['sferik@gmail.com']
   spec.files         = %w(.yardopts CONTRIBUTING.md LICENSE.md README.md Rakefile gems.gemspec)
   spec.files         = `git ls-files`.split("\n")

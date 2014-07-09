@@ -7,7 +7,7 @@ describe Gems::Request do
 
   describe '#get with redirect' do
     before do
-      response_body = %q(<html>\r\n<head><title>302 Found</title></head>\r\n<body bgcolor=\"white\">\r\n<center><h1>302 Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n)
+      response_body = '<html>\r\n<head><title>302 Found</title></head>\r\n<body bgcolor=\"white\">\r\n<center><h1>302 Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n'
       response_location = 'https://bundler.rubygems.org/api/v1/dependencies?gems=rails,thor'
 
       stub_get('/api/v1/dependencies').
