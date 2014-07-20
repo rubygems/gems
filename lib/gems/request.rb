@@ -52,7 +52,7 @@ module Gems
     end
 
     def hash_to_query_string(hash)
-      hash.keys.inject('') do |query_string, key|
+      hash.keys.each_with_object('') do |key, query_string|
         query_string << '&' unless key == hash.keys.first
         query_string << "#{URI.encode(key.to_s)}=#{URI.encode(hash[key])}"
       end

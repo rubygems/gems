@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.licenses      = %w(MIT)
   spec.name          = 'gems'
   spec.require_paths = %w(lib)
+  spec.required_ruby_version = '>= 1.9.3'
   spec.summary       = spec.description
   spec.test_files    = Dir.glob('spec/**/*')
   spec.version       = Gems::VERSION
