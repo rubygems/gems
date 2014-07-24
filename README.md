@@ -109,7 +109,7 @@ Ruby wrapper for the RubyGems.org API.
     Gems.dependencies ['rails', 'thor']
 
     # The following methods require authentication.
-    # By default, we load your API key from ~/.gem/credentails
+    # By default, we load your API key from ~/.gem/credentials
     # You can override this default by specifying a custom API key.
     Gems.configure do |config|
       config.key '701243f217cdf23b1370c7b66b65ca97'
