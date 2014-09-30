@@ -1,6 +1,6 @@
 require 'net/http'
 require 'rubygems'
-require 'uri'
+require 'open-uri'
 
 module Gems
   module Request
@@ -40,14 +40,19 @@ module Gems
         request.body = data
         request.content_length = data.size
       end
-      connection = Net::HTTP.new uri.host, uri.port
+      proxy = uri.find_proxy
+      @connection = if proxy
+        Net::HTTP::Proxy(proxy.host, proxy.port, proxy.user, proxy.password).new(uri.host, uri.port)
+      else
+        Net::HTTP.new uri.host, uri.port
+      end
       if uri.scheme == 'https'
         require 'net/https'
-        connection.use_ssl = true
-        connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        @connection.use_ssl = true
+        @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
-      connection.start
-      response = connection.request request
+      @connection.start
+      response = @connection.request request
       body_from_response(response, method, content_type)
     end
 
