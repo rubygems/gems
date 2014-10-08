@@ -9,16 +9,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Erik Michaels-Ober']
   spec.description   = 'Ruby wrapper for the RubyGems.org API'
   spec.email         = ['sferik@gmail.com']
-  spec.files         = %w(.yardopts CONTRIBUTING.md LICENSE.md README.md Rakefile gems.gemspec)
-  spec.files         = `git ls-files`.split("\n")
-  spec.files        += Dir.glob('lib/**/*.rb')
-  spec.files        += Dir.glob('spec/**/*')
+  spec.files         = %w(.yardopts CONTRIBUTING.md LICENSE.md README.md gems.gemspec) + Dir['lib/**/*.rb']
   spec.homepage      = 'https://github.com/rubygems/gems'
   spec.licenses      = %w(MIT)
   spec.name          = 'gems'
   spec.require_paths = %w(lib)
   spec.required_ruby_version = '>= 1.9.3'
   spec.summary       = spec.description
-  spec.test_files    = Dir.glob('spec/**/*')
   spec.version       = Gems::VERSION
 end
