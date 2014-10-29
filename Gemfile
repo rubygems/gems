@@ -11,7 +11,7 @@ end
 group :test do
   gem 'backports'
   gem 'coveralls'
-  gem 'rspec', '>= 2.11'
+  gem 'rspec', '>= 3.1.0'
   gem 'rubocop', '>= 0.25'
   gem 'simplecov', '>= 0.9'
   gem 'webmock'
