@@ -15,7 +15,7 @@ describe Gems::Request do
         to_return(:body => response_body, :status => 302, :headers => {:location => response_location})
       stub_request(:get, 'https://bundler.rubygems.org/api/v1/dependencies').
         with(:query => {'gems' => 'rails,thor'}).
-         to_return(:body => fixture('dependencies'), :status => 200, :headers => {})
+        to_return(:body => fixture('dependencies'), :status => 200, :headers => {})
     end
     it 'returns an array of hashes for all versions of given gems' do
       dependencies = Gems.dependencies 'rails', 'thor'

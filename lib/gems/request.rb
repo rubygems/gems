@@ -22,7 +22,7 @@ module Gems
 
   private
 
-    def request(method, path, data, content_type, request_host = host) # rubocop:disable CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
+    def request(method, path, data, content_type, request_host = host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
       path = [path, hash_to_query_string(data)[/.+/]].compact.join('?') if [:delete, :get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
