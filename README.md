@@ -112,7 +112,7 @@ Ruby wrapper for the RubyGems.org API.
     # By default, we load your API key from ~/.gem/credentials
     # You can override this default by specifying a custom API key.
     Gems.configure do |config|
-      config.key '701243f217cdf23b1370c7b66b65ca97'
+      config.key = '701243f217cdf23b1370c7b66b65ca97'
     end
 
 ## Supported Ruby Versions
