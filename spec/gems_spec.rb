@@ -72,5 +72,4 @@ describe Gems do
       end
     end
   end
-
 end

@@ -40,5 +40,4 @@ describe Gems::Request do
     it { expect(@connection.proxy_pass).to eq 'proxy_pass' }
     it { expect(@connection.proxy_port).to eq 9999 }
   end
-
 end
