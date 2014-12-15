@@ -23,7 +23,7 @@ module Gems
   private
 
     def request(method, path, data, content_type, request_host = host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
-      path = [path, hash_to_query_string(data)[/.+/]].compact.join('?') if [:delete, :get].include? method
+      path += hash_to_query_string(data) if [:delete, :get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
       request = request_class.new uri.request_uri
@@ -57,10 +57,11 @@ module Gems
     end
 
     def hash_to_query_string(hash)
-      hash.keys.each_with_object('') do |key, query_string|
-        query_string << '&' unless key == hash.keys.first
-        query_string << "#{URI.encode(key.to_s)}=#{URI.encode(hash[key])}"
-      end
+      return '' if hash.empty?
+
+      hash.keys.each_with_object('?') do |key, query_string|
+        query_string << "#{URI.encode(key.to_s)}=#{URI.encode(hash[key])}&"
+      end.chop!
     end
 
     def body_from_response(response, method, content_type)
