@@ -105,6 +105,18 @@ module Gems
       JSON.parse(response)
     end
 
+    # Returns an hash of gem latest version
+    #
+    # @authenticated false
+    # @param gem_name [String] The name of a gem.
+    # @return [Hash]
+    # @example
+    #   Gems.latest_version 'coulda'
+    def latest_version(gem_name)
+      response = get("/api/v1/versions/#{gem_name}/latest.json")
+      JSON.parse(response)
+    end
+
     # Returns the total number of downloads for a particular gem
     #
     # @authenticated false
