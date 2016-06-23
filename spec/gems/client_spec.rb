@@ -193,21 +193,6 @@ describe Gems::Client do
     end
   end
 
-  describe '#most_downloaded_today' do
-    context 'with nothing specified' do
-      before do
-        stub_get('/api/v1/downloads/top.json').
-          to_return(:body => fixture('most_downloaded_today.json'))
-      end
-      it 'returns the most downloaded versions today' do
-        most_downloaded = Gems.most_downloaded_today
-        expect(a_get('/api/v1/downloads/top.json')).to have_been_made
-        expect(most_downloaded.first.first['full_name']).to eq 'rake-0.9.2.2'
-        expect(most_downloaded.first.last).to eq 9801
-      end
-    end
-  end
-
   describe '#most_downloaded' do
     context 'with nothing specified' do
       before do
