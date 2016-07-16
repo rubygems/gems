@@ -11,7 +11,7 @@ module Gems
       :password,
       :user_agent,
       :username,
-    ]
+    ].freeze
 
     # Set the default API endpoint
     DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : 'https://rubygems.org'
@@ -20,7 +20,7 @@ module Gems
     DEFAULT_KEY = Gem.configuration.rubygems_api_key
 
     # Set the default 'User-Agent' HTTP header
-    DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}"
+    DEFAULT_USER_AGENT = "Gems #{Gems::VERSION}".freeze
 
     attr_accessor(*VALID_OPTIONS_KEYS)
 
@@ -43,7 +43,8 @@ module Gems
 
     # Reset all configuration options to defaults
     def reset
-      self.username, self.password = nil, nil
+      self.username = nil
+      self.password = nil
       self.host       = DEFAULT_HOST
       self.key        = DEFAULT_KEY
       self.user_agent = DEFAULT_USER_AGENT
