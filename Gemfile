@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'yard'
 gem 'jruby-openssl', :platforms => :jruby
+gem 'json', platform: :mri_19
 
 group :development do
   gem 'pry'
