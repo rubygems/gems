@@ -16,4 +16,5 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 1.9.3'
   spec.summary       = spec.description
   spec.version       = Gems::VERSION
+  spec.add_runtime_dependency 'multi_json'
 end

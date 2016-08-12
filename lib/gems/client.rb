@@ -1,7 +1,7 @@
 require 'date'
 require 'gems/configuration'
 require 'gems/request'
-require 'json'
+require 'multi_json'
 
 module Gems
   class Client
@@ -24,7 +24,7 @@ module Gems
     #   Gems.info 'rails'
     def info(gem_name)
       response = get("/api/v1/gems/#{gem_name}.json")
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Returns an array of active gems that match the query
@@ -36,7 +36,7 @@ module Gems
     #   Gems.search 'cucumber'
     def search(query)
       response = get('/api/v1/search.json', :query => query)
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # List all gems that you own
@@ -48,7 +48,7 @@ module Gems
     #   Gems.gems
     def gems(user_handle = nil)
       response = user_handle ? get("/api/v1/owners/#{user_handle}/gems.json") : get('/api/v1/gems.json')
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Submit a gem to RubyGems.org or another host
@@ -102,7 +102,7 @@ module Gems
     #   Gems.versions 'coulda'
     def versions(gem_name)
       response = get("/api/v1/versions/#{gem_name}.json")
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Returns the total number of downloads for a particular gem
@@ -115,7 +115,7 @@ module Gems
     #   Gems.total_downloads 'rails_admin', '0.0.1'
     def total_downloads(gem_name = nil, gem_version = nil)
       response = gem_name ? get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name)['version']}.json") : get('/api/v1/downloads.json')
-      JSON.parse(response, :symbolize_names => true)
+      MultiJson.load(response, :symbolize_names => true)
     end
 
     # Returns an array containing the top 50 downloaded gem versions for today
@@ -126,7 +126,7 @@ module Gems
     #   Gems.most_downloaded_today
     def most_downloaded_today
       response = get('/api/v1/downloads/top.json')
-      JSON.parse(response)['gems']
+      MultiJson.load(response)['gems']
     end
 
     # Returns an array containing the top 50 downloaded gem versions of all time
@@ -137,7 +137,7 @@ module Gems
     #   Gems.most_downloaded
     def most_downloaded
       response = get('/api/v1/downloads/all.json')
-      JSON.parse(response)['gems']
+      MultiJson.load(response)['gems']
     end
 
     # Returns the number of downloads by day for a particular gem version
@@ -153,7 +153,7 @@ module Gems
     def downloads(gem_name, gem_version = nil, from = nil, to = Date.today)
       gem_version ||= info(gem_name)['version']
       response = from ? get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", :from => from.to_s, :to => to.to_s) : get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # View all owners of a gem that you own
@@ -165,7 +165,7 @@ module Gems
     #   Gems.owners 'gemcutter'
     def owners(gem_name)
       response = get("/api/v1/gems/#{gem_name}/owners.json")
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
@@ -200,7 +200,7 @@ module Gems
     #   Gems.web_hooks
     def web_hooks
       response = get('/api/v1/web_hooks.json')
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Create a webhook
@@ -248,7 +248,7 @@ module Gems
     #   Gem.latest
     def latest(options = {})
       response = get('/api/v1/activity/latest.json', options)
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Returns the 50 most recently updated gems
@@ -260,7 +260,7 @@ module Gems
     #   Gem.just_updated
     def just_updated(options = {})
       response = get('/api/v1/activity/just_updated.json', options)
-      JSON.parse(response)
+      MultiJson.load(response)
     end
 
     # Retrieve your API key using HTTP basic auth
@@ -299,7 +299,7 @@ module Gems
     #   Gems.reverse_dependencies 'money'
     def reverse_dependencies(gem_name, options = {})
       response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", options)
-      JSON.parse(response)
+      MultiJson.load(response)
     end
   end
 end
