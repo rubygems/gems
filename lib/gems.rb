@@ -1,5 +1,4 @@
 require 'gems/client'
-require 'gems/configuration'
 
 module Gems
   extend Configuration

@@ -1,6 +1,5 @@
 require 'gems/version'
 require 'rubygems'
-require 'yaml'
 
 module Gems
   module Configuration

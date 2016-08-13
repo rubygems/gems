@@ -1,6 +1,5 @@
 require 'httpi'
 require 'rubygems'
-require 'open-uri'
 
 module Gems
   module Request
