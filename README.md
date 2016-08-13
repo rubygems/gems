@@ -122,7 +122,8 @@ implementations:
 * Ruby 1.9.3
 * Ruby 2.0.0
 * Ruby 2.1.0
-* Ruby 2.2.0
+* Ruby 2.2.5
+* Ruby 2.3.1
 * [JRuby][]
 * [Rubinius][]
 
@@ -143,6 +144,6 @@ fashion. If critical issues for a particular implementation exist at the time
 of a major release, support for that Ruby version may be dropped.
 
 ## Copyright
-Copyright (c) 2011-2013 Erik Michaels-Ober. See [LICENSE][] for details.
+Copyright (c) 2011-2016 Erik Michaels-Ober. See [LICENSE][] for details.
 
 [license]: LICENSE.md

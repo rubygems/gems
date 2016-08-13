@@ -1,8 +1,8 @@
 module Gems
   class Version
     MAJOR = 0 unless defined? Gems::Version::MAJOR
-    MINOR = 8 unless defined? Gems::Version::MINOR
-    PATCH = 3 unless defined? Gems::Version::PATCH
+    MINOR = 9 unless defined? Gems::Version::MINOR
+    PATCH = 0 unless defined? Gems::Version::PATCH
     PRE = nil unless defined? Gems::Version::PRE
 
     class << self

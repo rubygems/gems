@@ -12,6 +12,8 @@ require 'gems'
 require 'rspec'
 require 'webmock/rspec'
 
+HTTPI.log = false
+
 WebMock.disable_net_connect!(:allow => 'coveralls.io')
 
 RSpec.configure do |config|
