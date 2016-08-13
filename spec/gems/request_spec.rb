@@ -35,9 +35,6 @@ describe Gems::Request do
       gems.info 'rails'
       @connection = gems.instance_variable_get(:@connection)
     end
-    it { expect(@connection.proxy_address).to eq '192.168.1.99' }
-    it { expect(@connection.proxy_user).to eq 'proxy_user' }
-    it { expect(@connection.proxy_pass).to eq 'proxy_pass' }
-    it { expect(@connection.proxy_port).to eq 9999 }
+    it { expect(@connection.proxy).to eq URI('http://proxy_user:proxy_pass@192.168.1.99:9999') }
   end
 end
