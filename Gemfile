@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
+gem 'jruby-openssl', :platforms => :jruby
 gem 'rake'
 gem 'yard'
-gem 'jruby-openssl', :platforms => :jruby
 
 group :development do
   gem 'pry'

@@ -71,5 +71,5 @@ Lambda:
 RaiseArgs:
   EnforcedStyle: compact
 
-TrailingComma:
+TrailingCommaInLiteral:
   Enabled: false
