@@ -394,12 +394,12 @@ describe Gems::Client do
         config.username = 'nick@gemcutter.org'
         config.password = 'schwwwwing'
       end
-      stub_get('https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key').
+      stub_get('https://rubygems.org/api/v1/api_key').
         to_return(:body => fixture('api_key'))
     end
     it 'retrieves an API key' do
       api_key = Gems.api_key
-      expect(a_get('https://nick%40gemcutter.org:schwwwwing@rubygems.org/api/v1/api_key')).to have_been_made
+      expect(a_get('https://rubygems.org/api/v1/api_key')).to have_been_made
       expect(api_key).to eq '701243f217cdf23b1370c7b66b65ca97'
     end
   end
