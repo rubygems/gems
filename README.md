@@ -119,15 +119,13 @@ Ruby wrapper for the RubyGems.org API.
 This library aims to support and is [tested against][travis] the following Ruby
 implementations:
 
-* Ruby 1.9.3
-* Ruby 2.0.0
-* Ruby 2.1.0
-* Ruby 2.2.0
+* Ruby 2.1
+* Ruby 2.2
+* Ruby 2.3
+* Ruby 2.4
 * [JRuby][]
-* [Rubinius][]
 
 [jruby]: http://www.jruby.org/
-[rubinius]: http://rubini.us/
 
 If something doesn't work on one of these interpreters, it's a bug.
 

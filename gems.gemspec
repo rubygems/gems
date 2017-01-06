@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gems/version'
 
 Gem::Specification.new do |spec|
-  spec.add_dependency 'json', '~> 1.8'
+  spec.add_dependency 'json'
   spec.add_development_dependency 'bundler', '~> 1.0'
   spec.authors       = ['Erik Michaels-Ober']
   spec.description   = 'Ruby wrapper for the RubyGems.org API'
@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.licenses      = %w(MIT)
   spec.name          = 'gems'
   spec.require_paths = %w(lib)
-  spec.required_ruby_version = '>= 1.9.3'
+  spec.required_ruby_version = '>= 2.1.9'
   spec.summary       = spec.description
   spec.version       = Gems::VERSION
 end
