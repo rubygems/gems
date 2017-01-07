@@ -155,7 +155,7 @@ describe Gems::Client do
   describe '#latest_version' do
     before do
       stub_get('/api/v1/versions/script_helpers/latest.json').
-          to_return(:body => fixture('script_helpers/latest.json'))
+        to_return(:body => fixture('script_helpers/latest.json'))
     end
     it 'returns an hash of gem latest version' do
       latest_version = Gems.latest_version 'script_helpers'
