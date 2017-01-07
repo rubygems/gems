@@ -130,17 +130,6 @@ module Gems
       JSON.parse(response, :symbolize_names => true)
     end
 
-    # Returns an array containing the top 50 downloaded gem versions for today
-    #
-    # @authenticated false
-    # @return [Array]
-    # @example
-    #   Gems.most_downloaded_today
-    def most_downloaded_today
-      response = get('/api/v1/downloads/top.json')
-      JSON.parse(response)['gems']
-    end
-
     # Returns an array containing the top 50 downloaded gem versions of all time
     #
     # @authenticated false

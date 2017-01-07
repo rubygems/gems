@@ -49,16 +49,13 @@ Ruby wrapper for the RubyGems.org API.
 
     # Return an array of version details for coulda.
     Gems.versions 'coulda'
-    
+
     # Return an hash of latest version for coulda.
     Gems.latest_version 'coulda'
 
     # Return the total number of downloads for rails_admin 0.0.1.
     # (Defaults to the latest version if no version is specified.)
     Gems.total_downloads 'rails_admin', '0.0.1'
-
-    # Returns an array containing the top 50 downloaded gem versions for today.
-    Gems.most_downloaded_today
 
     # Returns an array containing the top 50 downloaded gem versions of all time.
     Gems.most_downloaded
