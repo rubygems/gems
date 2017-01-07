@@ -152,6 +152,18 @@ describe Gems::Client do
     end
   end
 
+  describe '#latest_version' do
+    before do
+      stub_get('/api/v1/versions/script_helpers/latest.json').
+          to_return(:body => fixture('script_helpers/latest.json'))
+    end
+    it 'returns an hash of gem latest version' do
+      latest_version = Gems.latest_version 'script_helpers'
+      expect(a_get('/api/v1/versions/script_helpers/latest.json')).to have_been_made
+      expect(latest_version['version']).to eq '0.3.0'
+    end
+  end
+
   describe '#total_downloads' do
     context 'with no version or gem name specified' do
       before do
