@@ -1,6 +1,7 @@
 require 'net/http'
 require 'rubygems'
 require 'open-uri'
+require 'gems/errors'
 
 module Gems
   module Request
@@ -63,10 +64,13 @@ module Gems
     end
 
     def body_from_response(response, method, content_type)
-      if response.is_a?(Net::HTTPRedirection)
+      case response
+      when Net::HTTPRedirection
         uri = URI.parse(response['location'])
         host_with_scheme = [uri.scheme, uri.host].join('://')
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
+      when Net::HTTPNotFound
+        raise Gems::NotFound.new(response.body)
       else
         response.body
       end
