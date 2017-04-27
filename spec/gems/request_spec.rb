@@ -25,6 +25,21 @@ describe Gems::Request do
     end
   end
 
+  describe '#get with 404' do
+    before do
+      response_body = 'This rubygem could not be found.'
+
+      stub_get('/api/v1/dependencies').
+        with(:query => {'gems' => 'rails,thor'}).
+        to_return(:body => response_body, :status => 404)
+    end
+
+    it 'raise a Gems::NotFound error' do
+      expect { Gems.dependencies('rails', 'thor') }.to raise_error(Gems::NotFound)
+      expect(a_get('/api/v1/dependencies').with(:query => {'gems' => 'rails,thor'})).to have_been_made
+    end
+  end
+
   describe 'request behind proxy' do
     before do
       allow(ENV).to receive(:[]).with('no_proxy').and_return('')
