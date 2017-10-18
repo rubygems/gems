@@ -25,6 +25,8 @@ module Gems
     def info(gem_name)
       response = get("/api/v1/gems/#{gem_name}.json")
       JSON.parse(response)
+    rescue JSON::ParserError
+      []
     end
 
     # Returns an array of active gems that match the query
