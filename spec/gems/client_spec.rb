@@ -6,14 +6,28 @@ describe Gems::Client do
   end
 
   describe '#info' do
-    before do
-      stub_get('/api/v1/gems/rails.json').
-        to_return(:body => fixture('rails.json'))
+    context 'when gem exists' do
+      before do
+        stub_get('/api/v1/gems/rails.json').
+          to_return(:body => fixture('rails.json'))
+      end
+      it 'returns some basic information about the given gem' do
+        info = Gems.info 'rails'
+        expect(a_get('/api/v1/gems/rails.json')).to have_been_made
+        expect(info['name']).to eq 'rails'
+      end
     end
-    it 'returns some basic information about the given gem' do
-      info = Gems.info 'rails'
-      expect(a_get('/api/v1/gems/rails.json')).to have_been_made
-      expect(info['name']).to eq 'rails'
+
+    context 'when gem does not exist' do
+      before do
+        stub_get('/api/v1/gems/nonexistentgem.json').
+          to_return(:body => 'This rubygem could not be found.')
+      end
+      it 'returns some basic information about the given gem' do
+        info = Gems.info 'nonexistentgem'
+        expect(a_get('/api/v1/gems/nonexistentgem.json')).to have_been_made
+        expect(info).to eq []
+      end
     end
   end
 
