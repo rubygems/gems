@@ -21,7 +21,7 @@ describe Gems::Client do
     context 'when gem does not exist' do
       before do
         stub_get('/api/v1/gems/nonexistentgem.json').
-          to_return(:body => "This rubygem could not be found.")
+          to_return(:body => 'This rubygem could not be found.')
       end
       it 'returns some basic information about the given gem' do
         info = Gems.info 'nonexistentgem'
