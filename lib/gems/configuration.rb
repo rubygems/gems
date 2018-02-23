@@ -5,12 +5,12 @@ require 'yaml'
 module Gems
   module Configuration
     # An array of valid keys in the options hash when configuring a {Gems::Client}
-    VALID_OPTIONS_KEYS = [
-      :host,
-      :key,
-      :password,
-      :user_agent,
-      :username,
+    VALID_OPTIONS_KEYS = %i[
+      host
+      key
+      password
+      user_agent
+      username
     ].freeze
 
     # Set the default API endpoint

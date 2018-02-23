@@ -59,11 +59,11 @@ EmptyLinesAroundAccessModifier:
 
 # Align ends correctly
 EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 # Indentation of when/else
 CaseIndentation:
-  IndentWhenRelativeTo: end
+  EnforcedStyle: end
   IndentOneStep: false
 
 Lambda:
@@ -73,4 +73,14 @@ RaiseArgs:
   EnforcedStyle: compact
 
 TrailingCommaInLiteral:
+  Enabled: false
+
+# Ignore length of describe and context blocks
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+# The RubyGems /api/v1/dependencies endpoint returns serialized ruby objects
+# that need to be deserialized within Gems::Client#dependencies. :(
+Security/MarshalLoad:
   Enabled: false
