@@ -66,7 +66,7 @@ Ruby wrapper for the RubyGems.org API.
 
     # Return the number of downloads by day for coulda 0.6.3 for the past 90 days.
     # (Defaults to the latest version if no version is specified.)
-    Gems.downloads 'coulda', '0.6.3'
+    Gems.downloads 'coulda', '0.6.3', Date.today - 90, Date.today
 
     # Return the number of downloads by day for coulda 0.6.3 for the past year.
     Gems.downloads 'coulda', '0.6.3', Date.today - 365, Date.today
