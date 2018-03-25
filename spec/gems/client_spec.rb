@@ -26,7 +26,7 @@ describe Gems::Client do
       it 'returns some basic information about the given gem' do
         info = Gems.info 'nonexistentgem'
         expect(a_get('/api/v1/gems/nonexistentgem.json')).to have_been_made
-        expect(info).to eq []
+        expect(info['name']).to be_nil
       end
     end
   end
