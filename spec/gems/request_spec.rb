@@ -36,6 +36,20 @@ describe Gems::Request do
 
     it 'raise a Gems::NotFound error' do
       expect { Gems.dependencies('rails', 'thor') }.to raise_error(Gems::NotFound)
+    end
+  end
+
+  describe "#get with a non-200" do
+    before do
+      response_body = 'Internal Server Error'
+
+      stub_get('/api/v1/dependencies').
+        with(:query => {'gems' => 'rails,thor'}).
+        to_return(:body => response_body, :status => 500)
+    end
+
+    it 'raise a wrapped Gems::Error' do
+      expect { Gems.dependencies('rails', 'thor') }.to raise_error(Gems::GemError)
       expect(a_get('/api/v1/dependencies').with(:query => {'gems' => 'rails,thor'})).to have_been_made
     end
   end
