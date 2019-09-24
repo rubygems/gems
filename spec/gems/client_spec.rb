@@ -36,11 +36,18 @@ describe Gems::Client do
       stub_get('/api/v1/search.json').
         with(:query => {'query' => 'cucumber'}).
         to_return(:body => fixture('search.json'))
+      stub_get('/api/v1/search.json').
+        with(:query => {'query' => 'cucumber', 'page' => '2'}).
+        to_return(:body => fixture('search.json'))
     end
     it 'returns an array of active gems that match the query' do
       search = Gems.search 'cucumber'
       expect(a_get('/api/v1/search.json').with(:query => {'query' => 'cucumber'})).to have_been_made
       expect(search.first['name']).to eq 'cucumber'
+    end
+    it 'allows passing a page parameter' do
+      Gems.search 'cucumber', :page => 2
+      expect(a_get('/api/v1/search.json').with(:query => {'query' => 'cucumber', 'page' => '2'})).to have_been_made
     end
   end
 

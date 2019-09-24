@@ -33,11 +33,13 @@ module Gems
     #
     # @authenticated false
     # @param query [String] A term to search for.
+    # @param options [Hash] A customizable set of options.
+    # @option options [Integer] :page
     # @return [Array<Hash>]
     # @example
     #   Gems.search 'cucumber'
-    def search(query)
-      response = get('/api/v1/search.json', :query => query)
+    def search(query, options = {})
+      response = get('/api/v1/search.json', options.merge(:query => query))
       JSON.parse(response)
     end
 
