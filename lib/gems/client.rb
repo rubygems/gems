@@ -209,7 +209,7 @@ module Gems
     # Create a webhook
     #
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to add the hook to all your gems.
+    # @param gem_name [String] The name of a gem. Specify "*" to add the hook to all gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
@@ -221,7 +221,7 @@ module Gems
     # Remove a webhook
     #
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to remove the hook from all your gems.
+    # @param gem_name [String] The name of a gem. Specify "*" to remove the hook from all gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
@@ -233,7 +233,7 @@ module Gems
     # Test fire a webhook
     #
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to fire the hook for all your gems.
+    # @param gem_name [String] The name of a gem. Specify "*" to fire the hook for all gems.
     # @param url [String] The URL of the web hook.
     # @return [String]
     # @example
