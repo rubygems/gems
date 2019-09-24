@@ -5,7 +5,7 @@ SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCo
 
 SimpleCov.start do
   add_filter '/spec/'
-  minimum_coverage(100)
+  minimum_coverage(100) unless RUBY_PLATFORM =~ /java/
 end
 
 require 'gems'
