@@ -1,0 +1,22 @@
+name: ubuntu
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ '2.3.x', '2.4.x', '2.5.x', '2.6.x' ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install Dependencies
+        run: |
+          gem install bundler --no-document
+          bundle install
+      - name: Run Test
+        run: bundle exec rake spec
