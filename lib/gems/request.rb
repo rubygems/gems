@@ -71,8 +71,10 @@ module Gems
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
       when Net::HTTPNotFound
         raise Gems::NotFound.new(response.body)
-      else
+      when Net::HTTPSuccess
         response.body
+      else
+        raise Gems::GemError.new(response.body)
       end
     end
   end
