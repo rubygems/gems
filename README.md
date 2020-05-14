@@ -1,12 +1,12 @@
 # Gems
 
 [![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
-[![Build Status](http://img.shields.io/travis/rubygems/gems.svg)][travis]
+[![Build Status](https://github.com/rubygems/gems/workflows/ubuntu/badge.svg)][gh-actions]
 [![Code Climate](http://img.shields.io/codeclimate/github/rubygems/gems.svg)][codeclimate]
 [![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
 
 [gem]: https://rubygems.org/gems/gems
-[travis]: http://travis-ci.org/rubygems/gems
+[gh-actions]: https://github.com/rubygems/gems/actions
 [codeclimate]: https://codeclimate.com/github/rubygems/gems
 [coveralls]: https://coveralls.io/r/rubygems/gems
 
@@ -114,7 +114,7 @@ Ruby wrapper for the RubyGems.org API.
     end
 
 ## Supported Ruby Versions
-This library aims to support and is [tested against][travis] the following Ruby
+This library aims to support and is [tested against][gh-actions] the following Ruby
 implementations:
 
 * Ruby 2.1
