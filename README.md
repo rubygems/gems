@@ -2,13 +2,11 @@
 
 [![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
 [![Build Status](https://github.com/rubygems/gems/workflows/ubuntu/badge.svg)][gh-actions]
-[![Dependency Status](http://img.shields.io/gemnasium/rubygems/gems.svg)][gemnasium]
 [![Code Climate](http://img.shields.io/codeclimate/github/rubygems/gems.svg)][codeclimate]
 [![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
 
 [gem]: https://rubygems.org/gems/gems
 [gh-actions]: https://github.com/rubygems/gems/actions
-[gemnasium]: https://gemnasium.com/rubygems/gems
 [codeclimate]: https://codeclimate.com/github/rubygems/gems
 [coveralls]: https://coveralls.io/r/rubygems/gems
 
@@ -18,7 +16,7 @@ Ruby wrapper for the RubyGems.org API.
     gem install gems
 
 ## Documentation
-[http://rdoc.info/gems/gems](http://rdoc.info/gems/gems)
+[https://rdoc.info/gems/gems](https://rdoc.info/gems/gems)
 
 # Usage Examples
     require 'rubygems'
@@ -125,7 +123,7 @@ implementations:
 * Ruby 2.4
 * [JRuby][]
 
-[jruby]: http://www.jruby.org/
+[jruby]: https://www.jruby.org/
 
 If something doesn't work on one of these interpreters, it's a bug.
 
