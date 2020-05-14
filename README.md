@@ -2,13 +2,11 @@
 
 [![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
 [![Build Status](http://img.shields.io/travis/rubygems/gems.svg)][travis]
-[![Dependency Status](http://img.shields.io/gemnasium/rubygems/gems.svg)][gemnasium]
 [![Code Climate](http://img.shields.io/codeclimate/github/rubygems/gems.svg)][codeclimate]
 [![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
 
 [gem]: https://rubygems.org/gems/gems
 [travis]: http://travis-ci.org/rubygems/gems
-[gemnasium]: https://gemnasium.com/rubygems/gems
 [codeclimate]: https://codeclimate.com/github/rubygems/gems
 [coveralls]: https://coveralls.io/r/rubygems/gems
 
@@ -125,7 +123,7 @@ implementations:
 * Ruby 2.4
 * [JRuby][]
 
-[jruby]: http://www.jruby.org/
+[jruby]: https://www.jruby.org/
 
 If something doesn't work on one of these interpreters, it's a bug.
 
