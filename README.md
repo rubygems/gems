@@ -2,12 +2,12 @@
 
 [![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
 [![Build Status](https://github.com/rubygems/gems/workflows/ubuntu/badge.svg)][gh-actions]
-[![Code Climate](http://img.shields.io/codeclimate/github/rubygems/gems.svg)][codeclimate]
+[![Code Climate](https://api.codeclimate.com/v1/badges/45ff982a29d7a000ee84/maintainability)][codeclimate]
 [![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
 
 [gem]: https://rubygems.org/gems/gems
 [gh-actions]: https://github.com/rubygems/gems/actions
-[codeclimate]: https://codeclimate.com/github/rubygems/gems
+[codeclimate]: https://codeclimate.com/github/rubygems/gems/maintainability
 [coveralls]: https://coveralls.io/r/rubygems/gems
 
 Ruby wrapper for the RubyGems.org API.
