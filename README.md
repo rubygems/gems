@@ -120,10 +120,11 @@ end
 This library aims to support and is [tested against][gh-actions] the following Ruby
 implementations:
 
-* Ruby 2.1
-* Ruby 2.2
 * Ruby 2.3
 * Ruby 2.4
+* Ruby 2.5
+* Ruby 2.6
+* Ruby 2.7
 * [JRuby][]
 
 [jruby]: https://www.jruby.org/
