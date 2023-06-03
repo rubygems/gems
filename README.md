@@ -126,6 +126,8 @@ implementations:
 * Ruby 2.6
 * Ruby 2.7
 * Ruby 3.0
+* Ruby 3.1
+* Ruby 3.2
 * [JRuby][]
 
 [jruby]: https://www.jruby.org/
