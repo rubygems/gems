@@ -14,7 +14,6 @@ describe Gems::V2::Client do
       it 'returns some basic information about the given gem' do
         info = Gems::V2.info 'rails', '7.0.6'
         expect(a_get('/api/v2/rubygems/rails/versions/7.0.6.json')).to have_been_made
-        puts info.inspect
         expect(info['name']).to eq 'rails'
         expect(info['version']).to eq '7.0.6'
       end
