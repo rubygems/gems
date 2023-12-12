@@ -5,6 +5,15 @@ describe Gems::Client do
     Gems.reset
   end
 
+  describe '#new' do
+    it 'creates a new v1 client' do
+      client = Gems::V1.new
+
+      expect(client).to_not be_nil
+      expect(client.class).to eq(Gems::V1::Client)
+    end
+  end
+
   describe '#info' do
     context 'when gem exists' do
       before do

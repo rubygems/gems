@@ -27,6 +27,9 @@ require 'gems'
 # Return some basic information about rails.
 Gems.info 'rails'
 
+# Return some basic information about rails version 7.0.6.
+Gems::V2.info 'rails', '7.0.6'
+
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 
