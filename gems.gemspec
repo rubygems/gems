@@ -17,5 +17,5 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/rubygems/gems'
   spec.licenses      = %w[MIT]
   spec.require_paths = %w[lib]
-  spec.required_ruby_version = '>= 2.1.9'
+  spec.required_ruby_version = '>= 2.3.0'
 end
