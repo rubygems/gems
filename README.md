@@ -123,12 +123,6 @@ end
 This library aims to support and is [tested against][gh-actions] the following Ruby
 implementations:
 
-* Ruby 2.3
-* Ruby 2.4
-* Ruby 2.5
-* Ruby 2.6
-* Ruby 2.7
-* Ruby 3.0
 * Ruby 3.1
 * Ruby 3.2
 * Ruby 3.3
