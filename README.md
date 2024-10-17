@@ -16,7 +16,7 @@ Ruby wrapper for the RubyGems.org API.
     gem install gems
 
 ## Documentation
-[https://rdoc.info/gems/gems](https://rdoc.info/gems/gems)
+[https://www.rubydoc.info/gems/gems](https://www.rubydoc.info/gems/gems)
 
 # Usage Examples
 
