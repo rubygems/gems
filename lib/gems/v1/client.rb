@@ -61,11 +61,19 @@ module Gems
       # @authenticated true
       # @param gem [File] A built gem.
       # @param host [String] A RubyGems compatible host to use.
+      # @param attestations [Array] An array of attestations to push, or `nil`.
       # @return [String]
       # @example
       #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-      def push(gem, host = Configuration::DEFAULT_HOST)
-        post('/api/v1/gems', gem.read, 'application/octet-stream', host)
+      def push(gem, host = Configuration::DEFAULT_HOST, attestations: nil)
+        if attestations
+          post('/api/v1/gems',
+               [['gem', gem.read, {:filename => gem.path, :content_type => 'application/octet-stream'}],
+                ['attestations', "[#{attestations.map(&:read).join(',')}]", {:content_type => 'application/json'}]],
+               'multipart/form-data', host)
+        else
+          post('/api/v1/gems', gem.read, 'application/octet-stream', host)
+        end
       end
 
       # Remove a gem from RubyGems.org's index
