@@ -110,6 +110,18 @@ describe Gems::Client do
         expect(push).to eq 'Successfully registered gem: gems (0.0.8)'
       end
     end
+
+    context 'with the attestations parameter' do
+      before do
+        stub_post('/api/v1/gems').
+          to_return(:body => fixture('push'))
+      end
+      it 'submits a gem to RubyGems.org with attestations' do
+        push = Gems.push(File.new(File.expand_path('../../fixtures/gems-0.0.8.gem', __FILE__), 'rb'), :attestations => [File.new(File.expand_path('../../fixtures/gems-0.0.8.gem', __FILE__), 'rb')])
+        expect(a_post('/api/v1/gems')).to have_been_made
+        expect(push).to eq 'Successfully registered gem: gems (0.0.8)'
+      end
+    end
   end
 
   describe '#yank' do

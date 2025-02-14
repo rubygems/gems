@@ -37,6 +37,8 @@ module Gems
       case content_type
       when 'application/x-www-form-urlencoded'
         request.form_data = data if %i[post put].include? method
+      when 'multipart/form-data'
+        request.set_form data, content_type if %i[post put].include? method
       when 'application/octet-stream'
         request.body = data
         request.content_length = data.size
