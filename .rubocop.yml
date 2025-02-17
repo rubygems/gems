@@ -1,9 +1,9 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 3.1
   Include:
-    - 'Gemfile'
-    - 'Rakefile'
-    - 'gems.gemspec'
+    - "Gemfile"
+    - "Rakefile"
+    - "gems.gemspec"
 
 # Avoid long parameter lists
 ParameterLists:
@@ -21,10 +21,10 @@ BlockNesting:
 # Align with the style guide.
 CollectionMethods:
   PreferredMethods:
-    map:      'collect'
-    reduce:   'inject'
-    find:     'detect'
-    find_all: 'select'
+    map: "collect"
+    reduce: "inject"
+    find: "detect"
+    find_all: "select"
 
 # Limit line length
 LineLength:
@@ -72,13 +72,16 @@ Lambda:
 RaiseArgs:
   EnforcedStyle: compact
 
-TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 
 # Ignore length of describe and context blocks
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*_spec.rb'
+    - "spec/**/*_spec.rb"
 
 # The RubyGems /api/v1/dependencies endpoint returns serialized ruby objects
 # that need to be deserialized within Gems::Client#dependencies. :(
