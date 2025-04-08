@@ -23,7 +23,7 @@ module Gems
 
   private
 
-    def request(method, path, data, content_type, request_host = host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
+    def request(method, path, data, content_type, request_host = host) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists, Metrics/PerceivedComplexity
       path += hash_to_query_string(data) if %i[delete get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
@@ -37,6 +37,8 @@ module Gems
       case content_type
       when 'application/x-www-form-urlencoded'
         request.form_data = data if %i[post put].include? method
+      when 'multipart/form-data'
+        request.set_form data, content_type if %i[post put].include? method
       when 'application/octet-stream'
         request.body = data
         request.content_length = data.size
