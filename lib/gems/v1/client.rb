@@ -291,8 +291,8 @@ module Gems
       # @example
       #   Gems.dependencies 'rails', 'thor'
       def dependencies(*gems)
-        response = get('/api/v1/dependencies', :gems => gems.join(','))
-        Marshal.load(response)
+        response = get('/api/v1/dependencies.json', :gems => gems.join(','))
+        JSON.parse(response)
       end
 
       # Returns an array of all the reverse dependencies to the given gem.
