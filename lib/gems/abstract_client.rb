@@ -10,9 +10,10 @@ module Gems
       end
 
       # Delegate to Gems::Client
-      def method_missing(method, *args, &block)
+      def method_missing(method, ...)
         return super unless new.respond_to?(method)
-        new.send(method, *args, &block)
+
+        new.send(method, ...)
       end
 
       def respond_to?(method_name, include_private = false)
