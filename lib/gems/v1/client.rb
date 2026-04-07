@@ -154,21 +154,6 @@ module Gems
         JSON.parse(response)['gems']
       end
 
-      # Returns the number of downloads by day for a particular gem version
-      #
-      # @authenticated false
-      # @param gem_name [String] The name of a gem.
-      # @param gem_version [String] The version of a gem.
-      # @param from [Date] Search start date.
-      # @param to [Date] Search end date.
-      # @return [Hash]
-      # @example
-      #   Gems.downloads 'coulda', '0.6.3', Date.today - 30, Date.today
-      def downloads(gem_name, gem_version = nil, from = nil, to = Date.today)
-        gem_version ||= info(gem_name)['version']
-        response = from ? get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads/search.json", :from => from.to_s, :to => to.to_s) : get("/api/v1/versions/#{gem_name}-#{gem_version}/downloads.json")
-        JSON.parse(response)
-      end
 
       # View all owners of a gem that you own
       #

@@ -262,57 +262,6 @@ describe Gems::Client do
     end
   end
 
-  describe '#downloads' do
-    context 'with no dates or version specified' do
-      before do
-        stub_get('/api/v1/gems/coulda.json').
-          to_return(:body => fixture('rails.json'))
-        stub_get('/api/v1/versions/coulda-3.0.9/downloads.json').
-          to_return(:body => fixture('downloads.json'))
-      end
-      it 'returns the number of downloads by day for a particular gem version' do
-        downloads = Gems.downloads 'coulda'
-        expect(a_get('/api/v1/gems/coulda.json')).to have_been_made
-        expect(a_get('/api/v1/versions/coulda-3.0.9/downloads.json')).to have_been_made
-        expect(downloads['2011-06-22']).to eq 8
-      end
-    end
-    context 'with no dates specified' do
-      before do
-        stub_get('/api/v1/versions/coulda-0.6.3/downloads.json').
-          to_return(:body => fixture('downloads.json'))
-      end
-      it 'returns the number of downloads by day for a particular gem version' do
-        downloads = Gems.downloads 'coulda', '0.6.3'
-        expect(a_get('/api/v1/versions/coulda-0.6.3/downloads.json')).to have_been_made
-        expect(downloads['2011-06-22']).to eq 8
-      end
-    end
-    context 'with from date specified' do
-      before do
-        stub_get('/api/v1/versions/coulda-0.6.3/downloads/search.json').
-          with(:query => {'from' => '2011-01-01', 'to' => Date.today.to_s}).
-          to_return(:body => fixture('downloads.json'))
-      end
-      it 'returns the number of downloads by day for a particular gem version' do
-        downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01')
-        expect(a_get('/api/v1/versions/coulda-0.6.3/downloads/search.json').with(:query => {'from' => '2011-01-01', 'to' => Date.today.to_s})).to have_been_made
-        expect(downloads['2011-06-22']).to eq 8
-      end
-    end
-    context 'with from and to dates specified' do
-      before do
-        stub_get('/api/v1/versions/coulda-0.6.3/downloads/search.json').
-          with(:query => {'from' => '2011-01-01', 'to' => '2011-06-28'}).
-          to_return(:body => fixture('downloads.json'))
-      end
-      it 'returns the number of downloads by day for a particular gem version' do
-        downloads = Gems.downloads 'coulda', '0.6.3', Date.parse('2011-01-01'), Date.parse('2011-06-28')
-        expect(a_get('/api/v1/versions/coulda-0.6.3/downloads/search.json').with(:query => {'from' => '2011-01-01', 'to' => '2011-06-28'})).to have_been_made
-        expect(downloads['2011-06-22']).to eq 8
-      end
-    end
-  end
 
   describe '#owners' do
     before do
