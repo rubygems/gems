@@ -16,7 +16,7 @@ module Gems
         end
       end
 
-      # Returns information about the given gem for a sepcific version
+      # Returns information about the given gem for a specific version
       #
       # @authenticated false
       # @param gem_name [String] The name of a gem.
