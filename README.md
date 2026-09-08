@@ -36,7 +36,7 @@ Gems.search 'cucumber'
 # Return all gems that you own.
 Gems.gems
 
-# Return all gems owned by Erik Michaels-Ober.
+# Return all gems owned by Erik Berlin.
 Gems.gems("sferik")
 
 # Submit a gem to RubyGems.org.
@@ -133,6 +133,6 @@ fashion. If critical issues for a particular implementation exist at the time
 of a major release, support for that Ruby version may be dropped.
 
 ## Copyright
-Copyright (c) 2011-2013 Erik Michaels-Ober. See [LICENSE][] for details.
+Copyright (c) 2011-2026 Erik Berlin. See [LICENSE][] for details.
 
 [license]: LICENSE.md

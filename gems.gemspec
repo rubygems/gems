@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Ruby wrapper for the RubyGems.org API'
   spec.summary       = spec.description
 
-  spec.authors       = ['Erik Michaels-Ober']
+  spec.authors       = ['Erik Berlin']
   spec.email         = ['sferik@gmail.com']
 
   spec.files         = %w[.yardopts CONTRIBUTING.md LICENSE.md README.md gems.gemspec] + Dir['lib/**/*.rb']
