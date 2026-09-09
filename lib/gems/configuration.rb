@@ -7,13 +7,19 @@ module Gems
   module Configuration
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = %i[
+      debug_output
       host
       id_token
       key
+      max_redirects
+      open_timeout
       otp
       password
+      proxy_url
+      read_timeout
       user_agent
       username
+      write_timeout
     ].freeze
 
     # Set the default API endpoint
@@ -67,14 +73,36 @@ module Gems
     # @example Reset the configuration
     #   Gems.reset
     def reset
-      self.username = nil
-      self.otp = nil
-      self.password = nil
       self.host = DEFAULT_HOST
+      self.user_agent = DEFAULT_USER_AGENT
+      reset_credentials
+      reset_connection
+      self
+    end
+
+    private
+
+    # Reset the credentials to their defaults
+    # @api private
+    # @return [void]
+    def reset_credentials
       self.id_token = nil
       self.key = DEFAULT_KEY
-      self.user_agent = DEFAULT_USER_AGENT
-      self
+      self.otp = nil
+      self.password = nil
+      self.username = nil
+    end
+
+    # Reset the connection and redirect options to their defaults
+    # @api private
+    # @return [void]
+    def reset_connection
+      self.open_timeout = Connection::DEFAULT_OPEN_TIMEOUT
+      self.read_timeout = Connection::DEFAULT_READ_TIMEOUT
+      self.write_timeout = Connection::DEFAULT_WRITE_TIMEOUT
+      self.debug_output = nil
+      self.proxy_url = nil
+      self.max_redirects = RedirectHandler::DEFAULT_MAX_REDIRECTS
     end
   end
 end

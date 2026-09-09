@@ -1,7 +1,10 @@
 RSpec.describe Gems::Configuration do
   describe "::VALID_OPTIONS_KEYS" do
     it "lists the configurable options" do
-      expect(described_class::VALID_OPTIONS_KEYS).to eq(%i[host id_token key otp password user_agent username])
+      keys = %i[debug_output host id_token key max_redirects open_timeout otp password proxy_url read_timeout]
+      keys += %i[user_agent username write_timeout]
+
+      expect(described_class::VALID_OPTIONS_KEYS).to eq(keys)
     end
   end
 
@@ -52,32 +55,45 @@ RSpec.describe Gems::Configuration do
   describe "#options" do
     before do
       Gems.configure do |config|
+        config.debug_output = $stderr
         config.host = "http://example.com"
         config.id_token = "ID_TOKEN"
         config.key = TEST_KEY
+        config.max_redirects = 3
+        config.open_timeout = 10
         config.otp = "123456"
         config.password = TEST_PASSWORD
+        config.proxy_url = "http://proxy.example.com:8080"
+        config.read_timeout = 20
         config.user_agent = "Custom User Agent"
         config.username = TEST_USERNAME
+        config.write_timeout = 30
       end
     end
 
     it "returns a hash of all options" do
-      expect(Gems.options).to eq(host: "http://example.com", id_token: "ID_TOKEN", key: TEST_KEY, otp: "123456",
-        password: TEST_PASSWORD, user_agent: "Custom User Agent", username: TEST_USERNAME)
+      expect(Gems.options).to eq(debug_output: $stderr, host: "http://example.com", id_token: "ID_TOKEN", key: TEST_KEY,
+        max_redirects: 3, open_timeout: 10, otp: "123456", password: TEST_PASSWORD, proxy_url: "http://proxy.example.com:8080",
+        read_timeout: 20, user_agent: "Custom User Agent", username: TEST_USERNAME, write_timeout: 30)
     end
   end
 
   describe "#reset" do
     before do
       Gems.configure do |config|
+        config.debug_output = $stderr
         config.host = "http://example.com"
         config.id_token = "ID_TOKEN"
         config.key = TEST_KEY
+        config.max_redirects = 3
+        config.open_timeout = 10
         config.otp = "123456"
         config.password = TEST_PASSWORD
+        config.proxy_url = "http://proxy.example.com:8080"
+        config.read_timeout = 20
         config.user_agent = "Custom User Agent"
         config.username = TEST_USERNAME
+        config.write_timeout = 30
       end
     end
 
@@ -88,7 +104,13 @@ RSpec.describe Gems::Configuration do
       otp: nil,
       password: nil,
       user_agent: Gems::Configuration::DEFAULT_USER_AGENT,
-      username: nil
+      username: nil,
+      open_timeout: Gems::Connection::DEFAULT_OPEN_TIMEOUT,
+      read_timeout: Gems::Connection::DEFAULT_READ_TIMEOUT,
+      write_timeout: Gems::Connection::DEFAULT_WRITE_TIMEOUT,
+      debug_output: nil,
+      proxy_url: nil,
+      max_redirects: Gems::RedirectHandler::DEFAULT_MAX_REDIRECTS
     }.each do |option, default|
       it "resets the #{option} to its default" do
         Gems.reset

@@ -68,11 +68,22 @@ module Gems
     attr_accessor password: String?
     attr_accessor user_agent: String
     attr_accessor username: String?
+    attr_accessor open_timeout: Integer
+    attr_accessor read_timeout: Integer
+    attr_accessor write_timeout: Integer
+    attr_accessor debug_output: IO?
+    attr_accessor proxy_url: String?
+    attr_accessor max_redirects: Integer
 
     def self.extended: (Configuration base) -> void
     def configure: () { (self) -> void } -> self
-    def options: () -> Hash[Symbol, String?]
+    def options: () -> Hash[Symbol, untyped]
     def reset: () -> self
+
+    private
+
+    def reset_credentials: () -> void
+    def reset_connection: () -> void
   end
 
   class Authenticator
@@ -325,6 +336,18 @@ module Gems
     def initialize: (?options options) -> void
     def host=: (String host) -> void
     def user_agent=: (String user_agent) -> void
+    def open_timeout: () -> Integer
+    def open_timeout=: (Integer open_timeout) -> void
+    def read_timeout: () -> Integer
+    def read_timeout=: (Integer read_timeout) -> void
+    def write_timeout: () -> Integer
+    def write_timeout=: (Integer write_timeout) -> void
+    def debug_output: () -> IO?
+    def debug_output=: (IO? debug_output) -> void
+    def proxy_url: () -> String?
+    def proxy_url=: (String? proxy_url) -> void
+    def max_redirects: () -> Integer
+    def max_redirects=: (Integer max_redirects) -> void
   end
 
   module V1

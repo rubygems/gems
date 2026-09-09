@@ -18,6 +18,13 @@ RSpec.describe Gems::Request do
       expect(client.request_builder.user_agent).to eq("Custom User Agent")
     end
 
+    it "returns a request builder with the including object's user agent" do
+      requester = Class.new { include Gems::Request }.new
+      requester.define_singleton_method(:user_agent) { "Custom User Agent" }
+
+      expect(requester.request_builder.user_agent).to eq("Custom User Agent")
+    end
+
     it "memoizes the request builder" do
       expect(client.request_builder).to equal(client.request_builder)
     end

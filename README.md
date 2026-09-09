@@ -145,12 +145,17 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
 | `id_token`    | The OIDC ID token exchanged for an API key               | `nil`                                  |
 | `user_agent`  | The `User-Agent` header                                  | `Gems <version>`                       |
+| `open_timeout` | The timeout for opening connections, in seconds         | `60`                                   |
+| `read_timeout` | The timeout for reading responses, in seconds           | `60`                                   |
+| `write_timeout` | The timeout for writing requests, in seconds           | `60`                                   |
+| `debug_output` | An IO that receives HTTP debug output                   | `nil`                                  |
+| `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
+| `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
 
 Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator`, `Gems::BasicAuthenticator`,
 `Gems::TrustedPublisherAuthenticator`, and `Gems::OtpAuthenticator` (which wraps one of the others).
 HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
 
-Timeouts, debug output, the proxy, and the redirect limit can be set on a client's `connection` and `redirect_handler`.
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless a proxy URL is set.
 
 ## Errors
