@@ -347,7 +347,12 @@ RSpec.describe Gems::API do
   end
 
   describe "#web_hooks" do
-    before { stub_get("/api/v1/web_hooks.json").to_return(body: fixture("web_hooks.json")) }
+    before do
+      stub_get("/api/v1/web_hooks.json").to_return(body: {
+        "all gems" => [{"url" => "http://example.com", "failure_count" => 0}],
+        "rails" => [{"url" => "http://example.com/rails", "failure_count" => 1}]
+      }.to_json)
+    end
 
     it "gets the correct resource" do
       client.web_hooks
@@ -355,8 +360,20 @@ RSpec.describe Gems::API do
       expect(a_get("/api/v1/web_hooks.json")).to have_been_made
     end
 
-    it "returns the registered web hooks" do
-      expect(client.web_hooks["all gems"].first["url"]).to eq("http://example.com")
+    it "returns every registered web hook" do
+      expect(client.web_hooks.map { |hook| hook["url"] }).to eq(%w[http://example.com http://example.com/rails])
+    end
+
+    it "uses * as the gem name for hooks registered for all gems" do
+      expect(client.web_hooks.first["gem_name"]).to eq("*")
+    end
+
+    it "uses the gem name for hooks registered for a gem" do
+      expect(client.web_hooks.last["gem_name"]).to eq("rails")
+    end
+
+    it "keeps the other attributes" do
+      expect(client.web_hooks.last["failure_count"]).to eq(1)
     end
   end
 
