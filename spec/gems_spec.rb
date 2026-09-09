@@ -1,36 +1,15 @@
-describe Gems do
-  after do
-    Gems.reset
+RSpec.describe Gems do
+  it "extends Gems::Configuration" do
+    expect(described_class).to be_a(Gems::Configuration)
   end
 
-  context "when delegating to a client" do
-    before do
-      stub_get("/api/v1/gems/rails.json")
-        .to_return(body: fixture("rails.json"))
+  describe "::VERSION" do
+    it "is a String" do
+      expect(Gems::VERSION).to be_a(String)
     end
 
-    it "gets the correct resource" do
-      Gems.info("rails")
-      expect(a_get("/api/v1/gems/rails.json")).to have_been_made
-    end
-
-    it "returns the same results as a client" do
-      expect(Gems.info("rails")).to eq Gems::Client.new.info("rails")
-    end
-  end
-
-  describe ".method_missing" do
-    it "raises NoMethodError for methods the client does not define" do
-      expect { described_class.foo }.to raise_error(NoMethodError)
-    end
-  end
-
-  describe ".respond_to?" do
-    it "returns true if a method exists" do
-      expect(Gems).to respond_to(:new)
-    end
-    it "returns false if a method doesn't exist" do
-      expect(Gems).not_to respond_to(:foo)
+    it "is a valid gem version" do
+      expect(Gem::Version.correct?(Gems::VERSION)).to be(true)
     end
   end
 
@@ -40,46 +19,41 @@ describe Gems do
     end
 
     it "passes options to the client" do
-      client = described_class.new(key: TEST_KEY, host: "http://example.com")
+      client = described_class.new(key: TEST_KEY, host: "http://example.com", max_redirects: 3)
 
-      expect([client.key, client.host]).to eq([TEST_KEY, "http://example.com"])
+      expect([client.key, client.host, client.max_redirects]).to eq([TEST_KEY, "http://example.com", 3])
     end
   end
 
-  describe ".host" do
-    it "returns the default host" do
-      expect(Gems.host).to eq Gems::Configuration::DEFAULT_HOST
+  Gems::API.public_instance_methods(false).each do |method|
+    it "delegates .#{method} to a client" do
+      expect(described_class).to respond_to(method)
     end
   end
 
-  describe ".host=" do
-    it "sets the host" do
-      Gems.host = "http://localhost:3000"
-      expect(Gems.host).to eq "http://localhost:3000"
+  it "does not respond to undefined methods" do
+    expect(described_class).not_to respond_to(:foo)
+  end
+
+  describe ".info" do
+    before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
+
+    it "delegates to a client" do
+      described_class.info("rails")
+
+      expect(a_get("/api/v1/gems/rails.json")).to have_been_made
+    end
+
+    it "returns the same result as a client" do
+      expect(described_class.info("rails")).to eq(Gems::Client.new.info("rails"))
     end
   end
 
-  describe ".user_agent" do
-    it "returns the default user agent" do
-      expect(Gems.user_agent).to eq Gems::Configuration::DEFAULT_USER_AGENT
-    end
-  end
+  describe ".version" do
+    before { stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json")) }
 
-  describe ".user_agent=" do
-    it "sets the user agent" do
-      Gems.user_agent = "Custom User Agent"
-      expect(Gems.user_agent).to eq "Custom User Agent"
-    end
-  end
-
-  describe ".configure" do
-    Gems::Configuration::VALID_OPTIONS_KEYS.each do |key|
-      it "sets the #{key}" do
-        Gems.configure do |config|
-          config.send("#{key}=", key)
-          expect(Gems.send(key)).to eq key
-        end
-      end
+    it "delegates to a client" do
+      expect(described_class.version("rails", "7.0.6")).to eq(Gems::Client.new.version("rails", "7.0.6"))
     end
   end
 end

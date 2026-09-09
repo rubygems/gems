@@ -112,6 +112,22 @@ module Gems
 
     private
 
+    # Initialize credential instance variables
+    # @api private
+    # @param key [String, nil] the API key
+    # @param username [String, nil] the username
+    # @param password [String, nil] the password
+    # @param otp [String, nil] the one-time passcode
+    # @param id_token [String, nil] the OIDC ID token
+    # @return [void]
+    def initialize_credentials(key:, username:, password:, otp:, id_token:)
+      @key = key
+      @username = username
+      @password = password
+      @otp = otp
+      @id_token = id_token
+    end
+
     # Initialize the appropriate authenticator based on available credentials
     #
     # Basic authentication takes precedence over trusted publishing, which takes
@@ -124,15 +140,6 @@ module Gems
       @authenticator = otp_authenticator(authenticator)
     end
 
-    # Build a trusted publisher authenticator if an ID token is available
-    # @api private
-    # @return [TrustedPublisherAuthenticator, nil] the trusted publisher authenticator or nil
-    def trusted_publisher_authenticator
-      return unless id_token
-
-      TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:)
-    end
-
     # Wrap an authenticator with a one-time passcode if one is available
     # @api private
     # @param authenticator [Authenticator] the authenticator to wrap
@@ -141,6 +148,15 @@ module Gems
       return authenticator unless otp
 
       OtpAuthenticator.new(authenticator:, otp:)
+    end
+
+    # Build a trusted publisher authenticator if an ID token is available
+    # @api private
+    # @return [TrustedPublisherAuthenticator, nil] the trusted publisher authenticator or nil
+    def trusted_publisher_authenticator
+      return unless id_token
+
+      TrustedPublisherAuthenticator.new(id_token:, host: @host, connection: @connection, request_builder: @request_builder)
     end
 
     # Build a basic authenticator if a username and password are available

@@ -1,22 +1,36 @@
 RSpec.describe Gems::Configuration do
-  describe "::VALID_OPTIONS_KEYS" do
-    it "lists the configurable options" do
-      keys = %i[debug_output host id_token key max_redirects open_timeout otp password proxy_url read_timeout]
-      keys += %i[user_agent username write_timeout]
-
-      expect(described_class::VALID_OPTIONS_KEYS).to eq(keys)
-    end
-  end
-
   describe "::DEFAULT_HOST" do
     it "defaults to rubygems.org" do
       expect(described_class::DEFAULT_HOST).to eq("https://rubygems.org")
     end
   end
 
-  describe "::DEFAULT_KEY" do
-    it "is loaded from the RubyGems configuration" do
-      expect(described_class::DEFAULT_KEY).to eq(Gem.configuration.rubygems_api_key)
+  describe "#default_key" do
+    it "reads the API key from the RubyGems configuration" do
+      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY"))
+
+      expect(Gems.default_key).to eq("FILE_KEY")
+    end
+  end
+
+  describe "#key" do
+    before { allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY")) }
+
+    it "returns the configured key" do
+      Gems.key = TEST_KEY
+
+      expect(Gems.key).to eq(TEST_KEY)
+    end
+
+    it "falls back to the default key" do
+      expect(Gems.key).to eq("FILE_KEY")
+    end
+
+    it "falls back to the default key after being cleared" do
+      Gems.key = TEST_KEY
+      Gems.key = nil
+
+      expect(Gems.key).to eq("FILE_KEY")
     end
   end
 
@@ -30,7 +44,8 @@ RSpec.describe Gems::Configuration do
     it "resets the configuration of the extending module" do
       mod = Module.new.extend(described_class)
 
-      expect(mod.options).to eq(Gems.reset.options)
+      expect([mod.host, mod.instance_variable_get(:@key), mod.user_agent, mod.username])
+        .to eq([described_class::DEFAULT_HOST, nil, described_class::DEFAULT_USER_AGENT, nil])
     end
   end
 
@@ -43,7 +58,9 @@ RSpec.describe Gems::Configuration do
       expect(Gems.configure { nil }).to equal(Gems)
     end
 
-    described_class::VALID_OPTIONS_KEYS.each do |key|
+    options = %i[host id_token key otp password user_agent username]
+    options += %i[open_timeout read_timeout write_timeout debug_output proxy_url max_redirects]
+    options.each do |key|
       it "sets the #{key}" do
         Gems.configure { |config| config.public_send(:"#{key}=", key.to_s) }
 
@@ -52,55 +69,28 @@ RSpec.describe Gems::Configuration do
     end
   end
 
-  describe "#options" do
-    before do
-      Gems.configure do |config|
-        config.debug_output = $stderr
-        config.host = "http://example.com"
-        config.id_token = "ID_TOKEN"
-        config.key = TEST_KEY
-        config.max_redirects = 3
-        config.open_timeout = 10
-        config.otp = "123456"
-        config.password = TEST_PASSWORD
-        config.proxy_url = "http://proxy.example.com:8080"
-        config.read_timeout = 20
-        config.user_agent = "Custom User Agent"
-        config.username = TEST_USERNAME
-        config.write_timeout = 30
-      end
-    end
-
-    it "returns a hash of all options" do
-      expect(Gems.options).to eq(debug_output: $stderr, host: "http://example.com", id_token: "ID_TOKEN", key: TEST_KEY,
-        max_redirects: 3, open_timeout: 10, otp: "123456", password: TEST_PASSWORD, proxy_url: "http://proxy.example.com:8080",
-        read_timeout: 20, user_agent: "Custom User Agent", username: TEST_USERNAME, write_timeout: 30)
-    end
-  end
-
   describe "#reset" do
     before do
       Gems.configure do |config|
-        config.debug_output = $stderr
         config.host = "http://example.com"
         config.id_token = "ID_TOKEN"
         config.key = TEST_KEY
-        config.max_redirects = 3
-        config.open_timeout = 10
         config.otp = "123456"
         config.password = TEST_PASSWORD
-        config.proxy_url = "http://proxy.example.com:8080"
-        config.read_timeout = 20
         config.user_agent = "Custom User Agent"
         config.username = TEST_USERNAME
+        config.open_timeout = 10
+        config.read_timeout = 20
         config.write_timeout = 30
+        config.debug_output = $stderr
+        config.proxy_url = "http://proxy.example.com:8080"
+        config.max_redirects = 3
       end
     end
 
     {
       host: Gems::Configuration::DEFAULT_HOST,
       id_token: nil,
-      key: Gems::Configuration::DEFAULT_KEY,
       otp: nil,
       password: nil,
       user_agent: Gems::Configuration::DEFAULT_USER_AGENT,
@@ -119,11 +109,10 @@ RSpec.describe Gems::Configuration do
       end
     end
 
-    it "resets the key to the stored default key" do
-      stub_const("Gems::Configuration::DEFAULT_KEY", "FILE_KEY")
+    it "clears the configured key" do
       Gems.reset
 
-      expect(Gems.key).to eq("FILE_KEY")
+      expect(Gems.instance_variable_get(:@key)).to be_nil
     end
 
     it "returns the configuration" do
