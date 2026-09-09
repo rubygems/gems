@@ -15,8 +15,8 @@ module Gems
     # @param gem_name [String] The name of a gem.
     # @return [Hash]
     # @example
-    #   Gems.info 'rails'
-    def info(gem_name)
+    #   Gems.gem 'rails'
+    def gem(gem_name)
       response = get("/api/v1/gems/#{gem_name}.json")
       JSON.parse(response)
     rescue JSON::ParserError
@@ -44,8 +44,8 @@ module Gems
     # @param user_handle [String] The handle of a user.
     # @return [Array]
     # @example
-    #   Gems.gems
-    def gems(user_handle = nil)
+    #   Gems.owned_gems
+    def owned_gems(user_handle = nil)
       response = if user_handle
         get("/api/v1/owners/#{user_handle}/gems.json")
       else
@@ -87,7 +87,7 @@ module Gems
     # @example
     #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def yank(gem_name, version = nil, platform: nil)
-      version ||= info(gem_name).fetch("version")
+      version ||= gem(gem_name).fetch("version")
       delete("/api/v1/gems/yank", {gem_name:, version:, platform:}.compact)
     end
 
@@ -102,7 +102,7 @@ module Gems
     # @example
     #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def unyank(gem_name, version = nil, platform: nil)
-      version ||= info(gem_name).fetch("version")
+      version ||= gem(gem_name).fetch("version")
       put("/api/v1/gems/unyank", {gem_name:, version:, platform:}.compact)
     end
 
@@ -143,7 +143,7 @@ module Gems
     #   Gems.total_downloads 'rails_admin', '0.0.1'
     def total_downloads(gem_name = nil, gem_version = nil)
       response = if gem_name
-        get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name).fetch("version")}.json")
+        get("/api/v1/downloads/#{gem_name}-#{gem_version || gem(gem_name).fetch("version")}.json")
       else
         get("/api/v1/downloads.json")
       end

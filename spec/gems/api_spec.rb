@@ -1,18 +1,18 @@
 RSpec.describe Gems::API do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
-  describe "#info" do
+  describe "#gem" do
     context "when the gem exists" do
       before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
 
       it "gets the correct resource" do
-        client.info("rails")
+        client.gem("rails")
 
         expect(a_get("/api/v1/gems/rails.json")).to have_been_made
       end
 
       it "returns information about the gem" do
-        expect(client.info("rails")["name"]).to eq("rails")
+        expect(client.gem("rails")["name"]).to eq("rails")
       end
     end
 
@@ -20,7 +20,7 @@ RSpec.describe Gems::API do
       before { stub_get("/api/v1/gems/nonexistentgem.json").to_return(body: "This rubygem could not be found.") }
 
       it "returns an empty hash" do
-        expect(client.info("nonexistentgem")).to eq({})
+        expect(client.gem("nonexistentgem")).to eq({})
       end
     end
   end
@@ -48,18 +48,18 @@ RSpec.describe Gems::API do
     end
   end
 
-  describe "#gems" do
+  describe "#owned_gems" do
     context "without a user handle" do
       before { stub_get("/api/v1/gems.json").to_return(body: fixture("gems.json")) }
 
       it "gets the correct resource" do
-        client.gems
+        client.owned_gems
 
         expect(a_get("/api/v1/gems.json")).to have_been_made
       end
 
       it "returns the gems you own" do
-        expect(client.gems.first["name"]).to eq("exchb")
+        expect(client.owned_gems.first["name"]).to eq("exchb")
       end
     end
 
@@ -67,13 +67,13 @@ RSpec.describe Gems::API do
       before { stub_get("/api/v1/owners/sferik/gems.json").to_return(body: fixture("gems.json")) }
 
       it "gets the correct resource" do
-        client.gems("sferik")
+        client.owned_gems("sferik")
 
         expect(a_get("/api/v1/owners/sferik/gems.json")).to have_been_made
       end
 
       it "returns the gems the user owns" do
-        expect(client.gems("sferik").first["name"]).to eq("exchb")
+        expect(client.owned_gems("sferik").first["name"]).to eq("exchb")
       end
     end
   end

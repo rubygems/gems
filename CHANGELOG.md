@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Push to the client's configured host by default
 * Read the default API key from `~/.gem/credentials` lazily instead of when the library is required
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
+* Rename `info` to `gem` and `gems` to `owned_gems`
 * Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 
 ### Removed
