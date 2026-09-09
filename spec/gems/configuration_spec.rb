@@ -34,6 +34,14 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  describe "#key=" do
+    it "resolves the key of an API key object" do
+      Gems.key = Gems::ApiKey.new("rubygems_api_key" => TEST_KEY)
+
+      expect(Gems.key).to eq(TEST_KEY)
+    end
+  end
+
   describe "::DEFAULT_USER_AGENT" do
     it "includes the version" do
       expect(described_class::DEFAULT_USER_AGENT).to eq("Gems #{Gems::VERSION}")

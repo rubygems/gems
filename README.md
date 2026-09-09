@@ -49,7 +49,7 @@ Gems.owned_gems
 Gems.owned_gems 'sferik'
 
 # Submit a gem to RubyGems.org.
-Gems.push File.new 'gemcutter-0.2.1.rubygem'
+Gems.push File.new 'gemcutter-0.2.1.gem'
 
 # Remove a gem from RubyGems.org's index.
 # Defaults to the latest version if no version is specified.
@@ -117,7 +117,7 @@ Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: t
 Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 
 # The following methods require authentication.
-# By default, we load your API key from ~/.rubygem/credentials
+# By default, we load your API key from ~/.gem/credentials
 # You can override this default by specifying a custom API key.
 Gems.configure do |config|
   config.key = '701243f217cdf23b1370c7b66b65ca97'
@@ -143,8 +143,9 @@ client.rubygem 'rails'
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
 `Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
-`Time` objects and boolean fields have predicate readers such as `yanked?`. Every object also exposes the raw response
-through `[]` and `to_h`, so fields without a reader remain accessible:
+`Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are accepted wherever their
+identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` all work.
+Every object also exposes the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
 
 ```ruby
 gem = Gems.rubygem 'rails'
@@ -159,7 +160,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | Option        | Description                                              | Default                                |
 | ------------- | -------------------------------------------------------- | -------------------------------------- |
 | `host`        | The RubyGems-compatible host, including scheme           | `RUBYGEMS_HOST` or `https://rubygems.org` |
-| `key`         | The API key sent in the `Authorization` header           | `~/.rubygem/credentials`                   |
+| `key`         | The API key sent in the `Authorization` header           | `~/.gem/credentials`                   |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |

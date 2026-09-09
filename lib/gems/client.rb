@@ -50,7 +50,7 @@ module Gems
     #
     # @api public
     # @param host [String] the host for API requests, including scheme
-    # @param key [String, nil] the API key
+    # @param key [String, ApiKey, nil] the API key, or an API key object
     # @param username [String, nil] the username for HTTP basic authentication
     # @param password [String, nil] the password for HTTP basic authentication
     # @param otp [String, nil] the one-time passcode for multi-factor authentication
