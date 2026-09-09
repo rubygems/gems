@@ -1,5 +1,6 @@
 require "json"
 require "uri"
+require_relative "api_key"
 require_relative "authenticator"
 require_relative "configuration"
 require_relative "connection"
@@ -83,7 +84,7 @@ module Gems
     # @example Generate an authentication header
     #   authenticator.header(request)
     def header(_request)
-      {AUTHENTICATION_HEADER => api_key || exchange_token!.fetch("rubygems_api_key")}
+      {AUTHENTICATION_HEADER => api_key || exchange_token!.key}
     end
 
     # Summarize the authenticator for the console
@@ -99,17 +100,17 @@ module Gems
     # Exchange the OIDC ID token for a RubyGems API key
     #
     # @api public
-    # @return [Hash] the token exchange response, including rubygems_api_key, name, scopes, and expires_at
+    # @return [ApiKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     # @example Exchange the ID token
-    #   authenticator.exchange_token!["expires_at"]
+    #   authenticator.exchange_token!.expires_at
     def exchange_token!
       request = request_builder.build(http_method: :post, uri: URI.join(host, EXCHANGE_TOKEN_PATH),
         body: JSON.generate({jwt: id_token}), content_type: JSON_CONTENT_TYPE, headers: {"Accept" => JSON_CONTENT_TYPE})
       response = connection.perform(request:)
-      token = JSON.parse(ResponseParser.new.parse(response:))
-      @api_key = token.fetch("rubygems_api_key")
-      token
+      api_key = ApiKey.new(JSON.parse(ResponseParser.new.parse(response:)))
+      @api_key = api_key.key
+      api_key
     end
   end
 end

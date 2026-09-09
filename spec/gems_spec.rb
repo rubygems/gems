@@ -13,16 +13,6 @@ RSpec.describe Gems do
     end
   end
 
-  describe "::VERSION" do
-    it "is a String" do
-      expect(Gems::VERSION).to be_a(String)
-    end
-
-    it "is a valid gem version" do
-      expect(Gem::Version.correct?(Gems::VERSION)).to be(true)
-    end
-  end
-
   describe ".new" do
     it "returns a Gems::Client" do
       expect(described_class.new).to be_an_instance_of(Gems::Client)

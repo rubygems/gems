@@ -27,10 +27,17 @@ Or, if Bundler is not being used to manage dependencies:
 require 'gems'
 
 # Return some basic information about rails.
-Gems.gem 'rails'
+gem = Gems.gem 'rails'
+gem.name             # => "rails"
+gem.version          # => "8.1.2"
+gem.downloads        # => 704478420
+gem.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", ...]
 
 # Return some basic information about rails version 7.0.6.
-Gems.version 'rails', '7.0.6'
+version = Gems.version 'rails', '7.0.6'
+version.number       # => "7.0.6"
+version.built_at     # => 2023-06-29 00:00:00 UTC
+version.sha          # => "5dfbd481..."
 
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
@@ -52,10 +59,10 @@ Gems.yank 'bills', '0.0.1'
 # Defaults to the latest version if no version is specified.
 Gems.unyank 'bills', '0.0.1'
 
-# Return an array of version details for coulda.
-Gems.versions 'coulda'
+# Return an array of versions of coulda.
+Gems.versions('coulda').map(&:number)
 
-# Return the latest version number of coulda.
+# Return the latest version of coulda.
 Gems.latest_version 'coulda'
 
 # Return the total number of downloads of all gems.
@@ -63,22 +70,22 @@ Gems.total_downloads
 
 # Return the number of downloads of rails_admin and of version 0.0.1.
 # (Defaults to the latest version if no version is specified.)
-Gems.downloads 'rails_admin', '0.0.1'
+Gems.downloads('rails_admin', '0.0.1').version_downloads
 
 # Returns an array containing the top 50 downloaded gem versions of all time.
-Gems.most_downloaded
+Gems.most_downloaded.first.full_name
 
 # View all owners of a gem that you own.
-Gems.owners 'gemcutter'
+Gems.owners('gemcutter').map(&:handle)
 
 # Add an owner to a RubyGem you own, giving that user permission to manage it.
-Gems.add_owner 'josh@technicalpickles.com', 'gemcutter'
+Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
 
 # Remove a user's permission to manage a RubyGem you own.
-Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter'
+Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
 
-# Return all the webhooks registered under your account, each with a gem_name ("*" for all gems).
-Gems.web_hooks
+# Return all the webhooks registered under your account.
+Gems.web_hooks.map(&:url)
 
 # Add a webhook.
 Gems.add_web_hook 'rails', 'http://example.com'
@@ -101,13 +108,13 @@ Gems.configure do |config|
   config.username = 'nick@gemcutter.org'
   config.password = 'schwwwwing'
 end
-Gems.create_api_key 'ci-push', push_rubygem: true
+Gems.create_api_key('ci-push', push_rubygem: true).key
 
 # Update the scopes of an API key.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
 
 # Exchange an OIDC ID token for an API key via trusted publishing.
-Gems.exchange_trusted_publisher_token ENV.fetch('ID_TOKEN')
+Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 
 # The following methods require authentication.
 # By default, we load your API key from ~/.gem/credentials
@@ -130,6 +137,19 @@ end
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.gem 'rails'
+```
+
+## Response objects
+
+Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
+`Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
+`Time` objects and boolean fields have predicate readers such as `yanked?`. Every object also exposes the raw response
+through `[]` and `to_h`, so fields without a reader remain accessible:
+
+```ruby
+gem = Gems.gem 'rails'
+gem['dependencies'] # => {"development" => [...], "runtime" => [...]}
+gem.to_h            # => the parsed JSON response
 ```
 
 ## Configuration
@@ -156,7 +176,7 @@ Each authentication method has its own authenticator class: `Gems::ApiKeyAuthent
 `Gems::TrustedPublisherAuthenticator`, and `Gems::OtpAuthenticator` (which wraps one of the others).
 HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
 
-Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless a proxy URL is set.
+Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
 
 ## Errors
 

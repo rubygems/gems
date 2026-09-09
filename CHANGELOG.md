@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `WebHook`, `Downloads`, and `ApiKey` objects
+* Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
 * Add RBS signatures
 
 ### Changed
@@ -31,11 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rename `info` to `gem` and `gems` to `owned_gems`
 * Return the version string from `latest_version`
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
-* Return a flat list from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
+* Return a flat list of `WebHook` objects from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
 * Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 
 ### Removed
-* Remove `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE`; `Gems::VERSION` remains the library version string
+* Remove `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE`; `Gems::Version` is now a response object and `Gems::VERSION` remains the library version string
 * Remove `dependencies` and `api_key`, whose endpoints have been retired by RubyGems.org; use `create_api_key` instead
 * Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`
 

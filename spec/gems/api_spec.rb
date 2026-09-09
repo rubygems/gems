@@ -11,16 +11,18 @@ RSpec.describe Gems::API do
         expect(a_get("/api/v1/gems/rails.json")).to have_been_made
       end
 
-      it "returns information about the gem" do
-        expect(client.gem("rails")["name"]).to eq("rails")
+      it "returns the gem" do
+        info = client.gem("rails")
+
+        expect([info.class, info.name]).to eq([Gems::Gem, "rails"])
       end
     end
 
     context "when the response is not JSON" do
       before { stub_get("/api/v1/gems/nonexistentgem.json").to_return(body: "This rubygem could not be found.") }
 
-      it "returns an empty hash" do
-        expect(client.gem("nonexistentgem")).to eq({})
+      it "raises a parser error" do
+        expect { client.gem("nonexistentgem") }.to raise_error(JSON::ParserError)
       end
     end
   end
@@ -38,7 +40,9 @@ RSpec.describe Gems::API do
     end
 
     it "returns the gems that match the query" do
-      expect(client.search("cucumber").first["name"]).to eq("cucumber")
+      gem = client.search("cucumber").first
+
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "cucumber"])
     end
 
     it "passes options as query parameters" do
@@ -59,7 +63,9 @@ RSpec.describe Gems::API do
       end
 
       it "returns the gems you own" do
-        expect(client.owned_gems.first["name"]).to eq("exchb")
+        gem = client.owned_gems.first
+
+        expect([gem.class, gem.name]).to eq([Gems::Gem, "exchb"])
       end
     end
 
@@ -73,7 +79,9 @@ RSpec.describe Gems::API do
       end
 
       it "returns the gems the user owns" do
-        expect(client.owned_gems("sferik").first["name"]).to eq("exchb")
+        gem = client.owned_gems("sferik").first
+
+        expect([gem.class, gem.name]).to eq([Gems::Gem, "exchb"])
       end
     end
   end
@@ -82,15 +90,13 @@ RSpec.describe Gems::API do
     let(:gem) { fixture("gems-0.0.8.gem") }
     let(:gem_data) { File.binread(File.join(fixture_path, "gems-0.0.8.gem")) }
 
-    before do
-      stub_post("/api/v1/gems").to_return(body: fixture("push"))
-      allow(client).to receive(:post).and_call_original
-    end
+    before { stub_post("/api/v1/gems").to_return(body: fixture("push")) }
 
     it "posts the gem as a binary body" do
       client.push(gem)
 
-      expect(client).to have_received(:post).with("/api/v1/gems", gem_data, host: nil)
+      expect(a_post("/api/v1/gems")
+        .with(body: gem_data, headers: {"Content-Type" => "application/octet-stream"})).to have_been_made
     end
 
     it "returns the response body" do
@@ -114,17 +120,11 @@ RSpec.describe Gems::API do
 
     context "with attestations" do
       let(:attestations) { [fixture("attestations/one.json"), fixture("attestations/two.json")] }
-      let(:fields) do
-        [
-          ["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}],
-          ["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}]
-        ]
-      end
 
-      it "posts multipart fields for the gem and the attestations" do
+      it "posts a multipart body" do
         client.push(gem, attestations:)
 
-        expect(client).to have_received(:post).with("/api/v1/gems", fields, host: nil)
+        expect(a_post("/api/v1/gems").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
       end
 
       it "pushes to a custom host" do
@@ -137,6 +137,25 @@ RSpec.describe Gems::API do
       it "returns the response body" do
         expect(client.push(gem, attestations:)).to eq("Successfully registered gem: gems (0.0.8)")
       end
+    end
+  end
+
+  describe "#multipart_push_body" do
+    let(:gem) { fixture("gems-0.0.8.gem") }
+    let(:gem_data) { File.binread(File.join(fixture_path, "gems-0.0.8.gem")) }
+    let(:attestations) { [fixture("attestations/one.json"), fixture("attestations/two.json")] }
+    let(:body) { client.send(:multipart_push_body, gem, attestations) }
+
+    it "includes the gem with its filename and content type" do
+      expect(body.first).to eq(["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}])
+    end
+
+    it "includes the attestations as a JSON array" do
+      expect(body.last).to eq(["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}])
+    end
+
+    it "has exactly two fields" do
+      expect(body.size).to eq(2)
     end
   end
 
@@ -167,12 +186,6 @@ RSpec.describe Gems::API do
 
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
     end
-
-    it "raises KeyError when the gem has no version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: "{}")
-
-      expect { client.yank("gems") }.to raise_error(KeyError)
-    end
   end
 
   describe "#unyank" do
@@ -200,12 +213,6 @@ RSpec.describe Gems::API do
 
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "3.0.9"})).to have_been_made
     end
-
-    it "raises KeyError when the gem has no version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: "{}")
-
-      expect { client.unyank("gems") }.to raise_error(KeyError)
-    end
   end
 
   describe "#versions" do
@@ -217,8 +224,14 @@ RSpec.describe Gems::API do
       expect(a_get("/api/v1/versions/script_helpers.json")).to have_been_made
     end
 
+    it "sets each version's gem name" do
+      expect(client.versions("script_helpers").map(&:name).uniq).to eq(["script_helpers"])
+    end
+
     it "returns the gem's versions" do
-      expect(client.versions("script_helpers").first["number"]).to eq("0.1.0")
+      version = client.versions("script_helpers").first
+
+      expect([version.class, version.number]).to eq([Gems::Version, "0.1.0"])
     end
   end
 
@@ -231,14 +244,8 @@ RSpec.describe Gems::API do
       expect(a_get("/api/v1/versions/script_helpers/latest.json")).to have_been_made
     end
 
-    it "returns the gem's latest version" do
+    it "returns the gem's latest version number" do
       expect(client.latest_version("script_helpers")).to eq("0.3.0")
-    end
-
-    it "raises KeyError when the response has no version" do
-      stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: "{}")
-
-      expect { client.latest_version("script_helpers") }.to raise_error(KeyError)
     end
   end
 
@@ -254,12 +261,6 @@ RSpec.describe Gems::API do
     it "returns the total downloads of all gems" do
       expect(client.total_downloads).to eq(244_368_950)
     end
-
-    it "raises KeyError when the response has no total" do
-      stub_get("/api/v1/downloads.json").to_return(body: "{}")
-
-      expect { client.total_downloads }.to raise_error(KeyError)
-    end
   end
 
   describe "#downloads" do
@@ -271,8 +272,10 @@ RSpec.describe Gems::API do
       expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
     end
 
-    it "returns the gem's downloads with symbolized keys" do
-      expect(client.downloads("rails_admin", "0.0.0").values_at(:total_downloads, :version_downloads)).to eq([3142, 3142])
+    it "returns the gem's downloads" do
+      downloads = client.downloads("rails_admin", "0.0.0")
+
+      expect([downloads.class, downloads.total, downloads.version_downloads]).to eq([Gems::Downloads, 3142, 3142])
     end
 
     it "defaults to the latest version" do
@@ -294,13 +297,24 @@ RSpec.describe Gems::API do
     end
 
     it "returns the most downloaded gem versions" do
-      expect(client.most_downloaded.first.first["full_name"]).to eq("abstract-1.0.0")
+      version = client.most_downloaded.first
+
+      expect([version.class, version.full_name]).to eq([Gems::Version, "abstract-1.0.0"])
     end
 
-    it "raises KeyError when the response has no gems" do
-      stub_get("/api/v1/downloads/all.json").to_return(body: "{}")
+    it "includes each version's download count" do
+      expect(client.most_downloaded.first.downloads_count).to eq(1)
+    end
 
-      expect { client.most_downloaded }.to raise_error(KeyError)
+    it "derives each version's gem name from its full name" do
+      expect(client.most_downloaded.first.name).to eq("abstract")
+    end
+
+    it "excludes the platform from the derived gem name" do
+      version = {"full_name" => "nokogiri-1.15.0-java", "number" => "1.15.0", "platform" => "java"}
+      stub_get("/api/v1/downloads/all.json").to_return(body: JSON.generate("gems" => [[version, 5]]))
+
+      expect(client.most_downloaded.first.name).to eq("nokogiri")
     end
   end
 
@@ -314,7 +328,9 @@ RSpec.describe Gems::API do
     end
 
     it "returns the gem's owners" do
-      expect(client.owners("gems").first["email"]).to eq("sferik@gmail.com")
+      owner = client.owners("gems").first
+
+      expect([owner.class, owner.email]).to eq([Gems::Owner, "sferik@gmail.com"])
     end
   end
 
@@ -361,19 +377,23 @@ RSpec.describe Gems::API do
     end
 
     it "returns every registered web hook" do
-      expect(client.web_hooks.map { |hook| hook["url"] }).to eq(%w[http://example.com http://example.com/rails])
+      expect(client.web_hooks.map(&:url)).to eq(%w[http://example.com http://example.com/rails])
+    end
+
+    it "returns web hooks" do
+      expect(client.web_hooks).to all(be_an_instance_of(Gems::WebHook))
     end
 
     it "uses * as the gem name for hooks registered for all gems" do
-      expect(client.web_hooks.first["gem_name"]).to eq("*")
+      expect(client.web_hooks.first.gem_name).to eq("*")
     end
 
     it "uses the gem name for hooks registered for a gem" do
-      expect(client.web_hooks.last["gem_name"]).to eq("rails")
+      expect(client.web_hooks.last.gem_name).to eq("rails")
     end
 
     it "keeps the other attributes" do
-      expect(client.web_hooks.last["failure_count"]).to eq(1)
+      expect(client.web_hooks.last.failure_count).to eq(1)
     end
   end
 
@@ -432,7 +452,9 @@ RSpec.describe Gems::API do
     end
 
     it "returns the latest gems" do
-      expect(client.latest.first["name"]).to eq("seanwalbran-rpm_contrib")
+      gem = client.latest.first
+
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "seanwalbran-rpm_contrib"])
     end
 
     it "passes options as query parameters" do
@@ -453,7 +475,9 @@ RSpec.describe Gems::API do
     end
 
     it "returns the most recently updated gems" do
-      expect(client.just_updated.first["name"]).to eq("rspec-tag_matchers")
+      gem = client.just_updated.first
+
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "rspec-tag_matchers"])
     end
 
     it "passes options as query parameters" do
@@ -489,13 +513,9 @@ RSpec.describe Gems::API do
     end
 
     it "returns the new API key" do
-      expect(client.create_api_key("ci-push", push_rubygem: true)).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
-    end
+      api_key = client.create_api_key("ci-push", push_rubygem: true)
 
-    it "raises KeyError when the response has no key" do
-      stub_post("/api/v1/api_key.json").to_return(body: "{}")
-
-      expect { client.create_api_key("ci-push") }.to raise_error(KeyError)
+      expect([api_key.class, api_key.key]).to eq([Gems::ApiKey, "rubygems_701243f217cdf23b1370c7b66b65ca97"])
     end
   end
 
@@ -535,8 +555,8 @@ RSpec.describe Gems::API do
         headers: {"Content-Type" => "application/json"})).to have_been_made
     end
 
-    it "returns the token exchange response" do
-      expect(client.exchange_trusted_publisher_token("ID_TOKEN")).to eq(JSON.parse(fixture("exchange_token.json").read))
+    it "returns the exchanged API key" do
+      expect(client.exchange_trusted_publisher_token("ID_TOKEN")).to eq(Gems::ApiKey.new(JSON.parse(fixture("exchange_token.json").read)))
     end
 
     it "exchanges the token with the client's host" do
@@ -595,16 +615,18 @@ RSpec.describe Gems::API do
         expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
       end
 
-      it "returns information about the gem version" do
-        expect(client.version("rails", "7.0.6").values_at("name", "version")).to eq(%w[rails 7.0.6])
+      it "returns the gem version" do
+        info = client.version("rails", "7.0.6")
+
+        expect([info.class, info.name, info.number]).to eq([Gems::Version, "rails", "7.0.6"])
       end
     end
 
     context "when the response is not JSON" do
       before { stub_get("/api/v2/rubygems/rails/versions/7.0.99.json").to_return(body: "This version could not be found.") }
 
-      it "returns an empty hash" do
-        expect(client.version("rails", "7.0.99")).to eq({})
+      it "raises a parser error" do
+        expect { client.version("rails", "7.0.99") }.to raise_error(JSON::ParserError)
       end
     end
   end

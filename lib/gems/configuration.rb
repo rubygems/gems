@@ -138,7 +138,7 @@ module Gems
     # @example Get the stored API key
     #   Gems.default_key
     def default_key
-      Gem.configuration.rubygems_api_key
+      ::Gem.configuration.rubygems_api_key
     end
 
     # Convenience method to allow configuration options to be set in a block
