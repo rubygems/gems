@@ -20,11 +20,11 @@ module Gems
   def self.new: (?host: String, ?key: String?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
   def self.info: (String gem_name) -> untyped
   def self.version: (String gem_name, String version) -> untyped
-  def self.search: (String query, ?options options) -> untyped
+  def self.search: (String query, ?page: Integer?) -> untyped
   def self.gems: (?String? user_handle) -> untyped
-  def self.push: (File gem, ?String? host, ?attestations: Array[File]?) -> String
-  def self.yank: (String gem_name, ?String? gem_version, ?options options) -> String
-  def self.unyank: (String gem_name, ?String? gem_version, ?options options) -> String
+  def self.push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
+  def self.yank: (String gem_name, ?String? version, ?platform: String?) -> String
+  def self.unyank: (String gem_name, ?String? version, ?platform: String?) -> String
   def self.versions: (String gem_name) -> untyped
   def self.latest_version: (String gem_name) -> untyped
   def self.total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
@@ -36,13 +36,13 @@ module Gems
   def self.add_web_hook: (String gem_name, String url) -> String
   def self.remove_web_hook: (String gem_name, String url) -> String
   def self.fire_web_hook: (String gem_name, String url) -> String
-  def self.latest: (?options options) -> untyped
-  def self.just_updated: (?options options) -> untyped
+  def self.latest: (?page: Integer?) -> untyped
+  def self.just_updated: (?page: Integer?) -> untyped
   def self.api_key: () -> String
   def self.create_api_key: (String name, ?options options) -> String
-  def self.update_api_key: (String key, ?options options) -> String
+  def self.update_api_key: (String key, **bool scopes) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> untyped
-  def self.reverse_dependencies: (String gem_name, ?options options) -> untyped
+  def self.reverse_dependencies: (String gem_name, ?only: String?) -> untyped
 
   module Configuration
     DEFAULT_HOST: String
@@ -166,11 +166,11 @@ module Gems
   module API : Object, _Requests
     def info: (String gem_name) -> untyped
     def version: (String gem_name, String version) -> untyped
-    def search: (String query, ?options options) -> untyped
+    def search: (String query, ?page: Integer?) -> untyped
     def gems: (?String? user_handle) -> untyped
-    def push: (File gem, ?String? host, ?attestations: Array[File]?) -> String
-    def yank: (String gem_name, ?String? gem_version, ?options options) -> String
-    def unyank: (String gem_name, ?String? gem_version, ?options options) -> String
+    def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
+    def yank: (String gem_name, ?String? version, ?platform: String?) -> String
+    def unyank: (String gem_name, ?String? version, ?platform: String?) -> String
     def versions: (String gem_name) -> untyped
     def latest_version: (String gem_name) -> untyped
     def total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
@@ -182,13 +182,13 @@ module Gems
     def add_web_hook: (String gem_name, String url) -> String
     def remove_web_hook: (String gem_name, String url) -> String
     def fire_web_hook: (String gem_name, String url) -> String
-    def latest: (?options options) -> untyped
-    def just_updated: (?options options) -> untyped
+    def latest: (?page: Integer?) -> untyped
+    def just_updated: (?page: Integer?) -> untyped
     def api_key: () -> String
     def create_api_key: (String name, ?options options) -> String
-    def update_api_key: (String key, ?options options) -> String
+    def update_api_key: (String key, **bool scopes) -> String
     def exchange_trusted_publisher_token: (String id_token) -> untyped
-    def reverse_dependencies: (String gem_name, ?options options) -> untyped
+    def reverse_dependencies: (String gem_name, ?only: String?) -> untyped
 
   end
 
