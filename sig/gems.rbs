@@ -1,15 +1,6 @@
 module Gems
   VERSION: String
 
-  class Version
-    MAJOR: Integer
-    MINOR: Integer
-    PATCH: Integer
-    PRE: String?
-
-    def self.to_s: () -> String
-  end
-
   type multipart_field = [Symbol | String, untyped] | [String, String, Hash[Symbol, String]]
   type options = Hash[Symbol, untyped]
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
