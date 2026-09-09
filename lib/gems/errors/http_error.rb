@@ -1,20 +1,20 @@
 require "net/http"
-require_relative "gem_error"
+require_relative "error"
 
 module Gems
   # Base class for HTTP errors from the RubyGems API
   # @api public
-  class HTTPError < GemError
+  class HTTPError < Error
     # The HTTP response
     # @api public
-    # @return [Net::HTTPResponse, nil] the HTTP response, if the error was raised for one
+    # @return [Net::HTTPResponse] the HTTP response
     # @example Get the response
     #   error.response
     attr_reader :response
 
     # The HTTP status code
     # @api public
-    # @return [String, nil] the HTTP status code, if the error was raised for a response
+    # @return [String] the HTTP status code
     # @example Get the status code
     #   error.code
     attr_reader :code
@@ -22,17 +22,14 @@ module Gems
     # Initialize a new HTTPError
     #
     # @api public
-    # @param message [String, nil] the error message (defaults to the response body or status message)
-    # @param response [Net::HTTPResponse, nil] the HTTP response
+    # @param response [Net::HTTPResponse] the HTTP response
     # @return [HTTPError] a new instance
-    # @example Create an HTTP error from a response
+    # @example Create an HTTP error
     #   error = Gems::HTTPError.new(response: response)
-    # @example Create an HTTP error from a message
-    #   error = Gems::NotFound.new("This rubygem could not be found.")
-    def initialize(message = nil, response: nil)
-      super(message || (response && error_message(response)))
+    def initialize(response:)
+      super(error_message(response))
       @response = response
-      @code = response&.code
+      @code = response.code
     end
 
     private

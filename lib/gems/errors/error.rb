@@ -1,4 +1,4 @@
 module Gems
   # Base error class for all Gems errors
-  class GemError < StandardError; end
+  class Error < StandardError; end
 end

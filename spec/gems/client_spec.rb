@@ -392,10 +392,10 @@ RSpec.describe Gems::Client do
       expect { client.get("/path") }.to raise_error(Gems::NotFound, "This rubygem could not be found.")
     end
 
-    it "raises GemError for other error responses" do
+    it "raises Error for other error responses" do
       stub_get("/path").to_return(status: 500, body: "Internal Server Error")
 
-      expect { client.get("/path") }.to raise_error(Gems::GemError, "Internal Server Error")
+      expect { client.get("/path") }.to raise_error(Gems::Error, "Internal Server Error")
     end
   end
 end

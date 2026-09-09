@@ -160,7 +160,7 @@ Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environmen
 
 ## Errors
 
-All errors inherit from `Gems::GemError`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
+All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
 status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`.
 Redirect loops raise `Gems::TooManyRedirects`.
 
