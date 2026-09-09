@@ -87,7 +87,7 @@ module Gems
     # @example
     #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def yank(gem_name, version = nil, platform: nil)
-      version ||= gem(gem_name).fetch("version")
+      version ||= latest_version(gem_name)
       delete("/api/v1/gems/yank", {gem_name:, version:, platform:}.compact)
     end
 
@@ -102,7 +102,7 @@ module Gems
     # @example
     #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def unyank(gem_name, version = nil, platform: nil)
-      version ||= gem(gem_name).fetch("version")
+      version ||= latest_version(gem_name)
       put("/api/v1/gems/unyank", {gem_name:, version:, platform:}.compact)
     end
 
@@ -124,12 +124,12 @@ module Gems
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem.
-    # @return [Hash]
+    # @return [String] the latest version number
     # @example
-    #   Gems.latest_version 'coulda'
+    #   Gems.latest_version "coulda"
     def latest_version(gem_name)
       response = get("/api/v1/versions/#{gem_name}/latest.json")
-      JSON.parse(response)
+      JSON.parse(response).fetch("version")
     end
 
     # Returns the total number of downloads for a particular gem
@@ -143,7 +143,7 @@ module Gems
     #   Gems.total_downloads 'rails_admin', '0.0.1'
     def total_downloads(gem_name = nil, gem_version = nil)
       response = if gem_name
-        get("/api/v1/downloads/#{gem_name}-#{gem_version || gem(gem_name).fetch("version")}.json")
+        get("/api/v1/downloads/#{gem_name}-#{gem_version || latest_version(gem_name)}.json")
       else
         get("/api/v1/downloads.json")
       end
