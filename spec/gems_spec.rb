@@ -35,17 +35,17 @@ RSpec.describe Gems do
     expect(described_class).not_to respond_to(:foo)
   end
 
-  describe ".info" do
+  describe ".gem" do
     before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
 
     it "delegates to a client" do
-      described_class.info("rails")
+      described_class.gem("rails")
 
       expect(a_get("/api/v1/gems/rails.json")).to have_been_made
     end
 
     it "returns the same result as a client" do
-      expect(described_class.info("rails")).to eq(Gems::Client.new.info("rails"))
+      expect(described_class.gem("rails")).to eq(Gems::Client.new.gem("rails"))
     end
   end
 
