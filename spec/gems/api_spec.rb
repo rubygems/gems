@@ -448,29 +448,13 @@ RSpec.describe Gems::API do
     end
   end
 
-  describe "#api_key" do
-    subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
-
-    before { stub_get("/api/v1/api_key").to_return(body: fixture("api_key")) }
-
-    it "gets the correct resource with basic authentication" do
-      client.api_key
-
-      expect(a_get("/api/v1/api_key").with(basic_auth: %w[nick@gemcutter.org schwwwwing])).to have_been_made
-    end
-
-    it "returns the API key" do
-      expect(client.api_key).to eq("701243f217cdf23b1370c7b66b65ca97")
-    end
-  end
-
   describe "#create_api_key" do
     subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 
     before { stub_post("/api/v1/api_key.json").to_return(body: fixture("api_key.json")) }
 
     it "posts the correct resource with basic authentication" do
-      client.create_api_key("ci-push", {push_rubygem: true})
+      client.create_api_key("ci-push", push_rubygem: true)
 
       expect(a_post("/api/v1/api_key.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing],
         body: {name: "ci-push", push_rubygem: "true"})).to have_been_made
@@ -482,8 +466,14 @@ RSpec.describe Gems::API do
       expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
     end
 
+    it "keeps the positional name when the scopes include one" do
+      client.create_api_key("ci-push", name: "other")
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
+    end
+
     it "returns the new API key" do
-      expect(client.create_api_key("ci-push", {push_rubygem: true})).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+      expect(client.create_api_key("ci-push", push_rubygem: true)).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
     end
 
     it "raises KeyError when the response has no key" do
