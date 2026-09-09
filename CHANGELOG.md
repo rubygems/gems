@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
 
 ### Removed
+* Remove `dependencies`, whose endpoint has been retired by RubyGems.org
 * Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`
 
 ### Deprecated

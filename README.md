@@ -106,9 +106,6 @@ Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: t
 # Exchange an OIDC ID token for an API key via trusted publishing.
 Gems.exchange_trusted_publisher_token ENV.fetch('ID_TOKEN')
 
-# Return an array of gem dependency details for all versions of all the given gems.
-Gems.dependencies ['rails', 'thor']
-
 # The following methods require authentication.
 # By default, we load your API key from ~/.gem/credentials
 # You can override this default by specifying a custom API key.

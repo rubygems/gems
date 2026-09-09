@@ -42,7 +42,6 @@ module Gems
   def self.create_api_key: (String name, ?options options) -> String
   def self.update_api_key: (String key, ?options options) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> untyped
-  def self.dependencies: (*String gems) -> untyped
   def self.reverse_dependencies: (String gem_name, ?options options) -> untyped
 
   module Configuration
@@ -189,7 +188,6 @@ module Gems
     def create_api_key: (String name, ?options options) -> String
     def update_api_key: (String key, ?options options) -> String
     def exchange_trusted_publisher_token: (String id_token) -> untyped
-    def dependencies: (*String gems) -> untyped
     def reverse_dependencies: (String gem_name, ?options options) -> untyped
 
   end
