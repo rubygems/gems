@@ -1,6 +1,7 @@
 require_relative "api_key_authenticator"
 require_relative "authenticator"
 require_relative "basic_authenticator"
+require_relative "identifiers"
 require_relative "otp_authenticator"
 require_relative "trusted_publisher_authenticator"
 
@@ -8,6 +9,8 @@ module Gems
   # Mixin for client authentication credentials
   # @api private
   module ClientCredentials
+    include Identifiers
+
     # The API key
     # @api public
     # @return [String, nil] the API key
@@ -53,12 +56,14 @@ module Gems
     # Set the API key
     #
     # @api public
-    # @param key [String, nil] the API key
+    # @param key [String, ApiKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
     #   client.key = "701243f217cdf23b1370c7b66b65ca97"
+    # @example Set the API key from a newly created API key
+    #   client.key = client.create_api_key("ci-push", push_rubygem: true)
     def key=(key)
-      @key = key
+      @key = key_of(key)
       initialize_authenticator
     end
 
@@ -114,14 +119,14 @@ module Gems
 
     # Initialize credential instance variables
     # @api private
-    # @param key [String, nil] the API key
+    # @param key [String, ApiKey, nil] the API key, or an API key object
     # @param username [String, nil] the username
     # @param password [String, nil] the password
     # @param otp [String, nil] the one-time passcode
     # @param id_token [String, nil] the OIDC ID token
     # @return [void]
     def initialize_credentials(key:, username:, password:, otp:, id_token:)
-      @key = key
+      @key = key_of(key)
       @username = username
       @password = password
       @otp = otp
