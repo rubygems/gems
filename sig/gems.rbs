@@ -290,6 +290,9 @@ module Gems
   class GatewayTimeout < ServerError
   end
 
+  class NetworkError < Error
+  end
+
   class TooManyRedirects < Error
   end
 
@@ -299,6 +302,7 @@ module Gems
     DEFAULT_OPEN_TIMEOUT: Integer
     DEFAULT_READ_TIMEOUT: Integer
     DEFAULT_WRITE_TIMEOUT: Integer
+    NETWORK_ERRORS: Array[singleton(EOFError) | singleton(Errno::ECONNREFUSED) | singleton(Errno::ECONNRESET) | singleton(Errno::EHOSTUNREACH) | singleton(Errno::ETIMEDOUT) | singleton(Net::OpenTimeout) | singleton(Net::ReadTimeout) | singleton(Net::WriteTimeout) | singleton(OpenSSL::SSL::SSLError) | singleton(SocketError)]
 
     attr_accessor open_timeout: Integer
     attr_accessor read_timeout: Integer

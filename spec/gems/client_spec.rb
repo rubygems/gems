@@ -397,5 +397,11 @@ RSpec.describe Gems::Client do
 
       expect { client.get("/path") }.to raise_error(Gems::Error, "Internal Server Error")
     end
+
+    it "raises NetworkError for network errors" do
+      stub_get("/path").to_raise(Errno::ECONNREFUSED)
+
+      expect { client.get("/path") }.to raise_error(Gems::NetworkError)
+    end
   end
 end

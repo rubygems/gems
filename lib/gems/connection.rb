@@ -2,6 +2,7 @@ require "forwardable"
 require "net/http"
 require "openssl"
 require "uri"
+require_relative "errors/network_error"
 
 module Gems
   # Manages HTTP connections to the RubyGems API
@@ -15,6 +16,19 @@ module Gems
     DEFAULT_READ_TIMEOUT = 60 # seconds
     # Default timeout for writing requests in seconds
     DEFAULT_WRITE_TIMEOUT = 60 # seconds
+    # Network errors that should be wrapped in NetworkError
+    NETWORK_ERRORS = [
+      EOFError,
+      Errno::ECONNREFUSED,
+      Errno::ECONNRESET,
+      Errno::EHOSTUNREACH,
+      Errno::ETIMEDOUT,
+      Net::OpenTimeout,
+      Net::ReadTimeout,
+      Net::WriteTimeout,
+      OpenSSL::SSL::SSLError,
+      SocketError
+    ].freeze
 
     # The timeout for opening connections in seconds
     # @api public
@@ -90,11 +104,14 @@ module Gems
     # @api public
     # @param request [Net::HTTPRequest] the HTTP request to perform
     # @return [Net::HTTPResponse] the HTTP response
+    # @raise [NetworkError] if a network error occurs
     # @example Perform a request
     #   response = connection.perform(request: request)
     def perform(request:)
       http_client = build_http_client(request.uri)
       http_client.request(request)
+    rescue *NETWORK_ERRORS => e
+      raise NetworkError, "Network error: #{e}"
     end
 
     # Set the proxy URL for requests
