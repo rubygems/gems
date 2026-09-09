@@ -7,6 +7,7 @@ module Gems
     class Client < BaseClient
       # Returns information about the given gem for a specific version
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem.
       # @param version [String] The requested version of the gem.

@@ -1,18 +1,21 @@
 # Gems
 
-[![Gem Version](http://img.shields.io/gem/v/gems.svg)][gem]
-[![Build Status](https://github.com/rubygems/gems/workflows/ubuntu/badge.svg)][gh-actions]
-[![Code Climate](https://api.codeclimate.com/v1/badges/45ff982a29d7a000ee84/maintainability)][codeclimate]
-[![Coverage Status](http://img.shields.io/coveralls/rubygems/gems.svg)][coveralls]
-
-[gem]: https://rubygems.org/gems/gems
-[gh-actions]: https://github.com/rubygems/gems/actions
-[codeclimate]: https://codeclimate.com/github/rubygems/gems/maintainability
-[coveralls]: https://coveralls.io/r/rubygems/gems
+[![tests](https://github.com/rubygems/gems/actions/workflows/test.yml/badge.svg)](https://github.com/rubygems/gems/actions/workflows/test.yml)
+[![mutation tests](https://github.com/rubygems/gems/actions/workflows/mutant.yml/badge.svg)](https://github.com/rubygems/gems/actions/workflows/mutant.yml)
+[![linter](https://github.com/rubygems/gems/actions/workflows/lint.yml/badge.svg)](https://github.com/rubygems/gems/actions/workflows/lint.yml)
+[![type checker](https://github.com/rubygems/gems/actions/workflows/steep.yml/badge.svg)](https://github.com/rubygems/gems/actions/workflows/steep.yml)
+[![gem version](https://badge.fury.io/rb/gems.svg)](https://rubygems.org/gems/gems)
 
 Ruby wrapper for the RubyGems.org API.
 
 ## Installation
+
+Install the gem and add to the application's Gemfile:
+
+    bundle add gems
+
+Or, if Bundler is not being used to manage dependencies:
+
     gem install gems
 
 ## Documentation
@@ -21,7 +24,6 @@ Ruby wrapper for the RubyGems.org API.
 # Usage Examples
 
 ```ruby
-require 'rubygems'
 require 'gems'
 
 # Return some basic information about rails.
@@ -106,7 +108,41 @@ Gems.dependencies ['rails', 'thor']
 Gems.configure do |config|
   config.key = '701243f217cdf23b1370c7b66b65ca97'
 end
+
+# Alternatively, create a client with its own credentials and settings.
+client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
+client.info 'rails'
 ```
+
+## Configuration
+
+Clients default to the global configuration, which can be set with `Gems.configure` or overridden per client:
+
+| Option        | Description                                              | Default                                |
+| ------------- | -------------------------------------------------------- | -------------------------------------- |
+| `host`        | The RubyGems-compatible host, including scheme           | `RUBYGEMS_HOST` or `https://rubygems.org` |
+| `key`         | The API key sent in the `Authorization` header           | `~/.gem/credentials`                   |
+| `username`    | The username for HTTP basic authentication               | `nil`                                  |
+| `password`    | The password for HTTP basic authentication               | `nil`                                  |
+| `user_agent`  | The `User-Agent` header                                  | `Gems <version>`                       |
+
+Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator` and `Gems::BasicAuthenticator`.
+When a username and password are both set, HTTP basic authentication takes precedence over the API key.
+
+Timeouts, debug output, the proxy, and the redirect limit can be set on a client's `connection` and `redirect_handler`.
+Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless a proxy URL is set.
+
+## Errors
+
+All errors inherit from `Gems::GemError`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
+status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`.
+Redirect loops raise `Gems::TooManyRedirects`.
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the tests,
+linters, mutation tests, type checker, and documentation checks. You can also run `bin/console` for an interactive
+prompt that will allow you to experiment.
 
 ## Supported Ruby Versions
 This library aims to support and is [tested against][gh-actions] the following Ruby
@@ -115,8 +151,10 @@ implementations:
 * Ruby 3.1
 * Ruby 3.2
 * Ruby 3.3
+* Ruby 3.4
 * [JRuby][]
 
+[gh-actions]: https://github.com/rubygems/gems/actions
 [jruby]: https://www.jruby.org/
 
 If something doesn't work on one of these interpreters, it's a bug.

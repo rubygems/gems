@@ -7,6 +7,7 @@ module Gems
     class Client < BaseClient
       # Returns some basic information about the given gem
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem.
       # @return [Hash]
@@ -21,6 +22,7 @@ module Gems
 
       # Returns an array of active gems that match the query
       #
+      # @api public
       # @authenticated false
       # @param query [String] A term to search for.
       # @param options [Hash] A customizable set of options.
@@ -35,6 +37,7 @@ module Gems
 
       # List all gems that you own
       #
+      # @api public
       # @authenticated true
       # @param user_handle [String] The handle of a user.
       # @return [Array]
@@ -51,6 +54,7 @@ module Gems
 
       # Submit a gem to RubyGems.org or another host
       #
+      # @api public
       # @authenticated true
       # @param gem [File] A built gem.
       # @param host [String] A RubyGems compatible host to use.
@@ -72,6 +76,7 @@ module Gems
 
       # Remove a gem from RubyGems.org's index
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem.
       # @param gem_version [String] The version of a gem.
@@ -87,6 +92,7 @@ module Gems
 
       # Update a previously yanked gem back into RubyGems.org's index
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem.
       # @param gem_version [String] The version of a gem.
@@ -102,6 +108,7 @@ module Gems
 
       # Returns an array of gem version details
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem.
       # @return [Hash]
@@ -114,6 +121,7 @@ module Gems
 
       # Returns an hash of gem latest version
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem.
       # @return [Hash]
@@ -126,6 +134,7 @@ module Gems
 
       # Returns the total number of downloads for a particular gem
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem.
       # @param gem_version [String] The version of a gem.
@@ -143,6 +152,7 @@ module Gems
 
       # Returns an array containing the top 50 downloaded gem versions of all time
       #
+      # @api public
       # @authenticated false
       # @return [Array]
       # @example
@@ -154,6 +164,7 @@ module Gems
 
       # View all owners of a gem that you own
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem.
       # @return [Array]
@@ -166,6 +177,7 @@ module Gems
 
       # Add an owner to a RubyGem you own, giving that user permission to manage it
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem.
       # @param owner [String] The email address of the user you want to add.
@@ -178,6 +190,7 @@ module Gems
 
       # Remove a user's permission to manage a RubyGem you own
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem.
       # @param owner [String] The email address of the user you want to remove.
@@ -190,6 +203,7 @@ module Gems
 
       # List the webhooks registered under your account
       #
+      # @api public
       # @authenticated true
       # @return [Hash]
       # @example
@@ -201,6 +215,7 @@ module Gems
 
       # Create a webhook
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem. Specify "*" to add the hook to all gems.
       # @param url [String] The URL of the web hook.
@@ -213,6 +228,7 @@ module Gems
 
       # Remove a webhook
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem. Specify "*" to remove the hook from all gems.
       # @param url [String] The URL of the web hook.
@@ -225,6 +241,7 @@ module Gems
 
       # Test fire a webhook
       #
+      # @api public
       # @authenticated true
       # @param gem_name [String] The name of a gem. Specify "*" to fire the hook for all gems.
       # @param url [String] The URL of the web hook.
@@ -237,6 +254,7 @@ module Gems
 
       # Returns the 50 gems most recently added to RubyGems.org (for the first time)
       #
+      # @api public
       # @authenticated false
       # @param options [Hash] A customizable set of options.
       # @return [Array]
@@ -249,6 +267,7 @@ module Gems
 
       # Returns the 50 most recently updated gems
       #
+      # @api public
       # @authenticated false
       # @param options [Hash] A customizable set of options.
       # @return [Array]
@@ -261,6 +280,7 @@ module Gems
 
       # Retrieve your API key using HTTP basic auth
       #
+      # @api public
       # @authenticated true
       # @return [String]
       # @example
@@ -275,6 +295,7 @@ module Gems
 
       # Returns an array of hashes for all versions of given gems
       #
+      # @api public
       # @authenticated false
       # @param gems [Array] A list of gem names
       # @return [Array]
@@ -285,8 +306,9 @@ module Gems
         Marshal.load(response)
       end
 
-      # Returns an array of all the reverse dependencies to the given gem.
+      # Returns an array of all the reverse dependencies to the given gem
       #
+      # @api public
       # @authenticated false
       # @param gem_name [String] The name of a gem
       # @param options [Hash] A customizable set of options.

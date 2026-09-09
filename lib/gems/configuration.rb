@@ -25,23 +25,45 @@ module Gems
 
     attr_accessor(*VALID_OPTIONS_KEYS)
 
-    # When this module is extended, set all configuration options to their default values
+    # Reset the extending module to the default configuration
+    #
+    # @api private
+    # @param base [Module] the module being extended
+    # @return [void]
     def self.extended(base)
       base.reset
     end
 
     # Convenience method to allow configuration options to be set in a block
+    #
+    # @api public
+    # @yield [self] the configuration
+    # @return [self]
+    # @example Configure the API key
+    #   Gems.configure do |config|
+    #     config.key = "701243f217cdf23b1370c7b66b65ca97"
+    #   end
     def configure
       yield self
       self
     end
 
     # Create a hash of options and their values
+    #
+    # @api public
+    # @return [Hash{Symbol => String, nil}] the options
+    # @example Get the options
+    #   Gems.options
     def options
       VALID_OPTIONS_KEYS.to_h { |key| [key, public_send(key)] }
     end
 
     # Reset all configuration options to defaults
+    #
+    # @api public
+    # @return [self]
+    # @example Reset the configuration
+    #   Gems.reset
     def reset
       self.username = nil
       self.password = nil

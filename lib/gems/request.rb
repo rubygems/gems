@@ -133,7 +133,7 @@ module Gems
       response_parser.parse(response:)
     end
 
-    # The query parameters for a request: the data for GET and DELETE requests, nothing otherwise
+    # The query parameters for a request (the data for GET and DELETE requests)
     # @api private
     # @param http_method [Symbol] the HTTP method
     # @param data [Hash, Array, String] the query parameters or request body
@@ -144,7 +144,7 @@ module Gems
       data #: Hash[Symbol | String, untyped]
     end
 
-    # The body for a request: the data for POST and PUT requests, nothing otherwise
+    # The body for a request (the data for POST and PUT requests)
     # @api private
     # @param http_method [Symbol] the HTTP method
     # @param data [Hash, Array, String] the query parameters or request body
@@ -156,7 +156,7 @@ module Gems
       body_for(data, content_type)
     end
 
-    # Convert a Hash body to multipart fields when a multipart content type is requested
+    # Convert a Hash body to multipart fields for a multipart content type
     # @api private
     # @param data [Hash, Array, String] the request body
     # @param content_type [String] the content type of the body

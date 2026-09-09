@@ -7,7 +7,12 @@ module Gems
     PRE = nil unless defined? Gems::Version::PRE
 
     class << self
-      # @return [String]
+      # The version as a string
+      #
+      # @api public
+      # @return [String] the version string
+      # @example Get the version string
+      #   Gems::Version.to_s
       def to_s
         [MAJOR, MINOR, PATCH, PRE].compact.join(".")
       end
