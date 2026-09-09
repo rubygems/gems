@@ -42,7 +42,7 @@ RSpec.describe Gems::API do
     end
 
     it "passes options as query parameters" do
-      client.search("cucumber", {page: 2})
+      client.search("cucumber", page: 2)
 
       expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
     end
@@ -107,7 +107,7 @@ RSpec.describe Gems::API do
 
     it "pushes to a custom host" do
       stub_request(:post, "http://example.com/api/v1/gems").to_return(body: fixture("push"))
-      client.push(gem, "http://example.com")
+      client.push(gem, host: "http://example.com")
 
       expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
     end
@@ -129,7 +129,7 @@ RSpec.describe Gems::API do
 
       it "pushes to a custom host" do
         stub_request(:post, "http://example.com/api/v1/gems").to_return(body: fixture("push"))
-        client.push(gem, "http://example.com", attestations:)
+        client.push(gem, host: "http://example.com", attestations:)
 
         expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
       end
@@ -155,7 +155,7 @@ RSpec.describe Gems::API do
 
     it "passes options as query parameters" do
       stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
-      client.yank("gems", "0.0.8", {platform: "java"})
+      client.yank("gems", "0.0.8", platform: "java")
 
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
@@ -189,7 +189,7 @@ RSpec.describe Gems::API do
     end
 
     it "passes options in the body" do
-      client.unyank("gems", "0.0.8", {platform: "java"})
+      client.unyank("gems", "0.0.8", platform: "java")
 
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
     end
@@ -421,7 +421,7 @@ RSpec.describe Gems::API do
 
     it "passes options as query parameters" do
       stub_get("/api/v1/activity/latest.json?page=2").to_return(body: fixture("latest.json"))
-      client.latest({page: 2})
+      client.latest(page: 2)
 
       expect(a_get("/api/v1/activity/latest.json?page=2")).to have_been_made
     end
@@ -442,7 +442,7 @@ RSpec.describe Gems::API do
 
     it "passes options as query parameters" do
       stub_get("/api/v1/activity/just_updated.json?page=2").to_return(body: fixture("just_updated.json"))
-      client.just_updated({page: 2})
+      client.just_updated(page: 2)
 
       expect(a_get("/api/v1/activity/just_updated.json?page=2")).to have_been_made
     end
@@ -499,10 +499,17 @@ RSpec.describe Gems::API do
     before { stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated") }
 
     it "patches the correct resource with basic authentication" do
-      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", {yank_rubygem: true})
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
 
       expect(a_request(:patch, rubygems_url("/api/v1/api_key")).with(basic_auth: %w[nick@gemcutter.org schwwwwing],
         body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
+    end
+
+    it "keeps the positional key when the scopes include one" do
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", api_key: "other")
+
+      expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
+        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97"})).to have_been_made
     end
 
     it "returns the response body" do
@@ -566,7 +573,7 @@ RSpec.describe Gems::API do
     it "passes options as query parameters" do
       stub_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")
         .to_return(body: fixture("reverse_dependencies_short.json"))
-      client.reverse_dependencies("rspec", {only: "development"})
+      client.reverse_dependencies("rspec", only: "development")
 
       expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")).to have_been_made
     end
