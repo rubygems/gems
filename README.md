@@ -27,7 +27,7 @@ Or, if Bundler is not being used to manage dependencies:
 require 'gems'
 
 # Return some basic information about rails.
-Gems.info 'rails'
+Gems.gem 'rails'
 
 # Return some basic information about rails version 7.0.6.
 Gems.version 'rails', '7.0.6'
@@ -36,10 +36,10 @@ Gems.version 'rails', '7.0.6'
 Gems.search 'cucumber'
 
 # Return all gems that you own.
-Gems.gems
+Gems.owned_gems
 
 # Return all gems owned by Erik Berlin.
-Gems.gems("sferik")
+Gems.owned_gems 'sferik'
 
 # Submit a gem to RubyGems.org.
 Gems.push File.new 'gemcutter-0.2.1.gem'
@@ -126,7 +126,7 @@ end
 
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
-client.info 'rails'
+client.gem 'rails'
 ```
 
 ## Configuration

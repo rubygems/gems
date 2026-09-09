@@ -18,10 +18,10 @@ module Gems
   extend SingleForwardable
 
   def self.new: (?host: String, ?key: String?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
-  def self.info: (String gem_name) -> untyped
+  def self.gem: (String gem_name) -> untyped
   def self.version: (String gem_name, String version) -> untyped
   def self.search: (String query, ?page: Integer?) -> untyped
-  def self.gems: (?String? user_handle) -> untyped
+  def self.owned_gems: (?String? user_handle) -> untyped
   def self.push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
   def self.yank: (String gem_name, ?String? version, ?platform: String?) -> String
   def self.unyank: (String gem_name, ?String? version, ?platform: String?) -> String
@@ -163,10 +163,10 @@ module Gems
   end
 
   module API : Object, _Requests
-    def info: (String gem_name) -> untyped
+    def gem: (String gem_name) -> untyped
     def version: (String gem_name, String version) -> untyped
     def search: (String query, ?page: Integer?) -> untyped
-    def gems: (?String? user_handle) -> untyped
+    def owned_gems: (?String? user_handle) -> untyped
     def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
     def yank: (String gem_name, ?String? version, ?platform: String?) -> String
     def unyank: (String gem_name, ?String? version, ?platform: String?) -> String
