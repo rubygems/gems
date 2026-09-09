@@ -1,79 +1,150 @@
-require "net/http"
-require "rubygems"
-require "open-uri"
-require "gems/response_parser"
+require "uri"
+require_relative "connection"
+require_relative "redirect_handler"
+require_relative "request_builder"
+require_relative "response_parser"
 
 module Gems
-  # HTTP request helpers mixed into clients
+  # HTTP requests for the RubyGems API, mixed into clients
+  #
+  # Classes that include this module must provide +host+, +user_agent+, and +authenticator+.
+  #
+  # @api public
   module Request
-    def delete(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
-      request(:delete, path, data, content_type, request_host)
+    # Content type for form-encoded request bodies
+    FORM_URLENCODED = "application/x-www-form-urlencoded".freeze
+
+    # The connection used for requests
+    #
+    # @api public
+    # @return [Connection] the connection
+    # @example Get the connection
+    #   client.connection.proxy_url
+    def connection
+      @connection ||= Connection.new
     end
 
-    def get(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
+    # The request builder used for requests
+    #
+    # @api public
+    # @return [RequestBuilder] the request builder
+    # @example Get the request builder
+    #   client.request_builder.user_agent
+    def request_builder
+      @request_builder ||= RequestBuilder.new(user_agent:)
+    end
+
+    # The redirect handler used for requests
+    #
+    # @api public
+    # @return [RedirectHandler] the redirect handler
+    # @example Get the redirect handler
+    #   client.redirect_handler.max_redirects
+    def redirect_handler
+      @redirect_handler ||= RedirectHandler.new(connection:, request_builder:)
+    end
+
+    # The response parser used for requests
+    #
+    # @api public
+    # @return [ResponseParser] the response parser
+    # @example Get the response parser
+    #   client.response_parser
+    def response_parser
+      @response_parser ||= ResponseParser.new
+    end
+
+    # Perform a GET request
+    #
+    # @api public
+    # @param path [String] the request path
+    # @param data [Hash] the query parameters
+    # @param content_type [String] ignored for GET requests
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    # @raise [HTTPError] if the response is not successful
+    # @example Get information about a gem
+    #   client.get("/api/v1/gems/rails.json")
+    def get(path, data = {}, content_type = FORM_URLENCODED, request_host = host)
       request(:get, path, data, content_type, request_host)
     end
 
-    def post(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
+    # Perform a DELETE request
+    #
+    # @api public
+    # @param path [String] the request path
+    # @param data [Hash] the query parameters
+    # @param content_type [String] ignored for DELETE requests
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    # @raise [HTTPError] if the response is not successful
+    # @example Remove an owner from a gem
+    #   client.delete("/api/v1/gems/gems/owners", email: "josh@technicalpickles.com")
+    def delete(path, data = {}, content_type = FORM_URLENCODED, request_host = host)
+      request(:delete, path, data, content_type, request_host)
+    end
+
+    # Perform a POST request
+    #
+    # @api public
+    # @param path [String] the request path
+    # @param data [Hash, Array, String] the request body (form fields, multipart fields, or raw data)
+    # @param content_type [String] the content type of the body
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    # @raise [HTTPError] if the response is not successful
+    # @example Add an owner to a gem
+    #   client.post("/api/v1/gems/gems/owners", email: "josh@technicalpickles.com")
+    def post(path, data = {}, content_type = FORM_URLENCODED, request_host = host)
       request(:post, path, data, content_type, request_host)
     end
 
-    def put(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
+    # Perform a PUT request
+    #
+    # @api public
+    # @param path [String] the request path
+    # @param data [Hash, Array, String] the request body (form fields, multipart fields, or raw data)
+    # @param content_type [String] the content type of the body
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    # @raise [HTTPError] if the response is not successful
+    # @example Unyank a gem
+    #   client.put("/api/v1/gems/unyank", gem_name: "gems", version: "0.0.8")
+    def put(path, data = {}, content_type = FORM_URLENCODED, request_host = host)
       request(:put, path, data, content_type, request_host)
     end
 
     private
 
-    def request(method, path, data, content_type, request_host = host) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-      path += hash_to_query_string(data) if %i[delete get].include? method
-      uri = URI.parse [request_host, path].join
-      request_class = Net::HTTP.const_get method.to_s.capitalize
-      request = request_class.new uri.request_uri
-      request.add_field "Authorization", key if key
-      request.add_field "Connection", "keep-alive"
-      request.add_field "Keep-Alive", "30"
-      request.add_field "User-Agent", user_agent
-      request.basic_auth username, password if username && password
-      request.content_type = content_type
-      case content_type
-      when "application/x-www-form-urlencoded"
-        request.form_data = data if %i[post put].include? method
-      when "multipart/form-data"
-        request.set_form data, content_type if %i[post put].include? method
-      when "application/octet-stream"
-        request.body = data
-        request.content_length = data.size
-      end
-      proxy = uri.find_proxy
-      @connection = if proxy
-        Net::HTTP::Proxy(proxy.host, proxy.port, proxy.user, proxy.password).new(uri.host, uri.port)
+    # Perform an HTTP request
+    # @api private
+    # @param http_method [Symbol] the HTTP method
+    # @param path [String] the request path
+    # @param data [Hash, Array, String] the query parameters or request body
+    # @param content_type [String] the content type of the body
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    def request(http_method, path, data, content_type, request_host)
+      uri = URI.join(request_host, path)
+      params, body = if %i[get delete].include?(http_method)
+        [data, nil]
       else
-        Net::HTTP.new uri.host, uri.port
+        [{}, body_for(data, content_type)]
       end
-      if uri.scheme == "https"
-        require "net/https"
-        @connection.use_ssl = true
-        @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      @connection.start
-      response = @connection.request request
-      body_from_response(response, method, content_type)
+      request = request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
+      response = redirect_handler.handle(response: connection.perform(request:), request:, authenticator:)
+      response_parser.parse(response:)
     end
 
-    def hash_to_query_string(hash)
-      return "" if hash.empty?
+    # Convert a Hash body to multipart fields when a multipart content type is requested
+    # @api private
+    # @param data [Hash, Array, String] the request body
+    # @param content_type [String] the content type of the body
+    # @return [Hash, Array, String] the request body
+    def body_for(data, content_type)
+      return data.to_a if data.is_a?(Hash) && content_type == RequestBuilder::MULTIPART_FORM_DATA
 
-      "?#{URI.encode_www_form(hash)}"
-    end
-
-    def body_from_response(response, method, content_type)
-      if response.is_a?(Net::HTTPRedirection)
-        uri = URI.parse(response["location"])
-        host_with_scheme = [uri.scheme, uri.host].join("://")
-        request(method, uri.request_uri, {}, content_type, host_with_scheme)
-      else
-        ResponseParser.new.parse(response:)
-      end
+      data
     end
   end
 end

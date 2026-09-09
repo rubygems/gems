@@ -19,6 +19,12 @@ describe Gems do
     end
   end
 
+  describe ".method_missing" do
+    it "raises NoMethodError for methods the client does not define" do
+      expect { described_class.foo }.to raise_error(NoMethodError)
+    end
+  end
+
   describe ".respond_to?" do
     it "returns true if a method exists" do
       expect(Gems).to respond_to(:new)

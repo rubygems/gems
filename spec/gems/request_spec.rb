@@ -1,70 +1,229 @@
-describe Gems::Request do
-  after do
-    Gems.reset
-  end
+RSpec.describe Gems::Request do
+  let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
-  describe "#get with redirect" do
-    before do
-      response_body = "<html><head><title>302 Found</title></head><body><center><h1>302 Found</h1></center></body></html>"
-      response_location = "https://bundler.rubygems.org/api/v1/dependencies?gems=rails,thor"
-
-      stub_get("/api/v1/dependencies")
-        .with(query: {"gems" => "rails,thor"})
-        .to_return(body: response_body, status: 302, headers: {location: response_location})
-      stub_request(:get, "https://bundler.rubygems.org/api/v1/dependencies")
-        .with(query: {"gems" => "rails,thor"})
-        .to_return(body: fixture("dependencies"), status: 200, headers: {})
+  describe "#connection" do
+    it "returns a connection" do
+      expect(client.connection).to be_an_instance_of(Gems::Connection)
     end
-    it "returns an array of hashes for all versions of given gems" do
-      dependencies = Gems.dependencies "rails", "thor"
-      expect(a_get("/api/v1/dependencies").with(query: {"gems" => "rails,thor"})).to have_been_made
-      expect(a_get("https://bundler.rubygems.org/api/v1/dependencies").with(query: {"gems" => "rails,thor"})).to have_been_made
-      expect(dependencies.first[:number]).to eq "3.0.9"
+
+    it "memoizes the connection" do
+      expect(client.connection).to equal(client.connection)
     end
   end
 
-  describe "#get with 404" do
-    before do
-      response_body = "This rubygem could not be found."
+  describe "#request_builder" do
+    it "returns a request builder with the client's user agent" do
+      client.user_agent = "Custom User Agent"
 
-      stub_get("/api/v1/dependencies")
-        .with(query: {"gems" => "rails,thor"})
-        .to_return(body: response_body, status: 404)
+      expect(client.request_builder.user_agent).to eq("Custom User Agent")
     end
 
-    it "raise a Gems::NotFound error" do
-      expect { Gems.dependencies("rails", "thor") }.to raise_error(Gems::NotFound)
+    it "memoizes the request builder" do
+      expect(client.request_builder).to equal(client.request_builder)
     end
   end
 
-  describe "#get with a non-200" do
-    before do
-      response_body = "Internal Server Error"
+  describe "#redirect_handler" do
+    it "returns a redirect handler sharing the connection and request builder" do
+      handler = client.redirect_handler
 
-      stub_get("/api/v1/dependencies")
-        .with(query: {"gems" => "rails,thor"})
-        .to_return(body: response_body, status: 500)
+      expect([handler.connection, handler.request_builder]).to eq([client.connection, client.request_builder])
     end
 
-    it "raise a wrapped Gems::Error" do
-      expect { Gems.dependencies("rails", "thor") }.to raise_error(Gems::GemError)
-      expect(a_get("/api/v1/dependencies").with(query: {"gems" => "rails,thor"})).to have_been_made
+    it "memoizes the redirect handler" do
+      expect(client.redirect_handler).to equal(client.redirect_handler)
     end
   end
 
-  describe "request behind proxy" do
-    before do
-      allow(ENV).to receive(:[]).with("no_proxy").and_return("")
-      allow(ENV).to receive(:[]).with("https_proxy").and_return("http://proxy_user:proxy_pass@192.168.1.99:9999")
-      stub_get("/api/v1/gems/rails.json")
-        .to_return(body: fixture("rails.json"))
-      gems = Gems.new
-      gems.info "rails"
-      @connection = gems.instance_variable_get(:@connection)
+  describe "#response_parser" do
+    it "returns a response parser" do
+      expect(client.response_parser).to be_an_instance_of(Gems::ResponseParser)
     end
-    it { expect(@connection.proxy_address).to eq "192.168.1.99" }
-    it { expect(@connection.proxy_user).to eq "proxy_user" }
-    it { expect(@connection.proxy_pass).to eq "proxy_pass" }
-    it { expect(@connection.proxy_port).to eq 9999 }
+
+    it "memoizes the response parser" do
+      expect(client.response_parser).to equal(client.response_parser)
+    end
+  end
+
+  %i[get delete].each do |http_method|
+    describe "##{http_method}" do
+      it "performs a #{http_method.upcase} request and returns the body" do
+        stub_request(http_method, rubygems_url("/path")).to_return(body: "body")
+
+        expect(client.public_send(http_method, "/path")).to eq("body")
+      end
+
+      it "sends the data as query parameters" do
+        stub_request(http_method, rubygems_url("/path?query=cucumber&page=2"))
+        client.public_send(http_method, "/path", {query: "cucumber", page: 2})
+
+        expect(a_request(http_method, rubygems_url("/path?query=cucumber&page=2"))).to have_been_made
+      end
+
+      it "does not send a body" do
+        stub_request(http_method, rubygems_url("/path?page=2"))
+        client.public_send(http_method, "/path", {page: 2}, "application/octet-stream")
+
+        expect(a_request(http_method, rubygems_url("/path?page=2")).with { |request| request.body.nil? || request.body.empty? })
+          .to have_been_made
+      end
+
+      it "uses a custom host" do
+        stub_request(http_method, "http://example.com/path")
+        client.public_send(http_method, "/path", {}, described_class::FORM_URLENCODED, "http://example.com")
+
+        expect(a_request(http_method, "http://example.com/path")).to have_been_made
+      end
+    end
+  end
+
+  %i[post put].each do |http_method|
+    describe "##{http_method}" do
+      it "performs a #{http_method.upcase} request and returns the body" do
+        stub_request(http_method, rubygems_url("/path")).to_return(body: "body")
+
+        expect(client.public_send(http_method, "/path")).to eq("body")
+      end
+
+      it "sends an empty form body by default" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path")
+
+        expect(a_request(http_method, rubygems_url("/path"))
+          .with(body: "", headers: {"Content-Type" => "application/x-www-form-urlencoded"})).to have_been_made
+      end
+
+      it "sends a form-encoded body" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", {gem_name: "gems", version: "0.0.8"})
+
+        expect(a_request(http_method, rubygems_url("/path")).with(body: "gem_name=gems&version=0.0.8")).to have_been_made
+      end
+
+      it "sends multipart fields" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", [["gem", "data", {filename: "gems.gem"}]], "multipart/form-data")
+
+        expect(a_request(http_method, rubygems_url("/path")).with(headers: {"Content-Type" => "multipart/form-data"}))
+          .to have_been_made
+      end
+
+      it "sends a Hash as multipart fields when the content type is multipart" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", {gem: "data"}, "multipart/form-data")
+
+        expect(a_request(http_method, rubygems_url("/path")).with(headers: {"Content-Type" => "multipart/form-data"}))
+          .to have_been_made
+      end
+
+      it "sends a binary body with the given content type" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", "data", "application/octet-stream")
+
+        expect(a_request(http_method, rubygems_url("/path"))
+          .with(body: "data", headers: {"Content-Type" => "application/octet-stream"})).to have_been_made
+      end
+
+      it "uses a custom host" do
+        stub_request(http_method, "http://example.com/path")
+        client.public_send(http_method, "/path", {}, described_class::FORM_URLENCODED, "http://example.com")
+
+        expect(a_request(http_method, "http://example.com/path")).to have_been_made
+      end
+    end
+  end
+
+  describe "#request" do
+    it "joins the path with the host" do
+      client.host = "http://example.com/"
+      stub_request(:get, "http://example.com/path")
+      client.get("/path")
+
+      expect(a_request(:get, "http://example.com/path")).to have_been_made
+    end
+
+    it "sends the user agent" do
+      client.user_agent = "Custom User Agent"
+      stub_get("/path")
+      client.get("/path")
+
+      expect(a_get("/path").with(headers: {"User-Agent" => "Custom User Agent"})).to have_been_made
+    end
+
+    it "authenticates requests" do
+      client.key = TEST_KEY
+      stub_get("/path")
+      client.get("/path")
+
+      expect(a_get("/path").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "does not authenticate requests without credentials" do
+      stub_get("/path")
+      client.get("/path")
+
+      expect(a_get("/path").with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
+    it "follows redirects" do
+      stub_get("/api/v1/dependencies?gems=rails,thor")
+        .to_return(status: 302, headers: {"Location" => "https://bundler.rubygems.org/api/v1/dependencies?gems=rails,thor"})
+      stub_request(:get, "https://bundler.rubygems.org/api/v1/dependencies?gems=rails,thor").to_return(body: fixture("dependencies"))
+
+      expect(client.dependencies("rails", "thor").first[:number]).to eq("3.0.9")
+    end
+
+    it "preserves authentication across redirects" do
+      client.key = TEST_KEY
+      stub_get("/old").to_return(status: 302, headers: {"Location" => "/new"})
+      stub_get("/new")
+      client.get("/old")
+
+      expect(a_get("/new").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "raises TooManyRedirects for redirect loops" do
+      stub_get("/loop").to_return(status: 302, headers: {"Location" => "/loop"})
+
+      expect { client.get("/loop") }.to raise_error(Gems::TooManyRedirects)
+    end
+
+    it "raises NotFound for 404 responses" do
+      stub_get("/path").to_return(status: 404, body: "This rubygem could not be found.")
+
+      expect { client.get("/path") }.to raise_error(Gems::NotFound, "This rubygem could not be found.")
+    end
+
+    it "raises GemError for other error responses" do
+      stub_get("/path").to_return(status: 500, body: "Internal Server Error")
+
+      expect { client.get("/path") }.to raise_error(Gems::GemError, "Internal Server Error")
+    end
+
+    it "performs requests through the connection" do
+      stub_get("/path")
+      allow(client.connection).to receive(:perform).and_call_original
+      client.get("/path")
+
+      expect(client.connection).to have_received(:perform).with(request: an_instance_of(Net::HTTP::Get))
+    end
+  end
+
+  describe "#body_for" do
+    it "converts a Hash to multipart fields for a multipart content type" do
+      expect(client.send(:body_for, {gem: "data"}, "multipart/form-data")).to eq([[:gem, "data"]])
+    end
+
+    it "keeps a Hash for a form content type" do
+      expect(client.send(:body_for, {gem: "data"}, described_class::FORM_URLENCODED)).to eq({gem: "data"})
+    end
+
+    it "keeps an Array for a multipart content type" do
+      expect(client.send(:body_for, [%w[gem data]], "multipart/form-data")).to eq([%w[gem data]])
+    end
+
+    it "keeps a String" do
+      expect(client.send(:body_for, "data", "application/octet-stream")).to eq("data")
+    end
   end
 end

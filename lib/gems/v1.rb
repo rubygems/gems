@@ -1,4 +1,4 @@
-require "gems/v1/client"
+require_relative "v1/client"
 
 module Gems
   # Module-level access to the RubyGems API v1

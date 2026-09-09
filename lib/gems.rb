@@ -1,17 +1,9 @@
-require "gems/abstract_client"
-require "gems/api_key_authenticator"
-require "gems/authenticator"
-require "gems/basic_authenticator"
-
-require "gems/v1"
-require "gems/v2"
-
-require "gems/client"
-require "gems/connection"
-require "gems/redirect_handler"
-require "gems/request_builder"
-require "gems/response_parser"
-require "gems/configuration"
+require_relative "gems/abstract_client"
+require_relative "gems/client"
+require_relative "gems/configuration"
+require_relative "gems/v1"
+require_relative "gems/v2"
+require_relative "gems/version"
 
 # A Ruby wrapper for the RubyGems.org API
 module Gems

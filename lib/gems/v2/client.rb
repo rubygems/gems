@@ -1,23 +1,10 @@
-require "date"
-require "gems/configuration"
-require "gems/request"
 require "json"
+require_relative "../base_client"
 
 module Gems
   module V2
     # A client for the RubyGems API v2
-    class Client
-      include Gems::Request
-
-      attr_accessor(*Configuration::VALID_OPTIONS_KEYS)
-
-      def initialize(options = {})
-        options = Gems.options.merge(options)
-        Configuration::VALID_OPTIONS_KEYS.each do |key|
-          send("#{key}=", options[key])
-        end
-      end
-
+    class Client < BaseClient
       # Returns information about the given gem for a specific version
       #
       # @authenticated false

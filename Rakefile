@@ -27,7 +27,7 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new(:yardstick) do |verify|
-  verify.threshold = 84.8
+  verify.threshold = 91
 end
 
 desc "Run linters"
