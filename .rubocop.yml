@@ -58,11 +58,6 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
-# The RubyGems /api/v1/dependencies endpoint returns serialized Ruby objects
-# that need to be deserialized within Gems::V1::Client#dependencies.
-Security/MarshalLoad:
-  Enabled: false
-
 Style/Alias:
   EnforcedStyle: prefer_alias_method
 
