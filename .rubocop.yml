@@ -38,6 +38,7 @@ Lint/MissingSuper:
 
 Metrics/BlockLength:
   Exclude:
+    - gems.gemspec
     - spec/**/*
 
 Metrics/ClassLength:

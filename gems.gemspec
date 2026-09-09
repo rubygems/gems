@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "allowed_push_host" => "https://rubygems.org",
     "bug_tracker_uri" => "https://github.com/rubygems/gems/issues",
+    "changelog_uri" => "https://github.com/rubygems/gems/blob/master/CHANGELOG.md",
     "documentation_uri" => "https://rubydoc.info/gems/gems/",
     "homepage_uri" => spec.homepage,
     "rubygems_mfa_required" => "true",
