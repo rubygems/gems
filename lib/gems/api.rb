@@ -278,23 +278,6 @@ module Gems
       JSON.parse(response)
     end
 
-    # Retrieve your API key using HTTP basic auth
-    #
-    # RubyGems.org has retired this endpoint, which now responds 410 Gone. Use {#create_api_key} instead.
-    #
-    # @api public
-    # @authenticated true
-    # @return [String]
-    # @example
-    #   Gems.configure do |config|
-    #     config.username = 'nick@gemcutter.org'
-    #     config.password = 'schwwwwing'
-    #   end
-    #   Gems.api_key
-    def api_key
-      get("/api/v1/api_key")
-    end
-
     # Create an API key using HTTP basic auth
     #
     # The key is only returned once, so store it somewhere safe.
@@ -302,16 +285,9 @@ module Gems
     # @api public
     # @authenticated true
     # @param name [String] A name for the key.
-    # @param options [Hash] Scopes and settings for the key.
-    # @option options [Boolean] :push_rubygem
-    # @option options [Boolean] :yank_rubygem
-    # @option options [Boolean] :index_rubygems
-    # @option options [Boolean] :add_owner
-    # @option options [Boolean] :remove_owner
-    # @option options [Boolean] :access_webhooks
-    # @option options [Boolean] :mfa Require a one-time passcode when the key is used.
-    # @option options [String] :expires_at
-    # @option options [String] :rubygem_name Restrict the key to a single gem.
+    # @param scopes [Hash{Symbol => Boolean, String}] Scopes and settings for the key: push_rubygem, yank_rubygem,
+    #   index_rubygems, add_owner, remove_owner, access_webhooks, mfa (require a one-time passcode), expires_at, and
+    #   rubygem_name (restrict the key to a single gem).
     # @return [String] the new API key
     # @example
     #   Gems.configure do |config|
@@ -319,8 +295,8 @@ module Gems
     #     config.password = "schwwwwing"
     #   end
     #   Gems.create_api_key "ci-push", push_rubygem: true
-    def create_api_key(name, options = {})
-      JSON.parse(post("/api/v1/api_key.json", options.merge({name:}))).fetch("rubygems_api_key")
+    def create_api_key(name, **scopes)
+      JSON.parse(post("/api/v1/api_key.json", {**scopes, name:})).fetch("rubygems_api_key")
     end
 
     # Update the scopes of an API key using HTTP basic auth
