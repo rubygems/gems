@@ -1,6 +1,7 @@
 require_relative "api_key_authenticator"
 require_relative "authenticator"
 require_relative "basic_authenticator"
+require_relative "otp_authenticator"
 
 module Gems
   # Mixin for client authentication credentials
@@ -26,6 +27,13 @@ module Gems
     # @example Get the password
     #   client.password
     attr_reader :password
+
+    # The one-time passcode for multi-factor authentication
+    # @api public
+    # @return [String, nil] the one-time passcode
+    # @example Get the one-time passcode
+    #   client.otp
+    attr_reader :otp
 
     # The authenticator for API requests
     # @api public
@@ -70,16 +78,39 @@ module Gems
       initialize_authenticator
     end
 
+    # Set the one-time passcode for multi-factor authentication
+    #
+    # @api public
+    # @param otp [String, nil] the one-time passcode
+    # @return [void]
+    # @example Set the one-time passcode
+    #   client.otp = "123456"
+    def otp=(otp)
+      @otp = otp
+      initialize_authenticator
+    end
+
     private
 
     # Initialize the appropriate authenticator based on available credentials
     #
-    # Basic authentication takes precedence over an API key.
+    # Basic authentication takes precedence over an API key. A one-time passcode
+    # wraps whichever is chosen.
     #
     # @api private
     # @return [Authenticator] the initialized authenticator
     def initialize_authenticator
-      @authenticator = basic_authenticator || api_key_authenticator || Authenticator.new
+      @authenticator = otp_authenticator(basic_authenticator || api_key_authenticator || Authenticator.new)
+    end
+
+    # Wrap an authenticator with a one-time passcode if one is available
+    # @api private
+    # @param authenticator [Authenticator] the authenticator to wrap
+    # @return [Authenticator] the wrapped authenticator, or the original if there is no passcode
+    def otp_authenticator(authenticator)
+      return authenticator unless otp
+
+      OtpAuthenticator.new(authenticator:, otp:)
     end
 
     # Build a basic authenticator if a username and password are available

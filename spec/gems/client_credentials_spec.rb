@@ -27,6 +27,34 @@ RSpec.describe Gems::ClientCredentials do
     it "returns the authenticator" do
       expect(client.send(:initialize_authenticator)).to equal(client.authenticator)
     end
+
+    it "wraps the authenticator with a one-time passcode" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+
+      expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
+    end
+  end
+
+  describe "#otp_authenticator" do
+    it "returns the authenticator unchanged without a one-time passcode" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: nil)
+
+      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+    end
+
+    it "wraps the credential authenticator with the one-time passcode" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+
+      expect([client.authenticator.otp, client.authenticator.authenticator.class]).to eq(["123456", Gems::ApiKeyAuthenticator])
+    end
+
+    it "sends the one-time passcode with requests" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+      stub_get("/path")
+      client.get("/path")
+
+      expect(a_get("/path").with(headers: {"Authorization" => TEST_KEY, "OTP" => "123456"})).to have_been_made
+    end
   end
 
   describe "#basic_authenticator" do
@@ -79,6 +107,20 @@ RSpec.describe Gems::ClientCredentials do
       client.key = nil
 
       expect(client.authenticator).to be_an_instance_of(Gems::Authenticator)
+    end
+  end
+
+  describe "#otp=" do
+    it "sets the one-time passcode" do
+      client.otp = "123456"
+
+      expect(client.otp).to eq("123456")
+    end
+
+    it "reinitializes the authenticator" do
+      client.otp = "123456"
+
+      expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
     end
   end
 

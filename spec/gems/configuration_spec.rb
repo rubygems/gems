@@ -1,7 +1,7 @@
 RSpec.describe Gems::Configuration do
   describe "::VALID_OPTIONS_KEYS" do
     it "lists the configurable options" do
-      expect(described_class::VALID_OPTIONS_KEYS).to eq(%i[host key password user_agent username])
+      expect(described_class::VALID_OPTIONS_KEYS).to eq(%i[host key otp password user_agent username])
     end
   end
 
@@ -54,6 +54,7 @@ RSpec.describe Gems::Configuration do
       Gems.configure do |config|
         config.host = "http://example.com"
         config.key = TEST_KEY
+        config.otp = "123456"
         config.password = TEST_PASSWORD
         config.user_agent = "Custom User Agent"
         config.username = TEST_USERNAME
@@ -61,7 +62,7 @@ RSpec.describe Gems::Configuration do
     end
 
     it "returns a hash of all options" do
-      expect(Gems.options).to eq(host: "http://example.com", key: TEST_KEY, password: TEST_PASSWORD,
+      expect(Gems.options).to eq(host: "http://example.com", key: TEST_KEY, otp: "123456", password: TEST_PASSWORD,
         user_agent: "Custom User Agent", username: TEST_USERNAME)
     end
   end
@@ -71,6 +72,7 @@ RSpec.describe Gems::Configuration do
       Gems.configure do |config|
         config.host = "http://example.com"
         config.key = TEST_KEY
+        config.otp = "123456"
         config.password = TEST_PASSWORD
         config.user_agent = "Custom User Agent"
         config.username = TEST_USERNAME
@@ -80,6 +82,7 @@ RSpec.describe Gems::Configuration do
     {
       host: Gems::Configuration::DEFAULT_HOST,
       key: Gems::Configuration::DEFAULT_KEY,
+      otp: nil,
       password: nil,
       user_agent: Gems::Configuration::DEFAULT_USER_AGENT,
       username: nil

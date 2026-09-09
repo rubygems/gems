@@ -9,6 +9,7 @@ module Gems
     VALID_OPTIONS_KEYS = %i[
       host
       key
+      otp
       password
       user_agent
       username
@@ -66,6 +67,7 @@ module Gems
     #   Gems.reset
     def reset
       self.username = nil
+      self.otp = nil
       self.password = nil
       self.host = DEFAULT_HOST
       self.key = DEFAULT_KEY

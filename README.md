@@ -113,6 +113,11 @@ Gems.configure do |config|
   config.key = '701243f217cdf23b1370c7b66b65ca97'
 end
 
+# If your account requires multi-factor authentication, provide a one-time passcode.
+Gems.configure do |config|
+  config.otp = '123456'
+end
+
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.info 'rails'
@@ -128,9 +133,11 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `key`         | The API key sent in the `Authorization` header           | `~/.gem/credentials`                   |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
+| `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
 | `user_agent`  | The `User-Agent` header                                  | `Gems <version>`                       |
 
-Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator` and `Gems::BasicAuthenticator`.
+Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator`, `Gems::BasicAuthenticator`,
+and `Gems::OtpAuthenticator` (which wraps one of the others).
 When a username and password are both set, HTTP basic authentication takes precedence over the API key.
 
 Timeouts, debug output, the proxy, and the redirect limit can be set on a client's `connection` and `redirect_handler`.

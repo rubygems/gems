@@ -62,6 +62,7 @@ module Gems
 
     attr_accessor host: String
     attr_accessor key: String?
+    attr_accessor otp: String?
     attr_accessor password: String?
     attr_accessor user_agent: String
     attr_accessor username: String?
@@ -93,19 +94,32 @@ module Gems
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
   end
 
+  class OtpAuthenticator < Authenticator
+    OTP_HEADER: String
+
+    attr_accessor authenticator: Authenticator
+    attr_accessor otp: String
+
+    def initialize: (authenticator: Authenticator, otp: String) -> void
+    def header: (Net::HTTPRequest? request) -> Hash[String, String]
+  end
+
   module ClientCredentials
     attr_reader key: String?
     attr_reader username: String?
     attr_reader password: String?
+    attr_reader otp: String?
     attr_reader authenticator: Authenticator
 
     def key=: (String? key) -> void
     def username=: (String? username) -> void
     def password=: (String? password) -> void
+    def otp=: (String? otp) -> void
 
     private
 
     def initialize_authenticator: () -> Authenticator
+    def otp_authenticator: (Authenticator authenticator) -> Authenticator
     def basic_authenticator: () -> BasicAuthenticator?
     def api_key_authenticator: () -> ApiKeyAuthenticator?
   end
