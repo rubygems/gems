@@ -20,6 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * Follow 301, 302, and 303 redirects with GET, keeping the method and body only for 307 and 308
+* Take keyword arguments in `Gems::Client.new` and `Gems.new`; unknown options raise `ArgumentError`
+* Take keyword arguments in the client's `get`, `post`, `put`, `patch`, and `delete` methods
+* Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`
+* Delegate only the API methods from the `Gems` module instead of every client method
+* Push to the client's configured host by default
+* Read the default API key from `~/.gem/credentials` lazily instead of when the library is required
+* Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
+
+### Removed
+* Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`
 
 ### Deprecated
 * Deprecate `api_key`, whose endpoint RubyGems.org has retired; use `create_api_key` instead

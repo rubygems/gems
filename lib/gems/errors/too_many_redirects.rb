@@ -1,6 +1,6 @@
-require_relative "gem_error"
+require_relative "error"
 
 module Gems
   # Error raised when too many redirects are encountered
-  class TooManyRedirects < GemError; end
+  class TooManyRedirects < Error; end
 end

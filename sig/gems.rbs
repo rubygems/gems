@@ -237,14 +237,14 @@ module Gems
     def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
   end
 
-  class GemError < StandardError
+  class Error < StandardError
   end
 
-  class HTTPError < GemError
-    attr_reader response: Net::HTTPResponse?
-    attr_reader code: String?
+  class HTTPError < Error
+    attr_reader response: Net::HTTPResponse
+    attr_reader code: String
 
-    def initialize: (?String? message, ?response: Net::HTTPResponse?) -> void
+    def initialize: (response: Net::HTTPResponse) -> void
 
     private
 
@@ -290,7 +290,7 @@ module Gems
   class GatewayTimeout < ServerError
   end
 
-  class TooManyRedirects < GemError
+  class TooManyRedirects < Error
   end
 
   class Connection
