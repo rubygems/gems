@@ -27,7 +27,8 @@ module Gems
   def self.unyank: (String gem_name, ?String? version, ?platform: String?) -> String
   def self.versions: (String gem_name) -> untyped
   def self.latest_version: (String gem_name) -> String
-  def self.total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
+  def self.total_downloads: () -> Integer
+  def self.downloads: (String gem_name, ?String? version) -> untyped
   def self.most_downloaded: () -> untyped
   def self.owners: (String gem_name) -> untyped
   def self.add_owner: (String gem_name, String owner) -> String
@@ -172,7 +173,8 @@ module Gems
     def unyank: (String gem_name, ?String? version, ?platform: String?) -> String
     def versions: (String gem_name) -> untyped
     def latest_version: (String gem_name) -> String
-    def total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
+    def total_downloads: () -> Integer
+    def downloads: (String gem_name, ?String? version) -> untyped
     def most_downloaded: () -> untyped
     def owners: (String gem_name) -> untyped
     def add_owner: (String gem_name, String owner) -> String

@@ -132,21 +132,28 @@ module Gems
       JSON.parse(response).fetch("version")
     end
 
-    # Returns the total number of downloads for a particular gem
+    # Returns the total number of downloads of all gems
+    #
+    # @api public
+    # @authenticated false
+    # @return [Integer]
+    # @example
+    #   Gems.total_downloads
+    def total_downloads
+      JSON.parse(get("/api/v1/downloads.json")).fetch("total")
+    end
+
+    # Returns the number of downloads of a gem and of one of its versions
     #
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @return [Hash]
+    # @param version [String, nil] The version of the gem (defaults to the latest version).
+    # @return [Hash] with :total_downloads and :version_downloads keys
     # @example
-    #   Gems.total_downloads 'rails_admin', '0.0.1'
-    def total_downloads(gem_name = nil, gem_version = nil)
-      response = if gem_name
-        get("/api/v1/downloads/#{gem_name}-#{gem_version || latest_version(gem_name)}.json")
-      else
-        get("/api/v1/downloads.json")
-      end
+    #   Gems.downloads("rails_admin", "0.0.1")[:version_downloads]
+    def downloads(gem_name, version = nil)
+      response = get("/api/v1/downloads/#{gem_name}-#{version || latest_version(gem_name)}.json")
       JSON.parse(response, symbolize_names: true)
     end
 
