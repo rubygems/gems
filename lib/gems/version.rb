@@ -8,6 +8,7 @@ module Gems
   # @api public
   class Version < Resource
     inspect_with :name, :number
+    identified_by :name, :number, :platform
 
     # @!method name
     #   The name of the gem

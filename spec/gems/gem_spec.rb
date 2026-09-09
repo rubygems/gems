@@ -5,6 +5,10 @@ RSpec.describe Gems::Gem do
     expect(gem).to be_a(Gems::Resource)
   end
 
+  it "is identified by its name" do
+    expect(described_class.new("name" => "rails", "downloads" => 1)).to eq(described_class.new("name" => "rails", "downloads" => 2))
+  end
+
   it "inspects as the name and version" do
     expect(gem.inspect).to eq('#<Gems::Gem name="rails" version="7.0.6">')
   end

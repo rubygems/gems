@@ -5,6 +5,10 @@ RSpec.describe Gems::Owner do
     expect(owner).to be_a(Gems::Resource)
   end
 
+  it "is identified by its id, handle, and email" do
+    expect(owner.identity).to eq([1, "sferik", "sferik@gmail.com"])
+  end
+
   it "inspects as the handle" do
     expect(owner.inspect).to eq('#<Gems::Owner handle="sferik">')
   end

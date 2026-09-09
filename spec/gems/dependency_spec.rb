@@ -5,6 +5,10 @@ RSpec.describe Gems::Dependency do
     expect(dependency).to be_a(Gems::Resource)
   end
 
+  it "is identified by its name and requirements" do
+    expect(dependency.identity).to eq(["thor", ">= 0.14.6"])
+  end
+
   it "inspects as the name and requirements" do
     expect(dependency.inspect).to eq('#<Gems::Dependency name="thor" requirements=">= 0.14.6">')
   end

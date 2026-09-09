@@ -5,6 +5,7 @@ module Gems
   # @api public
   class Dependency < Resource
     inspect_with :name, :requirements
+    identified_by :name, :requirements
 
     # @!method name
     #   The name of the dependency

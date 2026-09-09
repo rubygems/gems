@@ -145,7 +145,9 @@ Responses are wrapped in objects with readers for each documented field: `Gems::
 `Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
 `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are accepted wherever their
 identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` all work.
-Every object also exposes the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
+Objects compare by identity (a gem by its name, a version by its name, number, and platform, and so on), so
+`Gems.gem('rails') == Gems.gem('rails')` even when download counts have changed in between. Every object also exposes
+the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
 
 ```ruby
 gem = Gems.gem 'rails'

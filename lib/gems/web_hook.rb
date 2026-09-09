@@ -5,6 +5,7 @@ module Gems
   # @api public
   class WebHook < Resource
     inspect_with :gem_name, :url
+    identified_by :gem_name, :url
 
     # @!method gem_name
     #   The name of the gem the web hook is registered for, or "*" for all gems

@@ -79,6 +79,25 @@ module Gems
       @inspect_readers || []
     end
 
+    # Declare which readers identify the resource
+    #
+    # Resources with an identity compare equal when those readers match, even if other attributes differ.
+    #
+    # @api private
+    # @param readers [Array<Symbol>] the identifying readers
+    # @return [Array<Symbol>] the identifying readers
+    def self.identified_by(*readers)
+      @identity_readers = readers
+    end
+
+    # The readers that identify the resource
+    #
+    # @api private
+    # @return [Array<Symbol>] the identifying readers, empty when the resource is identified by all of its attributes
+    def self.identity_readers
+      @identity_readers || []
+    end
+
     # Initialize a new resource
     #
     # The attributes, including nested hashes, arrays, and strings, are frozen, so resources are immutable values.
@@ -113,17 +132,44 @@ module Gems
       attributes
     end
 
+    # The values that identify the resource
+    #
+    # @api public
+    # @return [Array<Object>, Hash{String => Object}] the identifying values, or all attributes when no identity is declared
+    # @example Get a gem's identity
+    #   gem.identity # => ["rails"]
+    def identity
+      readers = self.class.identity_readers
+      if readers.empty?
+        attributes
+      else
+        readers.map { |reader| public_send(reader) }
+      end
+    end
+
     # Compare with another resource
     #
     # @api public
     # @param other [Object] the object to compare with
-    # @return [Boolean] true if the other object is the same kind of resource with the same attributes
+    # @return [Boolean] true if the other object is the same kind of resource with the same identity
     # @example Compare two gems
-    #   gem == other_gem
+    #   Gems.gem("rails") == Gems.gem("rails") # => true
     def ==(other)
-      other.instance_of?(self.class) && attributes == other.attributes
+      other.instance_of?(self.class) && identity == other.identity
     end
-    alias_method :eql?, :==
+
+    # Compare with another resource for use as a hash key
+    #
+    # Unlike {#==}, identity values are compared with `eql?`, so this agrees with {#hash}.
+    #
+    # @api public
+    # @param other [Object] the object to compare with
+    # @return [Boolean] true if the other object is the same kind of resource with an eql? identity
+    # @example Compare two gems strictly
+    #   Gems.gem("rails").eql?(Gems.gem("rails")) # => true
+    def eql?(other)
+      other.instance_of?(self.class) && identity.eql?(other.identity)
+    end
 
     # Summarize the resource for the console
     #
@@ -145,7 +191,7 @@ module Gems
     # @example Use resources as hash keys
     #   {gem => true}
     def hash
-      [self.class, attributes].hash
+      [self.class, identity].hash
     end
 
     private

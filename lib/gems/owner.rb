@@ -5,6 +5,7 @@ module Gems
   # @api public
   class Owner < Resource
     inspect_with :handle
+    identified_by :id, :handle, :email
 
     # @!method id
     #   The ID of the owner

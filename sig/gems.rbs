@@ -155,12 +155,15 @@ module Gems
 
   class Resource
     self.@inspect_readers: Array[Symbol]?
+    self.@identity_readers: Array[Symbol]?
 
     attr_reader attributes: Hash[String, untyped]
 
     def self.list: (Array[Hash[String, untyped]] list) -> Array[instance]
     def self.inspect_with: (*Symbol readers) -> Array[Symbol]
     def self.inspect_readers: () -> Array[Symbol]
+    def self.identified_by: (*Symbol readers) -> Array[Symbol]
+    def self.identity_readers: () -> Array[Symbol]
     def self.attribute: (Symbol name, ?(String | Symbol) key) -> Symbol
     def self.predicate: (Symbol name, ?(String | Symbol) key) -> Symbol
     def self.time_attribute: (Symbol name, ?(String | Symbol) key) -> Symbol
@@ -168,6 +171,7 @@ module Gems
     def []: (String | Symbol key) -> untyped
     def to_h: () -> Hash[String, untyped]
     def inspect: () -> String
+    def identity: () -> (Array[untyped] | Hash[String, untyped])
     def ==: (untyped other) -> bool
     def eql?: (untyped other) -> bool
     def hash: () -> Integer

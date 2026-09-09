@@ -5,6 +5,10 @@ RSpec.describe Gems::Version do
     expect(version).to be_a(Gems::Resource)
   end
 
+  it "is identified by its name, number, and platform" do
+    expect(version.identity).to eq(["rails", "7.0.6", "ruby"])
+  end
+
   it "inspects as the name and number" do
     expect(version.inspect).to eq('#<Gems::Version name="rails" number="7.0.6">')
   end
