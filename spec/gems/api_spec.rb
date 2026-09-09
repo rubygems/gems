@@ -2,6 +2,13 @@ RSpec.describe Gems::API do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
   describe "#gem" do
+    it "accepts a gem" do
+      stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json"))
+      client.gem(Gems::Gem.new("name" => "rails"))
+
+      expect(a_get("/api/v1/gems/rails.json")).to have_been_made
+    end
+
     context "when the gem exists" do
       before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
 
@@ -53,6 +60,13 @@ RSpec.describe Gems::API do
   end
 
   describe "#owned_gems" do
+    it "accepts an owner" do
+      stub_get("/api/v1/owners/sferik/gems.json").to_return(body: fixture("gems.json"))
+      client.owned_gems(Gems::Owner.new("handle" => "sferik"))
+
+      expect(a_get("/api/v1/owners/sferik/gems.json")).to have_been_made
+    end
+
     context "without a user handle" do
       before { stub_get("/api/v1/gems.json").to_return(body: fixture("gems.json")) }
 
@@ -162,6 +176,13 @@ RSpec.describe Gems::API do
   describe "#yank" do
     before { stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8").to_return(body: fixture("yank")) }
 
+    it "accepts a gem and a version" do
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8").to_return(body: fixture("yank"))
+      client.yank(Gems::Gem.new("name" => "gems"), Gems::Version.new("number" => "0.0.8"))
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8")).to have_been_made
+    end
+
     it "deletes the correct resource" do
       client.yank("gems", "0.0.8")
 
@@ -191,6 +212,13 @@ RSpec.describe Gems::API do
   describe "#unyank" do
     before { stub_put("/api/v1/gems/unyank").to_return(body: fixture("unyank")) }
 
+    it "accepts a gem and a version" do
+      stub_put("/api/v1/gems/unyank").to_return(body: fixture("unyank"))
+      client.unyank(Gems::Gem.new("name" => "gems"), Gems::Version.new("number" => "0.0.8"))
+
+      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8"})).to have_been_made
+    end
+
     it "puts the correct resource" do
       client.unyank("gems", "0.0.8")
 
@@ -218,6 +246,13 @@ RSpec.describe Gems::API do
   describe "#versions" do
     before { stub_get("/api/v1/versions/script_helpers.json").to_return(body: fixture("script_helpers.json")) }
 
+    it "accepts a gem" do
+      stub_get("/api/v1/versions/script_helpers.json").to_return(body: fixture("script_helpers.json"))
+      client.versions(Gems::Gem.new("name" => "script_helpers"))
+
+      expect(a_get("/api/v1/versions/script_helpers.json")).to have_been_made
+    end
+
     it "gets the correct resource" do
       client.versions("script_helpers")
 
@@ -237,6 +272,13 @@ RSpec.describe Gems::API do
 
   describe "#latest_version" do
     before { stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: fixture("script_helpers/latest.json")) }
+
+    it "accepts a version" do
+      stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: fixture("script_helpers/latest.json"))
+      client.latest_version(Gems::Version.new("name" => "script_helpers"))
+
+      expect(a_get("/api/v1/versions/script_helpers/latest.json")).to have_been_made
+    end
 
     it "gets the correct resource" do
       client.latest_version("script_helpers")
@@ -265,6 +307,13 @@ RSpec.describe Gems::API do
 
   describe "#downloads" do
     before { stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json")) }
+
+    it "accepts a gem and a version" do
+      stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      client.downloads(Gems::Gem.new("name" => "rails_admin"), Gems::Version.new("number" => "0.0.0"))
+
+      expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
+    end
 
     it "gets the correct resource" do
       client.downloads("rails_admin", "0.0.0")
@@ -321,6 +370,13 @@ RSpec.describe Gems::API do
   describe "#owners" do
     before { stub_get("/api/v1/gems/gems/owners.json").to_return(body: fixture("owners.json")) }
 
+    it "accepts a gem" do
+      stub_get("/api/v1/gems/gems/owners.json").to_return(body: fixture("owners.json"))
+      client.owners(Gems::Gem.new("name" => "gems"))
+
+      expect(a_get("/api/v1/gems/gems/owners.json")).to have_been_made
+    end
+
     it "gets the correct resource" do
       client.owners("gems")
 
@@ -337,6 +393,13 @@ RSpec.describe Gems::API do
   describe "#add_owner" do
     before { stub_post("/api/v1/gems/gems/owners").to_return(body: fixture("add_owner")) }
 
+    it "accepts a gem and an owner, using the owner's handle" do
+      stub_post("/api/v1/gems/gems/owners").to_return(body: fixture("add_owner"))
+      client.add_owner(Gems::Gem.new("name" => "gems"), Gems::Owner.new("handle" => "sferik", "email" => "sferik@gmail.com"))
+
+      expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik"})).to have_been_made
+    end
+
     it "posts the correct resource" do
       client.add_owner("gems", "sferik@gmail.com")
 
@@ -350,6 +413,13 @@ RSpec.describe Gems::API do
 
   describe "#remove_owner" do
     before { stub_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com").to_return(body: fixture("remove_owner")) }
+
+    it "accepts a gem and an owner, using the owner's email without a handle" do
+      stub_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com").to_return(body: fixture("remove_owner"))
+      client.remove_owner(Gems::Gem.new("name" => "gems"), Gems::Owner.new("email" => "sferik@gmail.com"))
+
+      expect(a_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com")).to have_been_made
+    end
 
     it "deletes the correct resource" do
       client.remove_owner("gems", "sferik@gmail.com")
@@ -400,6 +470,13 @@ RSpec.describe Gems::API do
   describe "#add_web_hook" do
     before { stub_post("/api/v1/web_hooks").to_return(body: fixture("add_web_hook")) }
 
+    it "accepts a gem and a web hook" do
+      stub_post("/api/v1/web_hooks").to_return(body: fixture("add_web_hook"))
+      client.add_web_hook(Gems::Gem.new("name" => "rails"), Gems::WebHook.new("url" => "http://example.com"))
+
+      expect(a_post("/api/v1/web_hooks").with(body: {gem_name: "rails", url: "http://example.com"})).to have_been_made
+    end
+
     it "posts the correct resource" do
       client.add_web_hook("*", "http://example.com")
 
@@ -415,6 +492,13 @@ RSpec.describe Gems::API do
   describe "#remove_web_hook" do
     before { stub_delete("/api/v1/web_hooks/remove?gem_name=*&url=http://example.com").to_return(body: fixture("remove_web_hook")) }
 
+    it "accepts a gem and a web hook" do
+      stub_delete("/api/v1/web_hooks/remove?gem_name=rails&url=http://example.com").to_return(body: fixture("remove_web_hook"))
+      client.remove_web_hook(Gems::Gem.new("name" => "rails"), Gems::WebHook.new("url" => "http://example.com"))
+
+      expect(a_delete("/api/v1/web_hooks/remove?gem_name=rails&url=http://example.com")).to have_been_made
+    end
+
     it "deletes the correct resource" do
       client.remove_web_hook("*", "http://example.com")
 
@@ -429,6 +513,13 @@ RSpec.describe Gems::API do
 
   describe "#fire_web_hook" do
     before { stub_post("/api/v1/web_hooks/fire").to_return(body: fixture("fire_web_hook")) }
+
+    it "accepts a gem and a web hook" do
+      stub_post("/api/v1/web_hooks/fire").to_return(body: fixture("fire_web_hook"))
+      client.fire_web_hook(Gems::Gem.new("name" => "rails"), Gems::WebHook.new("url" => "http://example.com"))
+
+      expect(a_post("/api/v1/web_hooks/fire").with(body: {gem_name: "rails", url: "http://example.com"})).to have_been_made
+    end
 
     it "posts the correct resource" do
       client.fire_web_hook("*", "http://example.com")
@@ -524,6 +615,14 @@ RSpec.describe Gems::API do
 
     before { stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated") }
 
+    it "accepts an API key" do
+      stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated")
+      client.update_api_key(Gems::ApiKey.new("rubygems_api_key" => "rubygems_701243f217cdf23b1370c7b66b65ca97"), yank_rubygem: true)
+
+      expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
+        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
+    end
+
     it "patches the correct resource with basic authentication" do
       client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
 
@@ -586,6 +685,13 @@ RSpec.describe Gems::API do
   describe "#reverse_dependencies" do
     before { stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json")) }
 
+    it "accepts a gem" do
+      stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json"))
+      client.reverse_dependencies(Gems::Gem.new("name" => "rspec"))
+
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json")).to have_been_made
+    end
+
     it "gets the correct resource" do
       client.reverse_dependencies("rspec")
 
@@ -606,6 +712,13 @@ RSpec.describe Gems::API do
   end
 
   describe "#version" do
+    it "accepts a gem and a version" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version(Gems::Gem.new("name" => "rails"), Gems::Version.new("number" => "7.0.6"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
+    end
+
     context "when the gem version exists" do
       before { stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json")) }
 

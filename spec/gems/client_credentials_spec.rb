@@ -10,6 +10,12 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.key).to eq(TEST_KEY)
     end
 
+    it "resolves the key of an API key object" do
+      client = Gems::Client.new(key: Gems::ApiKey.new("rubygems_api_key" => TEST_KEY))
+
+      expect(client.key).to eq(TEST_KEY)
+    end
+
     it "sets the username" do
       expect(client.username).to eq(TEST_USERNAME)
     end
@@ -168,6 +174,12 @@ RSpec.describe Gems::ClientCredentials do
   describe "#key=" do
     it "sets the key" do
       client.key = TEST_KEY
+
+      expect(client.key).to eq(TEST_KEY)
+    end
+
+    it "resolves the key of an API key object" do
+      client.key = Gems::ApiKey.new("rubygems_api_key" => TEST_KEY)
 
       expect(client.key).to eq(TEST_KEY)
     end

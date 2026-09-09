@@ -2,6 +2,7 @@ require "json"
 require_relative "api_key"
 require_relative "downloads"
 require_relative "gem"
+require_relative "identifiers"
 require_relative "owner"
 require_relative "trusted_publisher_authenticator"
 require_relative "version"
@@ -14,6 +15,8 @@ module Gems
   #
   # @api public
   module API
+    include Identifiers
+
     # Mapping of the gem name groupings returned by the web hooks endpoint to the names used to register hooks
     WEB_HOOK_GEM_NAMES = {"all gems" => "*"}.freeze
 
@@ -21,12 +24,12 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
     # @return [Gem]
     # @example
     #   Gems.gem "rails"
     def gem(gem_name)
-      Gem.new(JSON.parse(get("/api/v1/gems/#{gem_name}.json")))
+      Gem.new(JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}.json")))
     end
 
     # Returns an array of active gems that match the query
@@ -46,13 +49,13 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param user_handle [String, nil] The handle of a user.
+    # @param user_handle [String, Owner, nil] The handle of a user, or an owner.
     # @return [Array<Gem>]
     # @example
     #   Gems.owned_gems
     def owned_gems(user_handle = nil)
       path = if user_handle
-        "/api/v1/owners/#{user_handle}/gems.json"
+        "/api/v1/owners/#{handle_of(user_handle)}/gems.json"
       else
         "/api/v1/gems.json"
       end
@@ -81,54 +84,55 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
     # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
     #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def yank(gem_name, version = nil, platform: nil)
-      version ||= latest_version(gem_name)
-      delete("/api/v1/gems/yank", {gem_name: gem_name, version:, platform:}.compact)
+      version = number_of(version) || latest_version(gem_name)
+      delete("/api/v1/gems/yank", {gem_name: name_of(gem_name), version:, platform:}.compact)
     end
 
     # Update a previously yanked gem back into RubyGems.org's index
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
     # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
     #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
     def unyank(gem_name, version = nil, platform: nil)
-      version ||= latest_version(gem_name)
-      put("/api/v1/gems/unyank", {gem_name: gem_name, version:, platform:}.compact)
+      version = number_of(version) || latest_version(gem_name)
+      put("/api/v1/gems/unyank", {gem_name: name_of(gem_name), version:, platform:}.compact)
     end
 
     # Returns an array of gem version details
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
     # @return [Array<Version>]
     # @example
     #   Gems.versions "coulda"
     def versions(gem_name)
-      Version.list(JSON.parse(get("/api/v1/versions/#{gem_name}.json")).map { |version| version.merge("name" => gem_name) })
+      name = name_of(gem_name)
+      Version.list(JSON.parse(get("/api/v1/versions/#{name}.json")).map { |version| version.merge("name" => name) })
     end
 
     # Returns the latest version number of a gem
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
     # @return [String] the latest version number
     # @example
     #   Gems.latest_version "coulda"
     def latest_version(gem_name)
-      JSON.parse(get("/api/v1/versions/#{gem_name}/latest.json")).fetch("version")
+      JSON.parse(get("/api/v1/versions/#{name_of(gem_name)}/latest.json")).fetch("version")
     end
 
     # Returns the total number of downloads of all gems
@@ -146,13 +150,14 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem.
-    # @param version [String, nil] The version of the gem (defaults to the latest version).
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version, nil] The version of the gem (defaults to the latest version).
     # @return [Downloads]
     # @example
     #   Gems.downloads("rails_admin", "0.0.1").version_downloads
     def downloads(gem_name, version = nil)
-      Downloads.new(JSON.parse(get("/api/v1/downloads/#{gem_name}-#{version || latest_version(gem_name)}.json")))
+      number = number_of(version) || latest_version(gem_name)
+      Downloads.new(JSON.parse(get("/api/v1/downloads/#{name_of(gem_name)}-#{number}.json")))
     end
 
     # Returns the top 50 downloaded gem versions of all time
@@ -174,38 +179,38 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
     # @return [Array<Owner>]
     # @example
     #   Gems.owners "gemcutter"
     def owners(gem_name)
-      Owner.list(JSON.parse(get("/api/v1/gems/#{gem_name}/owners.json")))
+      Owner.list(JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}/owners.json")))
     end
 
     # Add an owner to a RubyGem you own, giving that user permission to manage it
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param owner [String] The email address or handle of the user you want to add.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param owner [String, Owner] The email address or handle of the user you want to add, or an owner.
     # @return [String]
     # @example
     #   Gems.add_owner "gemcutter", "josh@technicalpickles.com"
     def add_owner(gem_name, owner)
-      post("/api/v1/gems/#{gem_name}/owners", {email: owner})
+      post("/api/v1/gems/#{name_of(gem_name)}/owners", {email: handle_of(owner)})
     end
 
     # Remove a user's permission to manage a RubyGem you own
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem.
-    # @param owner [String] The email address or handle of the user you want to remove.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param owner [String, Owner] The email address or handle of the user you want to remove, or an owner.
     # @return [String]
     # @example
     #   Gems.remove_owner "gemcutter", "josh@technicalpickles.com"
     def remove_owner(gem_name, owner)
-      delete("/api/v1/gems/#{gem_name}/owners", {email: owner})
+      delete("/api/v1/gems/#{name_of(gem_name)}/owners", {email: handle_of(owner)})
     end
 
     # List the webhooks registered under your account
@@ -227,39 +232,39 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to add the hook to all gems.
-    # @param url [String] The URL of the web hook.
+    # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to add the hook to all gems.
+    # @param url [String, WebHook] The URL of the web hook, or a web hook.
     # @return [String]
     # @example
     #   Gems.add_web_hook "rails", "http://example.com"
     def add_web_hook(gem_name, url)
-      post("/api/v1/web_hooks", {gem_name: gem_name, url: url})
+      post("/api/v1/web_hooks", {gem_name: name_of(gem_name), url: url_of(url)})
     end
 
     # Remove a webhook
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to remove the hook from all gems.
-    # @param url [String] The URL of the web hook.
+    # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to remove the hook from all gems.
+    # @param url [String, WebHook] The URL of the web hook, or a web hook.
     # @return [String]
     # @example
     #   Gems.remove_web_hook "rails", "http://example.com"
     def remove_web_hook(gem_name, url)
-      delete("/api/v1/web_hooks/remove", {gem_name: gem_name, url: url})
+      delete("/api/v1/web_hooks/remove", {gem_name: name_of(gem_name), url: url_of(url)})
     end
 
     # Test fire a webhook
     #
     # @api public
     # @authenticated true
-    # @param gem_name [String] The name of a gem. Specify "*" to fire the hook for all gems.
-    # @param url [String] The URL of the web hook.
+    # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to fire the hook for all gems.
+    # @param url [String, WebHook] The URL of the web hook, or a web hook.
     # @return [String]
     # @example
     #   Gems.fire_web_hook "rails", "http://example.com"
     def fire_web_hook(gem_name, url)
-      post("/api/v1/web_hooks/fire", {gem_name: gem_name, url: url})
+      post("/api/v1/web_hooks/fire", {gem_name: name_of(gem_name), url: url_of(url)})
     end
 
     # Returns the 50 gems most recently added to RubyGems.org (for the first time)
@@ -311,13 +316,13 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param key [String] The API key to update.
+    # @param key [String, ApiKey] The API key to update.
     # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
     # @return [String]
     # @example
     #   Gems.update_api_key "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
     def update_api_key(key, **scopes)
-      patch("/api/v1/api_key", {**scopes, api_key: key})
+      patch("/api/v1/api_key", {**scopes, api_key: key_of(key)})
     end
 
     # Exchange an OIDC ID token for an API key via trusted publishing
@@ -336,26 +341,26 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version
     # @param only [String, nil] Restrict the results to "development" or "runtime" dependencies.
     # @return [Array<String>]
     # @example
     #   Gems.reverse_dependencies "money", only: "runtime"
     def reverse_dependencies(gem_name, only: nil)
-      JSON.parse(get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", {only:}.compact))
+      JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}/reverse_dependencies.json", {only:}.compact))
     end
 
     # Returns information about the given gem for a specific version
     #
     # @api public
     # @authenticated false
-    # @param gem_name [String] The name of a gem.
-    # @param version [String] The requested version of the gem.
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version] The requested version of the gem.
     # @return [Version]
     # @example
     #   Gems.version "rails", "7.0.6"
     def version(gem_name, version)
-      Version.new(JSON.parse(get("/api/v2/rubygems/#{gem_name}/versions/#{version}.json")))
+      Version.new(JSON.parse(get("/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}.json")))
     end
 
     private

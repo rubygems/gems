@@ -1,5 +1,6 @@
 require "rubygems"
 require_relative "connection"
+require_relative "identifiers"
 require_relative "redirect_handler"
 require_relative "version"
 
@@ -7,6 +8,8 @@ module Gems
   # Global configuration for {Gems::Client} instances
   # @api public
   module Configuration
+    include Identifiers
+
     # The default API endpoint
     DEFAULT_HOST = ENV.fetch("RUBYGEMS_HOST", "https://rubygems.org").freeze
 
@@ -28,12 +31,17 @@ module Gems
     attr_accessor :id_token
 
     # Set the API key used for authentication
+    #
     # @api public
-    # @param key [String, nil] the API key
+    # @param key [String, ApiKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
     #   Gems.key = "701243f217cdf23b1370c7b66b65ca97"
-    attr_writer :key
+    # @example Set the API key from a newly created API key
+    #   Gems.key = Gems.create_api_key("ci-push", push_rubygem: true)
+    def key=(key)
+      @key = key_of(key)
+    end
 
     # The one-time passcode used for multi-factor authentication
     # @api public
