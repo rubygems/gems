@@ -175,6 +175,40 @@ RSpec.describe Gems::Resource do
     end
   end
 
+  describe ".identified_by" do
+    let(:identified_class) { Class.new(resource_class) { identified_by :name } }
+
+    it "declares the readers that identify the resource" do
+      expect(identified_class.identity_readers).to eq(%i[name])
+    end
+
+    it "returns the readers" do
+      expect(Class.new(described_class).identified_by(:name, :number)).to eq(%i[name number])
+    end
+  end
+
+  describe ".identity_readers" do
+    it "returns the declared readers" do
+      expect(Class.new(resource_class) { identified_by :name, :yanked? }.identity_readers).to eq(%i[name yanked?])
+    end
+
+    it "defaults to no readers" do
+      expect(resource_class.identity_readers).to eq([])
+    end
+  end
+
+  describe "#identity" do
+    it "is the attributes without declared readers" do
+      expect(resource.identity).to equal(attributes)
+    end
+
+    it "is the values of the declared readers" do
+      identified_class = Class.new(resource_class) { identified_by :name, :yanked? }
+
+      expect(identified_class.new(attributes).identity).to eq(["rails", true])
+    end
+  end
+
   describe "#to_h" do
     it "returns the attributes" do
       expect(resource.to_h).to equal(attributes)
@@ -205,15 +239,49 @@ RSpec.describe Gems::Resource do
     it "is false for a non-resource" do
       expect(resource).not_to eq(attributes)
     end
+
+    context "with an identity" do
+      let(:identified_class) { Class.new(resource_class) { identified_by :name } }
+
+      it "is true when the identity matches despite other attributes" do
+        expect(identified_class.new("name" => "rails", "yanked" => true)).to eq(identified_class.new("name" => "rails"))
+      end
+
+      it "is false when the identity differs" do
+        expect(identified_class.new("name" => "rails")).not_to eq(identified_class.new("name" => "thor"))
+      end
+    end
   end
 
   describe "#eql?" do
-    it "matches ==" do
+    it "is true for the same class and attributes" do
       expect(resource).to eql(resource_class.new(attributes.dup))
     end
 
     it "is false for different attributes" do
       expect(resource).not_to eql(resource_class.new({}))
+    end
+
+    it "compares attribute values with eql?" do
+      expect(resource_class.new("downloads" => 1)).not_to eql(resource_class.new("downloads" => 1.0))
+    end
+
+    it "is false for a different class with the same attributes" do
+      expect(resource).not_to eql(Class.new(described_class).new(attributes))
+    end
+
+    it "is false for a subclass with the same attributes" do
+      expect(resource).not_to eql(Class.new(resource_class).new(attributes))
+    end
+
+    it "is false for a non-resource" do
+      expect(resource).not_to eql(attributes)
+    end
+
+    it "is true when the identity matches despite other attributes" do
+      identified_class = Class.new(resource_class) { identified_by :name }
+
+      expect(identified_class.new("name" => "rails", "yanked" => true)).to eql(identified_class.new("name" => "rails"))
     end
   end
 
@@ -226,12 +294,26 @@ RSpec.describe Gems::Resource do
       expect(resource.hash).not_to eq(resource_class.new({}).hash)
     end
 
+    it "differs for attribute values that are == but not eql?" do
+      expect(resource_class.new("downloads" => 1).hash).not_to eq(resource_class.new("downloads" => 1.0).hash)
+    end
+
+    it "keeps == but not eql? resources distinct in a set" do
+      expect(Set[resource_class.new("downloads" => 1), resource_class.new("downloads" => 1.0)].size).to eq(2)
+    end
+
     it "differs for a different class with the same attributes" do
       expect(resource.hash).not_to eq(Class.new(described_class).new(attributes).hash)
     end
 
     it "deduplicates equal resources in a set" do
       expect(Set[resource, resource_class.new(attributes.dup)].size).to eq(1)
+    end
+
+    it "is equal for resources with the same identity" do
+      identified_class = Class.new(resource_class) { identified_by :name }
+
+      expect(identified_class.new("name" => "rails", "yanked" => true).hash).to eq(identified_class.new("name" => "rails").hash)
     end
   end
 end

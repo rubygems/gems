@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
 * Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `WebHook`, `Downloads`, and `ApiKey` objects
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
+* Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
 * Add RBS signatures
 
