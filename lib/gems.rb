@@ -1,4 +1,7 @@
 require "gems/abstract_client"
+require "gems/api_key_authenticator"
+require "gems/authenticator"
+require "gems/basic_authenticator"
 
 require "gems/v1"
 require "gems/v2"
