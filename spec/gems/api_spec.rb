@@ -161,7 +161,7 @@ RSpec.describe Gems::API do
     end
 
     it "defaults to the latest version" do
-      stub_get("/api/v1/gems/gems.json").to_return(body: fixture("rails.json"))
+      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
       stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
       client.yank("gems")
 
@@ -169,7 +169,7 @@ RSpec.describe Gems::API do
     end
 
     it "raises KeyError when the gem has no version" do
-      stub_get("/api/v1/gems/gems.json").to_return(body: "{}")
+      stub_get("/api/v1/versions/gems/latest.json").to_return(body: "{}")
 
       expect { client.yank("gems") }.to raise_error(KeyError)
     end
@@ -195,14 +195,14 @@ RSpec.describe Gems::API do
     end
 
     it "defaults to the latest version" do
-      stub_get("/api/v1/gems/gems.json").to_return(body: fixture("rails.json"))
+      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
       client.unyank("gems")
 
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "3.0.9"})).to have_been_made
     end
 
     it "raises KeyError when the gem has no version" do
-      stub_get("/api/v1/gems/gems.json").to_return(body: "{}")
+      stub_get("/api/v1/versions/gems/latest.json").to_return(body: "{}")
 
       expect { client.unyank("gems") }.to raise_error(KeyError)
     end
@@ -232,7 +232,13 @@ RSpec.describe Gems::API do
     end
 
     it "returns the gem's latest version" do
-      expect(client.latest_version("script_helpers")["version"]).to eq("0.3.0")
+      expect(client.latest_version("script_helpers")).to eq("0.3.0")
+    end
+
+    it "raises KeyError when the response has no version" do
+      stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: "{}")
+
+      expect { client.latest_version("script_helpers") }.to raise_error(KeyError)
     end
   end
 
@@ -267,7 +273,7 @@ RSpec.describe Gems::API do
 
     context "with a gem name but no version" do
       before do
-        stub_get("/api/v1/gems/rails_admin.json").to_return(body: fixture("rails.json"))
+        stub_get("/api/v1/versions/rails_admin/latest.json").to_return(body: '{"version":"3.0.9"}')
         stub_get("/api/v1/downloads/rails_admin-3.0.9.json").to_return(body: fixture("rails_admin-0.0.0.json"))
       end
 
@@ -278,7 +284,7 @@ RSpec.describe Gems::API do
       end
 
       it "raises KeyError when the gem has no version" do
-        stub_get("/api/v1/gems/rails_admin.json").to_return(body: "{}")
+        stub_get("/api/v1/versions/rails_admin/latest.json").to_return(body: "{}")
 
         expect { client.total_downloads("rails_admin") }.to raise_error(KeyError)
       end

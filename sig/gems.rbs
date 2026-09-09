@@ -26,7 +26,7 @@ module Gems
   def self.yank: (String gem_name, ?String? version, ?platform: String?) -> String
   def self.unyank: (String gem_name, ?String? version, ?platform: String?) -> String
   def self.versions: (String gem_name) -> untyped
-  def self.latest_version: (String gem_name) -> untyped
+  def self.latest_version: (String gem_name) -> String
   def self.total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
   def self.most_downloaded: () -> untyped
   def self.owners: (String gem_name) -> untyped
@@ -171,7 +171,7 @@ module Gems
     def yank: (String gem_name, ?String? version, ?platform: String?) -> String
     def unyank: (String gem_name, ?String? version, ?platform: String?) -> String
     def versions: (String gem_name) -> untyped
-    def latest_version: (String gem_name) -> untyped
+    def latest_version: (String gem_name) -> String
     def total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
     def most_downloaded: () -> untyped
     def owners: (String gem_name) -> untyped
