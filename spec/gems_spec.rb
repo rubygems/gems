@@ -1,5 +1,3 @@
-require "helper"
-
 describe Gems do
   after do
     Gems.reset

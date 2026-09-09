@@ -1,5 +1,3 @@
-require "helper"
-
 describe Gems::AbstractClient do
   it "raises NotImplementedError if new isn't overritten" do
     foo_client = Class.new do

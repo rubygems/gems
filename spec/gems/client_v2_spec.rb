@@ -1,5 +1,3 @@
-require "helper"
-
 describe Gems::V2::Client do
   after do
     Gems.reset
