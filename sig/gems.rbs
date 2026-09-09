@@ -30,6 +30,8 @@ module Gems
   def self.latest: (?options options) -> untyped
   def self.just_updated: (?options options) -> untyped
   def self.api_key: () -> String
+  def self.create_api_key: (String name, ?options options) -> String
+  def self.update_api_key: (String key, ?options options) -> String
   def self.dependencies: (*String gems) -> untyped
   def self.reverse_dependencies: (String gem_name, ?options options) -> untyped
 
@@ -197,7 +199,7 @@ module Gems
     FORM_URLENCODED: String
     MULTIPART_FORM_DATA: String
     OCTET_STREAM: String
-    HTTP_METHODS: Hash[Symbol, singleton(Net::HTTP::Get) | singleton(Net::HTTP::Post) | singleton(Net::HTTP::Put) | singleton(Net::HTTP::Delete)]
+    HTTP_METHODS: Hash[Symbol, singleton(Net::HTTP::Get) | singleton(Net::HTTP::Post) | singleton(Net::HTTP::Put) | singleton(Net::HTTP::Patch) | singleton(Net::HTTP::Delete)]
 
     attr_accessor user_agent: String
 
@@ -263,6 +265,7 @@ module Gems
     def delete: (String path, ?Hash[Symbol | String, untyped] data, ?String content_type, ?String request_host) -> String
     def post: (String path, ?request_body data, ?String content_type, ?String request_host) -> String
     def put: (String path, ?request_body data, ?String content_type, ?String request_host) -> String
+    def patch: (String path, ?request_body data, ?String content_type, ?String request_host) -> String
 
     private
 
@@ -310,6 +313,8 @@ module Gems
       def latest: (?options options) -> untyped
       def just_updated: (?options options) -> untyped
       def api_key: () -> String
+      def create_api_key: (String name, ?options options) -> String
+      def update_api_key: (String key, ?options options) -> String
       def dependencies: (*String gems) -> untyped
       def reverse_dependencies: (String gem_name, ?options options) -> untyped
     end

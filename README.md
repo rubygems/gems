@@ -92,12 +92,16 @@ Gems.latest
 # Returns the 50 most recently updated gems
 Gems.just_updated
 
-# Retrieve your API key using HTTP basic authentication.
+# Create an API key using HTTP basic authentication.
+# The key is only returned once, so store it somewhere safe.
 Gems.configure do |config|
   config.username = 'nick@gemcutter.org'
   config.password = 'schwwwwing'
 end
-Gems.api_key
+Gems.create_api_key 'ci-push', push_rubygem: true
+
+# Update the scopes of an API key.
+Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
 
 # Return an array of gem dependency details for all versions of all the given gems.
 Gems.dependencies ['rails', 'thor']

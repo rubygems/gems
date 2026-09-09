@@ -467,6 +467,52 @@ RSpec.describe Gems::V1::Client do
     end
   end
 
+  describe "#create_api_key" do
+    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+
+    before { stub_post("/api/v1/api_key.json").to_return(body: fixture("api_key.json")) }
+
+    it "posts the correct resource with basic authentication" do
+      client.create_api_key("ci-push", push_rubygem: true)
+
+      expect(a_post("/api/v1/api_key.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing],
+        body: {name: "ci-push", push_rubygem: "true"})).to have_been_made
+    end
+
+    it "posts the name without options" do
+      client.create_api_key("ci-push")
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
+    end
+
+    it "returns the new API key" do
+      expect(client.create_api_key("ci-push", push_rubygem: true)).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+    end
+
+    it "raises KeyError when the response has no key" do
+      stub_post("/api/v1/api_key.json").to_return(body: "{}")
+
+      expect { client.create_api_key("ci-push") }.to raise_error(KeyError)
+    end
+  end
+
+  describe "#update_api_key" do
+    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+
+    before { stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated") }
+
+    it "patches the correct resource with basic authentication" do
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
+
+      expect(a_request(:patch, rubygems_url("/api/v1/api_key")).with(basic_auth: %w[nick@gemcutter.org schwwwwing],
+        body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97")).to eq("Scopes for the API key ci-push updated")
+    end
+  end
+
   describe "#dependencies" do
     before { stub_get("/api/v1/dependencies?gems=rails,thor").to_return(body: fixture("dependencies")) }
 

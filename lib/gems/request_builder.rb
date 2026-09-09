@@ -18,6 +18,7 @@ module Gems
       get: Net::HTTP::Get,
       post: Net::HTTP::Post,
       put: Net::HTTP::Put,
+      patch: Net::HTTP::Patch,
       delete: Net::HTTP::Delete
     }.freeze
 
@@ -45,7 +46,7 @@ module Gems
     # fields (sent as multipart/form-data), or a String (sent with the given content type).
     #
     # @api public
-    # @param http_method [Symbol] the HTTP method (:get, :post, :put, :delete)
+    # @param http_method [Symbol] the HTTP method (:get, :post, :put, :patch, :delete)
     # @param uri [URI::Generic] the request URI
     # @param params [Hash] query parameters to append to the URI
     # @param body [Hash, Array, String, nil] the request body

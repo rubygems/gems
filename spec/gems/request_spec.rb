@@ -101,7 +101,7 @@ RSpec.describe Gems::Request do
     end
   end
 
-  %i[post put].each do |http_method|
+  %i[post put patch].each do |http_method|
     describe "##{http_method}" do
       it "performs a #{http_method.upcase} request and returns the body" do
         stub_request(http_method, rubygems_url("/path")).to_return(body: "body")

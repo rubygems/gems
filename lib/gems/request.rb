@@ -114,6 +114,21 @@ module Gems
       request(:put, path, data, content_type, request_host)
     end
 
+    # Perform a PATCH request
+    #
+    # @api public
+    # @param path [String] the request path
+    # @param data [Hash, Array, String] the request body (form fields, multipart fields, or raw data)
+    # @param content_type [String] the content type of the body
+    # @param request_host [String] the host for the request
+    # @return [String] the response body
+    # @raise [HTTPError] if the response is not successful
+    # @example Update the scopes of an API key
+    #   client.patch("/api/v1/api_key", api_key: "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
+    def patch(path, data = {}, content_type = FORM_URLENCODED, request_host = host)
+      request(:patch, path, data, content_type, request_host)
+    end
+
     private
 
     # Perform an HTTP request

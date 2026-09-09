@@ -21,7 +21,7 @@ RSpec.describe Gems::RequestBuilder do
     end
 
     it "raises an ArgumentError for an unsupported HTTP method" do
-      expect { builder.build(http_method: :patch, uri:) }.to raise_error(ArgumentError, "Unsupported HTTP method: patch")
+      expect { builder.build(http_method: :head, uri:) }.to raise_error(ArgumentError, "Unsupported HTTP method: head")
     end
 
     it "sets the request URI" do

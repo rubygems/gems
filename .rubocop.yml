@@ -40,6 +40,13 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*
 
+Metrics/ClassLength:
+  Max: 120
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
