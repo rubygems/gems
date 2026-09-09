@@ -66,6 +66,16 @@ module Gems
       initialize_authenticator
     end
 
+    # Summarize the client for the console
+    #
+    # @api public
+    # @return [String] the summary, which includes the host and authenticator but never credentials
+    # @example Inspect a client
+    #   client.inspect # => #<Gems::Client host="https://rubygems.org" authenticator=#<Gems::ApiKeyAuthenticator>>
+    def inspect
+      "#<#{self.class} host=#{host.inspect} authenticator=#{authenticator.inspect}>"
+    end
+
     # The timeout for opening connections in seconds
     # @api public
     # @return [Integer] the timeout for opening connections in seconds

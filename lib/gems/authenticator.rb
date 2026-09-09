@@ -16,5 +16,15 @@ module Gems
     def header(_request)
       {}
     end
+
+    # Summarize the authenticator for the console
+    #
+    # @api public
+    # @return [String] the summary, which never includes credentials
+    # @example Inspect an authenticator
+    #   authenticator.inspect # => #<Gems::Authenticator>
+    def inspect
+      "#<#{self.class}>"
+    end
   end
 end

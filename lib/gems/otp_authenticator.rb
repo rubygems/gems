@@ -47,5 +47,15 @@ module Gems
     def header(request)
       authenticator.header(request).merge(OTP_HEADER => otp)
     end
+
+    # Summarize the authenticator for the console
+    #
+    # @api public
+    # @return [String] the summary, which includes the wrapped authenticator but not the passcode
+    # @example Inspect an OTP authenticator
+    #   authenticator.inspect # => #<Gems::OtpAuthenticator authenticator=#<Gems::ApiKeyAuthenticator>>
+    def inspect
+      "#<#{self.class} authenticator=#{authenticator.inspect}>"
+    end
   end
 end

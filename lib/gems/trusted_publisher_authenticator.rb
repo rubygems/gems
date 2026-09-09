@@ -86,6 +86,16 @@ module Gems
       {AUTHENTICATION_HEADER => api_key || exchange_token!.fetch("rubygems_api_key")}
     end
 
+    # Summarize the authenticator for the console
+    #
+    # @api public
+    # @return [String] the summary, which includes the host but not the ID token or API key
+    # @example Inspect a trusted publisher authenticator
+    #   authenticator.inspect # => #<Gems::TrustedPublisherAuthenticator host="https://rubygems.org">
+    def inspect
+      "#<#{self.class} host=#{host.inspect}>"
+    end
+
     # Exchange the OIDC ID token for a RubyGems API key
     #
     # @api public

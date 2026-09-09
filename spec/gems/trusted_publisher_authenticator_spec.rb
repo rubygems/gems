@@ -120,4 +120,10 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect(a_request(:post, exchange_url)).to have_been_made.once
     end
   end
+
+  describe "#inspect" do
+    it "shows the host without the ID token" do
+      expect(authenticator.inspect).to eq('#<Gems::TrustedPublisherAuthenticator host="https://rubygems.org">')
+    end
+  end
 end

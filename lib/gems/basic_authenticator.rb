@@ -41,5 +41,15 @@ module Gems
     def header(_request)
       {AUTHENTICATION_HEADER => "Basic #{["#{username}:#{password}"].pack("m0")}"}
     end
+
+    # Summarize the authenticator for the console
+    #
+    # @api public
+    # @return [String] the summary, which includes the username but not the password
+    # @example Inspect a basic authenticator
+    #   authenticator.inspect # => #<Gems::BasicAuthenticator username="nick@gemcutter.org">
+    def inspect
+      "#<#{self.class} username=#{username.inspect}>"
+    end
   end
 end

@@ -26,4 +26,10 @@ RSpec.describe Gems::BasicAuthenticator do
       expect(authenticator.header(nil)["Authorization"]).not_to include("\n")
     end
   end
+
+  describe "#inspect" do
+    it "shows the username without the password" do
+      expect(authenticator.inspect).to eq('#<Gems::BasicAuthenticator username="user">')
+    end
+  end
 end

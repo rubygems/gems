@@ -6,4 +6,10 @@ RSpec.describe Gems::Authenticator do
       expect(authenticator.header(Net::HTTP::Get.new("/"))).to eq({})
     end
   end
+
+  describe "#inspect" do
+    it "shows the class" do
+      expect(authenticator.inspect).to eq("#<Gems::Authenticator>")
+    end
+  end
 end

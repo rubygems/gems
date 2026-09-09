@@ -16,4 +16,10 @@ RSpec.describe Gems::ApiKeyAuthenticator do
       expect(authenticator.header(Net::HTTP::Get.new("/"))).to eq("Authorization" => TEST_KEY)
     end
   end
+
+  describe "#inspect" do
+    it "shows the class without the key" do
+      expect(authenticator.inspect).to eq("#<Gems::ApiKeyAuthenticator>")
+    end
+  end
 end

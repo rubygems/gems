@@ -114,6 +114,14 @@ RSpec.describe Gems::BaseClient do
     end
   end
 
+  describe "#inspect" do
+    it "shows the host and authenticator without credentials" do
+      client = described_class.new(host: "http://example.com", key: TEST_KEY, username: nil, password: nil)
+
+      expect(client.inspect).to eq('#<Gems::BaseClient host="http://example.com" authenticator=#<Gems::ApiKeyAuthenticator>>')
+    end
+  end
+
   describe "#host=" do
     it "sets the host" do
       client.host = "http://example.com"

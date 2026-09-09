@@ -90,6 +90,7 @@ module Gems
     AUTHENTICATION_HEADER: String
 
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
+    def inspect: () -> String
   end
 
   class ApiKeyAuthenticator < Authenticator
@@ -105,6 +106,7 @@ module Gems
 
     def initialize: (username: String, password: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
+    def inspect: () -> String
   end
 
   class OtpAuthenticator < Authenticator
@@ -115,6 +117,7 @@ module Gems
 
     def initialize: (authenticator: Authenticator, otp: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
+    def inspect: () -> String
   end
 
   class TrustedPublisherAuthenticator < Authenticator
@@ -129,6 +132,7 @@ module Gems
 
     def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
+    def inspect: () -> String
     def exchange_token!: () -> untyped
   end
 
@@ -335,6 +339,7 @@ module Gems
 
     def initialize: (?options options) -> void
     def host=: (String host) -> void
+    def inspect: () -> String
     def user_agent=: (String user_agent) -> void
     def open_timeout: () -> Integer
     def open_timeout=: (Integer open_timeout) -> void

@@ -37,4 +37,10 @@ RSpec.describe Gems::OtpAuthenticator do
       expect(authenticator.header(request)).to eq("OTP" => "123456")
     end
   end
+
+  describe "#inspect" do
+    it "shows the wrapped authenticator without the passcode" do
+      expect(authenticator.inspect).to eq("#<Gems::OtpAuthenticator authenticator=#<Gems::ApiKeyAuthenticator>>")
+    end
+  end
 end
