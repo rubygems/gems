@@ -13,7 +13,7 @@ RSpec.describe Gems::Request do
 
   describe "#request_builder" do
     it "returns a request builder with the client's user agent" do
-      client.user_agent = "Custom User Agent"
+      client = Gems::Client.new(user_agent: "Custom User Agent")
 
       expect(client.request_builder.user_agent).to eq("Custom User Agent")
     end
@@ -68,11 +68,35 @@ RSpec.describe Gems::Request do
           .to have_been_made
       end
 
+      it "sends a form Content-Type header by default" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path")
+
+        expect(a_request(http_method, rubygems_url("/path"))
+          .with(headers: {"Content-Type" => "application/x-www-form-urlencoded"})).to have_been_made
+      end
+
+      it "sends the given Content-Type header" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", {}, "application/json")
+
+        expect(a_request(http_method, rubygems_url("/path")).with(headers: {"Content-Type" => "application/json"})).to have_been_made
+      end
+
       it "uses a custom host" do
         stub_request(http_method, "http://example.com/path")
         client.public_send(http_method, "/path", {}, described_class::FORM_URLENCODED, "http://example.com")
 
         expect(a_request(http_method, "http://example.com/path")).to have_been_made
+      end
+
+      it "defaults to no parameters, a form content type, and the client's host" do
+        stub_request(http_method, rubygems_url("/path"))
+        allow(client).to receive(:request).and_call_original
+        client.public_send(http_method, "/path")
+
+        expect(client).to have_received(:request)
+          .with(http_method, "/path", {}, described_class::FORM_URLENCODED, Gems::Configuration::DEFAULT_HOST)
       end
     end
   end
@@ -129,6 +153,15 @@ RSpec.describe Gems::Request do
         client.public_send(http_method, "/path", {}, described_class::FORM_URLENCODED, "http://example.com")
 
         expect(a_request(http_method, "http://example.com/path")).to have_been_made
+      end
+
+      it "defaults to an empty form body, a form content type, and the client's host" do
+        stub_request(http_method, rubygems_url("/path"))
+        allow(client).to receive(:request).and_call_original
+        client.public_send(http_method, "/path")
+
+        expect(client).to have_received(:request)
+          .with(http_method, "/path", {}, described_class::FORM_URLENCODED, Gems::Configuration::DEFAULT_HOST)
       end
     end
   end
@@ -200,6 +233,35 @@ RSpec.describe Gems::Request do
       expect { client.get("/path") }.to raise_error(Gems::GemError, "Internal Server Error")
     end
 
+    it "sends a form body" do
+      stub_post("/path")
+      client.post("/path", {gem_name: "gems"})
+
+      expect(a_post("/path").with(body: "gem_name=gems", headers: {"Content-Type" => "application/x-www-form-urlencoded"}))
+        .to have_been_made
+    end
+
+    it "sends a binary body with its content type" do
+      stub_post("/path")
+      client.post("/path", "data", "application/json")
+
+      expect(a_post("/path").with(body: "data", headers: {"Content-Type" => "application/json"})).to have_been_made
+    end
+
+    it "sends a Hash as multipart fields for a multipart content type" do
+      stub_post("/path")
+      client.post("/path", {gem: "data"}, "multipart/form-data")
+
+      expect(a_post("/path").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
+    end
+
+    it "sends the content type without a body" do
+      stub_get("/path")
+      client.get("/path", {}, "application/json")
+
+      expect(a_get("/path").with(headers: {"Content-Type" => "application/json"})).to have_been_made
+    end
+
     it "performs requests through the connection" do
       stub_get("/path")
       allow(client.connection).to receive(:perform).and_call_original
@@ -224,6 +286,16 @@ RSpec.describe Gems::Request do
 
     it "keeps a String" do
       expect(client.send(:body_for, "data", "application/octet-stream")).to eq("data")
+    end
+
+    it "keeps a String for a multipart content type" do
+      expect(client.send(:body_for, "data", "multipart/form-data")).to eq("data")
+    end
+
+    it "converts a Hash subclass to multipart fields" do
+      hash = Class.new(Hash).new.merge!(gem: "data")
+
+      expect(client.send(:body_for, hash, "multipart/form-data")).to eq([[:gem, "data"]])
     end
   end
 end

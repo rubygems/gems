@@ -81,7 +81,7 @@ module Gems
       # @example
       #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
       def yank(gem_name, gem_version = nil, options = {})
-        gem_version ||= info(gem_name)["version"]
+        gem_version ||= info(gem_name).fetch("version")
         delete("/api/v1/gems/yank", options.merge(gem_name: gem_name, version: gem_version))
       end
 
@@ -96,7 +96,7 @@ module Gems
       # @example
       #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
       def unyank(gem_name, gem_version = nil, options = {})
-        gem_version ||= info(gem_name)["version"]
+        gem_version ||= info(gem_name).fetch("version")
         put("/api/v1/gems/unyank", options.merge(gem_name: gem_name, version: gem_version))
       end
 
@@ -134,7 +134,7 @@ module Gems
       #   Gems.total_downloads 'rails_admin', '0.0.1'
       def total_downloads(gem_name = nil, gem_version = nil)
         response = if gem_name
-          get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name)["version"]}.json")
+          get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name).fetch("version")}.json")
         else
           get("/api/v1/downloads.json")
         end
@@ -149,7 +149,7 @@ module Gems
       #   Gems.most_downloaded
       def most_downloaded
         response = get("/api/v1/downloads/all.json")
-        JSON.parse(response)["gems"]
+        JSON.parse(response).fetch("gems")
       end
 
       # View all owners of a gem that you own

@@ -1,12 +1,9 @@
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
-unless RUBY_ENGINE.eql?("jruby")
+unless $PROGRAM_NAME.include?("mutant") || RUBY_ENGINE.eql?("jruby")
   require "simplecov"
 
-  SimpleCov.start do
-    enable_coverage :branch
-    minimum_coverage line: 100
-  end
+  SimpleCov.start "strict"
 end
 
 require "gems"

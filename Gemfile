@@ -5,6 +5,7 @@ gemspec
 
 gem "irb", ">= 1.14.1"
 gem "jruby-openssl", platforms: :jruby
+gem "mutant-rspec", ">= 0.16.1", platforms: :mri
 gem "rake", ">= 13.0.6"
 gem "rbs", ">= 3.2.1", platforms: :mri
 gem "rspec", ">= 3.13"

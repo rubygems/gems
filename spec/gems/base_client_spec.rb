@@ -31,10 +31,11 @@ RSpec.describe Gems::BaseClient do
       expect(client.user_agent).to eq("Custom User Agent")
     end
 
-    it "updates the request builder" do
+    it "updates an existing request builder" do
+      builder = client.request_builder
       client.user_agent = "Custom User Agent"
 
-      expect(client.request_builder.user_agent).to eq("Custom User Agent")
+      expect(builder.user_agent).to eq("Custom User Agent")
     end
   end
 

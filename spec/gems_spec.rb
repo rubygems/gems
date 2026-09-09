@@ -36,7 +36,13 @@ describe Gems do
 
   describe ".new" do
     it "returns a Gems::Client" do
-      expect(Gems.new).to be_a Gems::Client
+      expect(described_class.new).to be_an_instance_of(Gems::Client)
+    end
+
+    it "passes options to the client" do
+      client = described_class.new(key: TEST_KEY, host: "http://example.com")
+
+      expect([client.key, client.host]).to eq([TEST_KEY, "http://example.com"])
     end
   end
 

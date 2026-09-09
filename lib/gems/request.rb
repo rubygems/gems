@@ -59,7 +59,7 @@ module Gems
     # @api public
     # @param path [String] the request path
     # @param data [Hash] the query parameters
-    # @param content_type [String] ignored for GET requests
+    # @param content_type [String] the Content-Type header to send
     # @param request_host [String] the host for the request
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
@@ -74,7 +74,7 @@ module Gems
     # @api public
     # @param path [String] the request path
     # @param data [Hash] the query parameters
-    # @param content_type [String] ignored for DELETE requests
+    # @param content_type [String] the Content-Type header to send
     # @param request_host [String] the host for the request
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
@@ -127,7 +127,8 @@ module Gems
     def request(http_method, path, data, content_type, request_host)
       uri = URI.join(request_host, path)
       request = request_builder.build(http_method:, uri:, params: query_params(http_method, data),
-        body: request_body(http_method, data, content_type), content_type:, authenticator:)
+        body: request_body(http_method, data, content_type), content_type:, headers: {"Content-Type" => content_type},
+        authenticator:)
       response = redirect_handler.handle(response: connection.perform(request:), request:, authenticator:)
       response_parser.parse(response:)
     end
@@ -161,9 +162,12 @@ module Gems
     # @param content_type [String] the content type of the body
     # @return [Hash, Array, String] the request body
     def body_for(data, content_type)
-      return data.to_a if data.is_a?(Hash) && content_type == RequestBuilder::MULTIPART_FORM_DATA
+      return data unless data.is_a?(Hash)
 
-      data
+      case content_type
+      when RequestBuilder::MULTIPART_FORM_DATA then data.to_a
+      else data
+      end
     end
   end
 end

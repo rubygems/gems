@@ -23,6 +23,15 @@ rescue LoadError
   end
 end
 
+desc "Run mutation tests (skipped on Rubies without Mutant)"
+task :mutant do
+  if Gem.loaded_specs.key?("mutant-rspec")
+    sh "bundle exec mutant run"
+  else
+    warn "Mutant is not available on Ruby #{RUBY_VERSION}"
+  end
+end
+
 require "yard"
 
 YARD::Rake::YardocTask.new(:yard) do |t|
@@ -38,10 +47,10 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new(:yardstick) do |verify|
-  verify.threshold = 91.1
+  verify.threshold = 92.1
 end
 
 desc "Run linters"
 task lint: %i[rubocop standard]
 
-task default: %i[spec lint steep yardstick]
+task default: %i[spec lint mutant steep yardstick]

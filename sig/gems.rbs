@@ -7,6 +7,7 @@ module Gems
 
   extend Configuration
   include AbstractClient
+  extend SingleForwardable
 
   def self.new: (?options options) -> Client
   def self.info: (String gem_name) -> untyped
@@ -45,9 +46,8 @@ module Gems
     def self.included: (Module base) -> void
 
     module ClassMethods : Module
-      def new: (?options options) -> untyped
+      def new: (*untyped) -> untyped
       def method_missing: (Symbol method, *untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
-      def respond_to?: (Symbol | String method_name, ?bool include_private) -> bool
       def respond_to_missing?: (Symbol | String method_name, ?bool include_private) -> bool
     end
   end
@@ -285,6 +285,7 @@ module Gems
 
   module V1
     include AbstractClient
+    extend SingleForwardable
 
     def self.new: (?options options) -> Client
 
@@ -316,6 +317,7 @@ module Gems
 
   module V2
     include AbstractClient
+    extend SingleForwardable
 
     def self.new: (?options options) -> Client
 

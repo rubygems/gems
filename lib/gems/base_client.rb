@@ -41,9 +41,8 @@ module Gems
     # @example Create a client with HTTP basic authentication
     #   client = Gems::Client.new(username: "nick@gemcutter.org", password: "schwwwwing")
     def initialize(options = {})
-      options = Gems.options.merge(options)
-      Configuration::VALID_OPTIONS_KEYS.each do |key|
-        public_send(:"#{key}=", options[key])
+      Gems.options.merge(options).slice(*Configuration::VALID_OPTIONS_KEYS).each do |key, value|
+        public_send(:"#{key}=", value)
       end
     end
 
@@ -56,7 +55,7 @@ module Gems
     #   client.user_agent = "Custom User Agent"
     def user_agent=(user_agent)
       @user_agent = user_agent
-      request_builder.user_agent = user_agent
+      @request_builder&.user_agent = user_agent
     end
   end
 end

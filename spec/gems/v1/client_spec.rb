@@ -1,0 +1,505 @@
+RSpec.describe Gems::V1::Client do
+  subject(:client) { described_class.new(key: nil, username: nil, password: nil) }
+
+  it "is a Gems::BaseClient" do
+    expect(client).to be_a(Gems::BaseClient)
+  end
+
+  describe "#info" do
+    context "when the gem exists" do
+      before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
+
+      it "gets the correct resource" do
+        client.info("rails")
+
+        expect(a_get("/api/v1/gems/rails.json")).to have_been_made
+      end
+
+      it "returns information about the gem" do
+        expect(client.info("rails")["name"]).to eq("rails")
+      end
+    end
+
+    context "when the response is not JSON" do
+      before { stub_get("/api/v1/gems/nonexistentgem.json").to_return(body: "This rubygem could not be found.") }
+
+      it "returns an empty hash" do
+        expect(client.info("nonexistentgem")).to eq({})
+      end
+    end
+  end
+
+  describe "#search" do
+    before do
+      stub_get("/api/v1/search.json?query=cucumber").to_return(body: fixture("search.json"))
+      stub_get("/api/v1/search.json?query=cucumber&page=2").to_return(body: fixture("search.json"))
+    end
+
+    it "gets the correct resource" do
+      client.search("cucumber")
+
+      expect(a_get("/api/v1/search.json?query=cucumber")).to have_been_made
+    end
+
+    it "returns the gems that match the query" do
+      expect(client.search("cucumber").first["name"]).to eq("cucumber")
+    end
+
+    it "passes options as query parameters" do
+      client.search("cucumber", page: 2)
+
+      expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
+    end
+  end
+
+  describe "#gems" do
+    context "without a user handle" do
+      before { stub_get("/api/v1/gems.json").to_return(body: fixture("gems.json")) }
+
+      it "gets the correct resource" do
+        client.gems
+
+        expect(a_get("/api/v1/gems.json")).to have_been_made
+      end
+
+      it "returns the gems you own" do
+        expect(client.gems.first["name"]).to eq("exchb")
+      end
+    end
+
+    context "with a user handle" do
+      before { stub_get("/api/v1/owners/sferik/gems.json").to_return(body: fixture("gems.json")) }
+
+      it "gets the correct resource" do
+        client.gems("sferik")
+
+        expect(a_get("/api/v1/owners/sferik/gems.json")).to have_been_made
+      end
+
+      it "returns the gems the user owns" do
+        expect(client.gems("sferik").first["name"]).to eq("exchb")
+      end
+    end
+  end
+
+  describe "#push" do
+    let(:gem) { fixture("gems-0.0.8.gem") }
+    let(:gem_data) { File.binread(File.join(fixture_path, "gems-0.0.8.gem")) }
+
+    before do
+      stub_post("/api/v1/gems").to_return(body: fixture("push"))
+      allow(client).to receive(:post).and_call_original
+    end
+
+    it "posts the gem as a binary body to the default host" do
+      client.push(gem)
+
+      expect(client).to have_received(:post).with("/api/v1/gems", gem_data, "application/octet-stream", Gems::Configuration::DEFAULT_HOST)
+    end
+
+    it "returns the response body" do
+      expect(client.push(gem)).to eq("Successfully registered gem: gems (0.0.8)")
+    end
+
+    it "pushes to the default host even when the client has another host" do
+      client.host = "http://example.com"
+      client.push(gem)
+
+      expect(a_post("/api/v1/gems")).to have_been_made
+    end
+
+    it "pushes to a custom host" do
+      stub_request(:post, "http://example.com/api/v1/gems").to_return(body: fixture("push"))
+      client.push(gem, "http://example.com")
+
+      expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
+    end
+
+    context "with attestations" do
+      let(:attestations) { [fixture("attestations/one.json"), fixture("attestations/two.json")] }
+      let(:fields) do
+        [
+          ["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}],
+          ["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}]
+        ]
+      end
+
+      it "posts multipart fields for the gem and the attestations" do
+        client.push(gem, attestations:)
+
+        expect(client).to have_received(:post).with("/api/v1/gems", fields, "multipart/form-data", Gems::Configuration::DEFAULT_HOST)
+      end
+
+      it "pushes to a custom host" do
+        stub_request(:post, "http://example.com/api/v1/gems").to_return(body: fixture("push"))
+        client.push(gem, "http://example.com", attestations:)
+
+        expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
+      end
+
+      it "returns the response body" do
+        expect(client.push(gem, attestations:)).to eq("Successfully registered gem: gems (0.0.8)")
+      end
+    end
+  end
+
+  describe "#yank" do
+    before { stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8").to_return(body: fixture("yank")) }
+
+    it "deletes the correct resource" do
+      client.yank("gems", "0.0.8")
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8")).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.yank("gems", "0.0.8")).to eq("Successfully yanked gem: gems (0.0.8)")
+    end
+
+    it "passes options as query parameters" do
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
+      client.yank("gems", "0.0.8", platform: "java")
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/gems/gems.json").to_return(body: fixture("rails.json"))
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
+      client.yank("gems")
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
+    end
+
+    it "raises KeyError when the gem has no version" do
+      stub_get("/api/v1/gems/gems.json").to_return(body: "{}")
+
+      expect { client.yank("gems") }.to raise_error(KeyError)
+    end
+  end
+
+  describe "#unyank" do
+    before { stub_put("/api/v1/gems/unyank").to_return(body: fixture("unyank")) }
+
+    it "puts the correct resource" do
+      client.unyank("gems", "0.0.8")
+
+      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.unyank("gems", "0.0.8")).to eq("Successfully unyanked gem: gems (0.0.8)")
+    end
+
+    it "passes options in the body" do
+      client.unyank("gems", "0.0.8", platform: "java")
+
+      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/gems/gems.json").to_return(body: fixture("rails.json"))
+      client.unyank("gems")
+
+      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "3.0.9"})).to have_been_made
+    end
+
+    it "raises KeyError when the gem has no version" do
+      stub_get("/api/v1/gems/gems.json").to_return(body: "{}")
+
+      expect { client.unyank("gems") }.to raise_error(KeyError)
+    end
+  end
+
+  describe "#versions" do
+    before { stub_get("/api/v1/versions/script_helpers.json").to_return(body: fixture("script_helpers.json")) }
+
+    it "gets the correct resource" do
+      client.versions("script_helpers")
+
+      expect(a_get("/api/v1/versions/script_helpers.json")).to have_been_made
+    end
+
+    it "returns the gem's versions" do
+      expect(client.versions("script_helpers").first["number"]).to eq("0.1.0")
+    end
+  end
+
+  describe "#latest_version" do
+    before { stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: fixture("script_helpers/latest.json")) }
+
+    it "gets the correct resource" do
+      client.latest_version("script_helpers")
+
+      expect(a_get("/api/v1/versions/script_helpers/latest.json")).to have_been_made
+    end
+
+    it "returns the gem's latest version" do
+      expect(client.latest_version("script_helpers")["version"]).to eq("0.3.0")
+    end
+  end
+
+  describe "#total_downloads" do
+    context "without a gem name" do
+      before { stub_get("/api/v1/downloads.json").to_return(body: fixture("total_downloads.json")) }
+
+      it "gets the correct resource" do
+        client.total_downloads
+
+        expect(a_get("/api/v1/downloads.json")).to have_been_made
+      end
+
+      it "returns the total downloads with symbolized keys" do
+        expect(client.total_downloads[:total]).to eq(244_368_950)
+      end
+    end
+
+    context "with a gem name and version" do
+      before { stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json")) }
+
+      it "gets the correct resource" do
+        client.total_downloads("rails_admin", "0.0.0")
+
+        expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
+      end
+
+      it "returns the gem's downloads with symbolized keys" do
+        expect(client.total_downloads("rails_admin", "0.0.0")[:version_downloads]).to eq(3142)
+      end
+    end
+
+    context "with a gem name but no version" do
+      before do
+        stub_get("/api/v1/gems/rails_admin.json").to_return(body: fixture("rails.json"))
+        stub_get("/api/v1/downloads/rails_admin-3.0.9.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      end
+
+      it "looks up the latest version" do
+        client.total_downloads("rails_admin")
+
+        expect(a_get("/api/v1/downloads/rails_admin-3.0.9.json")).to have_been_made
+      end
+
+      it "raises KeyError when the gem has no version" do
+        stub_get("/api/v1/gems/rails_admin.json").to_return(body: "{}")
+
+        expect { client.total_downloads("rails_admin") }.to raise_error(KeyError)
+      end
+    end
+  end
+
+  describe "#most_downloaded" do
+    before { stub_get("/api/v1/downloads/all.json").to_return(body: fixture("most_downloaded.json")) }
+
+    it "gets the correct resource" do
+      client.most_downloaded
+
+      expect(a_get("/api/v1/downloads/all.json")).to have_been_made
+    end
+
+    it "returns the most downloaded gem versions" do
+      expect(client.most_downloaded.first.first["full_name"]).to eq("abstract-1.0.0")
+    end
+
+    it "raises KeyError when the response has no gems" do
+      stub_get("/api/v1/downloads/all.json").to_return(body: "{}")
+
+      expect { client.most_downloaded }.to raise_error(KeyError)
+    end
+  end
+
+  describe "#owners" do
+    before { stub_get("/api/v1/gems/gems/owners.json").to_return(body: fixture("owners.json")) }
+
+    it "gets the correct resource" do
+      client.owners("gems")
+
+      expect(a_get("/api/v1/gems/gems/owners.json")).to have_been_made
+    end
+
+    it "returns the gem's owners" do
+      expect(client.owners("gems").first["email"]).to eq("sferik@gmail.com")
+    end
+  end
+
+  describe "#add_owner" do
+    before { stub_post("/api/v1/gems/gems/owners").to_return(body: fixture("add_owner")) }
+
+    it "posts the correct resource" do
+      client.add_owner("gems", "sferik@gmail.com")
+
+      expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.add_owner("gems", "sferik@gmail.com")).to eq("Owner added successfully.")
+    end
+  end
+
+  describe "#remove_owner" do
+    before { stub_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com").to_return(body: fixture("remove_owner")) }
+
+    it "deletes the correct resource" do
+      client.remove_owner("gems", "sferik@gmail.com")
+
+      expect(a_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com")).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.remove_owner("gems", "sferik@gmail.com")).to eq("Owner removed successfully.")
+    end
+  end
+
+  describe "#web_hooks" do
+    before { stub_get("/api/v1/web_hooks.json").to_return(body: fixture("web_hooks.json")) }
+
+    it "gets the correct resource" do
+      client.web_hooks
+
+      expect(a_get("/api/v1/web_hooks.json")).to have_been_made
+    end
+
+    it "returns the registered web hooks" do
+      expect(client.web_hooks["all gems"].first["url"]).to eq("http://example.com")
+    end
+  end
+
+  describe "#add_web_hook" do
+    before { stub_post("/api/v1/web_hooks").to_return(body: fixture("add_web_hook")) }
+
+    it "posts the correct resource" do
+      client.add_web_hook("*", "http://example.com")
+
+      expect(a_post("/api/v1/web_hooks").with(body: {gem_name: "*", url: "http://example.com"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.add_web_hook("*", "http://example.com"))
+        .to eq("Successfully created webhook for all gems to http://example.com")
+    end
+  end
+
+  describe "#remove_web_hook" do
+    before { stub_delete("/api/v1/web_hooks/remove?gem_name=*&url=http://example.com").to_return(body: fixture("remove_web_hook")) }
+
+    it "deletes the correct resource" do
+      client.remove_web_hook("*", "http://example.com")
+
+      expect(a_delete("/api/v1/web_hooks/remove?gem_name=*&url=http://example.com")).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.remove_web_hook("*", "http://example.com"))
+        .to eq("Successfully removed webhook for all gems to http://example.com")
+    end
+  end
+
+  describe "#fire_web_hook" do
+    before { stub_post("/api/v1/web_hooks/fire").to_return(body: fixture("fire_web_hook")) }
+
+    it "posts the correct resource" do
+      client.fire_web_hook("*", "http://example.com")
+
+      expect(a_post("/api/v1/web_hooks/fire").with(body: {gem_name: "*", url: "http://example.com"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.fire_web_hook("*", "http://example.com"))
+        .to eq("Successfully deployed webhook for gemcutter to http://example.com")
+    end
+  end
+
+  describe "#latest" do
+    before { stub_get("/api/v1/activity/latest.json").to_return(body: fixture("latest.json")) }
+
+    it "gets the correct resource" do
+      client.latest
+
+      expect(a_get("/api/v1/activity/latest.json")).to have_been_made
+    end
+
+    it "returns the latest gems" do
+      expect(client.latest.first["name"]).to eq("seanwalbran-rpm_contrib")
+    end
+
+    it "passes options as query parameters" do
+      stub_get("/api/v1/activity/latest.json?page=2").to_return(body: fixture("latest.json"))
+      client.latest(page: 2)
+
+      expect(a_get("/api/v1/activity/latest.json?page=2")).to have_been_made
+    end
+  end
+
+  describe "#just_updated" do
+    before { stub_get("/api/v1/activity/just_updated.json").to_return(body: fixture("just_updated.json")) }
+
+    it "gets the correct resource" do
+      client.just_updated
+
+      expect(a_get("/api/v1/activity/just_updated.json")).to have_been_made
+    end
+
+    it "returns the most recently updated gems" do
+      expect(client.just_updated.first["name"]).to eq("rspec-tag_matchers")
+    end
+
+    it "passes options as query parameters" do
+      stub_get("/api/v1/activity/just_updated.json?page=2").to_return(body: fixture("just_updated.json"))
+      client.just_updated(page: 2)
+
+      expect(a_get("/api/v1/activity/just_updated.json?page=2")).to have_been_made
+    end
+  end
+
+  describe "#api_key" do
+    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+
+    before { stub_get("/api/v1/api_key").to_return(body: fixture("api_key")) }
+
+    it "gets the correct resource with basic authentication" do
+      client.api_key
+
+      expect(a_get("/api/v1/api_key").with(basic_auth: %w[nick@gemcutter.org schwwwwing])).to have_been_made
+    end
+
+    it "returns the API key" do
+      expect(client.api_key).to eq("701243f217cdf23b1370c7b66b65ca97")
+    end
+  end
+
+  describe "#dependencies" do
+    before { stub_get("/api/v1/dependencies?gems=rails,thor").to_return(body: fixture("dependencies")) }
+
+    it "gets the correct resource" do
+      client.dependencies("rails", "thor")
+
+      expect(a_get("/api/v1/dependencies?gems=rails,thor")).to have_been_made
+    end
+
+    it "returns the unmarshaled dependencies" do
+      expect(client.dependencies("rails", "thor").first[:number]).to eq("3.0.9")
+    end
+  end
+
+  describe "#reverse_dependencies" do
+    before { stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json")) }
+
+    it "gets the correct resource" do
+      client.reverse_dependencies("rspec")
+
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json")).to have_been_made
+    end
+
+    it "returns the reverse dependencies" do
+      expect(client.reverse_dependencies("rspec")).to be_an_instance_of(Array)
+    end
+
+    it "passes options as query parameters" do
+      stub_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")
+        .to_return(body: fixture("reverse_dependencies_short.json"))
+      client.reverse_dependencies("rspec", only: "development")
+
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")).to have_been_made
+    end
+  end
+end
