@@ -33,7 +33,7 @@ module Gems
   def self.owners: (String gem_name) -> untyped
   def self.add_owner: (String gem_name, String owner) -> String
   def self.remove_owner: (String gem_name, String owner) -> String
-  def self.web_hooks: () -> untyped
+  def self.web_hooks: () -> Array[Hash[String, untyped]]
   def self.add_web_hook: (String gem_name, String url) -> String
   def self.remove_web_hook: (String gem_name, String url) -> String
   def self.fire_web_hook: (String gem_name, String url) -> String
@@ -164,6 +164,8 @@ module Gems
   end
 
   module API : Object, _Requests
+    WEB_HOOK_GEM_NAMES: Hash[String, String]
+
     def gem: (String gem_name) -> untyped
     def version: (String gem_name, String version) -> untyped
     def search: (String query, ?page: Integer?) -> untyped
@@ -179,7 +181,7 @@ module Gems
     def owners: (String gem_name) -> untyped
     def add_owner: (String gem_name, String owner) -> String
     def remove_owner: (String gem_name, String owner) -> String
-    def web_hooks: () -> untyped
+    def web_hooks: () -> Array[Hash[String, untyped]]
     def add_web_hook: (String gem_name, String url) -> String
     def remove_web_hook: (String gem_name, String url) -> String
     def fire_web_hook: (String gem_name, String url) -> String
