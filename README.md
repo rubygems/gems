@@ -77,7 +77,7 @@ Gems.add_owner 'josh@technicalpickles.com', 'gemcutter'
 # Remove a user's permission to manage a RubyGem you own.
 Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter'
 
-# Return all the webhooks registered under your account.
+# Return all the webhooks registered under your account, each with a gem_name ("*" for all gems).
 Gems.web_hooks
 
 # Add a webhook.

@@ -8,6 +8,9 @@ module Gems
   #
   # @api public
   module API
+    # Mapping of the gem name groupings returned by the web hooks endpoint to the names used to register hooks
+    WEB_HOOK_GEM_NAMES = {"all gems" => "*"}.freeze
+
     # Returns some basic information about the given gem
     #
     # @api public
@@ -210,14 +213,18 @@ module Gems
 
     # List the webhooks registered under your account
     #
+    # Each hook includes a "gem_name" key; hooks registered for all gems have a gem name of "*",
+    # matching the value used to register them.
+    #
     # @api public
     # @authenticated true
-    # @return [Hash]
+    # @return [Array<Hash>]
     # @example
-    #   Gems.web_hooks
+    #   Gems.web_hooks.map { |hook| hook["url"] }
     def web_hooks
-      response = get("/api/v1/web_hooks.json")
-      JSON.parse(response)
+      JSON.parse(get("/api/v1/web_hooks.json")).flat_map do |gem_name, hooks|
+        hooks.map { |hook| hook.merge("gem_name" => WEB_HOOK_GEM_NAMES.fetch(gem_name, gem_name)) }
+      end
     end
 
     # Create a webhook
