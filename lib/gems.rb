@@ -8,7 +8,7 @@ require "gems/v2"
 
 require "gems/client"
 require "gems/connection"
-require "gems/errors/too_many_redirects"
+require "gems/redirect_handler"
 require "gems/request_builder"
 require "gems/response_parser"
 require "gems/configuration"
