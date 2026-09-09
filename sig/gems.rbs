@@ -38,8 +38,7 @@ module Gems
   def self.fire_web_hook: (String gem_name, String url) -> String
   def self.latest: (?page: Integer?) -> untyped
   def self.just_updated: (?page: Integer?) -> untyped
-  def self.api_key: () -> String
-  def self.create_api_key: (String name, ?options options) -> String
+  def self.create_api_key: (String name, **untyped scopes) -> String
   def self.update_api_key: (String key, **bool scopes) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> untyped
   def self.reverse_dependencies: (String gem_name, ?only: String?) -> untyped
@@ -184,8 +183,7 @@ module Gems
     def fire_web_hook: (String gem_name, String url) -> String
     def latest: (?page: Integer?) -> untyped
     def just_updated: (?page: Integer?) -> untyped
-    def api_key: () -> String
-    def create_api_key: (String name, ?options options) -> String
+    def create_api_key: (String name, **untyped scopes) -> String
     def update_api_key: (String key, **bool scopes) -> String
     def exchange_trusted_publisher_token: (String id_token) -> untyped
     def reverse_dependencies: (String gem_name, ?only: String?) -> untyped
