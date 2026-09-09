@@ -8,6 +8,7 @@ require "gems/v2"
 
 require "gems/client"
 require "gems/connection"
+require "gems/request_builder"
 require "gems/configuration"
 
 # A Ruby wrapper for the RubyGems.org API
