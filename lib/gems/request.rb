@@ -126,14 +126,33 @@ module Gems
     # @return [String] the response body
     def request(http_method, path, data, content_type, request_host)
       uri = URI.join(request_host, path)
-      params, body = if %i[get delete].include?(http_method)
-        [data, nil]
-      else
-        [{}, body_for(data, content_type)]
-      end
-      request = request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
+      request = request_builder.build(http_method:, uri:, params: query_params(http_method, data),
+        body: request_body(http_method, data, content_type), content_type:, authenticator:)
       response = redirect_handler.handle(response: connection.perform(request:), request:, authenticator:)
       response_parser.parse(response:)
+    end
+
+    # The query parameters for a request: the data for GET and DELETE requests, nothing otherwise
+    # @api private
+    # @param http_method [Symbol] the HTTP method
+    # @param data [Hash, Array, String] the query parameters or request body
+    # @return [Hash] the query parameters
+    def query_params(http_method, data)
+      return {} unless %i[get delete].include?(http_method)
+
+      data #: Hash[Symbol | String, untyped]
+    end
+
+    # The body for a request: the data for POST and PUT requests, nothing otherwise
+    # @api private
+    # @param http_method [Symbol] the HTTP method
+    # @param data [Hash, Array, String] the query parameters or request body
+    # @param content_type [String] the content type of the body
+    # @return [Hash, Array, String, nil] the request body
+    def request_body(http_method, data, content_type)
+      return if %i[get delete].include?(http_method)
+
+      body_for(data, content_type)
     end
 
     # Convert a Hash body to multipart fields when a multipart content type is requested

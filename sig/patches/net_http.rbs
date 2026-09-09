@@ -1,0 +1,10 @@
+# Widen stdlib signatures to match runtime behavior used by Gems
+module Net
+  class HTTP
+    def set_debug_output: (IO? output) -> void | ...
+  end
+
+  module HTTPHeader
+    def set_form: (Array[[String | Symbol, untyped] | [String, untyped, Hash[Symbol, untyped]]] params, ?String enctype, ?Hash[untyped, untyped] formopt) -> void | ...
+  end
+end

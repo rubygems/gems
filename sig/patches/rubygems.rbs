@@ -1,0 +1,6 @@
+# Declare the RubyGems configuration method used by Gems::Configuration
+module Gem
+  class ConfigFile
+    def rubygems_api_key: () -> String?
+  end
+end

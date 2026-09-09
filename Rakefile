@@ -12,6 +12,17 @@ require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
 
+begin
+  require "steep/rake_task"
+
+  Steep::RakeTask.new(:steep)
+rescue LoadError
+  desc "Run type checker (unavailable on this platform)"
+  task :steep do
+    warn "Steep is not available on #{RUBY_ENGINE}"
+  end
+end
+
 require "yard"
 
 YARD::Rake::YardocTask.new(:yard) do |t|
@@ -27,10 +38,10 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new(:yardstick) do |verify|
-  verify.threshold = 91
+  verify.threshold = 91.1
 end
 
 desc "Run linters"
 task lint: %i[rubocop standard]
 
-task default: %i[spec lint yardstick]
+task default: %i[spec lint steep yardstick]

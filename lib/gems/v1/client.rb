@@ -63,7 +63,7 @@ module Gems
           data = [
             ["gem", gem.read, {filename: gem.path, content_type: "application/octet-stream"}],
             ["attestations", "[#{attestations.map(&:read).join(",")}]", {content_type: "application/json"}]
-          ]
+          ] #: Array[multipart_field]
           post("/api/v1/gems", data, "multipart/form-data", host)
         else
           post("/api/v1/gems", gem.read, "application/octet-stream", host)

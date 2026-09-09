@@ -1,0 +1,329 @@
+module Gems
+  VERSION: String
+
+  type multipart_field = [Symbol | String, untyped] | [String, String, Hash[Symbol, String]]
+  type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
+  type options = Hash[Symbol, untyped]
+
+  extend Configuration
+  include AbstractClient
+
+  def self.new: (?options options) -> Client
+  def self.info: (String gem_name) -> untyped
+  def self.search: (String query, ?options options) -> untyped
+  def self.gems: (?String? user_handle) -> untyped
+  def self.push: (File gem, ?String host, ?attestations: Array[File]?) -> String
+  def self.yank: (String gem_name, ?String? gem_version, ?options options) -> String
+  def self.unyank: (String gem_name, ?String? gem_version, ?options options) -> String
+  def self.versions: (String gem_name) -> untyped
+  def self.latest_version: (String gem_name) -> untyped
+  def self.total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
+  def self.most_downloaded: () -> untyped
+  def self.owners: (String gem_name) -> untyped
+  def self.add_owner: (String gem_name, String owner) -> String
+  def self.remove_owner: (String gem_name, String owner) -> String
+  def self.web_hooks: () -> untyped
+  def self.add_web_hook: (String gem_name, String url) -> String
+  def self.remove_web_hook: (String gem_name, String url) -> String
+  def self.fire_web_hook: (String gem_name, String url) -> String
+  def self.latest: (?options options) -> untyped
+  def self.just_updated: (?options options) -> untyped
+  def self.api_key: () -> String
+  def self.dependencies: (*String gems) -> untyped
+  def self.reverse_dependencies: (String gem_name, ?options options) -> untyped
+
+  class Version
+    MAJOR: Integer
+    MINOR: Integer
+    PATCH: Integer
+    PRE: String?
+
+    def self.to_s: () -> String
+  end
+
+  module AbstractClient
+    def self.included: (Module base) -> void
+
+    module ClassMethods : Module
+      def new: (?options options) -> untyped
+      def method_missing: (Symbol method, *untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def respond_to?: (Symbol | String method_name, ?bool include_private) -> bool
+      def respond_to_missing?: (Symbol | String method_name, ?bool include_private) -> bool
+    end
+  end
+
+  module Configuration
+    VALID_OPTIONS_KEYS: Array[Symbol]
+    DEFAULT_HOST: String
+    DEFAULT_KEY: String?
+    DEFAULT_USER_AGENT: String
+
+    attr_accessor host: String
+    attr_accessor key: String?
+    attr_accessor password: String?
+    attr_accessor user_agent: String
+    attr_accessor username: String?
+
+    def self.extended: (Configuration base) -> void
+    def configure: () { (self) -> void } -> self
+    def options: () -> Hash[Symbol, String?]
+    def reset: () -> self
+  end
+
+  class Authenticator
+    AUTHENTICATION_HEADER: String
+
+    def header: (Net::HTTPRequest? request) -> Hash[String, String]
+  end
+
+  class ApiKeyAuthenticator < Authenticator
+    attr_accessor key: String
+
+    def initialize: (key: String) -> void
+    def header: (Net::HTTPRequest? request) -> Hash[String, String]
+  end
+
+  class BasicAuthenticator < Authenticator
+    attr_accessor username: String
+    attr_accessor password: String
+
+    def initialize: (username: String, password: String) -> void
+    def header: (Net::HTTPRequest? request) -> Hash[String, String]
+  end
+
+  module ClientCredentials
+    attr_reader key: String?
+    attr_reader username: String?
+    attr_reader password: String?
+    attr_reader authenticator: Authenticator
+
+    def key=: (String? key) -> void
+    def username=: (String? username) -> void
+    def password=: (String? password) -> void
+
+    private
+
+    def initialize_authenticator: () -> Authenticator
+    def basic_authenticator: () -> BasicAuthenticator?
+    def api_key_authenticator: () -> ApiKeyAuthenticator?
+  end
+
+  class GemError < StandardError
+  end
+
+  class HTTPError < GemError
+    attr_reader response: Net::HTTPResponse?
+    attr_reader code: String?
+
+    def initialize: (?String? message, ?response: Net::HTTPResponse?) -> void
+
+    private
+
+    def error_message: (Net::HTTPResponse response) -> String
+  end
+
+  class ClientError < HTTPError
+  end
+
+  class ServerError < HTTPError
+  end
+
+  class BadRequest < ClientError
+  end
+
+  class Unauthorized < ClientError
+  end
+
+  class Forbidden < ClientError
+  end
+
+  class NotFound < ClientError
+  end
+
+  class Conflict < ClientError
+  end
+
+  class UnprocessableEntity < ClientError
+  end
+
+  class TooManyRequests < ClientError
+  end
+
+  class InternalServerError < ServerError
+  end
+
+  class BadGateway < ServerError
+  end
+
+  class ServiceUnavailable < ServerError
+  end
+
+  class GatewayTimeout < ServerError
+  end
+
+  class TooManyRedirects < GemError
+  end
+
+  class Connection
+    extend Forwardable
+
+    DEFAULT_OPEN_TIMEOUT: Integer
+    DEFAULT_READ_TIMEOUT: Integer
+    DEFAULT_WRITE_TIMEOUT: Integer
+
+    attr_accessor open_timeout: Integer
+    attr_accessor read_timeout: Integer
+    attr_accessor write_timeout: Integer
+    attr_accessor debug_output: IO?
+    attr_reader proxy_url: String?
+    attr_reader proxy_uri: URI::Generic?
+
+    def proxy_host: () -> String?
+    def proxy_port: () -> Integer?
+    def proxy_user: () -> String?
+    def proxy_pass: () -> String?
+
+    def initialize: (?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?) -> void
+    def perform: (request: Net::HTTPRequest) -> Net::HTTPResponse
+    def proxy_url=: (String proxy_url) -> void
+
+    private
+
+    def build_http_client: (URI::Generic uri) -> Net::HTTP
+    def configure_http_client: (Net::HTTP http_client) -> Net::HTTP
+  end
+
+  class RequestBuilder
+    FORM_URLENCODED: String
+    MULTIPART_FORM_DATA: String
+    OCTET_STREAM: String
+    HTTP_METHODS: Hash[Symbol, singleton(Net::HTTP::Get) | singleton(Net::HTTP::Post) | singleton(Net::HTTP::Put) | singleton(Net::HTTP::Delete)]
+
+    attr_accessor user_agent: String
+
+    def initialize: (?user_agent: String) -> void
+    def build: (http_method: Symbol, uri: URI::Generic, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?, ?headers: Hash[String, String], ?authenticator: Authenticator) -> Net::HTTPRequest
+
+    private
+
+    def create_request: (http_method: Symbol, uri: URI::Generic, params: Hash[Symbol | String, untyped]) -> Net::HTTPRequest
+    def add_query_params: (URI::Generic uri, Hash[Symbol | String, untyped] params) -> URI::Generic
+    def add_headers: (request: Net::HTTPRequest, headers: Hash[String, String]) -> void
+    def add_body: (request: Net::HTTPRequest, body: request_body?, content_type: String?) -> void
+    def add_authentication: (request: Net::HTTPRequest, authenticator: Authenticator) -> void
+  end
+
+  class RedirectHandler
+    DEFAULT_MAX_REDIRECTS: Integer
+    METHOD_PRESERVING_CODES: Array[Integer]
+
+    attr_accessor max_redirects: Integer
+    attr_reader connection: Connection
+    attr_reader request_builder: RequestBuilder
+
+    def initialize: (?connection: Connection, ?request_builder: RequestBuilder, ?max_redirects: Integer) -> void
+    def handle: (response: Net::HTTPResponse, request: Net::HTTPRequest, ?authenticator: Authenticator, ?redirect_count: Integer) -> Net::HTTPResponse
+
+    private
+
+    def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::Generic
+    def build_request: (Net::HTTPRequest request, URI::Generic uri, Integer response_code, Authenticator authenticator) -> Net::HTTPRequest
+  end
+
+  class ResponseParser
+    ERROR_MAP: Hash[Integer, singleton(HTTPError)]
+
+    def parse: (response: Net::HTTPResponse) -> String
+
+    private
+
+    def error: (Net::HTTPResponse response) -> HTTPError
+    def error_class: (Net::HTTPResponse response) -> singleton(HTTPError)
+  end
+
+  interface _RequestClient
+    def host: () -> String
+    def user_agent: () -> String
+    def authenticator: () -> Authenticator
+  end
+
+  module Request : Object, _RequestClient
+    FORM_URLENCODED: String
+
+    @connection: Connection?
+    @request_builder: RequestBuilder?
+    @redirect_handler: RedirectHandler?
+    @response_parser: ResponseParser?
+
+    def connection: () -> Connection
+    def request_builder: () -> RequestBuilder
+    def redirect_handler: () -> RedirectHandler
+    def response_parser: () -> ResponseParser
+    def get: (String path, ?Hash[Symbol | String, untyped] data, ?String content_type, ?String request_host) -> String
+    def delete: (String path, ?Hash[Symbol | String, untyped] data, ?String content_type, ?String request_host) -> String
+    def post: (String path, ?request_body data, ?String content_type, ?String request_host) -> String
+    def put: (String path, ?request_body data, ?String content_type, ?String request_host) -> String
+
+    private
+
+    def request: (Symbol http_method, String path, request_body data, String content_type, String request_host) -> String
+    def query_params: (Symbol http_method, request_body data) -> Hash[Symbol | String, untyped]
+    def request_body: (Symbol http_method, request_body data, String content_type) -> request_body?
+    def body_for: (request_body data, String content_type) -> request_body
+  end
+
+  class BaseClient
+    include Request
+    include ClientCredentials
+
+    attr_accessor host: String
+    attr_reader user_agent: String
+
+    def initialize: (?options options) -> void
+    def user_agent=: (String user_agent) -> void
+  end
+
+  module V1
+    include AbstractClient
+
+    def self.new: (?options options) -> Client
+
+    class Client < BaseClient
+      def info: (String gem_name) -> untyped
+      def search: (String query, ?options options) -> untyped
+      def gems: (?String? user_handle) -> untyped
+      def push: (File gem, ?String host, ?attestations: Array[File]?) -> String
+      def yank: (String gem_name, ?String? gem_version, ?options options) -> String
+      def unyank: (String gem_name, ?String? gem_version, ?options options) -> String
+      def versions: (String gem_name) -> untyped
+      def latest_version: (String gem_name) -> untyped
+      def total_downloads: (?String? gem_name, ?String? gem_version) -> untyped
+      def most_downloaded: () -> untyped
+      def owners: (String gem_name) -> untyped
+      def add_owner: (String gem_name, String owner) -> String
+      def remove_owner: (String gem_name, String owner) -> String
+      def web_hooks: () -> untyped
+      def add_web_hook: (String gem_name, String url) -> String
+      def remove_web_hook: (String gem_name, String url) -> String
+      def fire_web_hook: (String gem_name, String url) -> String
+      def latest: (?options options) -> untyped
+      def just_updated: (?options options) -> untyped
+      def api_key: () -> String
+      def dependencies: (*String gems) -> untyped
+      def reverse_dependencies: (String gem_name, ?options options) -> untyped
+    end
+  end
+
+  module V2
+    include AbstractClient
+
+    def self.new: (?options options) -> Client
+
+    class Client < BaseClient
+      def info: (String gem_name, String version) -> untyped
+    end
+  end
+
+  class Client < V1::Client
+  end
+end
