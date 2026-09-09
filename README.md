@@ -55,7 +55,7 @@ Gems.unyank 'bills', '0.0.1'
 # Return an array of version details for coulda.
 Gems.versions 'coulda'
 
-# Return an hash of latest version for coulda.
+# Return the latest version number of coulda.
 Gems.latest_version 'coulda'
 
 # Return the total number of downloads for rails_admin 0.0.1.
