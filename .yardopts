@@ -1,6 +1,4 @@
---tag authenticated:"Requires Authentication"
+--no-private
 --markup markdown
--
-CONTRIBUTING.md
-LICENSE.md
-README.md
+--tag authenticated:"Requires Authentication"
+lib/**/*.rb
