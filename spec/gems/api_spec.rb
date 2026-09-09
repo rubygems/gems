@@ -550,20 +550,6 @@ RSpec.describe Gems::API do
     end
   end
 
-  describe "#dependencies" do
-    before { stub_get("/api/v1/dependencies?gems=rails,thor").to_return(body: fixture("dependencies")) }
-
-    it "gets the correct resource" do
-      client.dependencies("rails", "thor")
-
-      expect(a_get("/api/v1/dependencies?gems=rails,thor")).to have_been_made
-    end
-
-    it "returns the unmarshaled dependencies" do
-      expect(client.dependencies("rails", "thor").first[:number]).to eq("3.0.9")
-    end
-  end
-
   describe "#reverse_dependencies" do
     before { stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json")) }
 

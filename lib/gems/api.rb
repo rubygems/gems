@@ -353,19 +353,6 @@ module Gems
       TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:).exchange_token!
     end
 
-    # Returns an array of hashes for all versions of given gems
-    #
-    # @api public
-    # @authenticated false
-    # @param gems [Array] A list of gem names
-    # @return [Array]
-    # @example
-    #   Gems.dependencies 'rails', 'thor'
-    def dependencies(*gems)
-      response = get("/api/v1/dependencies", {gems: gems.join(",")})
-      Marshal.load(response)
-    end
-
     # Returns an array of all the reverse dependencies to the given gem
     #
     # @api public
