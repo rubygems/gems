@@ -243,51 +243,44 @@ RSpec.describe Gems::API do
   end
 
   describe "#total_downloads" do
-    context "without a gem name" do
-      before { stub_get("/api/v1/downloads.json").to_return(body: fixture("total_downloads.json")) }
+    before { stub_get("/api/v1/downloads.json").to_return(body: fixture("total_downloads.json")) }
 
-      it "gets the correct resource" do
-        client.total_downloads
+    it "gets the correct resource" do
+      client.total_downloads
 
-        expect(a_get("/api/v1/downloads.json")).to have_been_made
-      end
-
-      it "returns the total downloads with symbolized keys" do
-        expect(client.total_downloads[:total]).to eq(244_368_950)
-      end
+      expect(a_get("/api/v1/downloads.json")).to have_been_made
     end
 
-    context "with a gem name and version" do
-      before { stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json")) }
-
-      it "gets the correct resource" do
-        client.total_downloads("rails_admin", "0.0.0")
-
-        expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
-      end
-
-      it "returns the gem's downloads with symbolized keys" do
-        expect(client.total_downloads("rails_admin", "0.0.0")[:version_downloads]).to eq(3142)
-      end
+    it "returns the total downloads of all gems" do
+      expect(client.total_downloads).to eq(244_368_950)
     end
 
-    context "with a gem name but no version" do
-      before do
-        stub_get("/api/v1/versions/rails_admin/latest.json").to_return(body: '{"version":"3.0.9"}')
-        stub_get("/api/v1/downloads/rails_admin-3.0.9.json").to_return(body: fixture("rails_admin-0.0.0.json"))
-      end
+    it "raises KeyError when the response has no total" do
+      stub_get("/api/v1/downloads.json").to_return(body: "{}")
 
-      it "looks up the latest version" do
-        client.total_downloads("rails_admin")
+      expect { client.total_downloads }.to raise_error(KeyError)
+    end
+  end
 
-        expect(a_get("/api/v1/downloads/rails_admin-3.0.9.json")).to have_been_made
-      end
+  describe "#downloads" do
+    before { stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json")) }
 
-      it "raises KeyError when the gem has no version" do
-        stub_get("/api/v1/versions/rails_admin/latest.json").to_return(body: "{}")
+    it "gets the correct resource" do
+      client.downloads("rails_admin", "0.0.0")
 
-        expect { client.total_downloads("rails_admin") }.to raise_error(KeyError)
-      end
+      expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
+    end
+
+    it "returns the gem's downloads with symbolized keys" do
+      expect(client.downloads("rails_admin", "0.0.0").values_at(:total_downloads, :version_downloads)).to eq([3142, 3142])
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/versions/rails_admin/latest.json").to_return(body: '{"version":"3.0.9"}')
+      stub_get("/api/v1/downloads/rails_admin-3.0.9.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      client.downloads("rails_admin")
+
+      expect(a_get("/api/v1/downloads/rails_admin-3.0.9.json")).to have_been_made
     end
   end
 

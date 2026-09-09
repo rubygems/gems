@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
 * Rename `info` to `gem` and `gems` to `owned_gems`
 * Return the version string from `latest_version`
+* Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 
 ### Removed

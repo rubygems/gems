@@ -58,9 +58,12 @@ Gems.versions 'coulda'
 # Return the latest version number of coulda.
 Gems.latest_version 'coulda'
 
-# Return the total number of downloads for rails_admin 0.0.1.
+# Return the total number of downloads of all gems.
+Gems.total_downloads
+
+# Return the number of downloads of rails_admin and of version 0.0.1.
 # (Defaults to the latest version if no version is specified.)
-Gems.total_downloads 'rails_admin', '0.0.1'
+Gems.downloads 'rails_admin', '0.0.1'
 
 # Returns an array containing the top 50 downloaded gem versions of all time.
 Gems.most_downloaded
