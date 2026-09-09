@@ -28,13 +28,12 @@ module Gems
     # @api public
     # @authenticated false
     # @param query [String] A term to search for.
-    # @param options [Hash] A customizable set of options.
-    # @option options [Integer] :page
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array<Hash>]
     # @example
-    #   Gems.search 'cucumber'
-    def search(query, options = {})
-      response = get("/api/v1/search.json", options.merge({query:}))
+    #   Gems.search "cucumber", page: 2
+    def search(query, page: nil)
+      response = get("/api/v1/search.json", {query:, page:}.compact)
       JSON.parse(response)
     end
 
@@ -64,8 +63,8 @@ module Gems
     # @param attestations [Array] An array of attestations to push, or `nil`.
     # @return [String]
     # @example
-    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-    def push(gem, host = nil, attestations: nil)
+    #   Gems.push File.new("pkg/gemcutter-0.2.1.gem"), host: "https://gems.example.com"
+    def push(gem, host: nil, attestations: nil)
       if attestations
         data = [
           ["gem", gem.read, {filename: gem.path, content_type: "application/octet-stream"}],
@@ -82,15 +81,14 @@ module Gems
     # @api public
     # @authenticated true
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
+    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
-    #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def yank(gem_name, gem_version = nil, options = {})
-      gem_version ||= info(gem_name).fetch("version")
-      delete("/api/v1/gems/yank", options.merge({gem_name:, version: gem_version}))
+    #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+    def yank(gem_name, version = nil, platform: nil)
+      version ||= info(gem_name).fetch("version")
+      delete("/api/v1/gems/yank", {gem_name:, version:, platform:}.compact)
     end
 
     # Update a previously yanked gem back into RubyGems.org's index
@@ -98,15 +96,14 @@ module Gems
     # @api public
     # @authenticated true
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
+    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
-    #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def unyank(gem_name, gem_version = nil, options = {})
-      gem_version ||= info(gem_name).fetch("version")
-      put("/api/v1/gems/unyank", options.merge({gem_name:, version: gem_version}))
+    #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+    def unyank(gem_name, version = nil, platform: nil)
+      version ||= info(gem_name).fetch("version")
+      put("/api/v1/gems/unyank", {gem_name:, version:, platform:}.compact)
     end
 
     # Returns an array of gem version details
@@ -259,12 +256,12 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param options [Hash] A customizable set of options.
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array]
     # @example
-    #   Gem.latest
-    def latest(options = {})
-      response = get("/api/v1/activity/latest.json", options)
+    #   Gems.latest
+    def latest(page: nil)
+      response = get("/api/v1/activity/latest.json", {page:}.compact)
       JSON.parse(response)
     end
 
@@ -272,12 +269,12 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param options [Hash] A customizable set of options.
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array]
     # @example
-    #   Gem.just_updated
-    def just_updated(options = {})
-      response = get("/api/v1/activity/just_updated.json", options)
+    #   Gems.just_updated
+    def just_updated(page: nil)
+      response = get("/api/v1/activity/just_updated.json", {page:}.compact)
       JSON.parse(response)
     end
 
@@ -331,14 +328,12 @@ module Gems
     # @api public
     # @authenticated true
     # @param key [String] The API key to update.
-    # @param options [Hash] Scopes to enable or disable.
-    # @option options [Boolean] :push_rubygem
-    # @option options [Boolean] :yank_rubygem
+    # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
     # @return [String]
     # @example
     #   Gems.update_api_key "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
-    def update_api_key(key, options = {})
-      patch("/api/v1/api_key", options.merge({api_key: key}))
+    def update_api_key(key, **scopes)
+      patch("/api/v1/api_key", {**scopes, api_key: key})
     end
 
     # Exchange an OIDC ID token for an API key via trusted publishing
@@ -358,12 +353,12 @@ module Gems
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem
-    # @param options [Hash] A customizable set of options.
+    # @param only [String, nil] Restrict the results to "development" or "runtime" dependencies.
     # @return [Array]
     # @example
-    #   Gems.reverse_dependencies 'money'
-    def reverse_dependencies(gem_name, options = {})
-      response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", options)
+    #   Gems.reverse_dependencies "money", only: "runtime"
+    def reverse_dependencies(gem_name, only: nil)
+      response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", {only:}.compact)
       JSON.parse(response)
     end
 
