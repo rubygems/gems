@@ -1,9 +1,13 @@
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 unless $PROGRAM_NAME.include?("mutant") || RUBY_ENGINE.eql?("jruby")
-  require "simplecov"
+  begin
+    require "simplecov"
 
-  SimpleCov.start "strict"
+    SimpleCov.start "strict"
+  rescue LoadError
+    warn "SimpleCov is not available on Ruby #{RUBY_VERSION}"
+  end
 end
 
 require "gems"

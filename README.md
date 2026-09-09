@@ -167,8 +167,9 @@ Redirect loops raise `Gems::TooManyRedirects`.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the tests,
-linters, mutation tests, type checker, and documentation checks. You can also run `bin/console` for an interactive
-prompt that will allow you to experiment.
+linters, mutation tests, type checker, and documentation checks. Coverage, mutation testing, and type checking need
+Ruby 3.3 or later; on older Rubies those tasks are skipped. You can also run `bin/console` for an interactive prompt
+that will allow you to experiment.
 
 ## Supported Ruby Versions
 This library aims to support and is [tested against][gh-actions] the following Ruby
