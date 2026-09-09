@@ -60,8 +60,8 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
         headers: {"Content-Type" => "application/json", "Accept" => "application/json"})).to have_been_made
     end
 
-    it "returns the token exchange response" do
-      expect(authenticator.exchange_token!).to eq(JSON.parse(fixture("exchange_token.json").read))
+    it "returns the exchanged API key" do
+      expect(authenticator.exchange_token!).to eq(Gems::ApiKey.new(JSON.parse(fixture("exchange_token.json").read)))
     end
 
     it "stores the API key" do
