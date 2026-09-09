@@ -1,9 +1,5 @@
-RSpec.describe Gems::V1::Client do
-  subject(:client) { described_class.new(key: nil, username: nil, password: nil) }
-
-  it "is a Gems::BaseClient" do
-    expect(client).to be_a(Gems::BaseClient)
-  end
+RSpec.describe Gems::API do
+  let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
   describe "#info" do
     context "when the gem exists" do
@@ -46,7 +42,7 @@ RSpec.describe Gems::V1::Client do
     end
 
     it "passes options as query parameters" do
-      client.search("cucumber", page: 2)
+      client.search("cucumber", {page: 2})
 
       expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
     end
@@ -91,21 +87,22 @@ RSpec.describe Gems::V1::Client do
       allow(client).to receive(:post).and_call_original
     end
 
-    it "posts the gem as a binary body to the default host" do
+    it "posts the gem as a binary body" do
       client.push(gem)
 
-      expect(client).to have_received(:post).with("/api/v1/gems", gem_data, "application/octet-stream", Gems::Configuration::DEFAULT_HOST)
+      expect(client).to have_received(:post).with("/api/v1/gems", gem_data, host: nil)
     end
 
     it "returns the response body" do
       expect(client.push(gem)).to eq("Successfully registered gem: gems (0.0.8)")
     end
 
-    it "pushes to the default host even when the client has another host" do
+    it "pushes to the client's host by default" do
       client.host = "http://example.com"
+      stub_request(:post, "http://example.com/api/v1/gems").to_return(body: fixture("push"))
       client.push(gem)
 
-      expect(a_post("/api/v1/gems")).to have_been_made
+      expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
     end
 
     it "pushes to a custom host" do
@@ -127,7 +124,7 @@ RSpec.describe Gems::V1::Client do
       it "posts multipart fields for the gem and the attestations" do
         client.push(gem, attestations:)
 
-        expect(client).to have_received(:post).with("/api/v1/gems", fields, "multipart/form-data", Gems::Configuration::DEFAULT_HOST)
+        expect(client).to have_received(:post).with("/api/v1/gems", fields, host: nil)
       end
 
       it "pushes to a custom host" do
@@ -158,7 +155,7 @@ RSpec.describe Gems::V1::Client do
 
     it "passes options as query parameters" do
       stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
-      client.yank("gems", "0.0.8", platform: "java")
+      client.yank("gems", "0.0.8", {platform: "java"})
 
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
@@ -192,7 +189,7 @@ RSpec.describe Gems::V1::Client do
     end
 
     it "passes options in the body" do
-      client.unyank("gems", "0.0.8", platform: "java")
+      client.unyank("gems", "0.0.8", {platform: "java"})
 
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
     end
@@ -424,7 +421,7 @@ RSpec.describe Gems::V1::Client do
 
     it "passes options as query parameters" do
       stub_get("/api/v1/activity/latest.json?page=2").to_return(body: fixture("latest.json"))
-      client.latest(page: 2)
+      client.latest({page: 2})
 
       expect(a_get("/api/v1/activity/latest.json?page=2")).to have_been_made
     end
@@ -445,14 +442,14 @@ RSpec.describe Gems::V1::Client do
 
     it "passes options as query parameters" do
       stub_get("/api/v1/activity/just_updated.json?page=2").to_return(body: fixture("just_updated.json"))
-      client.just_updated(page: 2)
+      client.just_updated({page: 2})
 
       expect(a_get("/api/v1/activity/just_updated.json?page=2")).to have_been_made
     end
   end
 
   describe "#api_key" do
-    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+    subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 
     before { stub_get("/api/v1/api_key").to_return(body: fixture("api_key")) }
 
@@ -468,12 +465,12 @@ RSpec.describe Gems::V1::Client do
   end
 
   describe "#create_api_key" do
-    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+    subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 
     before { stub_post("/api/v1/api_key.json").to_return(body: fixture("api_key.json")) }
 
     it "posts the correct resource with basic authentication" do
-      client.create_api_key("ci-push", push_rubygem: true)
+      client.create_api_key("ci-push", {push_rubygem: true})
 
       expect(a_post("/api/v1/api_key.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing],
         body: {name: "ci-push", push_rubygem: "true"})).to have_been_made
@@ -486,7 +483,7 @@ RSpec.describe Gems::V1::Client do
     end
 
     it "returns the new API key" do
-      expect(client.create_api_key("ci-push", push_rubygem: true)).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+      expect(client.create_api_key("ci-push", {push_rubygem: true})).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
     end
 
     it "raises KeyError when the response has no key" do
@@ -497,12 +494,12 @@ RSpec.describe Gems::V1::Client do
   end
 
   describe "#update_api_key" do
-    subject(:client) { described_class.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
+    subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 
     before { stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated") }
 
     it "patches the correct resource with basic authentication" do
-      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", {yank_rubygem: true})
 
       expect(a_request(:patch, rubygems_url("/api/v1/api_key")).with(basic_auth: %w[nick@gemcutter.org schwwwwing],
         body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
@@ -583,9 +580,33 @@ RSpec.describe Gems::V1::Client do
     it "passes options as query parameters" do
       stub_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")
         .to_return(body: fixture("reverse_dependencies_short.json"))
-      client.reverse_dependencies("rspec", only: "development")
+      client.reverse_dependencies("rspec", {only: "development"})
 
       expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")).to have_been_made
+    end
+  end
+
+  describe "#version" do
+    context "when the gem version exists" do
+      before { stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json")) }
+
+      it "gets the correct resource" do
+        client.version("rails", "7.0.6")
+
+        expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
+      end
+
+      it "returns information about the gem version" do
+        expect(client.version("rails", "7.0.6").values_at("name", "version")).to eq(%w[rails 7.0.6])
+      end
+    end
+
+    context "when the response is not JSON" do
+      before { stub_get("/api/v2/rubygems/rails/versions/7.0.99.json").to_return(body: "This version could not be found.") }
+
+      it "returns an empty hash" do
+        expect(client.version("rails", "7.0.99")).to eq({})
+      end
     end
   end
 end
