@@ -1,7 +1,7 @@
 require "net/http"
 require "rubygems"
 require "open-uri"
-require "gems/errors"
+require "gems/response_parser"
 
 module Gems
   # HTTP request helpers mixed into clients
@@ -66,18 +66,13 @@ module Gems
       "?#{URI.encode_www_form(hash)}"
     end
 
-    def body_from_response(response, method, content_type) # rubocop:disable Metrics/MethodLength
-      case response
-      when Net::HTTPRedirection
+    def body_from_response(response, method, content_type)
+      if response.is_a?(Net::HTTPRedirection)
         uri = URI.parse(response["location"])
         host_with_scheme = [uri.scheme, uri.host].join("://")
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
-      when Net::HTTPNotFound
-        raise Gems::NotFound, response.body
-      when Net::HTTPSuccess
-        response.body
       else
-        raise Gems::GemError, response.body
+        ResponseParser.new.parse(response:)
       end
     end
   end
