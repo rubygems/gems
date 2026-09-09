@@ -1,5 +1,6 @@
 require "json"
 require_relative "../base_client"
+require_relative "../trusted_publisher_authenticator"
 
 module Gems
   module V1
@@ -336,6 +337,18 @@ module Gems
       #   Gems.update_api_key "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
       def update_api_key(key, options = {})
         patch("/api/v1/api_key", options.merge(api_key: key))
+      end
+
+      # Exchange an OIDC ID token for an API key via trusted publishing
+      #
+      # @api public
+      # @authenticated false
+      # @param id_token [String] The OIDC ID token.
+      # @return [Hash] the token exchange response, including rubygems_api_key, name, scopes, and expires_at
+      # @example
+      #   Gems.exchange_trusted_publisher_token ENV.fetch("ID_TOKEN")
+      def exchange_trusted_publisher_token(id_token)
+        TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:).exchange_token!
       end
 
       # Returns an array of hashes for all versions of given gems

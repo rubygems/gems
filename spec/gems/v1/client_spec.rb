@@ -513,6 +513,46 @@ RSpec.describe Gems::V1::Client do
     end
   end
 
+  describe "#exchange_trusted_publisher_token" do
+    let(:exchange_url) { "https://rubygems.org/api/v1/oidc/trusted_publisher/exchange_token" }
+
+    before { stub_request(:post, exchange_url).to_return(body: fixture("exchange_token.json")) }
+
+    it "posts the ID token as JSON" do
+      client.exchange_trusted_publisher_token("ID_TOKEN")
+
+      expect(a_request(:post, exchange_url).with(body: '{"jwt":"ID_TOKEN"}',
+        headers: {"Content-Type" => "application/json"})).to have_been_made
+    end
+
+    it "returns the token exchange response" do
+      expect(client.exchange_trusted_publisher_token("ID_TOKEN")).to eq(JSON.parse(fixture("exchange_token.json").read))
+    end
+
+    it "exchanges the token with the client's host" do
+      client.host = "http://example.com"
+      stub_request(:post, "http://example.com/api/v1/oidc/trusted_publisher/exchange_token").to_return(body: fixture("exchange_token.json"))
+      client.exchange_trusted_publisher_token("ID_TOKEN")
+
+      expect(a_request(:post, "http://example.com/api/v1/oidc/trusted_publisher/exchange_token")).to have_been_made
+    end
+
+    it "uses the client's request builder" do
+      client.user_agent = "Custom User Agent"
+      client.exchange_trusted_publisher_token("ID_TOKEN")
+
+      expect(a_request(:post, exchange_url).with(headers: {"User-Agent" => "Custom User Agent"})).to have_been_made
+    end
+
+    it "uses the client's connection" do
+      connection = client.connection
+      allow(connection).to receive(:perform).and_call_original
+      client.exchange_trusted_publisher_token("ID_TOKEN")
+
+      expect(connection).to have_received(:perform).with(request: an_instance_of(Net::HTTP::Post))
+    end
+  end
+
   describe "#dependencies" do
     before { stub_get("/api/v1/dependencies?gems=rails,thor").to_return(body: fixture("dependencies")) }
 

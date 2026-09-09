@@ -8,6 +8,7 @@ module Gems
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = %i[
       host
+      id_token
       key
       otp
       password
@@ -70,6 +71,7 @@ module Gems
       self.otp = nil
       self.password = nil
       self.host = DEFAULT_HOST
+      self.id_token = nil
       self.key = DEFAULT_KEY
       self.user_agent = DEFAULT_USER_AGENT
       self

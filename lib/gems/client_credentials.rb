@@ -2,6 +2,7 @@ require_relative "api_key_authenticator"
 require_relative "authenticator"
 require_relative "basic_authenticator"
 require_relative "otp_authenticator"
+require_relative "trusted_publisher_authenticator"
 
 module Gems
   # Mixin for client authentication credentials
@@ -34,6 +35,13 @@ module Gems
     # @example Get the one-time passcode
     #   client.otp
     attr_reader :otp
+
+    # The OIDC ID token for trusted publishing
+    # @api public
+    # @return [String, nil] the OIDC ID token
+    # @example Get the ID token
+    #   client.id_token
+    attr_reader :id_token
 
     # The authenticator for API requests
     # @api public
@@ -90,17 +98,39 @@ module Gems
       initialize_authenticator
     end
 
+    # Set the OIDC ID token for trusted publishing
+    #
+    # @api public
+    # @param id_token [String, nil] the OIDC ID token
+    # @return [void]
+    # @example Set the ID token
+    #   client.id_token = ENV.fetch("ID_TOKEN")
+    def id_token=(id_token)
+      @id_token = id_token
+      initialize_authenticator
+    end
+
     private
 
     # Initialize the appropriate authenticator based on available credentials
     #
-    # Basic authentication takes precedence over an API key. A one-time passcode
-    # wraps whichever is chosen.
+    # Basic authentication takes precedence over trusted publishing, which takes
+    # precedence over an API key. A one-time passcode wraps whichever is chosen.
     #
     # @api private
     # @return [Authenticator] the initialized authenticator
     def initialize_authenticator
-      @authenticator = otp_authenticator(basic_authenticator || api_key_authenticator || Authenticator.new)
+      authenticator = basic_authenticator || trusted_publisher_authenticator || api_key_authenticator || Authenticator.new
+      @authenticator = otp_authenticator(authenticator)
+    end
+
+    # Build a trusted publisher authenticator if an ID token is available
+    # @api private
+    # @return [TrustedPublisherAuthenticator, nil] the trusted publisher authenticator or nil
+    def trusted_publisher_authenticator
+      return unless id_token
+
+      TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:)
     end
 
     # Wrap an authenticator with a one-time passcode if one is available

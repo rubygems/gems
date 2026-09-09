@@ -45,5 +45,12 @@ RSpec.describe Gems::BaseClient do
 
       expect(client.host).to eq("http://example.com")
     end
+
+    it "reinitializes the authenticator with the new host" do
+      client.id_token = "ID_TOKEN"
+      client.host = "http://example.com"
+
+      expect(client.authenticator.host).to eq("http://example.com")
+    end
   end
 end

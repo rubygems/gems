@@ -28,6 +28,24 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.send(:initialize_authenticator)).to equal(client.authenticator)
     end
 
+    it "uses trusted publisher authentication with an ID token" do
+      client = Gems::Client.new(key: nil, username: nil, password: nil, id_token: "ID_TOKEN")
+
+      expect(client.authenticator).to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
+    end
+
+    it "prefers trusted publisher authentication over API key authentication" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, id_token: "ID_TOKEN")
+
+      expect(client.authenticator).to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
+    end
+
+    it "prefers basic authentication over trusted publisher authentication" do
+      client = Gems::Client.new(key: nil, username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
+
+      expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
+    end
+
     it "wraps the authenticator with a one-time passcode" do
       client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
 
@@ -77,6 +95,32 @@ RSpec.describe Gems::ClientCredentials do
     end
   end
 
+  describe "#trusted_publisher_authenticator" do
+    let(:client) { Gems::Client.new(key: nil, username: nil, password: nil, id_token: "ID_TOKEN", host: "http://example.com") }
+
+    it "returns nil without an ID token" do
+      client = Gems::Client.new(key: nil, username: nil, password: nil, id_token: nil)
+
+      expect(client.authenticator).to be_an_instance_of(Gems::Authenticator)
+    end
+
+    it "builds an authenticator with the ID token" do
+      expect(client.authenticator.id_token).to eq("ID_TOKEN")
+    end
+
+    it "builds an authenticator with the client's host" do
+      expect(client.authenticator.host).to eq("http://example.com")
+    end
+
+    it "builds an authenticator with the client's connection" do
+      expect(client.authenticator.connection).to equal(client.connection)
+    end
+
+    it "builds an authenticator with the client's request builder" do
+      expect(client.authenticator.request_builder).to equal(client.request_builder)
+    end
+  end
+
   describe "#api_key_authenticator" do
     it "returns nil without a key" do
       expect(client.authenticator).to be_an_instance_of(Gems::Authenticator)
@@ -121,6 +165,20 @@ RSpec.describe Gems::ClientCredentials do
       client.otp = "123456"
 
       expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
+    end
+  end
+
+  describe "#id_token=" do
+    it "sets the ID token" do
+      client.id_token = "ID_TOKEN"
+
+      expect(client.id_token).to eq("ID_TOKEN")
+    end
+
+    it "reinitializes the authenticator" do
+      client.id_token = "ID_TOKEN"
+
+      expect(client.authenticator).to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
     end
   end
 

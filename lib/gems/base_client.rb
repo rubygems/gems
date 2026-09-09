@@ -15,9 +15,9 @@ module Gems
     # The host for API requests
     # @api public
     # @return [String] the host for API requests, including scheme
-    # @example Get or set the host
-    #   client.host = "https://gems.example.com"
-    attr_accessor :host
+    # @example Get the host
+    #   client.host
+    attr_reader :host
 
     # The 'User-Agent' HTTP header sent with requests
     # @api public
@@ -34,6 +34,8 @@ module Gems
     # @option options [String, nil] :key the API key
     # @option options [String, nil] :username the username for HTTP basic authentication
     # @option options [String, nil] :password the password for HTTP basic authentication
+    # @option options [String, nil] :otp the one-time passcode for multi-factor authentication
+    # @option options [String, nil] :id_token the OIDC ID token for trusted publishing
     # @option options [String] :user_agent the 'User-Agent' HTTP header sent with requests
     # @return [BaseClient] a new client instance
     # @example Create a client with an API key
@@ -44,6 +46,18 @@ module Gems
       Gems.options.merge(options).slice(*Configuration::VALID_OPTIONS_KEYS).each do |key, value|
         public_send(:"#{key}=", value)
       end
+    end
+
+    # Set the host for API requests
+    #
+    # @api public
+    # @param host [String] the host for API requests, including scheme
+    # @return [void]
+    # @example Set the host
+    #   client.host = "https://gems.example.com"
+    def host=(host)
+      @host = host
+      initialize_authenticator
     end
 
     # Set the 'User-Agent' HTTP header sent with requests

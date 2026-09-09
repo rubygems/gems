@@ -103,6 +103,9 @@ Gems.create_api_key 'ci-push', push_rubygem: true
 # Update the scopes of an API key.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
 
+# Exchange an OIDC ID token for an API key via trusted publishing.
+Gems.exchange_trusted_publisher_token ENV.fetch('ID_TOKEN')
+
 # Return an array of gem dependency details for all versions of all the given gems.
 Gems.dependencies ['rails', 'thor']
 
@@ -116,6 +119,12 @@ end
 # If your account requires multi-factor authentication, provide a one-time passcode.
 Gems.configure do |config|
   config.otp = '123456'
+end
+
+# For trusted publishing, provide an OIDC ID token instead of an API key.
+# It is exchanged for an API key on the first request.
+Gems.configure do |config|
+  config.id_token = ENV.fetch('ID_TOKEN')
 end
 
 # Alternatively, create a client with its own credentials and settings.
@@ -134,11 +143,12 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
+| `id_token`    | The OIDC ID token exchanged for an API key               | `nil`                                  |
 | `user_agent`  | The `User-Agent` header                                  | `Gems <version>`                       |
 
 Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator`, `Gems::BasicAuthenticator`,
-and `Gems::OtpAuthenticator` (which wraps one of the others).
-When a username and password are both set, HTTP basic authentication takes precedence over the API key.
+`Gems::TrustedPublisherAuthenticator`, and `Gems::OtpAuthenticator` (which wraps one of the others).
+HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
 
 Timeouts, debug output, the proxy, and the redirect limit can be set on a client's `connection` and `redirect_handler`.
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless a proxy URL is set.
