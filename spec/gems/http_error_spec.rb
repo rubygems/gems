@@ -45,6 +45,7 @@ RSpec.describe Gems::HTTPError do
     Gems::BadGateway => Gems::ServerError,
     Gems::ServiceUnavailable => Gems::ServerError,
     Gems::GatewayTimeout => Gems::ServerError,
+    Gems::NetworkError => Gems::Error,
     Gems::TooManyRedirects => Gems::Error
   }.each do |error_class, parent_class|
     it "defines #{error_class} as a #{parent_class}" do

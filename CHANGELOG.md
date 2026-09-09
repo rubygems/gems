@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and status `code`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
 * Add credential-free `inspect` output for clients and authenticators
+* Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
 * Add RBS signatures
 
 ### Changed

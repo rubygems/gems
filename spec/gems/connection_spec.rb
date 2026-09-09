@@ -128,10 +128,26 @@ RSpec.describe Gems::Connection do
       expect(a_request(:get, http_uri.to_s)).to have_been_made
     end
 
-    it "does not wrap errors" do
+    described_class::NETWORK_ERRORS.each do |error_class|
+      it "wraps #{error_class} in a NetworkError" do
+        stub_request(:get, https_uri.to_s).to_raise(error_class)
+
+        expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }
+          .to raise_error(Gems::NetworkError, /\ANetwork error: /)
+      end
+    end
+
+    it "includes the original error message in the NetworkError" do
       stub_request(:get, https_uri.to_s).to_raise(Errno::ECONNREFUSED)
 
-      expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }.to raise_error(Errno::ECONNREFUSED)
+      expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }
+        .to raise_error(Gems::NetworkError, "Network error: Connection refused - Exception from WebMock")
+    end
+
+    it "does not wrap other errors" do
+      stub_request(:get, https_uri.to_s).to_raise(IOError)
+
+      expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }.to raise_error(IOError)
     end
   end
 
