@@ -1,11 +1,12 @@
-require 'gems/abstract_client'
+require "gems/abstract_client"
 
-require 'gems/v1'
-require 'gems/v2'
+require "gems/v1"
+require "gems/v2"
 
-require 'gems/client'
-require 'gems/configuration'
+require "gems/client"
+require "gems/configuration"
 
+# A Ruby wrapper for the RubyGems.org API
 module Gems
   extend Configuration
   include AbstractClient

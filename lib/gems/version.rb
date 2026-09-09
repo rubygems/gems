@@ -1,4 +1,5 @@
 module Gems
+  # The version of the Gems gem
   class Version
     MAJOR = 2 unless defined? Gems::Version::MAJOR
     MINOR = 0 unless defined? Gems::Version::MINOR
@@ -8,7 +9,7 @@ module Gems
     class << self
       # @return [String]
       def to_s
-        [MAJOR, MINOR, PATCH, PRE].compact.join('.')
+        [MAJOR, MINOR, PATCH, PRE].compact.join(".")
       end
     end
   end

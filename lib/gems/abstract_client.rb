@@ -1,12 +1,14 @@
 module Gems
+  # Delegates module-level calls to a client instance
   module AbstractClient
     def self.included(base)
       base.extend(ClassMethods)
     end
 
+    # Class-level delegation methods
     module ClassMethods
-      def new(options = {})
-        raise NotImplementedError.new
+      def new(_options = {})
+        raise NotImplementedError
       end
 
       # Delegate to Gems::Client
@@ -16,12 +18,12 @@ module Gems
         new.send(method, ...)
       end
 
-      def respond_to?(method_name, include_private = false)
-        new.respond_to?(method_name, include_private) || super(method_name, include_private)
+      def respond_to?(method_name, include_private = false) # rubocop:disable Style/OptionalBooleanParameter
+        new.respond_to?(method_name, include_private) || super
       end
 
       def respond_to_missing?(method_name, include_private = false)
-        new.respond_to?(method_name, include_private) || super(method_name, include_private)
+        new.respond_to?(method_name, include_private) || super
       end
     end
   end

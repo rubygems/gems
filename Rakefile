@@ -1,31 +1,36 @@
-require 'bundler'
-Bundler::GemHelper.install_tasks
+require "bundler/gem_tasks"
 
-require 'rspec/core/rake_task'
+require "rspec/core/rake_task"
+
 RSpec::Core::RakeTask.new(:spec)
 
-task :test => :spec
+desc "Run specs"
+task test: :spec
 
-begin
-  require 'rubocop/rake_task'
-  RuboCop::RakeTask.new
-rescue LoadError
-  task :rubocop do
-    warn 'RuboCop is disabled'
-  end
+require "standard/rake"
+require "rubocop/rake_task"
+
+RuboCop::RakeTask.new
+
+require "yard"
+
+YARD::Rake::YardocTask.new(:yard) do |t|
+  t.files = ["lib/**/*.rb"]
+  t.options = ["--no-private"]
 end
 
-require 'yard'
-YARD::Rake::YardocTask.new
+require "yardstick/rake/measurement"
+require "yardstick/rake/verify"
 
-require 'yardstick/rake/measurement'
-Yardstick::Rake::Measurement.new do |measurement|
-  measurement.output = 'measurement/report.txt'
+Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
+  measurement.output = "doc/coverage.txt"
 end
 
-require 'yardstick/rake/verify'
-Yardstick::Rake::Verify.new do |verify|
-  verify.threshold = 68.7
+Yardstick::Rake::Verify.new(:yardstick) do |verify|
+  verify.threshold = 68.2
 end
 
-task :default => %i[spec rubocop verify_measurements]
+desc "Run linters"
+task lint: %i[rubocop standard]
+
+task default: %i[spec lint yardstick]

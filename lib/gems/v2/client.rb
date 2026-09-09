@@ -1,12 +1,14 @@
-require 'date'
-require 'gems/configuration'
-require 'gems/request'
-require 'json'
+require "date"
+require "gems/configuration"
+require "gems/request"
+require "json"
 
 module Gems
   module V2
+    # A client for the RubyGems API v2
     class Client
       include Gems::Request
+
       attr_accessor(*Configuration::VALID_OPTIONS_KEYS)
 
       def initialize(options = {})

@@ -1,8 +1,9 @@
-require 'gems/version'
-require 'rubygems'
-require 'yaml'
+require "gems/version"
+require "rubygems"
+require "yaml"
 
 module Gems
+  # Global configuration for clients
   module Configuration
     # An array of valid keys in the options hash when configuring a {Gems::Client}
     VALID_OPTIONS_KEYS = %i[
@@ -14,7 +15,7 @@ module Gems
     ].freeze
 
     # Set the default API endpoint
-    DEFAULT_HOST = ENV['RUBYGEMS_HOST'] ? ENV['RUBYGEMS_HOST'] : 'https://rubygems.org'
+    DEFAULT_HOST = ENV["RUBYGEMS_HOST"] || "https://rubygems.org"
 
     # Set the default credentials
     DEFAULT_KEY = Gem.configuration.rubygems_api_key
@@ -45,8 +46,8 @@ module Gems
     def reset
       self.username = nil
       self.password = nil
-      self.host       = DEFAULT_HOST
-      self.key        = DEFAULT_KEY
+      self.host = DEFAULT_HOST
+      self.key = DEFAULT_KEY
       self.user_agent = DEFAULT_USER_AGENT
       self
     end

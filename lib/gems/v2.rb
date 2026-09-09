@@ -1,6 +1,7 @@
-require 'gems/v2/client'
+require "gems/v2/client"
 
 module Gems
+  # Module-level access to the RubyGems API v2
   module V2
     include AbstractClient
 

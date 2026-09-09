@@ -1,11 +1,11 @@
-*.gem
-*~
-.bundle
-.rvmrc
-.yardoc/*
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/tmp/
 Gemfile.lock
-coverage/*
-doc/*
-log/*
-measurement/*
-pkg/*
+
+# ASDF-VM / rbenv
+.tool-versions

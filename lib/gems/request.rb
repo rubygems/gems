@@ -1,45 +1,46 @@
-require 'net/http'
-require 'rubygems'
-require 'open-uri'
-require 'gems/errors'
+require "net/http"
+require "rubygems"
+require "open-uri"
+require "gems/errors"
 
 module Gems
+  # HTTP request helpers mixed into clients
   module Request
-    def delete(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
+    def delete(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
       request(:delete, path, data, content_type, request_host)
     end
 
-    def get(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
+    def get(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
       request(:get, path, data, content_type, request_host)
     end
 
-    def post(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
+    def post(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
       request(:post, path, data, content_type, request_host)
     end
 
-    def put(path, data = {}, content_type = 'application/x-www-form-urlencoded', request_host = host)
+    def put(path, data = {}, content_type = "application/x-www-form-urlencoded", request_host = host)
       request(:put, path, data, content_type, request_host)
     end
 
-  private
+    private
 
-    def request(method, path, data, content_type, request_host = host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
+    def request(method, path, data, content_type, request_host = host) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
       path += hash_to_query_string(data) if %i[delete get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
       request = request_class.new uri.request_uri
-      request.add_field 'Authorization', key if key
-      request.add_field 'Connection', 'keep-alive'
-      request.add_field 'Keep-Alive', '30'
-      request.add_field 'User-Agent', user_agent
+      request.add_field "Authorization", key if key
+      request.add_field "Connection", "keep-alive"
+      request.add_field "Keep-Alive", "30"
+      request.add_field "User-Agent", user_agent
       request.basic_auth username, password if username && password
       request.content_type = content_type
       case content_type
-      when 'application/x-www-form-urlencoded'
+      when "application/x-www-form-urlencoded"
         request.form_data = data if %i[post put].include? method
-      when 'multipart/form-data'
+      when "multipart/form-data"
         request.set_form data, content_type if %i[post put].include? method
-      when 'application/octet-stream'
+      when "application/octet-stream"
         request.body = data
         request.content_length = data.size
       end
@@ -49,8 +50,8 @@ module Gems
       else
         Net::HTTP.new uri.host, uri.port
       end
-      if uri.scheme == 'https'
-        require 'net/https'
+      if uri.scheme == "https"
+        require "net/https"
         @connection.use_ssl = true
         @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
@@ -60,23 +61,23 @@ module Gems
     end
 
     def hash_to_query_string(hash)
-      return '' if hash.empty?
+      return "" if hash.empty?
 
-      '?' + URI.encode_www_form(hash)
+      "?#{URI.encode_www_form(hash)}"
     end
 
-    def body_from_response(response, method, content_type)
+    def body_from_response(response, method, content_type) # rubocop:disable Metrics/MethodLength
       case response
       when Net::HTTPRedirection
-        uri = URI.parse(response['location'])
-        host_with_scheme = [uri.scheme, uri.host].join('://')
+        uri = URI.parse(response["location"])
+        host_with_scheme = [uri.scheme, uri.host].join("://")
         request(method, uri.request_uri, {}, content_type, host_with_scheme)
       when Net::HTTPNotFound
-        raise Gems::NotFound.new(response.body)
+        raise Gems::NotFound, response.body
       when Net::HTTPSuccess
         response.body
       else
-        raise Gems::GemError.new(response.body)
+        raise Gems::GemError, response.body
       end
     end
   end

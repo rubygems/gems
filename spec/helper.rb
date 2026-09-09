@@ -1,18 +1,18 @@
-require 'simplecov'
-require 'coveralls'
+require "simplecov"
+require "coveralls"
 
 SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 
 SimpleCov.start do
-  add_filter '/spec/'
-  minimum_coverage(100) unless RUBY_PLATFORM =~ /java/
+  add_filter "/spec/"
+  minimum_coverage(100) unless RUBY_PLATFORM.match?(/java/)
 end
 
-require 'gems'
-require 'rspec'
-require 'webmock/rspec'
+require "gems"
+require "rspec"
+require "webmock/rspec"
 
-WebMock.disable_net_connect!(:allow => 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
@@ -21,7 +21,9 @@ RSpec.configure do |config|
 end
 
 def rubygems_url(url)
-  url =~ /^http/ ? url : 'https://rubygems.org' + url
+  return url if url.start_with?("http")
+
+  "https://rubygems.org#{url}"
 end
 
 def a_delete(url)
@@ -57,9 +59,9 @@ def stub_put(url)
 end
 
 def fixture_path
-  File.expand_path('../fixtures', __FILE__)
+  File.expand_path("fixtures", __dir__)
 end
 
 def fixture(file)
-  File.new(fixture_path + '/' + file)
+  File.new(File.join(fixture_path, file))
 end

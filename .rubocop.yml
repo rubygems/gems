@@ -1,86 +1,65 @@
+require:
+ - standard
+
+plugins:
+ - rubocop-performance
+ - rubocop-rake
+ - standard-performance
+
 AllCops:
-  TargetRubyVersion: 2.1
-  Include:
-    - 'Gemfile'
-    - 'Rakefile'
-    - 'gems.gemspec'
+  NewCops: enable
+  TargetRubyVersion: 3.1
 
-# Avoid long parameter lists
-ParameterLists:
-  Max: 4
-  CountKeywordArgs: true
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 2
 
-MethodLength:
-  CountComments: false
-  Max: 10
+Layout/CaseIndentation:
+  EnforcedStyle: end
 
-# Avoid more than `Max` levels of nesting.
-BlockNesting:
-  Max: 2
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: start_of_line
 
-# Align with the style guide.
-CollectionMethods:
-  PreferredMethods:
-    map:      'collect'
-    reduce:   'inject'
-    find:     'detect'
-    find_all: 'select'
+Layout/LineLength:
+  Max: 140
 
-# Limit line length
-LineLength:
-  Enabled: false
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 2
 
-# Disable documentation checking until a class needs to be documented once
-Documentation:
-  Enabled: false
-
-# Enforce Ruby 1.8-compatible hash syntax
-HashSyntax:
-  EnforcedStyle: hash_rockets
-
-# No spaces inside hash literals
-SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
-# Allow dots at the end of lines
-DotPosition:
+Lint/MissingSuper:
   Enabled: false
 
-# Don't require magic comment at the top of every file
-Encoding:
-  Enabled: false
-
-# Enforce outdenting of access modifiers (i.e. public, private, protected)
-AccessModifierIndentation:
-  EnforcedStyle: outdent
-
-EmptyLinesAroundAccessModifier:
-  Enabled: true
-
-# Align ends correctly
-EndAlignment:
-  EnforcedStyleAlignWith: variable
-
-# Indentation of when/else
-CaseIndentation:
-  EnforcedStyle: end
-  IndentOneStep: false
-
-Lambda:
-  Enabled: false
-
-RaiseArgs:
-  EnforcedStyle: compact
-
-TrailingCommaInLiteral:
-  Enabled: false
-
-# Ignore length of describe and context blocks
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*_spec.rb'
+    - spec/**/*
 
-# The RubyGems /api/v1/dependencies endpoint returns serialized ruby objects
-# that need to be deserialized within Gems::Client#dependencies. :(
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
+# The RubyGems /api/v1/dependencies endpoint returns serialized Ruby objects
+# that need to be deserialized within Gems::V1::Client#dependencies.
 Security/MarshalLoad:
   Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: never
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses
+
+Bundler/GemFilename:
+  Exclude:
+    - lib/gems.rb
