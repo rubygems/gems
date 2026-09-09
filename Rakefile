@@ -1,5 +1,11 @@
 require "bundler/gem_tasks"
 
+# Override the release task to skip the gem push, which is handled by GitHub Actions with attestations
+# when a GitHub release is created (see .github/workflows/push_gem.yml)
+Rake::Task["release"].clear
+desc "Build the gem and create a tag (the gem push is handled by CI)"
+task release: %w[build release:guard_clean release:source_control_push]
+
 require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
