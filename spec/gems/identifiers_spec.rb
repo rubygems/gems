@@ -39,6 +39,32 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#full_name_of" do
+    it "joins the name and number" do
+      expect(client.send(:full_name_of, "rails", "7.0.6", nil)).to eq("rails-7.0.6")
+    end
+
+    it "appends the platform" do
+      expect(client.send(:full_name_of, "nokogiri", "1.15.0", "java")).to eq("nokogiri-1.15.0-java")
+    end
+
+    it "omits the ruby platform" do
+      expect(client.send(:full_name_of, "rails", "7.0.6", "ruby")).to eq("rails-7.0.6")
+    end
+
+    it "defaults to the platform of a version" do
+      version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java")
+
+      expect(client.send(:full_name_of, version, version, nil)).to eq("nokogiri-1.15.0-java")
+    end
+
+    it "prefers an explicit platform" do
+      version = Gems::Version.new("number" => "1.15.0", "platform" => "java")
+
+      expect(client.send(:full_name_of, "nokogiri", version, "x86_64-linux")).to eq("nokogiri-1.15.0-x86_64-linux")
+    end
+  end
+
   describe "#handle_of" do
     it "returns a handle unchanged" do
       expect(client.send(:handle_of, "sferik")).to eq("sferik")

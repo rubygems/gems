@@ -43,6 +43,19 @@ module Gems
       end
     end
 
+    # Resolve the full name of a gem version, such as "nokogiri-1.15.0-java"
+    #
+    # The platform is omitted when it is "ruby".
+    #
+    # @api private
+    # @param gem [String, Gem, Version] a gem name, gem, or version
+    # @param version [String, Version] a version number or version
+    # @param platform [String, nil] the platform; defaults to the platform of a version object
+    # @return [String] the full name
+    def full_name_of(gem, version, platform)
+      ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
+    end
+
     # Resolve a user identifier from a handle, an email address, or an owner
     # @api private
     # @param owner [String, Owner] a handle, email address, or owner

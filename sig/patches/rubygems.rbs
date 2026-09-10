@@ -1,6 +1,11 @@
-# Declare the RubyGems configuration method used by Gems::Configuration
+# Declare the RubyGems methods used by Gems::Configuration and Gems::Identifiers
 module Gem
   class ConfigFile
     def rubygems_api_key: () -> String?
+  end
+
+  class NameTuple
+    def initialize: (String? name, String? version, ?String? platform) -> void
+    def full_name: () -> String
   end
 end
