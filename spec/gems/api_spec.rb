@@ -733,6 +733,20 @@ RSpec.describe Gems::API do
       expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
     end
 
+    it "requests a specific platform" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("rails", "7.0.6", platform: "java")
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
+    end
+
+    it "defaults to the platform of a version" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("rails", Gems::Version.new("number" => "7.0.6", "platform" => "java"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
+    end
+
     context "when the gem version exists" do
       before { stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json")) }
 

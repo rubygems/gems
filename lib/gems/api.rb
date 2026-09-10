@@ -368,11 +368,16 @@ module Gems
     # @authenticated false
     # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
     # @param version [String, Version] The requested version of the gem.
+    # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
+    #   platform of a version object, or "ruby".
     # @return [Version]
     # @example
     #   Gems.version "rails", "7.0.6"
-    def version(gem_name, version)
-      Version.new(JSON.parse(get("/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}.json")))
+    # @example
+    #   Gems.version "nokogiri", "1.15.0", platform: "java"
+    def version(gem_name, version, platform: nil)
+      path = "/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}.json"
+      Version.new(JSON.parse(get(path, {platform: platform || platform_of(version)}.compact)))
     end
 
     private

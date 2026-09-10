@@ -39,6 +39,9 @@ version.number       # => "7.0.6"
 version.built_at     # => 2023-06-29 00:00:00 UTC
 version.sha          # => "5dfbd481..."
 
+# Return information about a version for a specific platform.
+Gems.version 'nokogiri', '1.15.0', platform: 'java'
+
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 
