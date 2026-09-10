@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `timeframe_versions` for the versions created in a timeframe
 * Add a `role` option to `add_owner` and `update_owner` for changing an owner's role
 * Add `profile` and `me` for user information
+* Add `expires_at`, `rubygem_name`, and `mfa` options to `create_api_key`
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and status `code`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
