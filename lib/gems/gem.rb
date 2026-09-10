@@ -6,7 +6,7 @@ module Gems
   # @api public
   class Gem < Resource
     inspect_with :name, :version
-    identified_by :name
+    identified_by :name, :version, :platform
 
     # @!method name
     #   The name of the gem

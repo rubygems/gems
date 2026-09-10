@@ -5,8 +5,18 @@ RSpec.describe Gems::Gem do
     expect(gem).to be_a(Gems::Resource)
   end
 
-  it "is identified by its name" do
+  it "is identified by its name, version, and platform" do
+    expect(gem.identity).to eq(["rails", "7.0.6", "ruby"])
+  end
+
+  it "ignores other attributes when comparing" do
     expect(described_class.new("name" => "rails", "downloads" => 1)).to eq(described_class.new("name" => "rails", "downloads" => 2))
+  end
+
+  it "distinguishes releases of the same gem" do
+    release = described_class.new("name" => "rails", "version" => "7.0.6")
+
+    expect(release).not_to eq(described_class.new("name" => "rails", "version" => "7.0.7"))
   end
 
   it "inspects as the name and version" do
