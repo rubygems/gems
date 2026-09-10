@@ -14,7 +14,7 @@ module Gems
 
     # Resolve a gem name from a name, a gem, or a version
     # @api private
-    # @param gem [String, Gem, Version] a gem name, gem, or version
+    # @param gem [String, Gem, Version, nil] a gem name, gem, or version
     # @return [String, nil] the gem name
     def name_of(gem)
       case gem

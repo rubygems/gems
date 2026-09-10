@@ -42,7 +42,7 @@ module Gems
   def self.profile: (user_identifier user) -> Profile
   def self.me: () -> Profile
   def self.just_updated: (?page: Integer?) -> Array[Gem]
-  def self.create_api_key: (String name, **untyped scopes) -> ApiKey
+  def self.create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
   def self.update_api_key: (api_key_identifier key, **bool scopes) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> ApiKey
   def self.reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
@@ -295,7 +295,7 @@ module Gems
   module Identifiers
     private
 
-    def name_of: (gem_identifier gem) -> String?
+    def name_of: (gem_identifier? gem) -> String?
     def number_of: (version_identifier? version) -> String?
     def platform_of: (version_identifier? version) -> String?
     def full_name_of: (gem_identifier gem, version_identifier version, String? platform) -> String
@@ -333,7 +333,7 @@ module Gems
     def profile: (user_identifier user) -> Profile
     def me: () -> Profile
     def just_updated: (?page: Integer?) -> Array[Gem]
-    def create_api_key: (String name, **untyped scopes) -> ApiKey
+    def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
     def update_api_key: (api_key_identifier key, **bool scopes) -> String
     def exchange_trusted_publisher_token: (String id_token) -> ApiKey
     def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]

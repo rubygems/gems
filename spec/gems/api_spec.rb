@@ -652,6 +652,25 @@ RSpec.describe Gems::API do
       expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
     end
 
+    it "posts an expiry, a gem restriction, and a passcode requirement" do
+      client.create_api_key("ci-push", expires_at: Time.utc(2027, 1, 1), rubygem_name: Gems::Gem.new("name" => "gems"), mfa: true)
+
+      expect(a_post("/api/v1/api_key.json")
+        .with(body: {name: "ci-push", expires_at: "2027-01-01T00:00:00Z", rubygem_name: "gems", mfa: "true"})).to have_been_made
+    end
+
+    it "accepts an expiry as an ISO 8601 string" do
+      client.create_api_key("ci-push", expires_at: "2027-01-01T00:00:00Z")
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", expires_at: "2027-01-01T00:00:00Z"})).to have_been_made
+    end
+
+    it "keeps the positional name when the settings include one" do
+      client.create_api_key("ci-push", name: "other", mfa: true)
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", mfa: "true"})).to have_been_made
+    end
+
     it "returns the new API key" do
       api_key = client.create_api_key("ci-push", push_rubygem: true)
 

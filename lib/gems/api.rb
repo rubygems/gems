@@ -357,9 +357,11 @@ module Gems
     # @api public
     # @authenticated true
     # @param name [String] A name for the key.
-    # @param scopes [Hash{Symbol => Boolean, String}] Scopes and settings for the key: push_rubygem, yank_rubygem,
-    #   index_rubygems, add_owner, remove_owner, access_webhooks, mfa (require a one-time passcode), expires_at, and
-    #   rubygem_name (restrict the key to a single gem).
+    # @param expires_at [Time, String, nil] When the key expires, as a Time or an ISO 8601 string.
+    # @param rubygem_name [String, Gem, nil] A gem to restrict the key to.
+    # @param mfa [Boolean, nil] Whether to require a one-time passcode when the key is used.
+    # @param scopes [Hash{Symbol => Boolean}] The scopes to enable: push_rubygem, yank_rubygem, index_rubygems,
+    #   add_owner, remove_owner, access_webhooks, update_owner, configure_trusted_publishers, and show_dashboard.
     # @return [ApiKey] the new API key
     # @example
     #   Gems.configure do |config|
@@ -367,8 +369,11 @@ module Gems
     #     config.password = "schwwwwing"
     #   end
     #   Gems.create_api_key("ci-push", push_rubygem: true).key
-    def create_api_key(name, **scopes)
-      ApiKey.new(JSON.parse(post("/api/v1/api_key.json", {**scopes, name:})))
+    # @example
+    #   Gems.create_api_key("ci-push", push_rubygem: true, rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
+    def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
+      settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
+      ApiKey.new(JSON.parse(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
     end
 
     # Update the scopes of an API key using HTTP basic auth

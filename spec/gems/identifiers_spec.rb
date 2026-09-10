@@ -13,6 +13,10 @@ RSpec.describe Gems::Identifiers do
     it "returns the name of a version" do
       expect(client.send(:name_of, Gems::Version.new("name" => "rails"))).to eq("rails")
     end
+
+    it "returns nil for nil" do
+      expect(client.send(:name_of, nil)).to be_nil
+    end
   end
 
   describe "#number_of" do
