@@ -1,71 +1,46 @@
-require:
- - standard
-
 plugins:
- - rubocop-performance
- - rubocop-rake
- - standard-performance
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+  - standard-custom
+  - standard-performance
+
+inherit_gem:
+  standard: config/base.yml
+  standard-custom: config/base.yml
+  standard-performance: config/base.yml
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1
 
-Layout/ArgumentAlignment:
-  EnforcedStyle: with_fixed_indentation
-  IndentationWidth: 2
-
-Layout/CaseIndentation:
-  EnforcedStyle: end
-
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: start_of_line
-
-Layout/LeadingCommentSpace:
-  AllowRBSInlineAnnotation: true
-
-Layout/LineLength:
-  Max: 140
-
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-  IndentationWidth: 2
-
-Layout/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
-
-Lint/MissingSuper:
-  Enabled: false
+# Standard disables the Metrics cops; enforce them at RuboCop's defaults
+Metrics/AbcSize:
+  Enabled: true
 
 Metrics/BlockLength:
-  Exclude:
-    - gems.gemspec
-    - spec/**/*
+  Enabled: true
+
+Metrics/BlockNesting:
+  Enabled: true
 
 Metrics/ClassLength:
-  Max: 120
-  CountAsOne:
-    - array
-    - hash
-    - heredoc
+  Enabled: true
+
+Metrics/CollectionLiteralLength:
+  Enabled: true
+
+Metrics/CyclomaticComplexity:
+  Enabled: true
+
+Metrics/MethodLength:
+  Enabled: true
+
+Metrics/ModuleLength:
+  Enabled: true
 
 Metrics/ParameterLists:
+  Enabled: true
   CountKeywordArgs: false
 
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/FrozenStringLiteralComment:
-  EnforcedStyle: never
-
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
-
-Style/TernaryParentheses:
-  EnforcedStyle: require_parentheses
-
-Bundler/GemFilename:
-  Exclude:
-    - lib/gems.rb
+Metrics/PerceivedComplexity:
+  Enabled: true

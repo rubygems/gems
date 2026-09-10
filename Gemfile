@@ -12,6 +12,7 @@ gem "rspec", ">= 3.13"
 gem "rubocop", ">= 1.21"
 gem "rubocop-performance", ">= 1.18"
 gem "rubocop-rake", ">= 0.6"
+gem "rubocop-rspec", ">= 3.0"
 gem "simplecov", ">= 1" if RUBY_VERSION >= "3.2"
 gem "standard", ">= 1.35.1"
 gem "steep", ">= 1.10", platforms: :mri
