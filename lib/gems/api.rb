@@ -4,6 +4,7 @@ require_relative "downloads"
 require_relative "gem"
 require_relative "identifiers"
 require_relative "owner"
+require_relative "profile"
 require_relative "trusted_publisher_authenticator"
 require_relative "version"
 require_relative "web_hook"
@@ -61,7 +62,7 @@ module Gems
     #
     # @api public
     # @authenticated true
-    # @param user_handle [String, Owner, nil] The handle of a user, or an owner.
+    # @param user_handle [String, Integer, Owner, Profile, nil] The handle or ID of a user, or an owner or profile.
     # @return [Array<Gem>]
     # @example
     #   Gems.owned_gems
@@ -306,6 +307,35 @@ module Gems
     #   Gems.latest
     def latest(page: nil)
       Gem.list(JSON.parse(get("/api/v1/activity/latest.json", {page:}.compact)))
+    end
+
+    # Returns basic information about a user
+    #
+    # @api public
+    # @authenticated false
+    # @param user [String, Integer, Owner, Profile] The handle or ID of a user, or an owner or profile.
+    # @return [Profile]
+    # @example
+    #   Gems.profile "qrush"
+    def profile(user)
+      Profile.new(JSON.parse(get("/api/v1/profiles/#{handle_of(user)}.json")))
+    end
+
+    # Returns basic information about your account
+    #
+    # The profile includes the account's multi-factor authentication level.
+    #
+    # @api public
+    # @authenticated true
+    # @return [Profile]
+    # @example
+    #   Gems.configure do |config|
+    #     config.username = "nick@gemcutter.org"
+    #     config.password = "schwwwwing"
+    #   end
+    #   Gems.me.mfa
+    def me
+      Profile.new(JSON.parse(get("/api/v1/profile/me.json")))
     end
 
     # Returns the 50 most recently updated gems

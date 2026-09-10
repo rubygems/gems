@@ -1,6 +1,7 @@
 require_relative "api_key"
 require_relative "gem"
 require_relative "owner"
+require_relative "profile"
 require_relative "version"
 require_relative "web_hook"
 
@@ -56,13 +57,13 @@ module Gems
       ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
     end
 
-    # Resolve a user identifier from a handle, an email address, or an owner
+    # Resolve a user identifier from a handle, email address, ID, owner, or profile
     # @api private
-    # @param owner [String, Owner] a handle, email address, or owner
-    # @return [String, nil] the handle, or the email address when the owner has no handle
+    # @param owner [String, Integer, Owner, Profile] a handle, email address, user ID, owner, or profile
+    # @return [String, Integer, nil] the handle or ID, or the email address when the user has no handle
     def handle_of(owner)
       case owner
-      when Owner then owner.handle || owner.email
+      when Owner, Profile then owner.handle || owner.email
       else owner
       end
     end

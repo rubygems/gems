@@ -61,6 +61,9 @@ Gems.owned_gems
 # Return all gems owned by Erik Berlin.
 Gems.owned_gems 'sferik'
 
+# Return basic information about a user, by handle or ID.
+Gems.profile('sferik').handle
+
 # Submit a gem to RubyGems.org.
 Gems.push File.new 'gemcutter-0.2.1.gem'
 
@@ -133,6 +136,9 @@ Gems.configure do |config|
 end
 Gems.create_api_key('ci-push', push_rubygem: true).key
 
+# Return your own profile, including its multi-factor authentication level.
+Gems.me.mfa
+
 # Update the scopes of an API key.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
 
@@ -165,9 +171,10 @@ client.gem 'rails'
 ## Response objects
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
-`Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
-`Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are accepted wherever their
-identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` all work.
+`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`.
+Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
+accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and
+`Gems.key = api_key` all work.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.gem('rails') == Gems.gem('rails')` even when download counts have changed in between. Every object also exposes
 the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
