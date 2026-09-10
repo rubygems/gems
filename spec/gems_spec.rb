@@ -25,7 +25,7 @@ RSpec.describe Gems do
     end
   end
 
-  Gems::API.public_instance_methods(false).each do |method|
+  Gems::API.public_instance_methods.each do |method|
     it "delegates .#{method} to a client" do
       expect(described_class).to respond_to(method)
     end
