@@ -77,6 +77,10 @@ RSpec.describe Gems::Identifiers do
     it "falls back to the email of an owner without a handle" do
       expect(client.send(:handle_of, Gems::Owner.new("email" => "sferik@gmail.com"))).to eq("sferik@gmail.com")
     end
+
+    it "returns the handle of a profile" do
+      expect(client.send(:handle_of, Gems::Profile.new("id" => 1, "handle" => "sferik"))).to eq("sferik")
+    end
   end
 
   describe "#url_of" do

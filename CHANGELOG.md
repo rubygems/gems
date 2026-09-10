@@ -18,12 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `attestations` for the sigstore attestations of a version
 * Add `timeframe_versions` for the versions created in a timeframe
 * Add a `role` option to `add_owner` and `update_owner` for changing an owner's role
+* Add `profile` and `me` for user information
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and status `code`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
-* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `WebHook`, `Downloads`, and `ApiKey` objects
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `ApiKey` objects
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
