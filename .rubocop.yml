@@ -49,7 +49,7 @@ Metrics/ClassLength:
     - heredoc
 
 Metrics/ModuleLength:
-  Max: 120
+  Max: 160
   CountAsOne:
     - array
     - hash

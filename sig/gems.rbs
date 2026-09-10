@@ -14,6 +14,7 @@ module Gems
 
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
   def self.gem: (gem_identifier gem_name) -> Gem
+  def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
   def self.contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
   def self.attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
@@ -322,12 +323,14 @@ module Gems
     def exchange_trusted_publisher_token: (String id_token) -> ApiKey
     def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
 
+    def timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
     def version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
     def contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
     def attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
 
     private
 
+    def timestamp_of: ((Time | String)? time) -> String?
     def gem_name_from: (Hash[String, untyped] version) -> String
     def multipart_push_body: (File gem, Array[File] attestations) -> Array[multipart_field]
   end

@@ -362,6 +362,23 @@ module Gems
       JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}/reverse_dependencies.json", {only:}.compact))
     end
 
+    # Returns the gem versions created within a timeframe of up to seven days
+    #
+    # The results are paginated, 30 versions at a time; use the page option until an empty list is returned.
+    #
+    # @api public
+    # @authenticated false
+    # @param from [Time, String] The start of the timeframe, as a Time or an ISO 8601 string.
+    # @param to [Time, String, nil] The end of the timeframe; defaults to now.
+    # @param page [Integer, nil] The page of results to return.
+    # @return [Array<Gem>]
+    # @example
+    #   Gems.timeframe_versions from: Time.now - 86_400
+    def timeframe_versions(from:, to: nil, page: nil)
+      params = {from: timestamp_of(from), to: timestamp_of(to), page:}.compact
+      Gem.list(JSON.parse(get("/api/v1/timeframe_versions.json", params)))
+    end
+
     # Returns information about the given gem for a specific version
     #
     # @api public
@@ -416,6 +433,17 @@ module Gems
     end
 
     private
+
+    # Format a timestamp for a query parameter
+    # @api private
+    # @param time [Time, String, nil] a Time, or an ISO 8601 string
+    # @return [String, nil] the ISO 8601 string
+    def timestamp_of(time)
+      case time
+      when Time then time.iso8601
+      else time
+      end
+    end
 
     # Derive the gem name from a version's full name
     #

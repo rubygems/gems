@@ -115,6 +115,10 @@ Gems.latest
 # Returns the 50 most recently updated gems
 Gems.just_updated
 
+# Returns the gem versions created in a timeframe of up to seven days, 30 at a time.
+Gems.timeframe_versions from: Time.now - 86_400
+Gems.timeframe_versions from: '2019-01-18T21:24:29Z', to: '2019-01-19T21:24:29Z', page: 2
+
 # Create an API key using HTTP basic authentication.
 # The key is only returned once, so store it somewhere safe.
 Gems.configure do |config|
@@ -158,7 +162,7 @@ Responses are wrapped in objects with readers for each documented field: `Gems::
 `Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
 `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are accepted wherever their
 identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` all work.
-Objects compare by identity (a gem by its name, a version by its name, number, and platform, and so on), so
+Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.gem('rails') == Gems.gem('rails')` even when download counts have changed in between. Every object also exposes
 the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
 

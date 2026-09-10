@@ -842,4 +842,48 @@ RSpec.describe Gems::API do
         .to eq(["application/vnd.dev.sigstore.bundle.v0.3+json"])
     end
   end
+
+  describe "#timeframe_versions" do
+    let(:from) { Time.utc(2019, 1, 18, 21, 24, 29) }
+    let(:to) { Time.utc(2019, 1, 18, 21, 24, 31) }
+    let(:query) { "from=2019-01-18T21:24:29Z&to=2019-01-18T21:24:31Z" }
+
+    before { stub_get("/api/v1/timeframe_versions.json?#{query}").to_return(body: fixture("timeframe_versions.json")) }
+
+    it "gets the correct resource" do
+      client.timeframe_versions(from:, to:)
+
+      expect(a_get("/api/v1/timeframe_versions.json?#{query}")).to have_been_made
+    end
+
+    it "accepts ISO 8601 strings" do
+      client.timeframe_versions(from: "2019-01-18T21:24:29Z", to: "2019-01-18T21:24:31Z")
+
+      expect(a_get("/api/v1/timeframe_versions.json?#{query}")).to have_been_made
+    end
+
+    it "defaults the end of the timeframe to now" do
+      stub_get("/api/v1/timeframe_versions.json?from=2019-01-18T21:24:29Z").to_return(body: fixture("timeframe_versions.json"))
+      client.timeframe_versions(from:)
+
+      expect(a_get("/api/v1/timeframe_versions.json?from=2019-01-18T21:24:29Z")).to have_been_made
+    end
+
+    it "requests a page" do
+      stub_get("/api/v1/timeframe_versions.json?#{query}&page=2").to_return(body: fixture("timeframe_versions.json"))
+      client.timeframe_versions(from:, to:, page: 2)
+
+      expect(a_get("/api/v1/timeframe_versions.json?#{query}&page=2")).to have_been_made
+    end
+
+    it "returns the versions created in the timeframe" do
+      version = client.timeframe_versions(from:, to:).first
+
+      expect([version.class, version.name, version.version]).to eq([Gems::Gem, "rails", "6.0.0.beta1"])
+    end
+
+    it "keeps releases of the same gem distinct" do
+      expect(client.timeframe_versions(from:, to:).uniq.map(&:version)).to eq(%w[6.0.0.beta1 6.0.0.beta2])
+    end
+  end
 end
