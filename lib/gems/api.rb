@@ -398,6 +398,23 @@ module Gems
       JSON.parse(get(path, {platform: platform || platform_of(version)}.compact))
     end
 
+    # Returns the sigstore attestations published with a gem version
+    #
+    # @api public
+    # @authenticated false
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version] The requested version of the gem.
+    # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
+    #   platform of a version object, or "ruby".
+    # @return [Array<Hash>] the sigstore bundles, empty for versions pushed without attestations
+    # @example
+    #   Gems.attestations("rails", "8.1.3.1").first["mediaType"]
+    # @example
+    #   Gems.attestations "nokogiri", "1.15.0", platform: "java"
+    def attestations(gem_name, version, platform: nil)
+      JSON.parse(get("/api/v1/attestations/#{full_name_of(gem_name, version, platform)}.json"))
+    end
+
     private
 
     # Derive the gem name from a version's full name

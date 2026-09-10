@@ -807,4 +807,39 @@ RSpec.describe Gems::API do
       expect(contents["MIT-LICENSE"]).to eq("sha256" => "717ba1949502290f8e47688ae2e323acd06c8ca47aec9f7596b15f678c1af4a2")
     end
   end
+
+  describe "#attestations" do
+    before { stub_get("/api/v1/attestations/rails-8.1.3.1.json").to_return(body: fixture("attestations/rails-8.1.3.1.json")) }
+
+    it "accepts a gem and a version" do
+      client.attestations(Gems::Gem.new("name" => "rails"), Gems::Version.new("number" => "8.1.3.1"))
+
+      expect(a_get("/api/v1/attestations/rails-8.1.3.1.json")).to have_been_made
+    end
+
+    it "gets the correct resource" do
+      client.attestations("rails", "8.1.3.1")
+
+      expect(a_get("/api/v1/attestations/rails-8.1.3.1.json")).to have_been_made
+    end
+
+    it "includes a specific platform in the full name" do
+      stub_get("/api/v1/attestations/nokogiri-1.15.0-java.json").to_return(body: "[]")
+      client.attestations("nokogiri", "1.15.0", platform: "java")
+
+      expect(a_get("/api/v1/attestations/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "includes the platform of a version in the full name" do
+      stub_get("/api/v1/attestations/nokogiri-1.15.0-java.json").to_return(body: "[]")
+      client.attestations("nokogiri", Gems::Version.new("number" => "1.15.0", "platform" => "java"))
+
+      expect(a_get("/api/v1/attestations/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "returns the sigstore bundles" do
+      expect(client.attestations("rails", "8.1.3.1").map { |bundle| bundle["mediaType"] })
+        .to eq(["application/vnd.dev.sigstore.bundle.v0.3+json"])
+    end
+  end
 end

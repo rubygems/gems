@@ -16,6 +16,7 @@ module Gems
   def self.gem: (gem_identifier gem_name) -> Gem
   def self.version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
   def self.contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
+  def self.attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
   def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
@@ -284,6 +285,7 @@ module Gems
     def name_of: (gem_identifier gem) -> String?
     def number_of: (version_identifier? version) -> String?
     def platform_of: (version_identifier? version) -> String?
+    def full_name_of: (gem_identifier gem, version_identifier version, String? platform) -> String
     def handle_of: (owner_identifier owner) -> String?
     def url_of: (web_hook_identifier web_hook) -> String?
     def key_of: (api_key_identifier? api_key) -> String?
@@ -322,6 +324,7 @@ module Gems
 
     def version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
     def contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
+    def attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
 
     private
 
