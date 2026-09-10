@@ -45,6 +45,10 @@ Gems.version 'nokogiri', '1.15.0', platform: 'java'
 # Return the SHA-256 checksum of every file in a version.
 Gems.contents('rails', '8.1.3.1')['README.md']['sha256']
 
+# Return the sigstore attestations published with a version.
+Gems.attestations 'rails', '8.1.3.1'
+Gems.attestations 'nokogiri', '1.15.0', platform: 'java'
+
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 
