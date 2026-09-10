@@ -16,6 +16,7 @@ module Gems
   def self.gem: (gem_identifier gem_name) -> Gem
   def self.version: (gem_identifier gem_name, version_identifier version) -> Version
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
+  def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
   def self.push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
   def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
@@ -293,6 +294,7 @@ module Gems
 
     def gem: (gem_identifier gem_name) -> Gem
     def search: (String query, ?page: Integer?) -> Array[Gem]
+    def autocomplete: (String query) -> Array[String]
     def owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
     def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
     def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String

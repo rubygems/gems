@@ -59,6 +59,20 @@ RSpec.describe Gems::API do
     end
   end
 
+  describe "#autocomplete" do
+    before { stub_get("/api/v1/search/autocomplete?query=nokogiri").to_return(body: fixture("autocomplete.json")) }
+
+    it "gets the correct resource" do
+      client.autocomplete("nokogiri")
+
+      expect(a_get("/api/v1/search/autocomplete?query=nokogiri")).to have_been_made
+    end
+
+    it "returns the gem names that match the query" do
+      expect(client.autocomplete("nokogiri")).to eq(%w[nokogiri nokogiri-diff nokogiri-happymapper nokogiri-styles])
+    end
+  end
+
   describe "#owned_gems" do
     it "accepts an owner" do
       stub_get("/api/v1/owners/sferik/gems.json").to_return(body: fixture("gems.json"))
