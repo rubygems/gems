@@ -27,7 +27,7 @@ Or, if Bundler is not being used to manage dependencies:
 require 'gems'
 
 # Return some basic information about rails.
-Gems.info 'rails'
+Gems.gem 'rails'
 
 # Return some basic information about rails version 7.0.6.
 Gems.version 'rails', '7.0.6'
@@ -36,10 +36,10 @@ Gems.version 'rails', '7.0.6'
 Gems.search 'cucumber'
 
 # Return all gems that you own.
-Gems.gems
+Gems.owned_gems
 
 # Return all gems owned by Erik Berlin.
-Gems.gems("sferik")
+Gems.owned_gems 'sferik'
 
 # Submit a gem to RubyGems.org.
 Gems.push File.new 'gemcutter-0.2.1.gem'
@@ -55,12 +55,15 @@ Gems.unyank 'bills', '0.0.1'
 # Return an array of version details for coulda.
 Gems.versions 'coulda'
 
-# Return an hash of latest version for coulda.
+# Return the latest version number of coulda.
 Gems.latest_version 'coulda'
 
-# Return the total number of downloads for rails_admin 0.0.1.
+# Return the total number of downloads of all gems.
+Gems.total_downloads
+
+# Return the number of downloads of rails_admin and of version 0.0.1.
 # (Defaults to the latest version if no version is specified.)
-Gems.total_downloads 'rails_admin', '0.0.1'
+Gems.downloads 'rails_admin', '0.0.1'
 
 # Returns an array containing the top 50 downloaded gem versions of all time.
 Gems.most_downloaded
@@ -74,7 +77,7 @@ Gems.add_owner 'josh@technicalpickles.com', 'gemcutter'
 # Remove a user's permission to manage a RubyGem you own.
 Gems.remove_owner 'josh@technicalpickles.com', 'gemcutter'
 
-# Return all the webhooks registered under your account.
+# Return all the webhooks registered under your account, each with a gem_name ("*" for all gems).
 Gems.web_hooks
 
 # Add a webhook.
@@ -106,9 +109,6 @@ Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: t
 # Exchange an OIDC ID token for an API key via trusted publishing.
 Gems.exchange_trusted_publisher_token ENV.fetch('ID_TOKEN')
 
-# Return an array of gem dependency details for all versions of all the given gems.
-Gems.dependencies ['rails', 'thor']
-
 # The following methods require authentication.
 # By default, we load your API key from ~/.gem/credentials
 # You can override this default by specifying a custom API key.
@@ -129,7 +129,7 @@ end
 
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
-client.info 'rails'
+client.gem 'rails'
 ```
 
 ## Configuration

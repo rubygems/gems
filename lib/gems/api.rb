@@ -8,6 +8,9 @@ module Gems
   #
   # @api public
   module API
+    # Mapping of the gem name groupings returned by the web hooks endpoint to the names used to register hooks
+    WEB_HOOK_GEM_NAMES = {"all gems" => "*"}.freeze
+
     # Returns some basic information about the given gem
     #
     # @api public
@@ -15,8 +18,8 @@ module Gems
     # @param gem_name [String] The name of a gem.
     # @return [Hash]
     # @example
-    #   Gems.info 'rails'
-    def info(gem_name)
+    #   Gems.gem 'rails'
+    def gem(gem_name)
       response = get("/api/v1/gems/#{gem_name}.json")
       JSON.parse(response)
     rescue JSON::ParserError
@@ -28,13 +31,12 @@ module Gems
     # @api public
     # @authenticated false
     # @param query [String] A term to search for.
-    # @param options [Hash] A customizable set of options.
-    # @option options [Integer] :page
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array<Hash>]
     # @example
-    #   Gems.search 'cucumber'
-    def search(query, options = {})
-      response = get("/api/v1/search.json", options.merge({query:}))
+    #   Gems.search "cucumber", page: 2
+    def search(query, page: nil)
+      response = get("/api/v1/search.json", {query:, page:}.compact)
       JSON.parse(response)
     end
 
@@ -45,8 +47,8 @@ module Gems
     # @param user_handle [String] The handle of a user.
     # @return [Array]
     # @example
-    #   Gems.gems
-    def gems(user_handle = nil)
+    #   Gems.owned_gems
+    def owned_gems(user_handle = nil)
       response = if user_handle
         get("/api/v1/owners/#{user_handle}/gems.json")
       else
@@ -64,8 +66,8 @@ module Gems
     # @param attestations [Array] An array of attestations to push, or `nil`.
     # @return [String]
     # @example
-    #   Gems.push File.new 'pkg/gemcutter-0.2.1.gem'
-    def push(gem, host = nil, attestations: nil)
+    #   Gems.push File.new("pkg/gemcutter-0.2.1.gem"), host: "https://gems.example.com"
+    def push(gem, host: nil, attestations: nil)
       if attestations
         data = [
           ["gem", gem.read, {filename: gem.path, content_type: "application/octet-stream"}],
@@ -82,15 +84,14 @@ module Gems
     # @api public
     # @authenticated true
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
+    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
-    #   Gems.yank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def yank(gem_name, gem_version = nil, options = {})
-      gem_version ||= info(gem_name).fetch("version")
-      delete("/api/v1/gems/yank", options.merge({gem_name:, version: gem_version}))
+    #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+    def yank(gem_name, version = nil, platform: nil)
+      version ||= latest_version(gem_name)
+      delete("/api/v1/gems/yank", {gem_name:, version:, platform:}.compact)
     end
 
     # Update a previously yanked gem back into RubyGems.org's index
@@ -98,15 +99,14 @@ module Gems
     # @api public
     # @authenticated true
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @param options [Hash] A customizable set of options.
-    # @option options [String] :platform
+    # @param version [String, nil] The version of a gem (defaults to the latest version).
+    # @param platform [String, nil] The platform of the gem.
     # @return [String]
     # @example
-    #   Gems.unyank "gemcutter", "0.2.1", {:platform => "x86-darwin-10"}
-    def unyank(gem_name, gem_version = nil, options = {})
-      gem_version ||= info(gem_name).fetch("version")
-      put("/api/v1/gems/unyank", options.merge({gem_name:, version: gem_version}))
+    #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+    def unyank(gem_name, version = nil, platform: nil)
+      version ||= latest_version(gem_name)
+      put("/api/v1/gems/unyank", {gem_name:, version:, platform:}.compact)
     end
 
     # Returns an array of gem version details
@@ -127,29 +127,36 @@ module Gems
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem.
-    # @return [Hash]
+    # @return [String] the latest version number
     # @example
-    #   Gems.latest_version 'coulda'
+    #   Gems.latest_version "coulda"
     def latest_version(gem_name)
       response = get("/api/v1/versions/#{gem_name}/latest.json")
-      JSON.parse(response)
+      JSON.parse(response).fetch("version")
     end
 
-    # Returns the total number of downloads for a particular gem
+    # Returns the total number of downloads of all gems
+    #
+    # @api public
+    # @authenticated false
+    # @return [Integer]
+    # @example
+    #   Gems.total_downloads
+    def total_downloads
+      JSON.parse(get("/api/v1/downloads.json")).fetch("total")
+    end
+
+    # Returns the number of downloads of a gem and of one of its versions
     #
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem.
-    # @param gem_version [String] The version of a gem.
-    # @return [Hash]
+    # @param version [String, nil] The version of the gem (defaults to the latest version).
+    # @return [Hash] with :total_downloads and :version_downloads keys
     # @example
-    #   Gems.total_downloads 'rails_admin', '0.0.1'
-    def total_downloads(gem_name = nil, gem_version = nil)
-      response = if gem_name
-        get("/api/v1/downloads/#{gem_name}-#{gem_version || info(gem_name).fetch("version")}.json")
-      else
-        get("/api/v1/downloads.json")
-      end
+    #   Gems.downloads("rails_admin", "0.0.1")[:version_downloads]
+    def downloads(gem_name, version = nil)
+      response = get("/api/v1/downloads/#{gem_name}-#{version || latest_version(gem_name)}.json")
       JSON.parse(response, symbolize_names: true)
     end
 
@@ -206,14 +213,18 @@ module Gems
 
     # List the webhooks registered under your account
     #
+    # Each hook includes a "gem_name" key; hooks registered for all gems have a gem name of "*",
+    # matching the value used to register them.
+    #
     # @api public
     # @authenticated true
-    # @return [Hash]
+    # @return [Array<Hash>]
     # @example
-    #   Gems.web_hooks
+    #   Gems.web_hooks.map { |hook| hook["url"] }
     def web_hooks
-      response = get("/api/v1/web_hooks.json")
-      JSON.parse(response)
+      JSON.parse(get("/api/v1/web_hooks.json")).flat_map do |gem_name, hooks|
+        hooks.map { |hook| hook.merge("gem_name" => WEB_HOOK_GEM_NAMES.fetch(gem_name, gem_name)) }
+      end
     end
 
     # Create a webhook
@@ -259,12 +270,12 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param options [Hash] A customizable set of options.
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array]
     # @example
-    #   Gem.latest
-    def latest(options = {})
-      response = get("/api/v1/activity/latest.json", options)
+    #   Gems.latest
+    def latest(page: nil)
+      response = get("/api/v1/activity/latest.json", {page:}.compact)
       JSON.parse(response)
     end
 
@@ -272,30 +283,13 @@ module Gems
     #
     # @api public
     # @authenticated false
-    # @param options [Hash] A customizable set of options.
+    # @param page [Integer, nil] The page of results to return.
     # @return [Array]
     # @example
-    #   Gem.just_updated
-    def just_updated(options = {})
-      response = get("/api/v1/activity/just_updated.json", options)
+    #   Gems.just_updated
+    def just_updated(page: nil)
+      response = get("/api/v1/activity/just_updated.json", {page:}.compact)
       JSON.parse(response)
-    end
-
-    # Retrieve your API key using HTTP basic auth
-    #
-    # RubyGems.org has retired this endpoint, which now responds 410 Gone. Use {#create_api_key} instead.
-    #
-    # @api public
-    # @authenticated true
-    # @return [String]
-    # @example
-    #   Gems.configure do |config|
-    #     config.username = 'nick@gemcutter.org'
-    #     config.password = 'schwwwwing'
-    #   end
-    #   Gems.api_key
-    def api_key
-      get("/api/v1/api_key")
     end
 
     # Create an API key using HTTP basic auth
@@ -305,16 +299,9 @@ module Gems
     # @api public
     # @authenticated true
     # @param name [String] A name for the key.
-    # @param options [Hash] Scopes and settings for the key.
-    # @option options [Boolean] :push_rubygem
-    # @option options [Boolean] :yank_rubygem
-    # @option options [Boolean] :index_rubygems
-    # @option options [Boolean] :add_owner
-    # @option options [Boolean] :remove_owner
-    # @option options [Boolean] :access_webhooks
-    # @option options [Boolean] :mfa Require a one-time passcode when the key is used.
-    # @option options [String] :expires_at
-    # @option options [String] :rubygem_name Restrict the key to a single gem.
+    # @param scopes [Hash{Symbol => Boolean, String}] Scopes and settings for the key: push_rubygem, yank_rubygem,
+    #   index_rubygems, add_owner, remove_owner, access_webhooks, mfa (require a one-time passcode), expires_at, and
+    #   rubygem_name (restrict the key to a single gem).
     # @return [String] the new API key
     # @example
     #   Gems.configure do |config|
@@ -322,8 +309,8 @@ module Gems
     #     config.password = "schwwwwing"
     #   end
     #   Gems.create_api_key "ci-push", push_rubygem: true
-    def create_api_key(name, options = {})
-      JSON.parse(post("/api/v1/api_key.json", options.merge({name:}))).fetch("rubygems_api_key")
+    def create_api_key(name, **scopes)
+      JSON.parse(post("/api/v1/api_key.json", {**scopes, name:})).fetch("rubygems_api_key")
     end
 
     # Update the scopes of an API key using HTTP basic auth
@@ -331,14 +318,12 @@ module Gems
     # @api public
     # @authenticated true
     # @param key [String] The API key to update.
-    # @param options [Hash] Scopes to enable or disable.
-    # @option options [Boolean] :push_rubygem
-    # @option options [Boolean] :yank_rubygem
+    # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
     # @return [String]
     # @example
     #   Gems.update_api_key "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
-    def update_api_key(key, options = {})
-      patch("/api/v1/api_key", options.merge({api_key: key}))
+    def update_api_key(key, **scopes)
+      patch("/api/v1/api_key", {**scopes, api_key: key})
     end
 
     # Exchange an OIDC ID token for an API key via trusted publishing
@@ -353,30 +338,17 @@ module Gems
       TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:).exchange_token!
     end
 
-    # Returns an array of hashes for all versions of given gems
-    #
-    # @api public
-    # @authenticated false
-    # @param gems [Array] A list of gem names
-    # @return [Array]
-    # @example
-    #   Gems.dependencies 'rails', 'thor'
-    def dependencies(*gems)
-      response = get("/api/v1/dependencies", {gems: gems.join(",")})
-      Marshal.load(response)
-    end
-
     # Returns an array of all the reverse dependencies to the given gem
     #
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem
-    # @param options [Hash] A customizable set of options.
+    # @param only [String, nil] Restrict the results to "development" or "runtime" dependencies.
     # @return [Array]
     # @example
-    #   Gems.reverse_dependencies 'money'
-    def reverse_dependencies(gem_name, options = {})
-      response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", options)
+    #   Gems.reverse_dependencies "money", only: "runtime"
+    def reverse_dependencies(gem_name, only: nil)
+      response = get("/api/v1/gems/#{gem_name}/reverse_dependencies.json", {only:}.compact)
       JSON.parse(response)
     end
 
