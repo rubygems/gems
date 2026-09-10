@@ -97,6 +97,20 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#timestamp_of" do
+    it "formats a Time as ISO 8601" do
+      expect(client.send(:timestamp_of, Time.utc(2019, 1, 18, 21, 24, 29))).to eq("2019-01-18T21:24:29Z")
+    end
+
+    it "returns a string unchanged" do
+      expect(client.send(:timestamp_of, "2019-01-18T21:24:29Z")).to eq("2019-01-18T21:24:29Z")
+    end
+
+    it "returns nil for nil" do
+      expect(client.send(:timestamp_of, nil)).to be_nil
+    end
+  end
+
   describe "#key_of" do
     it "returns a key unchanged" do
       expect(client.send(:key_of, TEST_KEY)).to eq(TEST_KEY)
