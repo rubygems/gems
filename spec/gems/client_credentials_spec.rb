@@ -1,6 +1,32 @@
 RSpec.describe Gems::ClientCredentials do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
+  describe "#initialize_credentials" do
+    let(:client) do
+      Gems::Client.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD, otp: "123456", id_token: "ID_TOKEN")
+    end
+
+    it "sets the key" do
+      expect(client.key).to eq(TEST_KEY)
+    end
+
+    it "sets the username" do
+      expect(client.username).to eq(TEST_USERNAME)
+    end
+
+    it "sets the password" do
+      expect(client.password).to eq(TEST_PASSWORD)
+    end
+
+    it "sets the one-time passcode" do
+      expect(client.otp).to eq("123456")
+    end
+
+    it "sets the ID token" do
+      expect(client.id_token).to eq("ID_TOKEN")
+    end
+  end
+
   describe "#initialize_authenticator" do
     it "uses no authentication without credentials" do
       expect(client.authenticator).to be_an_instance_of(Gems::Authenticator)
@@ -22,10 +48,6 @@ RSpec.describe Gems::ClientCredentials do
       client = Gems::Client.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD)
 
       expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
-    end
-
-    it "returns the authenticator" do
-      expect(client.send(:initialize_authenticator)).to equal(client.authenticator)
     end
 
     it "uses trusted publisher authentication with an ID token" do
@@ -51,27 +73,9 @@ RSpec.describe Gems::ClientCredentials do
 
       expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
     end
-  end
 
-  describe "#otp_authenticator" do
-    it "returns the authenticator unchanged without a one-time passcode" do
-      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: nil)
-
-      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
-    end
-
-    it "wraps the credential authenticator with the one-time passcode" do
-      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
-
-      expect([client.authenticator.otp, client.authenticator.authenticator.class]).to eq(["123456", Gems::ApiKeyAuthenticator])
-    end
-
-    it "sends the one-time passcode with requests" do
-      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
-      stub_get("/path")
-      client.get("/path")
-
-      expect(a_get("/path").with(headers: {"Authorization" => TEST_KEY, "OTP" => "123456"})).to have_been_made
+    it "returns the authenticator" do
+      expect(client.send(:initialize_authenticator)).to equal(client.authenticator)
     end
   end
 
@@ -92,6 +96,34 @@ RSpec.describe Gems::ClientCredentials do
       client = Gems::Client.new(key: nil, username: TEST_USERNAME, password: TEST_PASSWORD)
 
       expect([client.authenticator.username, client.authenticator.password]).to eq([TEST_USERNAME, TEST_PASSWORD])
+    end
+  end
+
+  describe "#otp_authenticator" do
+    it "returns the authenticator unchanged without a one-time passcode" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: nil)
+
+      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+    end
+
+    it "wraps the authenticator with the one-time passcode" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+
+      expect([client.authenticator.otp, client.authenticator.authenticator]).to eq(["123456", client.authenticator.authenticator])
+    end
+
+    it "wraps the credential authenticator" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+
+      expect(client.authenticator.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+    end
+
+    it "sends the one-time passcode with requests" do
+      client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
+      stub_get("/path")
+      client.get("/path")
+
+      expect(a_get("/path").with(headers: {"Authorization" => TEST_KEY, "OTP" => "123456"})).to have_been_made
     end
   end
 

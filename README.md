@@ -30,7 +30,7 @@ require 'gems'
 Gems.info 'rails'
 
 # Return some basic information about rails version 7.0.6.
-Gems::V2.info 'rails', '7.0.6'
+Gems.version 'rails', '7.0.6'
 
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
@@ -160,9 +160,9 @@ Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environmen
 
 ## Errors
 
-All errors inherit from `Gems::GemError`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
+All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
 status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`.
-Redirect loops raise `Gems::TooManyRedirects`.
+Network failures raise `Gems::NetworkError` and redirect loops raise `Gems::TooManyRedirects`.
 
 ## Development
 
