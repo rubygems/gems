@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add a `platform` option to `version`
 * Add `contents` for the file checksums of a version
 * Add `attestations` for the sigstore attestations of a version
+* Add `timeframe_versions` for the versions created in a timeframe
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and status `code`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
