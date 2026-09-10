@@ -94,6 +94,12 @@ Gems.owners('gemcutter').map(&:handle)
 # Add an owner to a RubyGem you own, giving that user permission to manage it.
 Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
 
+# Add a maintainer, who can push but cannot manage owners.
+Gems.add_owner 'gemcutter', 'josh@technicalpickles.com', role: 'maintainer'
+
+# Change the role of an existing owner.
+Gems.update_owner 'gemcutter', 'josh@technicalpickles.com', role: 'owner'
+
 # Remove a user's permission to manage a RubyGem you own.
 Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
 
