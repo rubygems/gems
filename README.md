@@ -136,6 +136,9 @@ Gems.configure do |config|
 end
 Gems.create_api_key('ci-push', push_rubygem: true).key
 
+# Create a key restricted to one gem that expires in a day and requires a one-time passcode.
+Gems.create_api_key('ci-push', push_rubygem: true, rubygem_name: 'gems', expires_at: Time.now + 86_400, mfa: true)
+
 # Return your own profile, including its multi-factor authentication level.
 Gems.me.mfa
 
