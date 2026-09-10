@@ -4,6 +4,7 @@ require:
 plugins:
  - rubocop-performance
  - rubocop-rake
+ - rubocop-rspec
  - standard-performance
 
 AllCops:
