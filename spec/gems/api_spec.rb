@@ -420,8 +420,36 @@ RSpec.describe Gems::API do
       expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com"})).to have_been_made
     end
 
+    it "posts a role" do
+      client.add_owner("gems", "sferik@gmail.com", role: "maintainer")
+
+      expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com", role: "maintainer"})).to have_been_made
+    end
+
     it "returns the response body" do
       expect(client.add_owner("gems", "sferik@gmail.com")).to eq("Owner added successfully.")
+    end
+  end
+
+  describe "#update_owner" do
+    before { stub_request(:patch, rubygems_url("/api/v1/gems/gems/owners")).to_return(body: fixture("update_owner")) }
+
+    it "accepts a gem and an owner, using the owner's handle" do
+      client.update_owner(Gems::Gem.new("name" => "gems"), Gems::Owner.new("handle" => "sferik"), role: "maintainer")
+
+      expect(a_request(:patch, rubygems_url("/api/v1/gems/gems/owners"))
+        .with(body: {email: "sferik", role: "maintainer"})).to have_been_made
+    end
+
+    it "patches the correct resource" do
+      client.update_owner("gems", "sferik@gmail.com", role: "maintainer")
+
+      expect(a_request(:patch, rubygems_url("/api/v1/gems/gems/owners"))
+        .with(body: {email: "sferik@gmail.com", role: "maintainer"})).to have_been_made
+    end
+
+    it "returns the response body" do
+      expect(client.update_owner("gems", "sferik@gmail.com", role: "maintainer")).to eq("Owner updated successfully.")
     end
   end
 

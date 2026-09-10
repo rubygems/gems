@@ -30,7 +30,8 @@ module Gems
   def self.downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
   def self.most_downloaded: () -> Array[Version]
   def self.owners: (gem_identifier gem_name) -> Array[Owner]
-  def self.add_owner: (gem_identifier gem_name, owner_identifier owner) -> String
+  def self.add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
+  def self.update_owner: (gem_identifier gem_name, owner_identifier owner, role: String) -> String
   def self.remove_owner: (gem_identifier gem_name, owner_identifier owner) -> String
   def self.web_hooks: () -> Array[WebHook]
   def self.add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
@@ -310,7 +311,8 @@ module Gems
     def downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
     def most_downloaded: () -> Array[Version]
     def owners: (gem_identifier gem_name) -> Array[Owner]
-    def add_owner: (gem_identifier gem_name, owner_identifier owner) -> String
+    def add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
+    def update_owner: (gem_identifier gem_name, owner_identifier owner, role: String) -> String
     def remove_owner: (gem_identifier gem_name, owner_identifier owner) -> String
     def web_hooks: () -> Array[WebHook]
     def add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
