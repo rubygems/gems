@@ -18,5 +18,5 @@ module Gems
   #     Gems.new(key: "701243f217cdf23b1370c7b66b65ca97")
   def_delegator "Gems::Client", :new
 
-  def_delegators :new, *API.public_instance_methods(false)
+  def_delegators :new, *API.public_instance_methods
 end

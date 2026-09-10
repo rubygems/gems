@@ -39,14 +39,30 @@ version.number       # => "7.0.6"
 version.built_at     # => 2023-06-29 00:00:00 UTC
 version.sha          # => "5dfbd481..."
 
+# Return information about a version for a specific platform.
+Gems.version 'nokogiri', '1.15.0', platform: 'java'
+
+# Return the SHA-256 checksum of every file in a version.
+Gems.contents('rails', '8.1.3.1')['README.md']['sha256']
+
+# Return the sigstore attestations published with a version.
+Gems.attestations 'rails', '8.1.3.1'
+Gems.attestations 'nokogiri', '1.15.0', platform: 'java'
+
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
+
+# Return the names of gems that match the query, for a search box.
+Gems.autocomplete 'nokogiri'
 
 # Return all gems that you own.
 Gems.owned_gems
 
 # Return all gems owned by Erik Berlin.
 Gems.owned_gems 'sferik'
+
+# Return basic information about a user, by handle or ID.
+Gems.profile('sferik').handle
 
 # Submit a gem to RubyGems.org.
 Gems.push File.new 'gemcutter-0.2.1.gem'
@@ -81,6 +97,12 @@ Gems.owners('gemcutter').map(&:handle)
 # Add an owner to a RubyGem you own, giving that user permission to manage it.
 Gems.add_owner 'gemcutter', 'josh@technicalpickles.com'
 
+# Add a maintainer, who can push but cannot manage owners.
+Gems.add_owner 'gemcutter', 'josh@technicalpickles.com', role: 'maintainer'
+
+# Change the role of an existing owner.
+Gems.update_owner 'gemcutter', 'josh@technicalpickles.com', role: 'owner'
+
 # Remove a user's permission to manage a RubyGem you own.
 Gems.remove_owner 'gemcutter', 'josh@technicalpickles.com'
 
@@ -102,6 +124,10 @@ Gems.latest
 # Returns the 50 most recently updated gems
 Gems.just_updated
 
+# Returns the gem versions created in a timeframe of up to seven days, 30 at a time.
+Gems.timeframe_versions from: Time.now - 86_400
+Gems.timeframe_versions from: '2019-01-18T21:24:29Z', to: '2019-01-19T21:24:29Z', page: 2
+
 # Create an API key using HTTP basic authentication.
 # The key is only returned once, so store it somewhere safe.
 Gems.configure do |config|
@@ -109,6 +135,12 @@ Gems.configure do |config|
   config.password = 'schwwwwing'
 end
 Gems.create_api_key('ci-push', push_rubygem: true).key
+
+# Create a key restricted to one gem that expires in a day and requires a one-time passcode.
+Gems.create_api_key('ci-push', push_rubygem: true, rubygem_name: 'gems', expires_at: Time.now + 86_400, mfa: true)
+
+# Return your own profile, including its multi-factor authentication level.
+Gems.me.mfa
 
 # Update the scopes of an API key.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
@@ -142,10 +174,11 @@ client.gem 'rails'
 ## Response objects
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
-`Gems::Dependency`, `Gems::Owner`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Timestamps are parsed into
-`Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are accepted wherever their
-identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` all work.
-Objects compare by identity (a gem by its name, a version by its name, number, and platform, and so on), so
+`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`.
+Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
+accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and
+`Gems.key = api_key` all work.
+Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.gem('rails') == Gems.gem('rails')` even when download counts have changed in between. Every object also exposes
 the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
 

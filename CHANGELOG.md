@@ -12,12 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `OtpAuthenticator` and an `otp` option for multi-factor authentication
 * Add `TrustedPublisherAuthenticator`, an `id_token` option, and `exchange_trusted_publisher_token` for trusted publishing
 * Add `create_api_key` and `update_api_key` for the current API key endpoints
+* Add `autocomplete` for gem name suggestions
+* Add a `platform` option to `version`
+* Add `contents` for the file checksums of a version
+* Add `attestations` for the sigstore attestations of a version
+* Add `timeframe_versions` for the versions created in a timeframe
+* Add a `role` option to `add_owner` and `update_owner` for changing an owner's role
+* Add `profile` and `me` for user information
+* Add `expires_at`, `rubygem_name`, and `mfa` options to `create_api_key`
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and status `code`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
-* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `WebHook`, `Downloads`, and `ApiKey` objects
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `ApiKey` objects
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`

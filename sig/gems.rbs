@@ -4,7 +4,8 @@ module Gems
   type multipart_field = [Symbol | String, untyped] | [String, String, Hash[Symbol, String]]
   type gem_identifier = String | Gem | Version
   type version_identifier = String | Version
-  type owner_identifier = String | Owner
+  type owner_identifier = String | Owner | Profile
+  type user_identifier = String | Integer | Owner | Profile
   type web_hook_identifier = String | WebHook
   type api_key_identifier = String | ApiKey
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
@@ -14,9 +15,13 @@ module Gems
 
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
   def self.gem: (gem_identifier gem_name) -> Gem
-  def self.version: (gem_identifier gem_name, version_identifier version) -> Version
+  def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
+  def self.version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
+  def self.contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
+  def self.attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
-  def self.owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
+  def self.autocomplete: (String query) -> Array[String]
+  def self.owned_gems: (?user_identifier? user_handle) -> Array[Gem]
   def self.push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
   def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
   def self.unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
@@ -26,15 +31,18 @@ module Gems
   def self.downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
   def self.most_downloaded: () -> Array[Version]
   def self.owners: (gem_identifier gem_name) -> Array[Owner]
-  def self.add_owner: (gem_identifier gem_name, owner_identifier owner) -> String
+  def self.add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
+  def self.update_owner: (gem_identifier gem_name, owner_identifier owner, role: String) -> String
   def self.remove_owner: (gem_identifier gem_name, owner_identifier owner) -> String
   def self.web_hooks: () -> Array[WebHook]
   def self.add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   def self.remove_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   def self.fire_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   def self.latest: (?page: Integer?) -> Array[Gem]
+  def self.profile: (user_identifier user) -> Profile
+  def self.me: () -> Profile
   def self.just_updated: (?page: Integer?) -> Array[Gem]
-  def self.create_api_key: (String name, **untyped scopes) -> ApiKey
+  def self.create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
   def self.update_api_key: (api_key_identifier key, **bool scopes) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> ApiKey
   def self.reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
@@ -247,6 +255,14 @@ module Gems
     def role: () -> String?
   end
 
+  class Profile < Resource
+    def id: () -> Integer?
+    def handle: () -> String?
+    def email: () -> String?
+    def mfa: () -> String?
+    def warning: () -> String?
+  end
+
   class WebHook < Resource
     def gem_name: () -> String?
     def url: () -> String?
@@ -279,49 +295,107 @@ module Gems
   module Identifiers
     private
 
-    def name_of: (gem_identifier gem) -> String?
+    def name_of: (gem_identifier? gem) -> String?
     def number_of: (version_identifier? version) -> String?
-    def handle_of: (owner_identifier owner) -> String?
+    def platform_of: (version_identifier? version) -> String?
+    def full_name_of: (gem_identifier gem, version_identifier version, String? platform) -> String
+    def handle_of: (user_identifier owner) -> (String | Integer)?
     def url_of: (web_hook_identifier web_hook) -> String?
     def key_of: (api_key_identifier? api_key) -> String?
+    def timestamp_of: ((Time | String)? time) -> String?
   end
 
   module API : Object, _Requests
+    include ActivityEndpoints
+    include ApiKeyEndpoints
+    include DownloadEndpoints
+    include GemEndpoints
+    include OwnerEndpoints
+    include ProfileEndpoints
+    include VersionEndpoints
+    include WebHookEndpoints
+  end
+
+  module API::ActivityEndpoints : Object, _Requests
     include Identifiers
 
-    WEB_HOOK_GEM_NAMES: Hash[String, String]
+    def latest: (?page: Integer?) -> Array[Gem]
+    def just_updated: (?page: Integer?) -> Array[Gem]
+  end
 
-    def gem: (gem_identifier gem_name) -> Gem
-    def search: (String query, ?page: Integer?) -> Array[Gem]
-    def owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
-    def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
-    def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
-    def unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
-    def versions: (gem_identifier gem_name) -> Array[Version]
-    def latest_version: (gem_identifier gem_name) -> String
+  module API::ApiKeyEndpoints : Object, _Requests
+    include Identifiers
+
+    def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
+    def update_api_key: (api_key_identifier key, **bool scopes) -> String
+    def exchange_trusted_publisher_token: (String id_token) -> ApiKey
+  end
+
+  module API::DownloadEndpoints : Object, _Requests, API::VersionEndpoints
+    include Identifiers
+
     def total_downloads: () -> Integer
     def downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
     def most_downloaded: () -> Array[Version]
-    def owners: (gem_identifier gem_name) -> Array[Owner]
-    def add_owner: (gem_identifier gem_name, owner_identifier owner) -> String
-    def remove_owner: (gem_identifier gem_name, owner_identifier owner) -> String
-    def web_hooks: () -> Array[WebHook]
-    def add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
-    def remove_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
-    def fire_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
-    def latest: (?page: Integer?) -> Array[Gem]
-    def just_updated: (?page: Integer?) -> Array[Gem]
-    def create_api_key: (String name, **untyped scopes) -> ApiKey
-    def update_api_key: (api_key_identifier key, **bool scopes) -> String
-    def exchange_trusted_publisher_token: (String id_token) -> ApiKey
-    def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
-
-    def version: (gem_identifier gem_name, version_identifier version) -> Version
 
     private
 
     def gem_name_from: (Hash[String, untyped] version) -> String
+  end
+
+  module API::GemEndpoints : Object, _Requests, API::VersionEndpoints
+    include Identifiers
+
+    def gem: (gem_identifier gem_name) -> Gem
+    def search: (String query, ?page: Integer?) -> Array[Gem]
+    def autocomplete: (String query) -> Array[String]
+    def owned_gems: (?user_identifier? user_handle) -> Array[Gem]
+    def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
+    def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
+    def unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
+    def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
+
+    private
+
     def multipart_push_body: (File gem, Array[File] attestations) -> Array[multipart_field]
+  end
+
+  module API::OwnerEndpoints : Object, _Requests
+    include Identifiers
+
+    def owners: (gem_identifier gem_name) -> Array[Owner]
+    def add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
+    def update_owner: (gem_identifier gem_name, owner_identifier owner, role: String) -> String
+    def remove_owner: (gem_identifier gem_name, owner_identifier owner) -> String
+  end
+
+  module API::ProfileEndpoints : Object, _Requests
+    include Identifiers
+
+    def profile: (user_identifier user) -> Profile
+    def me: () -> Profile
+  end
+
+  module API::VersionEndpoints : Object, _Requests
+    include Identifiers
+
+    def versions: (gem_identifier gem_name) -> Array[Version]
+    def latest_version: (gem_identifier gem_name) -> String
+    def version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
+    def contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
+    def attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
+    def timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
+  end
+
+  module API::WebHookEndpoints : Object, _Requests
+    include Identifiers
+
+    WEB_HOOK_GEM_NAMES: Hash[String, String]
+
+    def web_hooks: () -> Array[WebHook]
+    def add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
+    def remove_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
+    def fire_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   end
 
   class Client

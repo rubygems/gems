@@ -1,6 +1,7 @@
 require_relative "api_key"
 require_relative "gem"
 require_relative "owner"
+require_relative "profile"
 require_relative "version"
 require_relative "web_hook"
 
@@ -13,7 +14,7 @@ module Gems
 
     # Resolve a gem name from a name, a gem, or a version
     # @api private
-    # @param gem [String, Gem, Version] a gem name, gem, or version
+    # @param gem [String, Gem, Version, nil] a gem name, gem, or version
     # @return [String, nil] the gem name
     def name_of(gem)
       case gem
@@ -33,13 +34,36 @@ module Gems
       end
     end
 
-    # Resolve a user identifier from a handle, an email address, or an owner
+    # Resolve a platform from a version
     # @api private
-    # @param owner [String, Owner] a handle, email address, or owner
-    # @return [String, nil] the handle, or the email address when the owner has no handle
+    # @param version [String, Version, nil] a version number or version
+    # @return [String, nil] the platform of a version, or nil for a version number
+    def platform_of(version)
+      case version
+      when Version then version.platform
+      end
+    end
+
+    # Resolve the full name of a gem version, such as "nokogiri-1.15.0-java"
+    #
+    # The platform is omitted when it is "ruby".
+    #
+    # @api private
+    # @param gem [String, Gem, Version] a gem name, gem, or version
+    # @param version [String, Version] a version number or version
+    # @param platform [String, nil] the platform; defaults to the platform of a version object
+    # @return [String] the full name
+    def full_name_of(gem, version, platform)
+      ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
+    end
+
+    # Resolve a user identifier from a handle, email address, ID, owner, or profile
+    # @api private
+    # @param owner [String, Integer, Owner, Profile] a handle, email address, user ID, owner, or profile
+    # @return [String, Integer, nil] the handle or ID, or the email address when the user has no handle
     def handle_of(owner)
       case owner
-      when Owner then owner.handle || owner.email
+      when Owner, Profile then owner.handle || owner.email
       else owner
       end
     end
@@ -52,6 +76,17 @@ module Gems
       case web_hook
       when WebHook then web_hook.url
       else web_hook
+      end
+    end
+
+    # Resolve an ISO 8601 timestamp from a Time or a string
+    # @api private
+    # @param time [Time, String, nil] a Time, or an ISO 8601 string
+    # @return [String, nil] the ISO 8601 string
+    def timestamp_of(time)
+      case time
+      when Time then time.iso8601
+      else time
       end
     end
 

@@ -13,6 +13,10 @@ RSpec.describe Gems::Identifiers do
     it "returns the name of a version" do
       expect(client.send(:name_of, Gems::Version.new("name" => "rails"))).to eq("rails")
     end
+
+    it "returns nil for nil" do
+      expect(client.send(:name_of, nil)).to be_nil
+    end
   end
 
   describe "#number_of" do
@@ -29,6 +33,42 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#platform_of" do
+    it "returns nil for a version number" do
+      expect(client.send(:platform_of, "7.0.6")).to be_nil
+    end
+
+    it "returns the platform of a version" do
+      expect(client.send(:platform_of, Gems::Version.new("number" => "1.15.0", "platform" => "java"))).to eq("java")
+    end
+  end
+
+  describe "#full_name_of" do
+    it "joins the name and number" do
+      expect(client.send(:full_name_of, "rails", "7.0.6", nil)).to eq("rails-7.0.6")
+    end
+
+    it "appends the platform" do
+      expect(client.send(:full_name_of, "nokogiri", "1.15.0", "java")).to eq("nokogiri-1.15.0-java")
+    end
+
+    it "omits the ruby platform" do
+      expect(client.send(:full_name_of, "rails", "7.0.6", "ruby")).to eq("rails-7.0.6")
+    end
+
+    it "defaults to the platform of a version" do
+      version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java")
+
+      expect(client.send(:full_name_of, version, version, nil)).to eq("nokogiri-1.15.0-java")
+    end
+
+    it "prefers an explicit platform" do
+      version = Gems::Version.new("number" => "1.15.0", "platform" => "java")
+
+      expect(client.send(:full_name_of, "nokogiri", version, "x86_64-linux")).to eq("nokogiri-1.15.0-x86_64-linux")
+    end
+  end
+
   describe "#handle_of" do
     it "returns a handle unchanged" do
       expect(client.send(:handle_of, "sferik")).to eq("sferik")
@@ -41,6 +81,10 @@ RSpec.describe Gems::Identifiers do
     it "falls back to the email of an owner without a handle" do
       expect(client.send(:handle_of, Gems::Owner.new("email" => "sferik@gmail.com"))).to eq("sferik@gmail.com")
     end
+
+    it "returns the handle of a profile" do
+      expect(client.send(:handle_of, Gems::Profile.new("id" => 1, "handle" => "sferik"))).to eq("sferik")
+    end
   end
 
   describe "#url_of" do
@@ -50,6 +94,20 @@ RSpec.describe Gems::Identifiers do
 
     it "returns the URL of a web hook" do
       expect(client.send(:url_of, Gems::WebHook.new("url" => "http://example.com"))).to eq("http://example.com")
+    end
+  end
+
+  describe "#timestamp_of" do
+    it "formats a Time as ISO 8601" do
+      expect(client.send(:timestamp_of, Time.utc(2019, 1, 18, 21, 24, 29))).to eq("2019-01-18T21:24:29Z")
+    end
+
+    it "returns a string unchanged" do
+      expect(client.send(:timestamp_of, "2019-01-18T21:24:29Z")).to eq("2019-01-18T21:24:29Z")
+    end
+
+    it "returns nil for nil" do
+      expect(client.send(:timestamp_of, nil)).to be_nil
     end
   end
 
