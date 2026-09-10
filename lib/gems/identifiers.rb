@@ -33,6 +33,16 @@ module Gems
       end
     end
 
+    # Resolve a platform from a version
+    # @api private
+    # @param version [String, Version, nil] a version number or version
+    # @return [String, nil] the platform of a version, or nil for a version number
+    def platform_of(version)
+      case version
+      when Version then version.platform
+      end
+    end
+
     # Resolve a user identifier from a handle, an email address, or an owner
     # @api private
     # @param owner [String, Owner] a handle, email address, or owner

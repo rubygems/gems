@@ -29,6 +29,16 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#platform_of" do
+    it "returns nil for a version number" do
+      expect(client.send(:platform_of, "7.0.6")).to be_nil
+    end
+
+    it "returns the platform of a version" do
+      expect(client.send(:platform_of, Gems::Version.new("number" => "1.15.0", "platform" => "java"))).to eq("java")
+    end
+  end
+
   describe "#handle_of" do
     it "returns a handle unchanged" do
       expect(client.send(:handle_of, "sferik")).to eq("sferik")
