@@ -4,6 +4,7 @@ RSpec.describe Gems::RedirectHandler do
   let(:connection) { Gems::Connection.new }
   let(:request_builder) { Gems::RequestBuilder.new }
   let(:request) { Net::HTTP::Get.new(URI("https://rubygems.org/old")) }
+  let(:form_request) { Net::HTTP::Post.new(URI("https://rubygems.org/old")).tap { |post| post.form_data = {key: "value"} } }
 
   def redirect(code, location, klass: Net::HTTPFound)
     response = klass.new("1.1", code.to_s, "Redirect")
@@ -112,20 +113,16 @@ RSpec.describe Gems::RedirectHandler do
 
     {301 => Net::HTTPMovedPermanently, 302 => Net::HTTPFound, 303 => Net::HTTPSeeOther}.each do |code, klass|
       it "converts a POST to a GET on a #{code}" do
-        request = Net::HTTP::Post.new(URI("https://rubygems.org/old"))
-        request.form_data = {key: "value"}
         stub_request(:get, "https://rubygems.org/new")
-        handler.handle(response: redirect(code, "/new", klass:), request:)
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request)
 
         expect(a_request(:get, "https://rubygems.org/new")).to have_been_made
       end
     end
 
     it "drops the body on a 302" do
-      request = Net::HTTP::Post.new(URI("https://rubygems.org/old"))
-      request.form_data = {key: "value"}
       stub_request(:get, "https://rubygems.org/new")
-      handler.handle(response: redirect(302, "/new"), request:)
+      handler.handle(response: redirect(302, "/new"), request: form_request)
 
       expect(a_request(:get, "https://rubygems.org/new").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
     end
@@ -140,10 +137,8 @@ RSpec.describe Gems::RedirectHandler do
       end
 
       it "preserves the body on a #{code}" do
-        request = Net::HTTP::Post.new(URI("https://rubygems.org/old"))
-        request.form_data = {key: "value"}
         stub_request(:post, "https://rubygems.org/new")
-        handler.handle(response: redirect(code, "/new", klass:), request:)
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request)
 
         expect(a_request(:post, "https://rubygems.org/new").with(body: "key=value")).to have_been_made
       end
@@ -158,10 +153,8 @@ RSpec.describe Gems::RedirectHandler do
       end
 
       it "preserves the content type on a #{code}" do
-        request = Net::HTTP::Post.new(URI("https://rubygems.org/old"))
-        request.form_data = {key: "value"}
         stub_request(:post, "https://rubygems.org/new")
-        handler.handle(response: redirect(code, "/new", klass:), request:)
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request)
 
         expect(a_request(:post, "https://rubygems.org/new")
           .with(headers: {"Content-Type" => "application/x-www-form-urlencoded"})).to have_been_made
