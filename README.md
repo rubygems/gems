@@ -42,6 +42,9 @@ version.sha          # => "5dfbd481..."
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 
+# Return the names of gems that match the query, for a search box.
+Gems.autocomplete 'nokogiri'
+
 # Return all gems that you own.
 Gems.owned_gems
 
