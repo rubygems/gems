@@ -61,7 +61,7 @@ RSpec.describe Gems::ResponseParser do
     it "attaches the response to the error" do
       stub_request(:get, uri.to_s).to_return(status: 500)
 
-      expect { parser.parse(response:) }.to(raise_error { |error| expect(error.code).to eq("500") })
+      expect { parser.parse(response:) }.to raise_error(having_attributes(code: "500"))
     end
   end
 end
