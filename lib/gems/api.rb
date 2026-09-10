@@ -45,6 +45,18 @@ module Gems
       Gem.list(JSON.parse(get("/api/v1/search.json", {query:, page:}.compact)))
     end
 
+    # Returns the names of gems matching the query, for populating a search box
+    #
+    # @api public
+    # @authenticated false
+    # @param query [String] The query to autocomplete.
+    # @return [Array<String>]
+    # @example
+    #   Gems.autocomplete "nokogiri"
+    def autocomplete(query)
+      JSON.parse(get("/api/v1/search/autocomplete", {query:}))
+    end
+
     # List all gems that you own, or that the given user owns
     #
     # @api public
