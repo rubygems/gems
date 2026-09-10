@@ -79,6 +79,17 @@ module Gems
       end
     end
 
+    # Resolve an ISO 8601 timestamp from a Time or a string
+    # @api private
+    # @param time [Time, String, nil] a Time, or an ISO 8601 string
+    # @return [String, nil] the ISO 8601 string
+    def timestamp_of(time)
+      case time
+      when Time then time.iso8601
+      else time
+      end
+    end
+
     # Resolve an API key from a key or an API key object
     # @api private
     # @param api_key [String, ApiKey, nil] a key or API key
