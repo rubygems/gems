@@ -15,6 +15,7 @@ module Gems
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
   def self.gem: (gem_identifier gem_name) -> Gem
   def self.version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
+  def self.contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
   def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?owner_identifier? user_handle) -> Array[Gem]
@@ -320,6 +321,7 @@ module Gems
     def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
 
     def version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
+    def contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
 
     private
 

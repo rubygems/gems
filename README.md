@@ -42,6 +42,9 @@ version.sha          # => "5dfbd481..."
 # Return information about a version for a specific platform.
 Gems.version 'nokogiri', '1.15.0', platform: 'java'
 
+# Return the SHA-256 checksum of every file in a version.
+Gems.contents('rails', '8.1.3.1')['README.md']['sha256']
+
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 

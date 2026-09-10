@@ -380,6 +380,24 @@ module Gems
       Version.new(JSON.parse(get(path, {platform: platform || platform_of(version)}.compact)))
     end
 
+    # Returns the SHA-256 checksum of every file packaged in a specific gem version
+    #
+    # Only versions pushed after RubyGems.org started recording file manifests have this data.
+    #
+    # @api public
+    # @authenticated false
+    # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
+    # @param version [String, Version] The requested version of the gem.
+    # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
+    #   platform of a version object, or "ruby".
+    # @return [Hash{String => Hash{String => String}}] the checksums of each file, keyed by path
+    # @example
+    #   Gems.contents("rails", "8.1.3.1")["README.md"]["sha256"]
+    def contents(gem_name, version, platform: nil)
+      path = "/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}/contents.json"
+      JSON.parse(get(path, {platform: platform || platform_of(version)}.compact))
+    end
+
     private
 
     # Derive the gem name from a version's full name
