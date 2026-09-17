@@ -57,14 +57,25 @@ module Gems
       ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
     end
 
-    # Resolve a user identifier from a handle, email address, ID, owner, or profile
+    # Resolve the email parameter from a handle, email address, owner, or profile
     # @api private
     # @param owner [String, Integer, Owner, Profile] a handle, email address, user ID, owner, or profile
-    # @return [String, Integer, nil] the handle or ID, or the email address when the user has no handle
+    # @return [String, Integer, nil] the handle, or the email address when the user has no handle
     def handle_of(owner)
       case owner
       when Owner, Profile then owner.handle || owner.email
       else owner
+      end
+    end
+
+    # Resolve a user identifier for a URL path from a handle, ID, owner, or profile
+    # @api private
+    # @param user [String, Integer, Owner, Profile] a handle, user ID, owner, or profile
+    # @return [String, Integer, nil] the handle, or the ID when the user has no handle
+    def slug_of(user)
+      case user
+      when Owner, Profile then user.handle || user.id
+      else user
       end
     end
 

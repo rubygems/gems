@@ -18,7 +18,7 @@ module Gems
       # @example
       #   Gems.profile "qrush"
       def profile(user)
-        Profile.new(JSON.parse(get("/api/v1/profiles/#{handle_of(user)}.json")))
+        Profile.new(JSON.parse(get("/api/v1/profiles/#{slug_of(user)}.json")))
       end
 
       # Returns basic information about your account

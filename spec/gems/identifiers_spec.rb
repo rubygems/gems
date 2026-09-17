@@ -87,6 +87,24 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#slug_of" do
+    it "returns a handle unchanged" do
+      expect(client.send(:slug_of, "sferik")).to eq("sferik")
+    end
+
+    it "returns the handle of an owner" do
+      expect(client.send(:slug_of, Gems::Owner.new("id" => 1, "handle" => "sferik"))).to eq("sferik")
+    end
+
+    it "falls back to the ID of an owner without a handle" do
+      expect(client.send(:slug_of, Gems::Owner.new("id" => 1, "email" => "sferik@gmail.com"))).to eq(1)
+    end
+
+    it "returns the handle of a profile" do
+      expect(client.send(:slug_of, Gems::Profile.new("id" => 1, "handle" => "sferik"))).to eq("sferik")
+    end
+  end
+
   describe "#url_of" do
     it "returns a URL unchanged" do
       expect(client.send(:url_of, "http://example.com")).to eq("http://example.com")
