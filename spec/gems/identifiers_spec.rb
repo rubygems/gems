@@ -45,7 +45,7 @@ RSpec.describe Gems::Identifiers do
 
   describe "#full_name_of" do
     it "joins the name and number" do
-      expect(client.send(:full_name_of, "rails", "7.0.6", nil)).to eq("rails-7.0.6")
+      expect(client.send(:full_name_of, "rails", "7.0.6")).to eq("rails-7.0.6")
     end
 
     it "appends the platform" do
@@ -59,7 +59,7 @@ RSpec.describe Gems::Identifiers do
     it "defaults to the platform of a version" do
       version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java")
 
-      expect(client.send(:full_name_of, version, version, nil)).to eq("nokogiri-1.15.0-java")
+      expect(client.send(:full_name_of, version, version)).to eq("nokogiri-1.15.0-java")
     end
 
     it "prefers an explicit platform" do
