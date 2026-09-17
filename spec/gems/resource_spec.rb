@@ -124,7 +124,14 @@ RSpec.describe Gems::Resource do
 
   describe "#initialize" do
     it "stores the attributes" do
-      expect(resource.attributes).to equal(attributes)
+      expect(resource.attributes).to eq(attributes)
+    end
+
+    it "leaves the hash it was given mutable" do
+      raw = {"metadata" => {"changelog_uri" => +"https://example.com"}, "licenses" => [+"MIT"]}
+      resource_class.new(raw)
+
+      expect([raw, raw["metadata"], raw["licenses"], raw["licenses"].first].map(&:frozen?)).to all(be(false))
     end
 
     it "freezes the attributes" do
@@ -137,10 +144,20 @@ RSpec.describe Gems::Resource do
       expect([resource[:metadata], resource[:metadata]["changelog_uri"]]).to all(be_frozen)
     end
 
+    it "copies nested hashes entry by entry" do
+      resource = resource_class.new("metadata" => {"changelog_uri" => +"https://example.com"})
+
+      expect(resource[:metadata]).to eq("changelog_uri" => "https://example.com")
+    end
+
     it "freezes nested arrays and their elements" do
       resource = resource_class.new("licenses" => [+"MIT"])
 
       expect([resource[:licenses], resource[:licenses].first]).to all(be_frozen)
+    end
+
+    it "copies nested arrays element by element" do
+      expect(resource_class.new("licenses" => [+"MIT"])[:licenses]).to eq(["MIT"])
     end
 
     it "freezes strings" do
@@ -226,7 +243,7 @@ RSpec.describe Gems::Resource do
 
   describe "#identity" do
     it "is the attributes without declared readers" do
-      expect(resource.identity).to equal(attributes)
+      expect(resource.identity).to eq(attributes)
     end
 
     it "is the values of the declared readers" do
@@ -238,7 +255,7 @@ RSpec.describe Gems::Resource do
 
   describe "#to_h" do
     it "returns the attributes" do
-      expect(resource.to_h).to equal(attributes)
+      expect(resource.to_h).to eq(attributes)
     end
   end
 

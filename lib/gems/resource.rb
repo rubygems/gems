@@ -116,7 +116,8 @@ module Gems
 
     # Initialize a new resource
     #
-    # The attributes, including nested hashes, arrays, and strings, are frozen, so resources are immutable values.
+    # The attributes are deeply copied and frozen, so resources are immutable values and the hash passed in
+    # stays mutable.
     #
     # @api public
     # @param attributes [Hash{String => Object}] the raw attributes from the API response
@@ -221,16 +222,20 @@ module Gems
       nil
     end
 
-    # Freeze a value and everything nested inside it
+    # Copy a value, freezing the copy and everything nested inside it
+    #
+    # Everything a parsed JSON response holds other than hashes, arrays, and strings is already immutable.
+    #
     # @api private
-    # @param value [Object] the value to freeze
-    # @return [Object] the frozen value
+    # @param value [Object] the value to copy
+    # @return [Object] the frozen copy
     def deep_freeze(value)
       case value
-      when Hash then value.each_value { |nested| deep_freeze(nested) }
-      when Array then value.each { |nested| deep_freeze(nested) }
+      when Hash then value.to_h { |key, nested| [key, deep_freeze(nested)] }.freeze
+      when Array then value.map { |nested| deep_freeze(nested) }.freeze
+      when String then value.dup.freeze
+      else value
       end
-      value.freeze
     end
   end
 end
