@@ -1,18 +1,18 @@
 RSpec.describe Gems::API do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
-  describe "#gem" do
+  describe "#rubygem" do
     context "when the gem exists" do
       before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
 
       it "gets the correct resource" do
-        client.gem("rails")
+        client.rubygem("rails")
 
         expect(a_get("/api/v1/gems/rails.json")).to have_been_made
       end
 
       it "returns information about the gem" do
-        expect(client.gem("rails")["name"]).to eq("rails")
+        expect(client.rubygem("rails")["name"]).to eq("rails")
       end
     end
 
@@ -20,7 +20,7 @@ RSpec.describe Gems::API do
       before { stub_get("/api/v1/gems/nonexistentgem.json").to_return(body: "This rubygem could not be found.") }
 
       it "returns an empty hash" do
-        expect(client.gem("nonexistentgem")).to eq({})
+        expect(client.rubygem("nonexistentgem")).to eq({})
       end
     end
   end

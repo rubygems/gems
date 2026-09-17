@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Push to the client's configured host by default
 * Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now disables that fallback without disabling configured basic authentication or trusted publishing
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
-* Rename `info` to `gem` and `gems` to `owned_gems`
+* Rename `info` to `rubygem` and `gems` to `owned_gems`
 * Return the version string from `latest_version`
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a flat list from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
