@@ -96,7 +96,7 @@ module Gems
     #   @return [Boolean] whether the version has been yanked
     #   @example
     #     version.yanked?
-    predicate :yanked
+    predicate :yanked, "yanked", "yanked_at"
 
     # @!method licenses
     #   The licenses
@@ -120,7 +120,7 @@ module Gems
     #   @return [String, nil] the required Ruby version
     #   @example
     #     version.ruby_version
-    attribute :ruby_version
+    attribute :ruby_version, "ruby_version", "required_ruby_version"
 
     # @!method rubygems_version
     #   The required RubyGems version
@@ -128,7 +128,7 @@ module Gems
     #   @return [String, nil] the required RubyGems version
     #   @example
     #     version.rubygems_version
-    attribute :rubygems_version
+    attribute :rubygems_version, "rubygems_version", "required_rubygems_version"
 
     # @!method sha
     #   The SHA-256 checksum of the gem file
@@ -136,7 +136,7 @@ module Gems
     #   @return [String, nil] the SHA-256 checksum of the gem file
     #   @example
     #     version.sha
-    attribute :sha
+    attribute :sha, "sha", "sha256"
 
     # @!method spdx_identifier
     #   The SPDX license identifier

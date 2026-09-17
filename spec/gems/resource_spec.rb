@@ -3,10 +3,13 @@ RSpec.describe Gems::Resource do
     Class.new(described_class) do
       attribute :name
       attribute :key, "rubygems_api_key"
+      attribute :sha, "sha", "sha256"
       predicate :yanked
       predicate :indexed, "is_indexed"
+      predicate :removed, "removed", "removed_at"
       time_attribute :created_at
       time_attribute :updated_at, "last_updated"
+      time_attribute :built_at, "built_at", "constructed_at"
       inspect_with :name, :yanked?
     end
   end
@@ -42,6 +45,22 @@ RSpec.describe Gems::Resource do
       expect(resource_class.new({}).name).to be_nil
     end
 
+    it "reads the first of several keys the response contains" do
+      expect(resource_class.new("sha256" => "abc").sha).to eq("abc")
+    end
+
+    it "prefers the earlier key when the response contains both" do
+      expect(resource_class.new("sha" => "abc", "sha256" => "def").sha).to eq("abc")
+    end
+
+    it "prefers a key the response contains over a later one, even when its value is nil" do
+      expect(resource_class.new("sha" => nil, "sha256" => "def").sha).to be_nil
+    end
+
+    it "returns nil when the response contains none of the keys" do
+      expect(resource_class.new({}).sha).to be_nil
+    end
+
     it "returns the name of the reader" do
       expect(resource_class.attribute(:version)).to eq(:version)
     end
@@ -68,6 +87,10 @@ RSpec.describe Gems::Resource do
       expect(resource_class.new("is_indexed" => true).indexed?).to be(true)
     end
 
+    it "reads the first of several keys the response contains" do
+      expect(resource_class.new("removed_at" => "2023-06-29T20:57:24Z").removed?).to be(true)
+    end
+
     it "returns the name of the reader" do
       expect(resource_class.predicate(:prerelease)).to eq(:prerelease?)
     end
@@ -90,8 +113,12 @@ RSpec.describe Gems::Resource do
       expect(resource_class.new("last_updated" => "2023-06-29T00:00:00Z").updated_at).to eq(Time.utc(2023, 6, 29))
     end
 
+    it "reads the first of several keys the response contains" do
+      expect(resource_class.new("constructed_at" => "2023-06-29T00:00:00Z").built_at).to eq(Time.utc(2023, 6, 29))
+    end
+
     it "returns the name of the reader" do
-      expect(resource_class.time_attribute(:built_at)).to eq(:built_at)
+      expect(resource_class.time_attribute(:pushed_at)).to eq(:pushed_at)
     end
   end
 
