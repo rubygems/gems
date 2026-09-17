@@ -122,17 +122,22 @@ module Gems
       JSON.parse(response)
     end
 
-    # Returns an hash of gem latest version
+    # Returns the latest version number of a gem
     #
     # @api public
     # @authenticated false
     # @param gem_name [String] The name of a gem.
     # @return [String] the latest version number
+    # @raise [KeyError] if the gem has no published version
     # @example
     #   Gems.latest_version "coulda"
     def latest_version(gem_name)
       response = get("/api/v1/versions/#{gem_name}/latest.json")
-      JSON.parse(response).fetch("version")
+      version = JSON.parse(response).fetch("version")
+      # The endpoint answers 200 with "unknown" rather than 404 for a gem with no published version
+      raise KeyError, "#{gem_name} has no latest version" if version.eql?("unknown")
+
+      version
     end
 
     # Returns the total number of downloads of all gems
