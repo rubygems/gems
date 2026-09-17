@@ -88,6 +88,13 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_get("/api/v1/owners/1/gems.json")).to have_been_made
     end
 
+    it "falls back to the ID of an owner without a handle" do
+      stub_get("/api/v1/owners/1/gems.json").to_return(body: fixture("gems.json"))
+      client.owned_gems(Gems::Owner.new("id" => 1, "email" => "sferik@gmail.com"))
+
+      expect(a_get("/api/v1/owners/1/gems.json")).to have_been_made
+    end
+
     context "without a user handle" do
       before { stub_get("/api/v1/gems.json").to_return(body: fixture("gems.json")) }
 

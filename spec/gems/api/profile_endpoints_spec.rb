@@ -17,6 +17,13 @@ RSpec.describe Gems::API::ProfileEndpoints do
       expect(a_get("/api/v1/profiles/1.json")).to have_been_made
     end
 
+    it "falls back to the ID of an owner without a handle" do
+      stub_get("/api/v1/profiles/1.json").to_return(body: fixture("profile.json"))
+      client.profile(Gems::Owner.new("id" => 1, "email" => "nick@quaran.to"))
+
+      expect(a_get("/api/v1/profiles/1.json")).to have_been_made
+    end
+
     it "gets the correct resource" do
       client.profile("qrush")
 

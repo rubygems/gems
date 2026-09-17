@@ -57,7 +57,7 @@ module Gems
       #   Gems.owned_gems
       def owned_gems(user_handle = nil)
         path = if user_handle
-          "/api/v1/owners/#{handle_of(user_handle)}/gems.json"
+          "/api/v1/owners/#{slug_of(user_handle)}/gems.json"
         else
           "/api/v1/gems.json"
         end
