@@ -88,11 +88,12 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
-      # @param platform [String, nil] The platform of the gem.
+      # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
       # @example
       #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
       def yank(gem_name, version = nil, platform: nil)
+        platform ||= platform_of(version)
         version = number_of(version) || latest_version(gem_name)
         delete("/api/v1/gems/yank", {gem_name: name_of(gem_name), version:, platform:}.compact)
       end
@@ -103,11 +104,12 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
-      # @param platform [String, nil] The platform of the gem.
+      # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
       # @example
       #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
       def unyank(gem_name, version = nil, platform: nil)
+        platform ||= platform_of(version)
         version = number_of(version) || latest_version(gem_name)
         put("/api/v1/gems/unyank", {gem_name: name_of(gem_name), version:, platform:}.compact)
       end

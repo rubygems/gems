@@ -202,6 +202,13 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
 
+    it "defaults to the platform of a version" do
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
+      client.yank("gems", Gems::Version.new("number" => "0.0.8", "platform" => "java"))
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
+    end
+
     it "defaults to the latest version" do
       stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
       stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
@@ -239,6 +246,12 @@ RSpec.describe Gems::API::GemEndpoints do
 
     it "passes options in the body" do
       client.unyank("gems", "0.0.8", platform: "java")
+
+      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
+    end
+
+    it "defaults to the platform of a version" do
+      client.unyank("gems", Gems::Version.new("number" => "0.0.8", "platform" => "java"))
 
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
     end
