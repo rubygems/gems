@@ -164,9 +164,10 @@ module Gems
     def self.inspect_readers: () -> Array[Symbol]
     def self.identified_by: (*Symbol readers) -> Array[Symbol]
     def self.identity_readers: () -> Array[Symbol]
-    def self.attribute: (Symbol name, ?(String | Symbol) key) -> Symbol
-    def self.predicate: (Symbol name, ?(String | Symbol) key) -> Symbol
-    def self.time_attribute: (Symbol name, ?(String | Symbol) key) -> Symbol
+    def self.attribute: (Symbol name, *(String | Symbol) keys) -> Symbol
+    def self.predicate: (Symbol name, *(String | Symbol) keys) -> Symbol
+    def self.time_attribute: (Symbol name, *(String | Symbol) keys) -> Symbol
+    def self.keys_for: (Symbol name, Array[String | Symbol] keys) -> Array[String]
     def initialize: (Hash[String, untyped] attributes) -> void
     def []: (String | Symbol key) -> untyped
     def to_h: () -> Hash[String, untyped]
@@ -178,6 +179,7 @@ module Gems
 
     private
 
+    def value_of: (Array[String] keys) -> untyped
     def deep_freeze: (untyped value) -> untyped
   end
 

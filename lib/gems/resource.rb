@@ -24,14 +24,18 @@ module Gems
 
     # Define a reader for an attribute
     #
+    # Endpoints spell some fields differently, so a reader may declare several keys and reads the first
+    # one the response contains.
+    #
     # @api private
     # @param name [Symbol] the name of the reader
-    # @param key [String, Symbol] the attribute key
+    # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
-    def self.attribute(name, key = name)
+    def self.attribute(name, *keys)
+      keys = keys_for(name, keys)
       define_method(name) do
         # @type self: Resource
-        self[key]
+        value_of(keys)
       end
     end
 
@@ -39,12 +43,13 @@ module Gems
     #
     # @api private
     # @param name [Symbol] the name of the attribute (the reader is suffixed with a question mark)
-    # @param key [String, Symbol] the attribute key
+    # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
-    def self.predicate(name, key = name)
+    def self.predicate(name, *keys)
+      keys = keys_for(name, keys)
       define_method(:"#{name}?") do
         # @type self: Resource
-        !!self[key]
+        !!value_of(keys)
       end
     end
 
@@ -52,14 +57,25 @@ module Gems
     #
     # @api private
     # @param name [Symbol] the name of the reader
-    # @param key [String, Symbol] the attribute key
+    # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
-    def self.time_attribute(name, key = name)
+    def self.time_attribute(name, *keys)
+      keys = keys_for(name, keys)
       define_method(name) do
         # @type self: Resource
-        value = self[key]
+        value = value_of(keys)
         value && Time.parse(value)
       end
+    end
+
+    # The attribute keys a reader reads
+    #
+    # @api private
+    # @param name [Symbol] the name of the reader
+    # @param keys [Array<String, Symbol>] the declared keys
+    # @return [Array<String>] the keys, most preferred first
+    def self.keys_for(name, keys)
+      (keys.empty? ? [name] : keys).map(&:to_s)
     end
 
     # Declare which readers appear in the inspect output
@@ -195,6 +211,15 @@ module Gems
     end
 
     private
+
+    # The value of the first of the given keys the response contains
+    # @api private
+    # @param keys [Array<String>] the attribute keys, most preferred first
+    # @return [Object, nil] the value, or nil when the response contains none of the keys
+    def value_of(keys)
+      keys.each { |key| return self[key] if attributes.key?(key) }
+      nil
+    end
 
     # Freeze a value and everything nested inside it
     # @api private

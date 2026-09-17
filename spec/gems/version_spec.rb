@@ -62,6 +62,23 @@ RSpec.describe Gems::Version do
     expect(version.yanked?).to be(false)
   end
 
+  context "with the field names the downloads endpoint uses" do
+    subject(:version) do
+      described_class.new("sha256" => "abc", "required_ruby_version" => ">= 3.1.0",
+        "required_rubygems_version" => ">= 3.4.0", "yanked_at" => "2023-06-29T20:57:24Z")
+    end
+
+    {sha: "abc", ruby_version: ">= 3.1.0", rubygems_version: ">= 3.4.0"}.each do |reader, value|
+      it "exposes #{reader}" do
+        expect(version.public_send(reader)).to eq(value)
+      end
+    end
+
+    it "exposes yanked?" do
+      expect(version.yanked?).to be(true)
+    end
+  end
+
   describe "#number" do
     it "returns the number" do
       expect(version.number).to eq("7.0.6")
