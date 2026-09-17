@@ -27,7 +27,7 @@ Or, if Bundler is not being used to manage dependencies:
 require 'gems'
 
 # Return some basic information about rails.
-Gems.gem 'rails'
+Gems.rubygem 'rails'
 
 # Return some basic information about rails version 7.0.6.
 Gems.version 'rails', '7.0.6'
@@ -129,7 +129,7 @@ end
 
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
-client.gem 'rails'
+client.rubygem 'rails'
 ```
 
 ## Configuration

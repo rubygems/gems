@@ -18,8 +18,8 @@ module Gems
     # @param gem_name [String] The name of a gem.
     # @return [Hash]
     # @example
-    #   Gems.gem 'rails'
-    def gem(gem_name)
+    #   Gems.rubygem 'rails'
+    def rubygem(gem_name)
       response = get("/api/v1/gems/#{gem_name}.json")
       JSON.parse(response)
     rescue JSON::ParserError
