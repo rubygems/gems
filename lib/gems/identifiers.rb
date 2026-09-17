@@ -53,7 +53,7 @@ module Gems
     # @param version [String, Version] a version number or version
     # @param platform [String, nil] the platform; defaults to the platform of a version object
     # @return [String] the full name
-    def full_name_of(gem, version, platform)
+    def full_name_of(gem, version, platform = nil)
       ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
     end
 

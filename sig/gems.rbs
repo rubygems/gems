@@ -300,7 +300,7 @@ module Gems
     def name_of: (gem_identifier? gem) -> String?
     def number_of: (version_identifier? version) -> String?
     def platform_of: (version_identifier? version) -> String?
-    def full_name_of: (gem_identifier gem, version_identifier version, String? platform) -> String
+    def full_name_of: (gem_identifier gem, version_identifier version, ?String? platform) -> String
     def handle_of: (user_identifier owner) -> (String | Integer)?
     def url_of: (web_hook_identifier web_hook) -> String?
     def key_of: (api_key_identifier? api_key) -> String?

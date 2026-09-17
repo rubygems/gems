@@ -31,8 +31,8 @@ module Gems
       # @example
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
       def downloads(gem_name, version = nil)
-        number = number_of(version) || latest_version(gem_name)
-        Downloads.new(JSON.parse(get("/api/v1/downloads/#{name_of(gem_name)}-#{number}.json")))
+        full_name = full_name_of(gem_name, version || latest_version(gem_name))
+        Downloads.new(JSON.parse(get("/api/v1/downloads/#{full_name}.json")))
       end
 
       # Returns the top 50 downloaded gem versions of all time
