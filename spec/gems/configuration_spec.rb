@@ -26,11 +26,11 @@ RSpec.describe Gems::Configuration do
       expect(Gems.key).to eq("FILE_KEY")
     end
 
-    it "falls back to the default key after being cleared" do
+    it "stays unauthenticated after being set to nil" do
       Gems.key = TEST_KEY
       Gems.key = nil
 
-      expect(Gems.key).to eq("FILE_KEY")
+      expect(Gems.key).to be_nil
     end
   end
 
@@ -109,10 +109,12 @@ RSpec.describe Gems::Configuration do
       end
     end
 
-    it "clears the configured key" do
+    it "restores the default key" do
+      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY"))
+      Gems.key = TEST_KEY
       Gems.reset
 
-      expect(Gems.instance_variable_get(:@key)).to be_nil
+      expect(Gems.key).to eq("FILE_KEY")
     end
 
     it "returns the configuration" do
