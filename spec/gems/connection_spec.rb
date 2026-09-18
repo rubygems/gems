@@ -128,7 +128,23 @@ RSpec.describe Gems::Connection do
       expect(a_request(:get, http_uri.to_s)).to have_been_made
     end
 
-    described_class::NETWORK_ERRORS.each do |error_class|
+    [
+      EOFError,
+      Errno::ECONNABORTED,
+      Errno::ECONNREFUSED,
+      Errno::ECONNRESET,
+      Errno::EHOSTUNREACH,
+      Errno::ENETUNREACH,
+      Errno::EPIPE,
+      Errno::ETIMEDOUT,
+      IOError,
+      Net::HTTPBadResponse,
+      Net::OpenTimeout,
+      Net::ReadTimeout,
+      Net::WriteTimeout,
+      OpenSSL::SSL::SSLError,
+      SocketError
+    ].each do |error_class|
       it "wraps #{error_class} in a NetworkError" do
         stub_request(:get, https_uri.to_s).to_raise(error_class)
 
@@ -145,9 +161,9 @@ RSpec.describe Gems::Connection do
     end
 
     it "does not wrap other errors" do
-      stub_request(:get, https_uri.to_s).to_raise(IOError)
+      stub_request(:get, https_uri.to_s).to_raise(ArgumentError)
 
-      expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }.to raise_error(IOError)
+      expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }.to raise_error(ArgumentError)
     end
   end
 
