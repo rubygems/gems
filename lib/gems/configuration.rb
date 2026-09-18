@@ -119,14 +119,15 @@ module Gems
 
     # The API key used for authentication
     #
-    # Falls back to {#default_key} when no key has been set.
+    # Falls back to {#default_key} until a key is assigned. Assigning nil
+    # keeps requests unauthenticated instead of restoring the fallback.
     #
     # @api public
     # @return [String, nil] the API key
     # @example Get the API key
     #   Gems.key
     def key
-      @key || default_key
+      defined?(@key) ? @key : default_key
     end
 
     # The API key stored in ~/.gem/credentials by `gem signin`
@@ -176,7 +177,7 @@ module Gems
     # @return [void]
     def reset_credentials
       self.id_token = nil
-      self.key = nil
+      remove_instance_variable(:@key) if defined?(@key)
       self.otp = nil
       self.password = nil
       self.username = nil
