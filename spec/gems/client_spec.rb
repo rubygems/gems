@@ -321,6 +321,21 @@ RSpec.describe Gems::Client do
       expect(a_request(:get, "http://example.com/path")).to have_been_made
     end
 
+    it "keeps a path prefix on the host" do
+      client.host = "http://example.com/gems"
+      stub_request(:get, "http://example.com/gems/path")
+      client.get("/path")
+
+      expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
+    end
+
+    it "keeps a path prefix on a per-request host" do
+      stub_request(:get, "http://example.com/gems/path")
+      client.get("/path", host: "http://example.com/gems/")
+
+      expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
+    end
+
     it "sends request bodies" do
       stub_post("/path")
       client.post("/path", {gem_name: "gems"})
