@@ -242,6 +242,8 @@ module Gems
   class Error < StandardError
   end
 
+  GemError: singleton(Error)
+
   class HTTPError < Error
     attr_reader response: Net::HTTPResponse
     attr_reader code: String
