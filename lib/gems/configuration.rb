@@ -127,7 +127,11 @@ module Gems
     # @example Get the API key
     #   Gems.key
     def key
-      defined?(@key) ? @key : default_key
+      if instance_variable_defined?(:@key)
+        @key
+      else
+        default_key
+      end
     end
 
     # The API key stored in ~/.gem/credentials by `gem signin`
@@ -177,7 +181,7 @@ module Gems
     # @return [void]
     def reset_credentials
       self.id_token = nil
-      remove_instance_variable(:@key) if defined?(@key)
+      remove_instance_variable(:@key) if instance_variable_defined?(:@key)
       self.otp = nil
       self.password = nil
       self.username = nil
