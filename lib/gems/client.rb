@@ -194,11 +194,23 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     def execute_request(http_method, path, host:, params: {}, body: nil, content_type: nil)
-      uri = URI.join(host || @host, path)
+      uri = build_uri(host || @host, path)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
       response = @connection.perform(request:)
       response = @redirect_handler.handle(response:, request:, authenticator:)
       @response_parser.parse(response:)
+    end
+
+    private
+
+    # Join a host and a request path, keeping any path prefix on the host
+    #
+    # @api private
+    # @param host [String] the host, optionally carrying a path prefix
+    # @param path [String] the request path
+    # @return [URI] the request URI
+    def build_uri(host, path)
+      URI.join("#{host.chomp("/")}/", path.delete_prefix("/"))
     end
   end
 end

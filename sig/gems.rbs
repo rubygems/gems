@@ -235,6 +235,8 @@ module Gems
     private
 
     def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
+
+    def build_uri: (String host, String path) -> URI::Generic
   end
 
   class Error < StandardError
