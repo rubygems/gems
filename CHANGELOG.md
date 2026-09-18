@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 * Deprecate `api_key`, whose endpoint RubyGems.org has retired; use `create_api_key` instead
+* Deprecate `GemError`, kept as a constant alias; use `Error` instead
 
 ### Security
 * Verify SSL certificates instead of disabling verification

@@ -5,6 +5,10 @@ RSpec.describe Gems::HTTPError do
     expect(described_class.new(response:)).to be_a(Gems::Error)
   end
 
+  it "is rescuable as the deprecated GemError" do
+    expect { raise described_class.new(response:) }.to raise_error(Gems.const_get(:GemError, false))
+  end
+
   describe "#initialize" do
     it "uses the response body as the message" do
       expect(described_class.new(response:).message).to eq("This rubygem could not be found.")
