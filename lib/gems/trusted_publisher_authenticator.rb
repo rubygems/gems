@@ -104,7 +104,8 @@ module Gems
     # @example Exchange the ID token
     #   authenticator.exchange_token!["expires_at"]
     def exchange_token!
-      request = request_builder.build(http_method: :post, uri: URI.join(host, EXCHANGE_TOKEN_PATH),
+      uri = URI.join("#{host.chomp("/")}/", EXCHANGE_TOKEN_PATH.delete_prefix("/"))
+      request = request_builder.build(http_method: :post, uri:,
         body: JSON.generate({jwt: id_token}), content_type: JSON_CONTENT_TYPE, headers: {"Accept" => JSON_CONTENT_TYPE})
       response = connection.perform(request:)
       token = JSON.parse(ResponseParser.new.parse(response:))

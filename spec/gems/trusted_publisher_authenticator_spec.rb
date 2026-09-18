@@ -77,6 +77,16 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect(a_request(:post, "http://example.com/api/v1/oidc/trusted_publisher/exchange_token")).to have_been_made
     end
 
+    ["https://example.com/gems", "https://example.com/gems/"].each do |host|
+      it "preserves the path prefix when the host is #{host}" do
+        url = "https://example.com/gems/api/v1/oidc/trusted_publisher/exchange_token"
+        stub_exchange(url)
+        described_class.new(id_token: "ID_TOKEN", host:).exchange_token!
+
+        expect(a_request(:post, url).with(body: '{"jwt":"ID_TOKEN"}')).to have_been_made.once
+      end
+    end
+
     it "uses the configured connection" do
       connection = Gems::Connection.new
       allow(connection).to receive(:perform).and_call_original

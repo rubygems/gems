@@ -120,7 +120,8 @@ module Gems
     # The API key used for authentication
     #
     # Falls back to {#default_key} until a key is assigned. Assigning nil
-    # keeps requests unauthenticated instead of restoring the fallback.
+    # disables this API-key fallback. Basic authentication and trusted
+    # publishing remain available when their credentials are configured.
     #
     # @api public
     # @return [String, nil] the API key
