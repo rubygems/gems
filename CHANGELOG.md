@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`
 * Delegate only the API methods from the `Gems` module instead of every client method
 * Push to the client's configured host by default
-* Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now keeps requests unauthenticated rather than restoring that default
+* Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now disables that fallback without disabling configured basic authentication or trusted publishing
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
 
 ### Removed
