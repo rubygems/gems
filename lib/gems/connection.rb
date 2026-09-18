@@ -18,16 +18,14 @@ module Gems
     DEFAULT_WRITE_TIMEOUT = 60 # seconds
     # Network errors that should be wrapped in NetworkError
     NETWORK_ERRORS = [
-      EOFError,
-      Errno::ECONNREFUSED,
-      Errno::ECONNRESET,
-      Errno::EHOSTUNREACH,
-      Errno::ETIMEDOUT,
+      IOError,
+      Net::HTTPBadResponse,
       Net::OpenTimeout,
       Net::ReadTimeout,
       Net::WriteTimeout,
       OpenSSL::SSL::SSLError,
-      SocketError
+      SocketError,
+      SystemCallError
     ].freeze
 
     # The timeout for opening connections in seconds
