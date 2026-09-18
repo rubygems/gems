@@ -75,7 +75,8 @@ module Gems
     # @param keys [Array<String, Symbol>] the declared keys
     # @return [Array<String>] the keys, most preferred first
     def self.keys_for(name, keys)
-      (keys.empty? ? [name] : keys).map(&:to_s)
+      keys = [name] if keys.empty?
+      keys.map(&:to_s)
     end
 
     # Declare which readers appear in the inspect output
