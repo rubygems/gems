@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe Gems::RetryHandler do
-  subject(:handler) { described_class.new(max_retries: 2) }
+  subject(:handler) { described_class.new(max_retries: 2, random: steady) }
+
+  # A source of randomness that jitters nothing, so that the waits between attempts are exactly the backoff
+  let(:steady) { instance_double(Random, rand: 0.0) }
+
+  # A source of randomness that jitters as far as the backoff allows, which is half of the wait
+  let(:jittery) { instance_double(Random, rand: 1.0) }
 
   let(:request) { Net::HTTP::Get.new(URI("#{TEST_HOST}/api/v1/gems/rails.json")) }
   let(:post_request) { Net::HTTP::Post.new(URI("#{TEST_HOST}/api/v1/gems")) }
@@ -59,6 +65,10 @@ RSpec.describe Gems::RetryHandler do
 
       expect([handler.max_retries, handler.max_retry_delay])
         .to eq([described_class::DEFAULT_MAX_RETRIES, described_class::DEFAULT_MAX_RETRY_DELAY])
+    end
+
+    it "defaults to Random for the jitter of the backoff" do
+      expect(described_class.new.random).to equal(Random)
     end
   end
 
@@ -125,6 +135,35 @@ RSpec.describe Gems::RetryHandler do
       expect(waited).to eq([1, 2])
     end
 
+    it "jitters the doubling wait down by as much as half" do
+      handler = described_class.new(max_retries: 2, random: jittery)
+      _, waited = handle(handler, [rate_limited, rate_limited, success])
+
+      expect(waited).to eq([0.5, 1])
+    end
+
+    it "jitters the wait after a network error too" do
+      handler = described_class.new(max_retries: 2, random: jittery)
+      _, waited = handle(handler, [network_error, network_error, success])
+
+      expect(waited).to eq([0.5, 1])
+    end
+
+    it "waits between half of the doubling wait and all of it" do
+      handler = described_class.new(max_retries: 5, random: Random.new(1_649))
+      _, waited = handle(handler, [*Array.new(5) { rate_limited }, success])
+      within_bounds = waited.each_with_index.map { |seconds, retries| (2**retries / 2.0..2**retries).cover?(seconds) }
+
+      expect(within_bounds).to eq([true] * 5)
+    end
+
+    it "does not jitter the wait the Retry-After header asks for" do
+      handler = described_class.new(max_retries: 2, random: jittery)
+      _, waited = handle(handler, [rate_limited(retry_after: "5"), success])
+
+      expect(waited).to eq([5])
+    end
+
     it "gives up after the maximum number of retries" do
       last = rate_limited
       response, waited = handle(handler, [rate_limited, rate_limited, last])
@@ -157,14 +196,14 @@ RSpec.describe Gems::RetryHandler do
     end
 
     it "shortens a doubling wait to the maximum retry delay" do
-      handler = described_class.new(max_retries: 3, max_retry_delay: 3)
+      handler = described_class.new(max_retries: 3, max_retry_delay: 3, random: steady)
       _, waited = handle(handler, [rate_limited, rate_limited, rate_limited, success])
 
       expect(waited).to eq([1, 2, 3])
     end
 
     it "sends the request again as many times as asked once the wait reaches the maximum retry delay" do
-      handler = described_class.new(max_retries: 5, max_retry_delay: 2)
+      handler = described_class.new(max_retries: 5, max_retry_delay: 2, random: steady)
       response, waited = handle(handler, [*Array.new(5) { rate_limited }, success])
 
       expect([response, waited]).to eq([success, [1, 2, 2, 2, 2]])
@@ -199,14 +238,14 @@ RSpec.describe Gems::RetryHandler do
       end
 
       it "shortens the wait to the maximum retry delay" do
-        handler = described_class.new(max_retries: 3, max_retry_delay: 3)
+        handler = described_class.new(max_retries: 3, max_retry_delay: 3, random: steady)
         _, waited = handle(handler, [network_error, network_error, network_error, success])
 
         expect(waited).to eq([1, 2, 3])
       end
 
       it "waits a delay equal to the maximum retry delay" do
-        handler = described_class.new(max_retries: 2, max_retry_delay: 1)
+        handler = described_class.new(max_retries: 2, max_retry_delay: 1, random: steady)
         _, waited = handle(handler, [network_error, success])
 
         expect(waited).to eq([1])

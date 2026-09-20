@@ -311,7 +311,9 @@ Only an idempotent request is retried, so `push` and the other `POST` requests a
 idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
 `Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the
 header, which is the wait after a network failure too, since a request that never arrived has no response to read a
-wait from. A response asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your
+wait from. A wait the library chose for itself is jittered down by up to half, so that the clients a server turned
+away at the same moment do not all send their requests again at the same instant; a wait `Retry-After` asked for is
+taken as it is, since the server named the moment it is ready. A response asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your
 program for as long as it likes. `HTTPError#retry_after` reads the header yourself when you would rather handle it in
 your own code.
 

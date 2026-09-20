@@ -44,27 +44,38 @@ module Gems
     #   handler.max_retry_delay = 30
     attr_accessor :max_retry_delay
 
+    # The source of the randomness the backoff is jittered with
+    # @api private
+    # @return [Random, Class<Random>] the source of randomness
+    # @example Get the source of randomness
+    #   handler.random
+    attr_reader :random
+
     # Initialize a new RetryHandler
     #
     # @api private
     # @param max_retries [Integer] the number of times a request is sent again
     # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
+    # @param random [Random, Class<Random>] the source of the randomness the backoff is jittered with, which
+    #   answers `rand` with a Float between zero and one
     # @return [RetryHandler] a new instance
     # @example Create a retry handler
     #   handler = Gems::RetryHandler.new(max_retries: 3)
-    def initialize(max_retries: DEFAULT_MAX_RETRIES, max_retry_delay: DEFAULT_MAX_RETRY_DELAY)
+    def initialize(max_retries: DEFAULT_MAX_RETRIES, max_retry_delay: DEFAULT_MAX_RETRY_DELAY, random: Random)
       @max_retries = max_retries
       @max_retry_delay = max_retry_delay
+      @random = random
     end
 
     # Send a request until the server and the network stop turning it away
     #
     # The block is called again for each retry, so a request that was redirected is followed again from the start.
     # The wait between attempts is the one the `Retry-After` header of the response asks for, and doubles from one
-    # second otherwise, up to {#max_retry_delay}, which is the wait after a {NetworkError} too, since a request that
-    # never reached the server has no response to read a wait from. A response that asks to wait longer than
-    # {#max_retry_delay} is returned rather than waited for, so that the caller is told what happened instead of
-    # pausing for as long as the server likes, and a {NetworkError} that has no retry left is raised as it was.
+    # second otherwise, up to {#max_retry_delay}, jittered as {#backoff} describes; that is the wait after a
+    # {NetworkError} too, since a request that never reached the server has no response to read a wait from. A
+    # response that asks to wait longer than {#max_retry_delay} is returned rather than waited for, so that the
+    # caller is told what happened instead of pausing for as long as the server likes, and a {NetworkError} that
+    # has no retry left is raised as it was.
     #
     # @api private
     # @param request [Net::HTTPRequest] the request being sent
@@ -172,11 +183,19 @@ module Gems
     end
 
     # The seconds to wait when the response does not ask for a wait of its own
+    #
+    # The wait doubles with each retry up to {#max_retry_delay}, and is then jittered down by up to half of itself,
+    # so that the clients a server turned away at the same moment do not all send their requests again at the same
+    # instant and turn the retry into a second wave of the load the server was shedding. A wait the response asked
+    # for is not jittered: the server named the moment it is ready for the request, and jittering that wait down
+    # would send the request again before then.
+    #
     # @api private
     # @param retries [Integer] the number of times the request has been sent again
-    # @return [Numeric] the seconds to wait, which doubles with each retry up to {#max_retry_delay}
+    # @return [Numeric] the seconds to wait, between half of the doubling wait and all of it
     def backoff(retries)
-      [2**retries, max_retry_delay].min #: Numeric
+      delay = [2**retries, max_retry_delay].min
+      delay - (random.rand * delay / 2) #: Numeric
     end
   end
 end

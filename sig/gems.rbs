@@ -789,6 +789,10 @@ module Gems
     def each_page: [T] (^(T) -> void | nil block) { (Integer page) -> Array[T] } -> Enumerator[T, void]
   end
 
+  interface _Random
+    def rand: () -> Float
+  end
+
   class RetryHandler
     include Idempotence
     include RetryAfter
@@ -799,8 +803,9 @@ module Gems
 
     attr_accessor max_retries: Integer
     attr_accessor max_retry_delay: Numeric
+    attr_reader random: _Random
 
-    def initialize: (?max_retries: Integer, ?max_retry_delay: Numeric) -> void
+    def initialize: (?max_retries: Integer, ?max_retry_delay: Numeric, ?random: _Random) -> void
     def handle: (request: Net::HTTPRequest) { () -> Net::HTTPResponse } -> Net::HTTPResponse
 
     private
