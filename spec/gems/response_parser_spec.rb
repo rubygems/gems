@@ -34,22 +34,40 @@ RSpec.describe Gems::ResponseParser do
       end
     end
 
-    it "raises HTTPError for an unmapped error status" do
+    it "raises ClientError for an unmapped 4xx status" do
       stub_request(:get, uri.to_s).to_return(status: 418)
 
-      expect { parser.parse(response:) }.to raise_error(Gems::HTTPError)
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::ClientError))
     end
 
-    it "does not raise a subclass for an unmapped error status" do
-      stub_request(:get, uri.to_s).to_return(status: 418)
+    it "raises ServerError for an unmapped 5xx status" do
+      stub_request(:get, uri.to_s).to_return(status: 501)
 
-      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::HTTPError))
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::ServerError))
+    end
+
+    it "raises ClientError for the last 4xx status" do
+      stub_request(:get, uri.to_s).to_return(status: 499)
+
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::ClientError))
+    end
+
+    it "raises ServerError for the last 5xx status" do
+      stub_request(:get, uri.to_s).to_return(status: 599)
+
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::ServerError))
     end
 
     it "raises HTTPError for a redirect response" do
       stub_request(:get, uri.to_s).to_return(status: 302)
 
-      expect { parser.parse(response:) }.to raise_error(Gems::HTTPError)
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::HTTPError))
+    end
+
+    it "raises HTTPError for a status outside 4xx and 5xx" do
+      stub_request(:get, uri.to_s).to_return(status: 600)
+
+      expect { parser.parse(response:) }.to raise_error(an_instance_of(Gems::HTTPError))
     end
 
     it "uses the response body as the error message" do

@@ -582,6 +582,7 @@ module Gems
 
   class ResponseParser
     ERROR_MAP: Hash[Integer, singleton(HTTPError)]
+    STATUS_CLASS_ERRORS: Hash[Integer, singleton(HTTPError)]
 
     def parse: (response: Net::HTTPResponse) -> String
 
