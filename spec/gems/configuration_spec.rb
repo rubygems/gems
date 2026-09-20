@@ -5,6 +5,31 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  describe "#default_host" do
+    # Set RUBYGEMS_HOST for the block, restoring it before the configuration is reset between examples
+    def with_gem_host(host)
+      original = ENV.fetch("RUBYGEMS_HOST", nil)
+      ENV["RUBYGEMS_HOST"] = host
+      yield
+    ensure
+      ENV["RUBYGEMS_HOST"] = original
+    end
+
+    it "defaults to rubygems.org" do
+      expect(Gems.default_host).to eq("https://rubygems.org")
+    end
+
+    it "reads the RUBYGEMS_HOST environment variable" do
+      with_gem_host("https://gems.example.com") { expect(Gems.default_host).to eq("https://gems.example.com") }
+    end
+
+    it "reads the environment when it is called, not when the library is required" do
+      with_gem_host("https://gems.example.com") { Gems.reset }
+
+      expect(Gems.host).to eq("https://gems.example.com")
+    end
+  end
+
   describe "#key_configured?" do
     it "is false until a key is assigned" do
       expect(Gems.key_configured?).to be(false)

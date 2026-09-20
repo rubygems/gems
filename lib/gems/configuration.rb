@@ -10,8 +10,8 @@ module Gems
   module Configuration
     include Identifiers
 
-    # The default API endpoint
-    DEFAULT_HOST = ENV.fetch("RUBYGEMS_HOST", "https://rubygems.org").freeze
+    # The API endpoint used when the RUBYGEMS_HOST environment variable is not set
+    DEFAULT_HOST = "https://rubygems.org".freeze
 
     # The default 'User-Agent' HTTP header
     DEFAULT_USER_AGENT = "Gems #{VERSION}".freeze
@@ -143,6 +143,19 @@ module Gems
       end
     end
 
+    # The host `gem push` would use
+    #
+    # This is the `RUBYGEMS_HOST` environment variable, else RubyGems.org. The environment is read when this method
+    # is called, as it is for {#default_key}, rather than when the library is required.
+    #
+    # @api public
+    # @return [String] the host, including scheme
+    # @example Get the default host
+    #   Gems.default_host
+    def default_host
+      ENV.fetch("RUBYGEMS_HOST", DEFAULT_HOST)
+    end
+
     # The API key `gem push` would use for a host
     #
     # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the host in
@@ -196,7 +209,7 @@ module Gems
     # @example Reset the configuration
     #   Gems.reset
     def reset
-      self.host = DEFAULT_HOST
+      self.host = default_host
       self.user_agent = DEFAULT_USER_AGENT
       reset_credentials
       reset_connection

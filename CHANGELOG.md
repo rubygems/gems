@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
 * Match resources against `case`/`in` patterns by their readers, such as `in {name:, version:}`, with `Resource#deconstruct_keys` and `Resource.attribute_names`
 * Add `key_configured?`, and a host argument to `default_key`, for the API key stored for a host other than the configured one
+* Add `default_host`, the host `gem push` would use, which reads the `RUBYGEMS_HOST` environment variable when it is called rather than when the library is required
 * Add RBS signatures, with a manifest naming the standard libraries they refer to
 
 ### Changed
@@ -59,6 +60,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Build the client the module delegates to again only when the configured credentials change, and apply the rest of the configuration — the user agent, the timeouts, the debug output, the proxy, and the maximum redirects — to the client it has, so that changing one of them no longer throws away the API key an ID token was exchanged for; `Gems.reset` forgets the client, and a mutex guards it, so that threads calling it at once build one client
 * Inherit the readers a resource declares in its subclasses, so that a subclass of `Gem`, `Version`, or another resource keeps matching patterns, inspecting, and comparing by them
 * Raise `InvalidResponse` from `Version#sha`, rather than `ArgumentError` or `NoMethodError`, when the base64 `sha256` of a response cannot be decoded
+* Read the `RUBYGEMS_HOST` environment variable when the host is resolved rather than when the library is required, as the API key is read; `Configuration::DEFAULT_HOST` is now the RubyGems.org host, which `default_host` falls back to
 * Raise `ArgumentError` for a `host` that is not an HTTP or HTTPS URL, when a client is built and when `host` is assigned, rather than letting `URI::BadURIError` or `URI::InvalidURIError` escape when a request is made; an invalid host leaves the host as it was, as an invalid `proxy_url` does
 * Raise `ArgumentError` for an API key scope the RubyGems API does not define, rather than sending a misspelled scope for the server to ignore and leaving the key scoped differently than it was meant to be
 

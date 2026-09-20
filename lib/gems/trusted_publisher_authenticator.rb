@@ -69,7 +69,7 @@ module Gems
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
-    def initialize(id_token:, host: Configuration::DEFAULT_HOST, connection: Connection.new,
+    def initialize(id_token:, host: Gems.default_host, connection: Connection.new,
       request_builder: RequestBuilder.new)
       @id_token = id_token
       @host = host

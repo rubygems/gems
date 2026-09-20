@@ -85,6 +85,7 @@ module Gems
 
     def self.extended: (Configuration base) -> void
     def key: () -> String?
+    def default_host: () -> String
     def default_key: (?String host) -> String?
     def key_configured?: () -> bool
     def configure: () { (self) -> void } -> self

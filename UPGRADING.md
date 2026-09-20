@@ -213,6 +213,19 @@ sent whatever it was given for the server to ignore, leaving the key scoped diff
 `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE` are gone. `Gems::VERSION` is the library's version string, and
 `Gems::Version` is the object returned for a version of a gem.
 
+`Gems::Configuration::DEFAULT_HOST` is the RubyGems.org host, where 2.x froze the `RUBYGEMS_HOST` environment
+variable into it when the library was required. The environment variable is still the default host, read by
+`Gems.default_host` when the host is resolved, as the API key is read:
+
+```ruby
+# 2.x
+Gems::Configuration::DEFAULT_HOST # => ENV["RUBYGEMS_HOST"], read when the library was required
+
+# 3.0
+Gems.default_host                 # => ENV["RUBYGEMS_HOST"], read now
+Gems.host                         # => the same, until another host is configured
+```
+
 ### Internals
 
 `Gems::RequestBuilder`, `Gems::RedirectHandler`, and `Gems::ResponseParser` are private API, which can change within
