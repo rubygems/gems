@@ -3,12 +3,14 @@ require_relative "connection"
 require_relative "identifiers"
 require_relative "redirect_handler"
 require_relative "request_builder"
+require_relative "url_validation"
 
 module Gems
   # Global configuration for {Gems::Client} instances
   # @api public
   module Configuration
     include Identifiers
+    include URLValidation
 
     # The API endpoint used when the RUBYGEMS_HOST environment variable is not set
     DEFAULT_HOST = "https://rubygems.org".freeze
@@ -19,9 +21,9 @@ module Gems
     # The host used for API requests
     # @api public
     # @return [String] the host, including scheme
-    # @example Get or set the host
-    #   Gems.host = "https://gems.example.com"
-    attr_accessor :host
+    # @example Get the host
+    #   Gems.host
+    attr_reader :host
 
     # The OIDC ID token used for trusted publishing
     # @api public
@@ -29,6 +31,21 @@ module Gems
     # @example Get or set the ID token
     #   Gems.id_token = ENV.fetch("ID_TOKEN")
     attr_accessor :id_token
+
+    # Set the host used for API requests
+    #
+    # The host is checked here rather than when a request is made with it, as {Client#host=} checks the host of a
+    # client, so that the error names the assignment that was wrong.
+    #
+    # @api public
+    # @param host [String] the host, including scheme
+    # @return [void]
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL, in which case the host is left as it was
+    # @example Set the host
+    #   Gems.host = "https://gems.example.com"
+    def host=(host)
+      @host = validate_host(host)
+    end
 
     # Set the API key used for authentication
     #
@@ -115,9 +132,26 @@ module Gems
     #
     # @api public
     # @return [String, nil] the proxy URL for requests
-    # @example Get or set the proxy URL
+    # @example Get the proxy URL
+    #   Gems.proxy_url
+    attr_reader :proxy_url
+
+    # Set the proxy URL for requests
+    #
+    # The proxy URL is checked here rather than when a request is made with it, as {Connection#proxy_url=} checks
+    # the proxy URL of a connection, so that the error names the assignment that was wrong.
+    #
+    # @api public
+    # @param proxy_url [String, nil] the proxy URL, or nil to read proxies from the environment
+    # @return [void]
+    # @raise [ArgumentError] if the proxy URL is invalid, in which case the proxy is left as it was; the message
+    #   leaves out its user and password
+    # @example Set the proxy URL
     #   Gems.proxy_url = "http://proxy.example.com:8080"
-    attr_accessor :proxy_url
+    def proxy_url=(proxy_url)
+      parse_proxy_uri(proxy_url) unless proxy_url.nil?
+      @proxy_url = proxy_url
+    end
 
     # The maximum number of redirects to follow
     # @api public
@@ -214,12 +248,16 @@ module Gems
 
     # Reset all configuration options to defaults
     #
+    # The default host is the one `gem push` would use, which is taken as it is rather than checked the way a host
+    # assigned to {#host=} is, so that a `RUBYGEMS_HOST` that is not a URL is reported when a client is built with
+    # it rather than when the library is required.
+    #
     # @api public
     # @return [self]
     # @example Reset the configuration
     #   Gems.reset
     def reset
-      self.host = default_host
+      @host = default_host
       self.user_agent = DEFAULT_USER_AGENT
       reset_credentials
       reset_connection

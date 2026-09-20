@@ -142,6 +142,66 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  describe "#host=" do
+    it "assigns an HTTP URL" do
+      Gems.host = "http://gems.example.com"
+
+      expect(Gems.host).to eq("http://gems.example.com")
+    end
+
+    it "raises for a URL that is not HTTP or HTTPS" do
+      expect { Gems.host = "ftp://gems.example.com" }.to raise_error(ArgumentError, "Invalid host: ftp://gems.example.com")
+    end
+
+    it "raises for a URL without a host" do
+      expect { Gems.host = "https://" }.to raise_error(ArgumentError, "Invalid host: https://")
+    end
+
+    it "leaves the host as it was after an invalid host" do
+      Gems.host = "https://gems.example.com"
+      Gems.host = "ftp://other.example.com"
+    rescue ArgumentError
+      expect(Gems.host).to eq("https://gems.example.com")
+    end
+
+    it "does not check the host a reset restores, so that a bad RUBYGEMS_HOST does not raise on require" do
+      stub_const("ENV", ENV.to_h.merge("RUBYGEMS_HOST" => "gems.example.com"))
+
+      expect { Gems.reset }.not_to raise_error
+    end
+  end
+
+  describe "#proxy_url=" do
+    it "assigns a proxy URL" do
+      Gems.proxy_url = "http://proxy.example.com:8080"
+
+      expect(Gems.proxy_url).to eq("http://proxy.example.com:8080")
+    end
+
+    it "assigns nil" do
+      Gems.proxy_url = "http://proxy.example.com:8080"
+      Gems.proxy_url = nil
+
+      expect(Gems.proxy_url).to be_nil
+    end
+
+    it "raises for a URL that is not HTTP or HTTPS" do
+      expect { Gems.proxy_url = "ftp://proxy.example.com" }.to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com")
+    end
+
+    it "leaves the user and password out of the message" do
+      expect { Gems.proxy_url = "ftp://user:password@proxy.example.com" }
+        .to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com")
+    end
+
+    it "leaves the proxy URL as it was after an invalid URL" do
+      Gems.proxy_url = "http://proxy.example.com:8080"
+      Gems.proxy_url = "ftp://other.example.com"
+    rescue ArgumentError
+      expect(Gems.proxy_url).to eq("http://proxy.example.com:8080")
+    end
+  end
+
   describe "::DEFAULT_USER_AGENT" do
     it "is the user agent a request builder sends" do
       expect(described_class::DEFAULT_USER_AGENT).to equal(Gems::RequestBuilder::DEFAULT_USER_AGENT)
@@ -166,13 +226,21 @@ RSpec.describe Gems::Configuration do
       expect(Gems.configure { nil }).to equal(Gems)
     end
 
-    options = %i[host id_token key otp password user_agent username]
-    options += %i[open_timeout read_timeout write_timeout keep_alive_timeout debug_output proxy_url max_redirects]
+    options = %i[id_token key otp password user_agent username]
+    options += %i[open_timeout read_timeout write_timeout keep_alive_timeout debug_output max_redirects]
     options.each do |key|
       it "sets the #{key}" do
         Gems.configure { |config| config.public_send(:"#{key}=", key.to_s) }
 
         expect(Gems.public_send(key)).to eq(key.to_s)
+      end
+    end
+
+    {host: "https://gems.example.com", proxy_url: "http://proxy.example.com:8080"}.each do |key, value|
+      it "sets the #{key} to a URL" do
+        Gems.configure { |config| config.public_send(:"#{key}=", value) }
+
+        expect(Gems.public_send(key)).to eq(value)
       end
     end
   end

@@ -3,11 +3,14 @@ require "uri"
 require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
+require_relative "url_validation"
 
 module Gems
   # Manages HTTP connections to the RubyGems API
   # @api public
   class Connection
+    include URLValidation
+
     # Default timeout for opening connections in seconds
     DEFAULT_OPEN_TIMEOUT = 60 # seconds
     # Default timeout for reading responses in seconds
@@ -212,29 +215,6 @@ module Gems
     # @return [Array<Object>] the settings
     def settings
       [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url]
-    end
-
-    # Parse and validate a proxy URL
-    # @api private
-    # @param proxy_url [String] the proxy URL
-    # @return [URI::HTTP] the proxy URI
-    # @raise [ArgumentError] if the proxy URL is not a valid HTTP or HTTPS URL; the message leaves out its user and
-    #   password
-    def parse_proxy_uri(proxy_url)
-      proxy_uri = URI(proxy_url)
-      raise ArgumentError, "Invalid proxy URL: #{redact(proxy_url)}" unless proxy_uri.is_a?(URI::HTTP)
-
-      proxy_uri
-    rescue URI::InvalidURIError
-      raise ArgumentError, "Invalid proxy URL: #{redact(proxy_url)}"
-    end
-
-    # Remove the user and password from a URL
-    # @api private
-    # @param url [String, nil] the URL
-    # @return [String, nil] the URL without its userinfo, or nil for nil
-    def redact(url)
-      url&.sub(%r{(?<=//)[^/@]*@}, "")
     end
 
     # Decode a percent-encoded component of a URL

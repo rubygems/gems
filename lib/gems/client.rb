@@ -7,6 +7,7 @@ require_relative "connection"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "response_parser"
+require_relative "url_validation"
 
 module Gems
   # A client for the RubyGems API
@@ -15,6 +16,7 @@ module Gems
     extend Forwardable
     include API
     include ClientCredentials
+    include URLValidation
 
     # The host for API requests
     # @api public
@@ -259,29 +261,6 @@ module Gems
     def origin(host)
       uri = URI(host).normalize
       [uri.scheme, uri.host, uri.port]
-    end
-
-    # Check that a host is a URL requests can be sent to
-    #
-    # @api private
-    # @param host [String] the host, including scheme
-    # @return [String] the host
-    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
-    def validate_host(host)
-      raise ArgumentError, "Invalid host: #{host}" unless http_url?(host)
-
-      host
-    end
-
-    # Whether a host is an HTTP or HTTPS URL with a host
-    # @api private
-    # @param host [Object] the host
-    # @return [Boolean] whether the host is a URL requests can be sent to
-    def http_url?(host)
-      uri = URI(host)
-      uri.is_a?(URI::HTTP) && !uri.host.to_s.empty?
-    rescue ArgumentError, URI::InvalidURIError
-      false
     end
 
     # Join a host and a request path, keeping any path prefix on the host

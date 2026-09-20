@@ -64,13 +64,15 @@ module Gems
 
   module Configuration
     include Identifiers
+    include URLValidation
 
     @key: String?
 
     DEFAULT_HOST: String
     DEFAULT_USER_AGENT: String
 
-    attr_accessor host: String
+    attr_reader host: String
+    def host=: (String host) -> void
     attr_accessor id_token: String?
     def key=: (api_key_identifier? key) -> void
     attr_accessor otp: String?
@@ -81,7 +83,8 @@ module Gems
     attr_accessor read_timeout: Integer
     attr_accessor write_timeout: Integer
     attr_accessor debug_output: IO?
-    attr_accessor proxy_url: String?
+    attr_reader proxy_url: String?
+    def proxy_url=: (String? proxy_url) -> void
     attr_accessor keep_alive_timeout: Integer
     attr_accessor max_redirects: Integer
 
@@ -465,6 +468,7 @@ module Gems
     include API
     extend Forwardable
     include ClientCredentials
+    include URLValidation
 
     @connection: Connection
     @request_builder: RequestBuilder
@@ -510,8 +514,6 @@ module Gems
     def authenticator_for: (String host) -> Authenticator
     def same_origin?: (String host, String other) -> bool
     def origin: (String host) -> [String?, String?, Integer?]
-    def validate_host: (String host) -> String
-    def http_url?: (untyped host) -> bool
 
     def build_uri: (String host, String path) -> URI::Generic
   end
@@ -637,6 +639,8 @@ module Gems
   end
 
   class Connection
+    include URLValidation
+
     @pool: ConnectionPool
 
     DEFAULT_OPEN_TIMEOUT: Integer
@@ -726,6 +730,15 @@ module Gems
 
     def error: (Net::HTTPResponse response) -> HTTPError
     def error_class: (Net::HTTPResponse response) -> singleton(HTTPError)
+  end
+
+  module URLValidation
+    private
+
+    def validate_host: (String host) -> String
+    def parse_proxy_uri: (String proxy_url) -> URI::HTTP
+    def http_url?: (untyped host) -> bool
+    def redact: (String? url) -> String?
   end
 
 end
