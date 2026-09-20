@@ -21,6 +21,9 @@ module Gems
 
     # Initialize a new HTTPError
     #
+    # The message is the response body, or the status message when the body is empty or an HTML page, such as the
+    # error page of a CDN.
+    #
     # @api public
     # @param response [Net::HTTPResponse] the HTTP response
     # @return [HTTPError] a new instance
@@ -37,10 +40,10 @@ module Gems
     # Get the error message from the response
     # @api private
     # @param response [Net::HTTPResponse] the HTTP response
-    # @return [String] the response body, or the status message if the body is empty
+    # @return [String] the response body, or the status message if the body is empty or an HTML page
     def error_message(response)
       body = response.body.to_s
-      return response.message if body.empty?
+      return response.message if body.empty? || response.content_type&.casecmp?("text/html")
 
       body
     end

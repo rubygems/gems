@@ -230,7 +230,8 @@ An `https://` proxy is connected to over TLS.
 
 All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
 integer status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`, and
-`Gems::ClientError` or `Gems::ServerError` for any other 4xx or 5xx status.
+`Gems::ClientError` or `Gems::ServerError` for any other 4xx or 5xx status. The message of an error is the response
+body, or the status message when the body is empty or an HTML page, such as the error page of a CDN.
 Network failures raise `Gems::NetworkError`, redirect loops raise `Gems::TooManyRedirects`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
 portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the

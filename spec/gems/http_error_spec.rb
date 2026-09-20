@@ -26,6 +26,19 @@ RSpec.describe Gems::HTTPError do
       expect(described_class.new(response:).message).to eq("Not Found")
     end
 
+    it "falls back to the status message when the body is an HTML page" do
+      response = build_response(Net::HTTPBadGateway, "502", "Bad Gateway", "<html><body>Bad Gateway</body></html>")
+      response["Content-Type"] = "Text/HTML; charset=utf-8"
+
+      expect(described_class.new(response:).message).to eq("Bad Gateway")
+    end
+
+    it "uses the body of a text response as the message" do
+      response["Content-Type"] = "text/plain; charset=utf-8"
+
+      expect(described_class.new(response:).message).to eq("This rubygem could not be found.")
+    end
+
     it "exposes the response" do
       expect(described_class.new(response:).response).to equal(response)
     end
