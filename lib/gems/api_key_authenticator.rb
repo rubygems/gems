@@ -17,7 +17,7 @@ module Gems
     # @param key [String] the API key
     # @return [APIKeyAuthenticator] a new instance
     # @example Create an API key authenticator
-    #   authenticator = Gems::APIKeyAuthenticator.new(key: "701243f217cdf23b1370c7b66b65ca97")
+    #   authenticator = Gems::APIKeyAuthenticator.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
     def initialize(key:)
       @key = key
     end

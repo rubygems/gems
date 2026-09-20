@@ -15,7 +15,7 @@ module Gems
   #   @param options [Hash] options passed to {Gems::Client#initialize}
   #   @return [Gems::Client] a new client
   #   @example Create a client
-  #     Gems.new(key: "701243f217cdf23b1370c7b66b65ca97")
+  #     Gems.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
   def_delegator "Gems::Client", :new
 
   def_delegators :client, *API.public_instance_methods

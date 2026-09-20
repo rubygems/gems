@@ -45,7 +45,7 @@ module Gems
       # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
       # @return [String]
       # @example
-      #   Gems.update_api_key "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
+      #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
       def update_api_key(key, **scopes)
         patch("/api/v1/api_key", {**scopes, api_key: key_of(key)})
       end

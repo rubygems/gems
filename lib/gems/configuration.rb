@@ -36,7 +36,7 @@ module Gems
     # @param key [String, APIKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
-    #   Gems.key = "701243f217cdf23b1370c7b66b65ca97"
+    #   Gems.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
     # @example Set the API key from a newly created API key
     #   Gems.key = Gems.create_api_key("ci-push", push_rubygem: true)
     def key=(key)
@@ -169,7 +169,7 @@ module Gems
     # @return [self]
     # @example Configure the API key
     #   Gems.configure do |config|
-    #     config.key = "701243f217cdf23b1370c7b66b65ca97"
+    #     config.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
     #   end
     def configure
       yield self

@@ -159,7 +159,7 @@ Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 # ~/.gem/credentials, where `gem signin` stores it (`gem signin --host` for another host).
 # You can override this default by specifying a custom API key.
 Gems.configure do |config|
-  config.key = '701243f217cdf23b1370c7b66b65ca97'
+  config.key = 'rubygems_701243f217cdf23b1370c7b66b65ca97'
 end
 
 # If your account requires multi-factor authentication, provide a one-time passcode.
@@ -178,7 +178,7 @@ end
 Gems.client.get '/api/v1/gems/rails.json'
 
 # Alternatively, create a client with its own credentials and settings.
-client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
+client = Gems::Client.new(key: 'rubygems_701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.rubygem 'rails'
 ```
 

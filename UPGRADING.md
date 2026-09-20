@@ -19,11 +19,11 @@ Version 3.0 requires Ruby 3.4 or later.
 
 ```ruby
 # 2.x
-client = Gems::Client.new(:key => "701243f217cdf23b1370c7b66b65ca97")
+client = Gems::Client.new(:key => "rubygems_701243f217cdf23b1370c7b66b65ca97")
 Gems::V2.info "rails", "7.0.6"
 
 # 3.0
-client = Gems::Client.new(key: "701243f217cdf23b1370c7b66b65ca97")
+client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
 Gems.version "rails", "7.0.6"
 ```
 

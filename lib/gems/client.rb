@@ -50,11 +50,11 @@ module Gems
     # @param max_redirects [Integer] the maximum number of redirects to follow
     # @return [Client] a new client instance
     # @example Create a client with an API key
-    #   client = Gems::Client.new(key: "701243f217cdf23b1370c7b66b65ca97")
+    #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
     # @example Create a client with HTTP basic authentication
     #   client = Gems::Client.new(username: "nick@gemcutter.org", password: "schwwwwing")
     # @example Create a client with an API key and a one-time passcode
-    #   client = Gems::Client.new(key: "701243f217cdf23b1370c7b66b65ca97", otp: "123456")
+    #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97", otp: "123456")
     # @example Create a client for trusted publishing
     #   client = Gems::Client.new(id_token: ENV.fetch("ID_TOKEN"))
     def initialize(host: Gems.host, key: Gems.key, username: Gems.username, password: Gems.password,
@@ -165,7 +165,7 @@ module Gems
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
     # @example Update the scopes of an API key
-    #   client.patch("/api/v1/api_key", {api_key: "701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true})
+    #   client.patch("/api/v1/api_key", {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true})
     def patch(path, body = {}, content_type: nil, host: nil)
       execute_request(:patch, path, body:, content_type:, host:)
     end

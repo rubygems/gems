@@ -59,7 +59,7 @@ module Gems
     # @param key [String, APIKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
-    #   client.key = "701243f217cdf23b1370c7b66b65ca97"
+    #   client.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
     # @example Set the API key from a newly created API key
     #   client.key = client.create_api_key("ci-push", push_rubygem: true)
     def key=(key)
