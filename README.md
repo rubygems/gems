@@ -172,6 +172,10 @@ Gems.configure do |config|
   config.id_token = ENV.fetch('ID_TOKEN')
 end
 
+# The methods of the Gems module share one client, Gems.client, which is built again when the
+# configuration changes. Use it for raw requests.
+Gems.client.get '/api/v1/gems/rails.json'
+
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: '701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.rubygem 'rails'

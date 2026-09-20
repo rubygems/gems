@@ -27,14 +27,16 @@ client = Gems::Client.new(key: "701243f217cdf23b1370c7b66b65ca97")
 Gems.version "rails", "7.0.6"
 ```
 
-The `Gems` module delegates the API methods alone to a new client. The raw request methods are on a client:
+The `Gems` module delegates the API methods alone to one client, `Gems.client`, which is built from the global
+configuration and built again when it changes, where 2.x delegated every client method to a new client for every
+call. The raw request methods are on that client:
 
 ```ruby
 # 2.x
 Gems.get "/api/v1/gems/rails.json"
 
 # 3.0
-Gems.new.get "/api/v1/gems/rails.json"
+Gems.client.get "/api/v1/gems/rails.json"
 ```
 
 The API key in `~/.gem/credentials` is read when it is first needed rather than when the library is required, and

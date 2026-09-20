@@ -25,6 +25,55 @@ RSpec.describe Gems do
     end
   end
 
+  describe ".client" do
+    it "returns a Gems::Client" do
+      expect(described_class.client).to be_an_instance_of(Gems::Client)
+    end
+
+    it "builds the client from the global configuration" do
+      described_class.configure { |config| config.key, config.host, config.max_redirects = TEST_KEY, "http://example.com", 3 }
+      client = described_class.client
+
+      expect([client.key, client.host, client.max_redirects]).to eq([TEST_KEY, "http://example.com", 3])
+    end
+
+    it "returns the same client while the configuration is unchanged" do
+      expect(described_class.client).to equal(described_class.client)
+    end
+
+    {
+      host: "http://example.com",
+      key: "OTHER_KEY",
+      username: TEST_USERNAME,
+      password: TEST_PASSWORD,
+      otp: "123456",
+      id_token: "ID_TOKEN",
+      user_agent: "Custom User Agent",
+      open_timeout: 1,
+      read_timeout: 1,
+      write_timeout: 1,
+      debug_output: $stderr,
+      proxy_url: "http://proxy.example.com:8080",
+      max_redirects: 1
+    }.each do |option, value|
+      it "builds a new client when #{option} changes" do
+        client = described_class.client
+        described_class.public_send(:"#{option}=", value)
+
+        expect(described_class.client).not_to equal(client)
+      end
+    end
+
+    it "exchanges a trusted publishing ID token once across calls" do
+      exchange = stub_post("/api/v1/oidc/trusted_publisher/exchange_token").to_return(body: fixture("exchange_token.json"))
+      stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json"))
+      described_class.id_token = "ID_TOKEN"
+      2.times { described_class.rubygem("rails") }
+
+      expect(exchange).to have_been_requested.once
+    end
+  end
+
   Gems::API.public_instance_methods.each do |method|
     it "delegates .#{method} to a client" do
       expect(described_class).to respond_to(method)

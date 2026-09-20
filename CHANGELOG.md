@@ -41,7 +41,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Take keyword arguments in `Gems::Client.new` and `Gems.new`; unknown options raise `ArgumentError`
 * Take keyword arguments in the client's `get`, `post`, `put`, `patch`, and `delete` methods
 * Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`
-* Delegate only the API methods from the `Gems` module instead of every client method
+* Delegate only the API methods from the `Gems` module, to one client, `Gems.client`, which is built from the global configuration and built again when it changes, rather than every client method to a new client for every call, so that a trusted publishing ID token is exchanged once; the raw request methods are on `Gems.client`
 * Push to the client's configured host by default
 * Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now disables that fallback without disabling configured basic authentication or trusted publishing
 * Resolve the default API key as `gem push` does: the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the configured host, else the RubyGems.org key
