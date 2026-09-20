@@ -57,6 +57,10 @@ module Gems
     # browsers do, so that a redirect cannot send them to a host they were not meant for. A later redirect back to
     # the original host does not restore them.
     #
+    # A redirect that cannot be followed, such as 304 Not Modified or one whose Location header is missing, is not a
+    # valid URL, or is not an HTTP or HTTPS URL, is returned as it is, so that the caller raises the HTTPError of its
+    # status.
+    #
     # @api public
     # @param response [Net::HTTPResponse] the HTTP response to handle
     # @param request [Net::HTTPRequest] the original HTTP request
@@ -72,6 +76,8 @@ module Gems
       raise TooManyRedirects, "Too many redirects" if redirect_count >= max_redirects
 
       new_uri = build_new_uri(response, request)
+      return response if new_uri.nil?
+
       authenticator = Authenticator.new unless same_origin?(request.uri, new_uri)
       new_request = build_request(request, new_uri, Integer(response.code), authenticator)
       new_response = connection.perform(request: new_request)
@@ -103,10 +109,17 @@ module Gems
     # @api private
     # @param response [Net::HTTPResponse] the redirect response
     # @param request [Net::HTTPRequest] the original request
-    # @return [URI::Generic] the new URI
+    # @return [URI::HTTP, nil] the new URI, or nil if the response has no Location header or one that is not an HTTP
+    #   or HTTPS URL
     def build_new_uri(response, request)
+      location = response["location"]
+      return if location.nil?
+
       # If location is relative, it will join with the original URI, otherwise it will overwrite it
-      URI.join(request.uri, response.fetch("location"))
+      new_uri = URI.join(request.uri, location)
+      new_uri if new_uri.is_a?(URI::HTTP)
+    rescue URI::InvalidURIError
+      nil
     end
 
     # Build a new request for the redirect

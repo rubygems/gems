@@ -45,6 +45,13 @@ RSpec.describe Gems::RedirectHandler do
       expect(handler.handle(response:, request:)).to equal(response)
     end
 
+    it "does not follow the Location header of a successful response" do
+      response = Net::HTTPCreated.new("1.1", "201", "Created")
+      response["Location"] = "https://rubygems.org/new"
+
+      expect(handler.handle(response:, request:)).to equal(response)
+    end
+
     it "follows an absolute redirect" do
       stub_request(:get, "https://bundler.rubygems.org/new")
       handler.handle(response: redirect(302, "https://bundler.rubygems.org/new"), request:)
@@ -123,6 +130,39 @@ RSpec.describe Gems::RedirectHandler do
         handler.handle(response: redirect(302, "https://example.com/away"), request:, authenticator:)
 
         expect(a_request(:get, "https://rubygems.org/back").with { |req| !req.headers.key?("Authorization") }).to have_been_made
+      end
+    end
+
+    context "when a redirect cannot be followed" do
+      it "returns a redirect without a Location header" do
+        response = Net::HTTPNotModified.new("1.1", "304", "Not Modified")
+
+        expect(handler.handle(response:, request:)).to equal(response)
+      end
+
+      it "returns a redirect whose location is not a valid URL" do
+        response = redirect(302, "http://exa mple.com/")
+
+        expect(handler.handle(response:, request:)).to equal(response)
+      end
+
+      it "returns a redirect whose location is not an HTTP URL" do
+        response = redirect(302, "ftp://rubygems.org/new")
+
+        expect(handler.handle(response:, request:)).to equal(response)
+      end
+
+      it "makes no request" do
+        handler.handle(response: redirect(302, "ftp://rubygems.org/new"), request:)
+
+        expect(a_request(:any, /.*/)).not_to have_been_made
+      end
+
+      it "counts against the maximum redirects first" do
+        handler.max_redirects = 0
+
+        expect { handler.handle(response: redirect(302, "ftp://rubygems.org/new"), request:) }
+          .to raise_error(Gems::TooManyRedirects)
       end
     end
 

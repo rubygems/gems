@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `expires_at`, `rubygem_name`, and `mfa` options to `create_api_key`
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and the status `code` as an Integer; any other 4xx or 5xx status raises `ClientError` or `ServerError`
-* Add `TooManyRedirects`, raised instead of looping forever on redirects
+* Add `TooManyRedirects`, raised instead of looping forever on redirects; a redirect that cannot be followed, such as 304 Not Modified or one whose `Location` is missing, is not a valid URL, or is not an HTTP or HTTPS URL, raises the `HTTPError` of its status
 * Add `NoLatestVersion`, raised by `latest_version`, and by `yank`, `unyank`, and `downloads` without a version, when a gem has no published version
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
