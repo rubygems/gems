@@ -14,8 +14,6 @@ module Gems
     # The Ruby it runs on is named along with the library and its version, as `gem push` names it, so that the
     # RubyGems.org operators can tell which client and which Ruby a request came from.
     DEFAULT_USER_AGENT = "gems/#{VERSION} (#{RUBY_ENGINE} #{RUBY_ENGINE_VERSION}; #{RUBY_PLATFORM})".freeze
-    # Content type for form-encoded request bodies
-    FORM_URLENCODED = "application/x-www-form-urlencoded"
     # Content type for multipart request bodies
     MULTIPART_FORM_DATA = "multipart/form-data"
     # Content type for binary request bodies
