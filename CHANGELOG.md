@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
-* Add RBS signatures
+* Add RBS signatures, with a manifest naming the standard libraries they refer to
 
 ### Changed
 * Follow 301, 302, and 303 redirects with GET, keeping the method and body only for 307 and 308, and follow a redirect to another scheme, host, or port without the API key, basic authentication, or one-time passcode of the request, so that a redirect cannot send them to a host they were not meant for

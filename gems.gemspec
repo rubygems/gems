@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
     ".yardopts",
     "lib/**/*.rb",
     "sig/*.rbs",
+    "sig/manifest.yaml",
     "*.md",
     "LICENSE.md"
   ]

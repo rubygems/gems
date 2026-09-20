@@ -1,0 +1,9 @@
+# The standard libraries the signatures of gems refer to, which rbs collection loads for code that depends on it
+dependencies:
+  - name: forwardable
+  - name: net-http
+  - name: openssl
+  - name: time
+  - name: timeout
+  - name: uri
+  - name: zlib
