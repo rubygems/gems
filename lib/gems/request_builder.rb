@@ -51,13 +51,14 @@ module Gems
     # Build an HTTP request
     #
     # The body may be a Hash (sent as a form-encoded body), an Array of multipart
-    # fields (sent as multipart/form-data), or a String (sent with the given content type).
+    # fields (sent as multipart/form-data), a String (sent with the given content type), or an open file (sent as a
+    # stream with the given content type).
     #
     # @api private
     # @param http_method [Symbol] the HTTP method (:get, :post, :put, :patch, :delete)
     # @param uri [URI::Generic] the request URI
     # @param params [Hash] query parameters to append to the URI
-    # @param body [Hash, Array, String, nil] the request body
+    # @param body [Hash, Array, String, File, nil] the request body
     # @param content_type [String, nil] the content type for a String body (defaults to application/octet-stream)
     # @param headers [Hash] additional headers for the request
     # @param authenticator [Authenticator] the authenticator for the request
@@ -114,19 +115,61 @@ module Gems
     # Add a body to a request
     # @api private
     # @param request [Net::HTTPRequest] the request
-    # @param body [Hash, Array, String, nil] the request body
-    # @param content_type [String, nil] the content type for a String body
+    # @param body [Hash, Array, String, File, nil] the request body
+    # @param content_type [String, nil] the content type for a String or stream body
     # @return [void]
     def add_body(request:, body:, content_type:)
+      return if body.nil?
+
       case body
-      when Hash
-        request.form_data = body
-      when Array
-        request.set_form(body, MULTIPART_FORM_DATA)
-      when String
-        request.content_type = content_type || OCTET_STREAM
-        request.body = body
+      when Hash then request.form_data = body
+      when Array then add_multipart_body(request:, body:)
+      when String then add_string_body(request:, body:, content_type:)
+      else add_stream_body(request:, body:, content_type:)
       end
+    end
+
+    # Add multipart form fields to a request
+    #
+    # A field read as a stream is rewound, so that a request built again from the same fields, such as the one a 307
+    # or 308 redirect is followed with, sends the whole file rather than the bytes the attempt before it left.
+    #
+    # @api private
+    # @param request [Net::HTTPRequest] the request
+    # @param body [Array] the multipart fields, each a name, a value, and the options of the field
+    # @return [void]
+    def add_multipart_body(request:, body:)
+      body.each { |_name, value| value.rewind if value.respond_to?(:rewind) }
+      request.set_form(body, MULTIPART_FORM_DATA)
+    end
+
+    # Add a String body to a request
+    # @api private
+    # @param request [Net::HTTPRequest] the request
+    # @param body [String] the request body
+    # @param content_type [String, nil] the content type for the body
+    # @return [void]
+    def add_string_body(request:, body:, content_type:)
+      request.content_type = content_type || OCTET_STREAM
+      request.body = body
+    end
+
+    # Add an open file to a request, as a stream
+    #
+    # The file is sent as it is read from, rather than read into a String first, so that pushing a gem does not hold
+    # the whole of it in memory. Its length is measured for the `Content-Length` header, which Net::HTTP requires for
+    # a stream it is not sending in chunks, and it is rewound before it is measured, as a multipart field is.
+    #
+    # @api private
+    # @param request [Net::HTTPRequest] the request
+    # @param body [File] the open file
+    # @param content_type [String, nil] the content type for the body
+    # @return [void]
+    def add_stream_body(request:, body:, content_type:)
+      body.rewind
+      request.content_type = content_type || OCTET_STREAM
+      request.content_length = body.size
+      request.body_stream = body
     end
 
     # Add authentication to a request

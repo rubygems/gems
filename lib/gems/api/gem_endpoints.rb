@@ -105,10 +105,9 @@ module Gems
       # @example
       #   Gems.push File.new("pkg/gemcutter-0.2.1.gem"), host: "https://gems.example.com"
       def push(gem, host: nil, attestations: nil)
-        if attestations
-          post("/api/v1/gems", multipart_push_body(gem, attestations), host:)
-        else
-          post("/api/v1/gems", read_file(gem), host:)
+        open_file(gem) do |file|
+          body = attestations ? multipart_push_body(file, attestations) : file
+          post("/api/v1/gems", body, host:)
         end
       end
 
@@ -172,21 +171,42 @@ module Gems
       private
 
       # Build the multipart body for pushing a gem with attestations
+      #
+      # The gem is a field the request reads as a stream, rather than the contents of the file, so that a gem pushed
+      # with attestations is no more held in memory than one pushed without them.
+      #
       # @api private
-      # @param gem [String, Pathname, File] The path of a built gem, or the open file.
+      # @param file [File] The open gem file, whose path names the field.
       # @param attestations [Array<String, Pathname, File>] The paths of the attestations, or the open files.
       # @return [Array] the multipart form fields
-      def multipart_push_body(gem, attestations)
+      def multipart_push_body(file, attestations)
         [
-          ["gem", read_file(gem), {filename: path_of(gem), content_type: RequestBuilder::OCTET_STREAM}],
+          ["gem", file, {filename: file.to_path, content_type: RequestBuilder::OCTET_STREAM}],
           ["attestations", "[#{attestations.map { |attestation| read_file(attestation) }.join(",")}]",
             {content_type: "application/json"}]
         ]
       end
 
+      # Open a file given as a path, or take one that is already open
+      #
+      # A file the library opens is closed once the request has been sent, and one the caller opened is left open for
+      # the caller to close. Either is read in binary mode, so that a gem opened in text mode is sent as the bytes it
+      # holds rather than with its line endings translated.
+      #
+      # @api private
+      # @param file [String, Pathname, File] the path, or the open file
+      # @yield [file] the open file
+      # @return [Object] what the block returns
+      def open_file(file, &block)
+        case file
+        when String, Pathname then File.open(file, "rb", &block)
+        else yield file.binmode
+        end
+      end
+
       # Read a file given as a path or an open file
       #
-      # An open file is read in binary mode, as a path is, so that a gem opened in text mode is sent as the bytes it
+      # An open file is read in binary mode, as a path is, so that a file opened in text mode is read as the bytes it
       # holds rather than with its line endings translated.
       #
       # @api private
@@ -196,17 +216,6 @@ module Gems
         case file
         when String, Pathname then File.binread(file)
         else file.binmode.read #: String
-        end
-      end
-
-      # The path of a file given as a path or an open file
-      # @api private
-      # @param file [String, Pathname, File] the path, or the open file
-      # @return [String] the path
-      def path_of(file)
-        case file
-        when String then file
-        else file.to_path
         end
       end
     end

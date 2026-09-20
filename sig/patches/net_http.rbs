@@ -7,6 +7,6 @@ module Net
   end
 
   module HTTPHeader
-    def set_form: (Array[[String | Symbol, untyped] | [String, untyped, Hash[Symbol, untyped]]] params, ?String enctype, ?Hash[untyped, untyped] formopt) -> void | ...
+    def set_form: (Array[Array[untyped]] params, ?String enctype, ?Hash[untyped, untyped] formopt) -> void | ...
   end
 end

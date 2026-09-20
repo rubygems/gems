@@ -57,6 +57,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`
 * Delegate only the API methods from the `Gems` module, to one client, `Gems.client`, which is built from the global configuration and built again when it changes, rather than every client method to a new client for every call, so that a trusted publishing ID token is exchanged once; the raw request methods are on `Gems.client`
 * Push to the client's configured host by default
+* Send the gem `push` is given as a stream rather than reading it into memory first, so that pushing a large gem no longer holds the whole of it in memory, with or without attestations; a gem given as a path is opened and closed by the library, and one given as an open file is left open for the caller to close
 * Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now disables that fallback without disabling configured basic authentication or trusted publishing
 * Resolve the default API key as `gem push` does: the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the configured host, else the RubyGems.org key
 * Return `nil` from `default_key`, rather than exiting the process as RubyGems does, when `~/.gem/credentials` does not have the permissions RubyGems requires; RubyGems still reports the problem on standard error

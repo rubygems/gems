@@ -71,6 +71,7 @@ Gems.owned_gems 'sferik'
 Gems.profile('sferik').handle
 
 # Submit a gem to RubyGems.org, given as a path or an open file.
+# The gem is sent as a stream, so a large gem is never held in memory.
 Gems.push 'gemcutter-0.2.1.gem'
 Gems.push File.new 'gemcutter-0.2.1.gem'
 

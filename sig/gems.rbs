@@ -1,7 +1,7 @@
 module Gems
   VERSION: String
 
-  type multipart_field = [Symbol | String, untyped] | [String, String, Hash[Symbol, String]]
+  type multipart_field = [Symbol | String, untyped, Hash[Symbol, String]]
   type gem_identifier = String | Gem | Version
   type version_identifier = String | Version
   type owner_identifier = String | Owner | Profile
@@ -10,7 +10,7 @@ module Gems
   type api_key_identifier = String | APIKey
   type trusted_publisher_identifier = Integer | String | TrustedPublisher
   type push_file = String | Pathname | File
-  type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
+  type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String | File
 
   extend Configuration
   extend SingleForwardable
@@ -463,9 +463,9 @@ module Gems
 
     private
 
-    def multipart_push_body: (push_file gem, Array[push_file] attestations) -> Array[multipart_field]
+    def multipart_push_body: (File file, Array[push_file] attestations) -> Array[multipart_field]
+    def open_file: [T] (push_file file) { (File file) -> T } -> T
     def read_file: (push_file file) -> String
-    def path_of: (push_file file) -> String
   end
 
   module API::OwnerEndpoints : Object, _Requests
@@ -773,6 +773,9 @@ module Gems
     def add_query_params: (URI::Generic uri, Hash[Symbol | String, untyped] params) -> URI::Generic
     def add_headers: (request: Net::HTTPRequest, headers: Hash[String, String]) -> void
     def add_body: (request: Net::HTTPRequest, body: request_body?, content_type: String?) -> void
+    def add_multipart_body: (request: Net::HTTPRequest, body: Array[multipart_field]) -> void
+    def add_string_body: (request: Net::HTTPRequest, body: String, content_type: String?) -> void
+    def add_stream_body: (request: Net::HTTPRequest, body: File, content_type: String?) -> void
     def add_authentication: (request: Net::HTTPRequest, authenticator: Authenticator) -> void
   end
 

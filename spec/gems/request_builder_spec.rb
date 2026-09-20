@@ -132,6 +132,44 @@ RSpec.describe Gems::RequestBuilder do
       it "sets the multipart fields" do
         expect(request.instance_variable_get(:@body_data)).to equal(body)
       end
+
+      it "rewinds a field it has already read" do
+        file = File.new(File.join(fixture_path, "gems-0.0.8.gem"))
+        file.read
+        builder.build(http_method: :post, uri:, body: [["gem", file, {filename: "gems-0.0.8.gem"}]])
+
+        expect(file.pos).to eq(0)
+      end
+    end
+
+    context "with an open file as the body" do
+      let(:path) { File.join(fixture_path, "gems-0.0.8.gem") }
+      let(:file) { File.new(path, "rb") }
+      let(:request) { builder.build(http_method: :post, uri:, body: file) }
+
+      it "sends the file as a stream rather than reading it into the body" do
+        expect([request.body_stream, request.body]).to eq([file, nil])
+      end
+
+      it "sets the content length to the size of the file" do
+        expect(request.content_length).to eq(File.size(path))
+      end
+
+      it "defaults the content type to application/octet-stream" do
+        expect(request.content_type).to eq("application/octet-stream")
+      end
+
+      it "uses the given content type" do
+        request = builder.build(http_method: :post, uri:, body: file, content_type: "application/json")
+
+        expect(request.content_type).to eq("application/json")
+      end
+
+      it "rewinds a file it has already read" do
+        file.read
+
+        expect(request.body_stream.pos).to eq(0)
+      end
     end
 
     context "with a String body" do

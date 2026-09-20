@@ -228,6 +228,20 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_request(:post, "http://example.com/api/v1/gems")).to have_been_made
     end
 
+    it "leaves a gem the caller opened open" do
+      client.push(gem)
+
+      expect(gem).not_to be_closed
+    end
+
+    it "sends the whole gem again when a redirect preserves the method" do
+      stub_post("/api/v1/gems").to_return(status: 307, headers: {"Location" => "/api/v1/gems/push"})
+      stub_post("/api/v1/gems/push").to_return(body: fixture("push"))
+      client.push(gem)
+
+      expect(a_post("/api/v1/gems/push").with(body: gem_data)).to have_been_made
+    end
+
     context "with attestations" do
       let(:attestations) { [fixture("attestations/one.json"), fixture("attestations/two.json")] }
 
@@ -246,6 +260,12 @@ RSpec.describe Gems::API::GemEndpoints do
 
       it "returns the response body" do
         expect(client.push(gem, attestations:)).to eq("Successfully registered gem: gems (0.0.8)")
+      end
+
+      it "posts a gem given as a path" do
+        client.push(File.join(fixture_path, "gems-0.0.8.gem"), attestations:)
+
+        expect(a_post("/api/v1/gems").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
       end
     end
   end
@@ -422,14 +442,50 @@ RSpec.describe Gems::API::GemEndpoints do
     end
   end
 
+  describe "#open_file" do
+    let(:path) { File.join(fixture_path, "gems-0.0.8.gem") }
+
+    it "opens a gem given as a path" do
+      expect(client.send(:open_file, path, &:read)).to eq(File.binread(path))
+    end
+
+    it "opens a gem given as a Pathname" do
+      expect(client.send(:open_file, Pathname(path), &:read)).to eq(File.binread(path))
+    end
+
+    it "closes the file it opens" do
+      expect(client.send(:open_file, path) { |file| file }).to be_closed
+    end
+
+    it "takes a gem that is already open" do
+      file = File.new(path)
+
+      expect(client.send(:open_file, file) { |open| open }).to equal(file)
+    end
+
+    it "leaves a gem the caller opened open" do
+      file = File.new(path)
+      client.send(:open_file, file) { |open| open }
+
+      expect(file).not_to be_closed
+    end
+
+    it "reads a gem opened in text mode as the bytes it holds" do
+      expect(client.send(:open_file, File.new(path), &:read)).to eq(File.binread(path))
+    end
+
+    it "opens a path that begins with a pipe as a file rather than running it" do
+      expect { client.send(:open_file, "|echo pushed", &:read) }.to raise_error(Errno::ENOENT)
+    end
+  end
+
   describe "#multipart_push_body" do
     let(:gem) { fixture("gems-0.0.8.gem") }
-    let(:gem_data) { File.binread(File.join(fixture_path, "gems-0.0.8.gem")) }
     let(:attestations) { [fixture("attestations/one.json"), fixture("attestations/two.json")] }
     let(:body) { client.send(:multipart_push_body, gem, attestations) }
 
     it "includes the gem with its filename and content type" do
-      expect(body.first).to eq(["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}])
+      expect(body.first).to eq(["gem", gem, {filename: gem.path, content_type: "application/octet-stream"}])
     end
 
     it "includes the attestations as a JSON array" do
@@ -440,19 +496,11 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(body.size).to eq(2)
     end
 
-    it "reads the gem and the attestations given as paths" do
-      path = File.join(fixture_path, "gems-0.0.8.gem")
-      attestation_paths = %w[one two].map { |name| File.join(fixture_path, "attestations", "#{name}.json") }
-      body = client.send(:multipart_push_body, path, attestation_paths)
+    it "reads the attestations given as paths" do
+      paths = %w[one two].map { |name| File.join(fixture_path, "attestations", "#{name}.json") }
+      body = client.send(:multipart_push_body, gem, paths)
 
-      expect(body).to eq([["gem", gem_data, {filename: path, content_type: "application/octet-stream"}],
-        ["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}]])
-    end
-
-    it "uses the path of a gem given as a Pathname as the filename" do
-      body = client.send(:multipart_push_body, Pathname(gem.path), attestations)
-
-      expect(body.first).to eq(["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}])
+      expect(body.last).to eq(["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}])
     end
   end
 end
