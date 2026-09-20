@@ -3,17 +3,6 @@
 RSpec.describe Gems::API::APIKeyEndpoints do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
-  describe "::API_KEY_SCOPES" do
-    it "names every scope the RubyGems API defines" do
-      expect(described_class::API_KEY_SCOPES).to eq(%i[access_webhooks add_owner configure_trusted_publishers
-        index_rubygems push_rubygem remove_owner show_dashboard update_owner yank_rubygem])
-    end
-
-    it "is frozen, so that a caller cannot change what the endpoints accept" do
-      expect(described_class::API_KEY_SCOPES).to be_frozen
-    end
-  end
-
   describe "#create_api_key" do
     subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 

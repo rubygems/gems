@@ -7,6 +7,17 @@ RSpec.describe Gems::APIKey do
     expect(api_key).to be_a(Gems::Resource)
   end
 
+  describe "::SCOPES" do
+    it "names every scope the RubyGems API defines" do
+      expect(described_class::SCOPES).to eq(%i[access_webhooks add_owner configure_trusted_publishers
+        index_rubygems push_rubygem remove_owner show_dashboard update_owner yank_rubygem])
+    end
+
+    it "is frozen, so that a caller cannot change what the endpoints accept" do
+      expect(described_class::SCOPES).to be_frozen
+    end
+  end
+
   it "inspects as the name and scopes without the key" do
     api_key = described_class.new("rubygems_api_key" => "secret", "name" => "ci-push", "scopes" => ["push_rubygem"])
 

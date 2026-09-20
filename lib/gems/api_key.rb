@@ -8,6 +8,25 @@ module Gems
   # An API key, as returned by the API key and trusted publishing endpoints
   # @api public
   class APIKey < Resource
+    # The scopes the RubyGems API defines for an API key
+    #
+    # A scope the API does not define is refused by {API::APIKeyEndpoints#create_api_key} and
+    # {API::APIKeyEndpoints#update_api_key} rather than sent, so this is the list a caller building its own scopes
+    # can check against.
+    #
+    # @api public
+    SCOPES = %i[
+      access_webhooks
+      add_owner
+      configure_trusted_publishers
+      index_rubygems
+      push_rubygem
+      remove_owner
+      show_dashboard
+      update_owner
+      yank_rubygem
+    ].freeze
+
     inspect_with :name, :scopes
 
     # @!method name

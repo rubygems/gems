@@ -13,24 +13,6 @@ module Gems
       include Identifiers
       include JSONParsing
 
-      # The scopes the RubyGems API defines for an API key
-      #
-      # A scope the API does not define is refused by {#create_api_key} and {#update_api_key} rather than sent, so
-      # this is the list a caller building its own scopes can check against.
-      #
-      # @api public
-      API_KEY_SCOPES = %i[
-        access_webhooks
-        add_owner
-        configure_trusted_publishers
-        index_rubygems
-        push_rubygem
-        remove_owner
-        show_dashboard
-        update_owner
-        yank_rubygem
-      ].freeze
-
       # Create an API key using HTTP basic auth
       #
       # The key is only returned once, so store it somewhere safe.
@@ -42,7 +24,8 @@ module Gems
       # @param rubygem_name [String, Gem, nil] A gem to restrict the key to.
       # @param mfa [Boolean, nil] Whether to require a one-time passcode when the key is used.
       # @param scopes [Hash{Symbol => Boolean}] The scopes to enable: push_rubygem, yank_rubygem, index_rubygems,
-      #   add_owner, remove_owner, access_webhooks, update_owner, configure_trusted_publishers, and show_dashboard.
+      #   add_owner, remove_owner, access_webhooks, update_owner, configure_trusted_publishers, and show_dashboard,
+      #   which are the scopes {APIKey::SCOPES} names.
       # @return [APIKey] the new API key
       # @example
       #   Gems.configure do |config|
@@ -63,7 +46,8 @@ module Gems
       # @api public
       # @authenticated true
       # @param key [String, APIKey] The API key to update.
-      # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
+      # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem;
+      #   {APIKey::SCOPES} names them all.
       # @return [String]
       # @example
       #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
@@ -96,11 +80,11 @@ module Gems
       # @return [void]
       # @raise [ArgumentError] if a scope is not one the API defines
       def validate_scopes(scopes)
-        unknown = scopes.keys - API_KEY_SCOPES
+        unknown = scopes.keys - APIKey::SCOPES
         return if unknown.empty?
 
         raise ArgumentError, "Unknown API key scope: #{unknown.join(", ")}. " \
-          "The scopes the API defines are: #{API_KEY_SCOPES.join(", ")}"
+          "The scopes the API defines are: #{APIKey::SCOPES.join(", ")}"
       end
     end
   end

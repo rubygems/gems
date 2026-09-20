@@ -328,6 +328,8 @@ module Gems
   end
 
   class APIKey < Resource
+    SCOPES: Array[Symbol]
+
     def key: () -> String
     def name: () -> String?
     def scopes: () -> Array[String]?
@@ -383,8 +385,6 @@ module Gems
   module API::APIKeyEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
-
-    API_KEY_SCOPES: Array[Symbol]
 
     def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> APIKey
     def update_api_key: (api_key_identifier key, **bool scopes) -> String

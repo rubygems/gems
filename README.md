@@ -164,7 +164,7 @@ Gems.me.mfa
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
 
 # The scopes the API defines, which a misspelled scope is checked against.
-Gems::API::APIKeyEndpoints::API_KEY_SCOPES
+Gems::APIKey::SCOPES
 
 # Exchange an OIDC ID token for an API key via trusted publishing.
 Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
