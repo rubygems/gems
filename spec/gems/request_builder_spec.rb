@@ -4,8 +4,13 @@ RSpec.describe Gems::RequestBuilder do
   let(:uri) { URI("https://rubygems.org/api/v1/gems/rails.json") }
 
   describe "::DEFAULT_USER_AGENT" do
-    it "includes the version" do
-      expect(described_class::DEFAULT_USER_AGENT).to eq("Gems #{Gems::VERSION}")
+    it "names the library and its version" do
+      expect(described_class::DEFAULT_USER_AGENT).to start_with("gems/#{Gems::VERSION} ")
+    end
+
+    it "names the Ruby it runs on" do
+      expect(described_class::DEFAULT_USER_AGENT)
+        .to eq("gems/#{Gems::VERSION} (#{RUBY_ENGINE} #{RUBY_ENGINE_VERSION}; #{RUBY_PLATFORM})")
     end
   end
 

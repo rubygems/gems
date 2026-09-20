@@ -245,7 +245,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
 | `id_token`    | The OIDC ID token exchanged for an API key               | `nil`                                  |
-| `user_agent`  | The `User-Agent` header                                  | `Gems <version>`                       |
+| `user_agent`  | The `User-Agent` header                                  | `gems/<version> (<ruby> <version>; <platform>)` |
 | `open_timeout` | The timeout for opening connections, in seconds         | `60`                                   |
 | `read_timeout` | The timeout for reading responses, in seconds           | `60`                                   |
 | `write_timeout` | The timeout for writing requests, in seconds           | `60`                                   |

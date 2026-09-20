@@ -8,7 +8,10 @@ module Gems
   # @api private
   class RequestBuilder
     # The default 'User-Agent' HTTP header
-    DEFAULT_USER_AGENT = "Gems #{VERSION}".freeze
+    #
+    # The Ruby it runs on is named along with the library and its version, as `gem push` names it, so that the
+    # RubyGems.org operators can tell which client and which Ruby a request came from.
+    DEFAULT_USER_AGENT = "gems/#{VERSION} (#{RUBY_ENGINE} #{RUBY_ENGINE_VERSION}; #{RUBY_PLATFORM})".freeze
     # Content type for form-encoded request bodies
     FORM_URLENCODED = "application/x-www-form-urlencoded".freeze
     # Content type for multipart request bodies
