@@ -53,6 +53,10 @@ module Gems
 
     # Handle redirects for an HTTP response
     #
+    # A redirect to another scheme, host, or port is followed without the credentials of the request, as curl and
+    # browsers do, so that a redirect cannot send them to a host they were not meant for. A later redirect back to
+    # the original host does not restore them.
+    #
     # @api public
     # @param response [Net::HTTPResponse] the HTTP response to handle
     # @param request [Net::HTTPRequest] the original HTTP request
@@ -67,13 +71,33 @@ module Gems
 
       raise TooManyRedirects, "Too many redirects" if redirect_count >= max_redirects
 
-      new_request = build_request(request, build_new_uri(response, request), Integer(response.code), authenticator)
+      new_uri = build_new_uri(response, request)
+      authenticator = Authenticator.new unless same_origin?(request.uri, new_uri)
+      new_request = build_request(request, new_uri, Integer(response.code), authenticator)
       new_response = connection.perform(request: new_request)
 
       handle(response: new_response, request: new_request, authenticator:, redirect_count: redirect_count + 1)
     end
 
     private
+
+    # Whether two URIs share a scheme, host, and port
+    # @api private
+    # @param uri [URI::Generic] one URI
+    # @param other [URI::Generic] the other URI
+    # @return [Boolean] whether the URIs share an origin
+    def same_origin?(uri, other)
+      origin(uri).eql?(origin(other))
+    end
+
+    # The origin of a URI, with the scheme and host in lowercase
+    # @api private
+    # @param uri [URI::Generic] the URI
+    # @return [Array] the scheme, host, and port
+    def origin(uri)
+      normalized = uri.normalize
+      [normalized.scheme, normalized.host, normalized.port]
+    end
 
     # Build a new URI from the redirect response
     # @api private

@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add RBS signatures
 
 ### Changed
-* Follow 301, 302, and 303 redirects with GET, keeping the method and body only for 307 and 308
+* Follow 301, 302, and 303 redirects with GET, keeping the method and body only for 307 and 308, and follow a redirect to another scheme, host, or port without the API key, basic authentication, or one-time passcode of the request, so that a redirect cannot send them to a host they were not meant for
 * Take keyword arguments in `Gems::Client.new` and `Gems.new`; unknown options raise `ArgumentError`
 * Take keyword arguments in the client's `get`, `post`, `put`, `patch`, and `delete` methods
 * Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`

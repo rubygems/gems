@@ -82,6 +82,50 @@ RSpec.describe Gems::RedirectHandler do
       expect(a_request(:get, "https://rubygems.org/third").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
     end
 
+    context "when a redirect leaves the origin" do
+      let(:authenticator) { Gems::OtpAuthenticator.new(authenticator: Gems::ApiKeyAuthenticator.new(key: TEST_KEY), otp: "123456") }
+
+      def headers_sent_to(location, uri = location)
+        stub_request(:get, uri)
+        handler.handle(response: redirect(302, location), request:, authenticator:)
+        headers = nil
+        expect(a_request(:get, uri).with { |req| headers = req.headers }).to have_been_made
+        headers
+      end
+
+      it "drops the credentials for another host" do
+        expect(headers_sent_to("https://example.com/new").keys).not_to include("Authorization", "Otp")
+      end
+
+      it "drops the credentials for another scheme" do
+        expect(headers_sent_to("http://rubygems.org/new").keys).not_to include("Authorization", "Otp")
+      end
+
+      it "drops the credentials for another scheme on the same port" do
+        expect(headers_sent_to("http://rubygems.org:443/new").keys).not_to include("Authorization", "Otp")
+      end
+
+      it "drops the credentials for another port" do
+        expect(headers_sent_to("https://rubygems.org:8443/new").keys).not_to include("Authorization", "Otp")
+      end
+
+      it "keeps the credentials for the same origin spelled in another case" do
+        expect(headers_sent_to("HTTPS://RubyGems.org/new", "https://rubygems.org/new")).to include("Authorization" => TEST_KEY, "Otp" => "123456")
+      end
+
+      it "keeps the credentials for the same origin with an explicit default port" do
+        expect(headers_sent_to("https://rubygems.org:443/new")).to include("Authorization" => TEST_KEY)
+      end
+
+      it "does not restore the credentials on a redirect back" do
+        stub_request(:get, "https://example.com/away").to_return(status: 302, headers: {"Location" => "https://rubygems.org/back"})
+        stub_request(:get, "https://rubygems.org/back")
+        handler.handle(response: redirect(302, "https://example.com/away"), request:, authenticator:)
+
+        expect(a_request(:get, "https://rubygems.org/back").with { |req| !req.headers.key?("Authorization") }).to have_been_made
+      end
+    end
+
     it "raises TooManyRedirects after the maximum number of redirects" do
       handler.max_redirects = 2
       stub_request(:get, "https://rubygems.org/loop").to_return(status: 302, headers: {"Location" => "/loop"})

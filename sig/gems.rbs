@@ -574,6 +574,8 @@ module Gems
 
     private
 
+    def same_origin?: (URI::Generic uri, URI::Generic other) -> bool
+    def origin: (URI::Generic uri) -> [String?, String?, Integer?]
     def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::Generic
     def build_request: (Net::HTTPRequest request, URI::Generic uri, Integer response_code, Authenticator authenticator) -> Net::HTTPRequest
   end
