@@ -91,6 +91,12 @@ RSpec.describe Gems::Configuration do
       expect(Gems.default_key).to eq("ENV_KEY")
     end
 
+    it "ignores an empty GEM_HOST_API_KEY" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_API_KEY" => ""))
+
+      expect(Gems.default_key).to eq("FILE_KEY")
+    end
+
     it "does not read the RubyGems configuration when GEM_HOST_API_KEY is set" do
       stub_const("ENV", ENV.to_h.merge("GEM_HOST_API_KEY" => "ENV_KEY"))
       Gems.default_key

@@ -206,6 +206,11 @@ module Gems
     # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The credentials file is only read when
     # this method is called.
     #
+    # An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, since a continuous integration
+    # service sets a variable to the empty string when the secret it was given is not set, and an empty
+    # `Authorization` header answers with a puzzling 401 where a request without one answers with the error the
+    # endpoint has for an unauthenticated request.
+    #
     # When the credentials file does not have the permissions RubyGems requires, RubyGems reports the problem on
     # standard error and would exit the process; this method returns nil instead.
     #
@@ -217,7 +222,10 @@ module Gems
     # @example Get the default API key for another host
     #   Gems.default_key("https://gems.example.com")
     def default_key(gem_host = host)
-      ENV.fetch("GEM_HOST_API_KEY") { ::Gem.configuration.api_keys.fetch(gem_host) { ::Gem.configuration.rubygems_api_key } }
+      env_key = ENV.fetch("GEM_HOST_API_KEY", "")
+      return env_key unless env_key.empty?
+
+      ::Gem.configuration.api_keys.fetch(gem_host) { ::Gem.configuration.rubygems_api_key }
     rescue ::Gem::SystemExitException
       nil
     end
