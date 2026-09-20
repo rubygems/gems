@@ -195,12 +195,22 @@ module Gems
     end
 
     # Build a trusted publisher authenticator if an ID token is available
+    #
+    # The authenticator built for an ID token is kept and given back while the client has that token and the host it
+    # would be exchanged with, so that changing another credential, such as the one-time passcode, does not throw
+    # away the API key the token was already exchanged for, which RubyGems.org issues once per token. Another token,
+    # or another host, is exchanged by an authenticator of its own.
+    #
     # @api private
     # @return [TrustedPublisherAuthenticator, nil] the trusted publisher authenticator or nil
     def trusted_publisher_authenticator
       return unless id_token
 
-      TrustedPublisherAuthenticator.new(id_token:, host: @host, connection: @connection, request_builder: @request_builder)
+      kept = @trusted_publisher_authenticator
+      return kept if kept && kept.id_token.eql?(id_token) && kept.host.eql?(@host)
+
+      @trusted_publisher_authenticator = TrustedPublisherAuthenticator.new(id_token:, host: @host,
+        connection: @connection, request_builder: @request_builder)
     end
 
     # Build a basic authenticator if a username and password are available

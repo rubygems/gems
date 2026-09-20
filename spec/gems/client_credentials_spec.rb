@@ -264,6 +264,46 @@ RSpec.describe Gems::ClientCredentials do
     it "builds an authenticator with the client's request builder" do
       expect(client.authenticator.request_builder).to equal(client.send(:request_builder))
     end
+
+    it "keeps the authenticator when another credential changes, so the exchanged key is not thrown away" do
+      authenticator = client.authenticator
+      client.otp = "123456"
+
+      expect(client.authenticator.authenticator).to equal(authenticator)
+    end
+
+    it "builds another authenticator for another ID token" do
+      authenticator = client.authenticator
+      client.id_token = "OTHER_ID_TOKEN"
+
+      expect(client.authenticator).not_to equal(authenticator)
+    end
+
+    it "builds another authenticator for another host, which the token is exchanged with" do
+      authenticator = client.authenticator
+      client.host = "http://gems.example.com"
+
+      expect(client.authenticator).not_to equal(authenticator)
+    end
+
+    context "when a request has exchanged the ID token" do
+      let(:exchange_url) { "http://example.com/api/v1/oidc/trusted_publisher/exchange_token" }
+
+      before do
+        stub_request(:post, exchange_url)
+          .to_return(body: fixture("exchange_token.json"), headers: {"Content-Type" => "application/json"})
+        stub_request(:get, "http://example.com/api/v1/gems/rails.json")
+          .to_return(body: fixture("rails.json"), headers: {"Content-Type" => "application/json"})
+      end
+
+      it "exchanges the token once across a credential change, since it is exchanged once per token" do
+        client.rubygem("rails")
+        client.otp = "123456"
+        client.rubygem("rails")
+
+        expect(a_request(:post, exchange_url)).to have_been_made.once
+      end
+    end
   end
 
   describe "#api_key_authenticator" do

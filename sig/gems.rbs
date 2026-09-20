@@ -160,6 +160,7 @@ module Gems
     @connection: Connection
     @request_builder: RequestBuilder
     @key_configured: bool
+    @trusted_publisher_authenticator: TrustedPublisherAuthenticator?
 
     UNSET: untyped
 
