@@ -66,7 +66,8 @@ Gems.owned_gems 'sferik'
 # Return basic information about a user, by handle or ID.
 Gems.profile('sferik').handle
 
-# Submit a gem to RubyGems.org.
+# Submit a gem to RubyGems.org, given as a path or an open file.
+Gems.push 'gemcutter-0.2.1.gem'
 Gems.push File.new 'gemcutter-0.2.1.gem'
 
 # Remove a gem from RubyGems.org's index.

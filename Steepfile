@@ -5,6 +5,7 @@ target :lib do
   library "json"
   library "net-http"
   library "openssl"
+  library "pathname"
   library "time"
   library "timeout"
   library "uri"

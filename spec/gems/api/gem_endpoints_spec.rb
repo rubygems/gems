@@ -1,3 +1,5 @@
+require "pathname"
+
 RSpec.describe Gems::API::GemEndpoints do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
@@ -143,6 +145,20 @@ RSpec.describe Gems::API::GemEndpoints do
 
     it "returns the response body" do
       expect(client.push(gem)).to eq("Successfully registered gem: gems (0.0.8)")
+    end
+
+    it "posts a gem given as a path" do
+      client.push(File.join(fixture_path, "gems-0.0.8.gem"))
+
+      expect(a_post("/api/v1/gems")
+        .with(body: gem_data, headers: {"Content-Type" => "application/octet-stream"})).to have_been_made
+    end
+
+    it "posts a gem given as a Pathname" do
+      client.push(Pathname(gem.path))
+
+      expect(a_post("/api/v1/gems")
+        .with(body: gem_data, headers: {"Content-Type" => "application/octet-stream"})).to have_been_made
     end
 
     it "pushes to the client's host by default" do
@@ -347,6 +363,21 @@ RSpec.describe Gems::API::GemEndpoints do
 
     it "has exactly two fields" do
       expect(body.size).to eq(2)
+    end
+
+    it "reads the gem and the attestations given as paths" do
+      path = File.join(fixture_path, "gems-0.0.8.gem")
+      attestation_paths = %w[one two].map { |name| File.join(fixture_path, "attestations", "#{name}.json") }
+      body = client.send(:multipart_push_body, path, attestation_paths)
+
+      expect(body).to eq([["gem", gem_data, {filename: path, content_type: "application/octet-stream"}],
+        ["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}]])
+    end
+
+    it "uses the path of a gem given as a Pathname as the filename" do
+      body = client.send(:multipart_push_body, Pathname(gem.path), attestations)
+
+      expect(body.first).to eq(["gem", gem_data, {filename: gem.path, content_type: "application/octet-stream"}])
     end
   end
 end

@@ -1,3 +1,4 @@
+require "pathname"
 require_relative "../identifiers"
 require_relative "../json_parsing"
 require_relative "../gem"
@@ -69,17 +70,20 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem [File] A built gem.
+      # @param gem [String, Pathname, File] The path of a built gem, or the open file.
       # @param host [String, nil] A RubyGems compatible host to use (defaults to the client's host).
-      # @param attestations [Array<File>, nil] An array of attestations to push, or `nil`.
+      # @param attestations [Array<String, Pathname, File>, nil] The paths of the attestations to push, or the open
+      #   files, or `nil`.
       # @return [String]
+      # @example
+      #   Gems.push "pkg/gemcutter-0.2.1.gem"
       # @example
       #   Gems.push File.new("pkg/gemcutter-0.2.1.gem"), host: "https://gems.example.com"
       def push(gem, host: nil, attestations: nil)
         if attestations
           post("/api/v1/gems", multipart_push_body(gem, attestations), host:)
         else
-          post("/api/v1/gems", gem.read, host:)
+          post("/api/v1/gems", read_file(gem), host:)
         end
       end
 
@@ -144,14 +148,37 @@ module Gems
 
       # Build the multipart body for pushing a gem with attestations
       # @api private
-      # @param gem [File] A built gem.
-      # @param attestations [Array<File>] An array of attestations to push.
+      # @param gem [String, Pathname, File] The path of a built gem, or the open file.
+      # @param attestations [Array<String, Pathname, File>] The paths of the attestations, or the open files.
       # @return [Array] the multipart form fields
       def multipart_push_body(gem, attestations)
         [
-          ["gem", gem.read, {filename: gem.path, content_type: RequestBuilder::OCTET_STREAM}],
-          ["attestations", "[#{attestations.map(&:read).join(",")}]", {content_type: "application/json"}]
+          ["gem", read_file(gem), {filename: path_of(gem), content_type: RequestBuilder::OCTET_STREAM}],
+          ["attestations", "[#{attestations.map { |attestation| read_file(attestation) }.join(",")}]",
+            {content_type: "application/json"}]
         ]
+      end
+
+      # Read a file given as a path or an open file
+      # @api private
+      # @param file [String, Pathname, File] the path, or the open file
+      # @return [String] the contents of the file
+      def read_file(file)
+        case file
+        when String, Pathname then File.binread(file)
+        else file.read #: String
+        end
+      end
+
+      # The path of a file given as a path or an open file
+      # @api private
+      # @param file [String, Pathname, File] the path, or the open file
+      # @return [String] the path
+      def path_of(file)
+        case file
+        when String then file
+        else file.to_path
+        end
       end
     end
   end

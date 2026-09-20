@@ -3,6 +3,7 @@ dependencies:
   - name: forwardable
   - name: net-http
   - name: openssl
+  - name: pathname
   - name: time
   - name: timeout
   - name: uri

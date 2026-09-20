@@ -8,6 +8,7 @@ module Gems
   type user_identifier = String | Integer | Owner | Profile
   type web_hook_identifier = String | WebHook
   type api_key_identifier = String | ApiKey
+  type push_file = String | Pathname | File
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
 
   extend Configuration
@@ -28,7 +29,7 @@ module Gems
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
   def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?user_identifier? user_handle) -> Array[Gem]
-  def self.push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
+  def self.push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
   def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
   def self.unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
   def self.versions: (gem_identifier gem_name) -> Array[Version]
@@ -374,14 +375,16 @@ module Gems
     def search: (String query, ?page: Integer?) -> Array[Gem]
     def autocomplete: (String query) -> Array[String]
     def owned_gems: (?user_identifier? user_handle) -> Array[Gem]
-    def push: (File gem, ?host: String?, ?attestations: Array[File]?) -> String
+    def push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
     def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
     def unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
     def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
 
     private
 
-    def multipart_push_body: (File gem, Array[File] attestations) -> Array[multipart_field]
+    def multipart_push_body: (push_file gem, Array[push_file] attestations) -> Array[multipart_field]
+    def read_file: (push_file file) -> String
+    def path_of: (push_file file) -> String
   end
 
   module API::OwnerEndpoints : Object, _Requests
