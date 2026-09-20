@@ -1,6 +1,7 @@
 require "pathname"
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../path_escaping"
 require_relative "../gem"
 require_relative "../request_builder"
 
@@ -11,6 +12,7 @@ module Gems
     module GemEndpoints
       include Identifiers
       include JSONParsing
+      include PathEscaping
 
       # Returns some basic information about the given gem
       #
@@ -21,7 +23,7 @@ module Gems
       # @example
       #   Gems.rubygem "rails"
       def rubygem(gem_name)
-        Gem.new(parse_json(get("/api/v1/gems/#{name_of(gem_name)}.json")))
+        Gem.new(parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}.json")))
       end
 
       # Returns an array of active gems that match the query
@@ -59,7 +61,7 @@ module Gems
       #   Gems.owned_gems
       def owned_gems(user_handle = nil)
         path = if user_handle
-          "/api/v1/owners/#{slug_of(user_handle)}/gems.json"
+          "/api/v1/owners/#{escape(slug_of(user_handle))}/gems.json"
         else
           "/api/v1/gems.json"
         end
@@ -141,7 +143,7 @@ module Gems
       # @example
       #   Gems.reverse_dependencies "money", only: "runtime"
       def reverse_dependencies(gem_name, only: nil)
-        parse_json(get("/api/v1/gems/#{name_of(gem_name)}/reverse_dependencies.json", {only:}.compact))
+        parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/reverse_dependencies.json", {only:}.compact))
       end
 
       private

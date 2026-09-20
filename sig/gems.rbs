@@ -368,6 +368,7 @@ module Gems
   module API::DownloadEndpoints : Object, _Requests, API::VersionEndpoints
     include Identifiers
     include JSONParsing
+    include PathEscaping
 
     def total_downloads: () -> Integer
     def downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
@@ -381,6 +382,7 @@ module Gems
   module API::GemEndpoints : Object, _Requests, API::VersionEndpoints
     include Identifiers
     include JSONParsing
+    include PathEscaping
 
     def rubygem: (gem_identifier gem_name) -> Gem
     def search: (String query, ?page: Integer?) -> Array[Gem]
@@ -401,6 +403,7 @@ module Gems
   module API::OwnerEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
+    include PathEscaping
 
     def owners: (gem_identifier gem_name) -> Array[Owner]
     def add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
@@ -411,6 +414,7 @@ module Gems
   module API::ProfileEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
+    include PathEscaping
 
     def profile: (user_identifier user) -> Profile
     def me: () -> Profile
@@ -419,6 +423,7 @@ module Gems
   module API::VersionEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
+    include PathEscaping
 
     def versions: (gem_identifier gem_name) -> Array[Version]
     def latest_version: (gem_identifier gem_name) -> String
@@ -561,6 +566,14 @@ module Gems
     attr_reader body: String
 
     def initialize: (body: String, ?message: String) -> void
+  end
+
+  module PathEscaping
+    UNRESERVED: Regexp
+
+    private
+
+    def escape: (untyped value) -> String
   end
 
   module JSONParsing

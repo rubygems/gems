@@ -1,5 +1,6 @@
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../path_escaping"
 require_relative "../profile"
 
 module Gems
@@ -9,6 +10,7 @@ module Gems
     module ProfileEndpoints
       include Identifiers
       include JSONParsing
+      include PathEscaping
 
       # Returns basic information about a user
       #
@@ -19,7 +21,7 @@ module Gems
       # @example
       #   Gems.profile "qrush"
       def profile(user)
-        Profile.new(parse_json(get("/api/v1/profiles/#{slug_of(user)}.json")))
+        Profile.new(parse_json(get("/api/v1/profiles/#{escape(slug_of(user))}.json")))
       end
 
       # Returns basic information about your account

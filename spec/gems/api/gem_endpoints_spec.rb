@@ -11,6 +11,13 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_get("/api/v1/gems/rails.json")).to have_been_made
     end
 
+    it "escapes the gem name" do
+      stub_get("/api/v1/gems/..%2Frails.json").to_return(body: fixture("rails.json"))
+      client.rubygem("../rails")
+
+      expect(a_get("/api/v1/gems/..%2Frails.json")).to have_been_made
+    end
+
     context "when the gem exists" do
       before { stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json")) }
 
@@ -81,6 +88,13 @@ RSpec.describe Gems::API::GemEndpoints do
       client.owned_gems(Gems::Owner.new("handle" => "sferik"))
 
       expect(a_get("/api/v1/owners/sferik/gems.json")).to have_been_made
+    end
+
+    it "escapes the user handle" do
+      stub_get("/api/v1/owners/..%2Fsferik/gems.json").to_return(body: fixture("gems.json"))
+      client.owned_gems("../sferik")
+
+      expect(a_get("/api/v1/owners/..%2Fsferik/gems.json")).to have_been_made
     end
 
     it "accepts a user ID" do
@@ -332,6 +346,13 @@ RSpec.describe Gems::API::GemEndpoints do
       client.reverse_dependencies("rspec")
 
       expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json")).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_get("/api/v1/gems/..%2Frspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json"))
+      client.reverse_dependencies("../rspec")
+
+      expect(a_get("/api/v1/gems/..%2Frspec/reverse_dependencies.json")).to have_been_made
     end
 
     it "returns the reverse dependencies" do

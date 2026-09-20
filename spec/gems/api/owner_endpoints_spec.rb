@@ -17,6 +17,13 @@ RSpec.describe Gems::API::OwnerEndpoints do
       expect(a_get("/api/v1/gems/gems/owners.json")).to have_been_made
     end
 
+    it "escapes the gem name" do
+      stub_get("/api/v1/gems/..%2Fgems/owners.json").to_return(body: fixture("owners.json"))
+      client.owners("../gems")
+
+      expect(a_get("/api/v1/gems/..%2Fgems/owners.json")).to have_been_made
+    end
+
     it "returns the gem's owners" do
       owner = client.owners("gems").first
 
@@ -38,6 +45,13 @@ RSpec.describe Gems::API::OwnerEndpoints do
       client.add_owner("gems", "sferik@gmail.com")
 
       expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com"})).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_post("/api/v1/gems/..%2Fgems/owners").to_return(body: fixture("add_owner"))
+      client.add_owner("../gems", "sferik@gmail.com")
+
+      expect(a_post("/api/v1/gems/..%2Fgems/owners")).to have_been_made
     end
 
     it "posts a role" do
@@ -68,6 +82,13 @@ RSpec.describe Gems::API::OwnerEndpoints do
         .with(body: {email: "sferik@gmail.com", role: "maintainer"})).to have_been_made
     end
 
+    it "escapes the gem name" do
+      stub_request(:patch, rubygems_url("/api/v1/gems/..%2Fgems/owners")).to_return(body: fixture("update_owner"))
+      client.update_owner("../gems", "sferik@gmail.com", role: "maintainer")
+
+      expect(a_request(:patch, rubygems_url("/api/v1/gems/..%2Fgems/owners"))).to have_been_made
+    end
+
     it "returns the response body" do
       expect(client.update_owner("gems", "sferik@gmail.com", role: "maintainer")).to eq("Owner updated successfully.")
     end
@@ -87,6 +108,13 @@ RSpec.describe Gems::API::OwnerEndpoints do
       client.remove_owner("gems", "sferik@gmail.com")
 
       expect(a_delete("/api/v1/gems/gems/owners?email=sferik@gmail.com")).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_delete("/api/v1/gems/..%2Fgems/owners?email=sferik@gmail.com").to_return(body: fixture("remove_owner"))
+      client.remove_owner("../gems", "sferik@gmail.com")
+
+      expect(a_delete("/api/v1/gems/..%2Fgems/owners?email=sferik@gmail.com")).to have_been_made
     end
 
     it "returns the response body" do

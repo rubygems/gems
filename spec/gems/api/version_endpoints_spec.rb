@@ -17,6 +17,13 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v1/versions/script_helpers.json")).to have_been_made
     end
 
+    it "escapes the gem name" do
+      stub_get("/api/v1/versions/..%2Fscript_helpers.json").to_return(body: fixture("script_helpers.json"))
+      client.versions("../script_helpers")
+
+      expect(a_get("/api/v1/versions/..%2Fscript_helpers.json")).to have_been_made
+    end
+
     it "sets each version's gem name" do
       expect(client.versions("script_helpers").map(&:name).uniq).to eq(["script_helpers"])
     end
@@ -42,6 +49,13 @@ RSpec.describe Gems::API::VersionEndpoints do
       client.latest_version("script_helpers")
 
       expect(a_get("/api/v1/versions/script_helpers/latest.json")).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_get("/api/v1/versions/..%2Fscript_helpers/latest.json").to_return(body: fixture("script_helpers/latest.json"))
+      client.latest_version("../script_helpers")
+
+      expect(a_get("/api/v1/versions/..%2Fscript_helpers/latest.json")).to have_been_made
     end
 
     it "returns the gem's latest version number" do
@@ -76,6 +90,20 @@ RSpec.describe Gems::API::VersionEndpoints do
       client.version(Gems::Gem.new("name" => "rails"), Gems::Version.new("number" => "7.0.6"))
 
       expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_get("/api/v2/rubygems/..%2Frails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("../rails", "7.0.6")
+
+      expect(a_get("/api/v2/rubygems/..%2Frails/versions/7.0.6.json")).to have_been_made
+    end
+
+    it "escapes the version number" do
+      stub_get("/api/v2/rubygems/rails/versions/..%2F7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("rails", "../7.0.6")
+
+      expect(a_get("/api/v2/rubygems/rails/versions/..%2F7.0.6.json")).to have_been_made
     end
 
     it "requests a specific platform" do
@@ -132,6 +160,20 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json")).to have_been_made
     end
 
+    it "escapes the gem name" do
+      stub_get("/api/v2/rubygems/..%2Frails/versions/8.1.3.1/contents.json").to_return(body: fixture("contents.json"))
+      client.contents("../rails", "8.1.3.1")
+
+      expect(a_get("/api/v2/rubygems/..%2Frails/versions/8.1.3.1/contents.json")).to have_been_made
+    end
+
+    it "escapes the version number" do
+      stub_get("/api/v2/rubygems/rails/versions/..%2F8.1.3.1/contents.json").to_return(body: fixture("contents.json"))
+      client.contents("rails", "../8.1.3.1")
+
+      expect(a_get("/api/v2/rubygems/rails/versions/..%2F8.1.3.1/contents.json")).to have_been_made
+    end
+
     it "requests a specific platform" do
       stub_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json?platform=java").to_return(body: fixture("contents.json"))
       client.contents("rails", "8.1.3.1", platform: "java")
@@ -166,6 +208,13 @@ RSpec.describe Gems::API::VersionEndpoints do
       client.attestations("rails", "8.1.3.1")
 
       expect(a_get("/api/v1/attestations/rails-8.1.3.1.json")).to have_been_made
+    end
+
+    it "escapes the full name" do
+      stub_get("/api/v1/attestations/..%2Frails-8.1.3.1.json").to_return(body: fixture("attestations/rails-8.1.3.1.json"))
+      client.attestations("../rails", "8.1.3.1")
+
+      expect(a_get("/api/v1/attestations/..%2Frails-8.1.3.1.json")).to have_been_made
     end
 
     it "includes a specific platform in the full name" do

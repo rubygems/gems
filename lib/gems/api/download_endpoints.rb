@@ -1,5 +1,6 @@
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../path_escaping"
 require_relative "../downloads"
 require_relative "../version"
 
@@ -10,6 +11,7 @@ module Gems
     module DownloadEndpoints
       include Identifiers
       include JSONParsing
+      include PathEscaping
 
       # Returns the total number of downloads of all gems
       #
@@ -38,7 +40,7 @@ module Gems
       #   Gems.downloads(Gems.version("rails_admin", "0.0.1")).version_downloads
       def downloads(gem_name, version = nil)
         version = version_of(gem_name, version) || latest_version(gem_name)
-        Downloads.new(parse_json(get("/api/v1/downloads/#{full_name_of(gem_name, version)}.json")))
+        Downloads.new(parse_json(get("/api/v1/downloads/#{escape(full_name_of(gem_name, version))}.json")))
       end
 
       # Returns the top 50 downloaded gem versions of all time

@@ -1,5 +1,6 @@
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../path_escaping"
 require_relative "../owner"
 
 module Gems
@@ -9,6 +10,7 @@ module Gems
     module OwnerEndpoints
       include Identifiers
       include JSONParsing
+      include PathEscaping
 
       # View all owners of a gem that you own
       #
@@ -19,7 +21,7 @@ module Gems
       # @example
       #   Gems.owners "gemcutter"
       def owners(gem_name)
-        Owner.list(parse_json(get("/api/v1/gems/#{name_of(gem_name)}/owners.json")))
+        Owner.list(parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/owners.json")))
       end
 
       # Add an owner to a RubyGem you own, giving that user permission to manage it
@@ -35,7 +37,7 @@ module Gems
       # @example
       #   Gems.add_owner "gemcutter", "josh@technicalpickles.com", role: "maintainer"
       def add_owner(gem_name, owner, role: nil)
-        post("/api/v1/gems/#{name_of(gem_name)}/owners", {email: handle_of(owner), role:}.compact)
+        post("/api/v1/gems/#{escape(name_of(gem_name))}/owners", {email: handle_of(owner), role:}.compact)
       end
 
       # Update the role of an existing owner of a RubyGem you own
@@ -49,7 +51,7 @@ module Gems
       # @example
       #   Gems.update_owner "gemcutter", "josh@technicalpickles.com", role: "maintainer"
       def update_owner(gem_name, owner, role:)
-        patch("/api/v1/gems/#{name_of(gem_name)}/owners", {email: handle_of(owner), role:})
+        patch("/api/v1/gems/#{escape(name_of(gem_name))}/owners", {email: handle_of(owner), role:})
       end
 
       # Remove a user's permission to manage a RubyGem you own
@@ -62,7 +64,7 @@ module Gems
       # @example
       #   Gems.remove_owner "gemcutter", "josh@technicalpickles.com"
       def remove_owner(gem_name, owner)
-        delete("/api/v1/gems/#{name_of(gem_name)}/owners", {email: handle_of(owner)})
+        delete("/api/v1/gems/#{escape(name_of(gem_name))}/owners", {email: handle_of(owner)})
       end
     end
   end

@@ -71,5 +71,6 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 ### Security
 * Verify SSL certificates instead of disabling verification
 * Redact credentials from `debug_output`, which Net::HTTP would otherwise write in the clear: the `Authorization` and `OTP` headers of every request, and the ID token a trusted publishing token exchange sends, are written as `[REDACTED]`
+* Escape the gem names, user handles, version numbers, and platforms interpolated into request paths, so that a value holding a slash cannot walk out of the endpoint it was meant for and take the credentials of the request with it, and one holding a question mark or a number sign cannot add a query string or truncate the path; a value holding a space or a character outside ASCII is escaped rather than raising `URI::InvalidURIError`
 
 [unreleased]: https://github.com/rubygems/gems/compare/v2.0.0...HEAD

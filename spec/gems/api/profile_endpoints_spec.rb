@@ -30,6 +30,13 @@ RSpec.describe Gems::API::ProfileEndpoints do
       expect(a_get("/api/v1/profiles/qrush.json")).to have_been_made
     end
 
+    it "escapes the user handle" do
+      stub_get("/api/v1/profiles/..%2Fqrush.json").to_return(body: fixture("profile.json"))
+      client.profile("../qrush")
+
+      expect(a_get("/api/v1/profiles/..%2Fqrush.json")).to have_been_made
+    end
+
     it "returns the user's profile" do
       profile = client.profile("qrush")
 
