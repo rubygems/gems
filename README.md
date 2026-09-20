@@ -104,7 +104,7 @@ Gems.downloads('nokogiri', '1.15.0', platform: 'java').version_downloads
 # Returns an array containing the top 50 downloaded gem versions of all time.
 Gems.most_downloaded.first.full_name
 
-# View all owners of a gem that you own.
+# View all owners of a gem.
 Gems.owners('gemcutter').map(&:handle)
 
 # Add an owner to a RubyGem you own, giving that user permission to manage it.

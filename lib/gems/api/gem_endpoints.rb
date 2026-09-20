@@ -73,8 +73,11 @@ module Gems
 
       # List all gems that you own, or that the given user owns
       #
+      # The gems of a user given by handle are public; the gems of the account the credentials belong to, which is
+      # what listing without a user asks for, are not.
+      #
       # @api public
-      # @authenticated true
+      # @authenticated true without a user, false with one
       # @param user_handle [String, Integer, Owner, Profile, nil] The handle or ID of a user, or an owner or profile.
       # @return [Array<Gem>]
       # @example

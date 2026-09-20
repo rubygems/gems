@@ -14,10 +14,13 @@ module Gems
       include JSONParsing
       include PathEscaping
 
-      # View all owners of a gem that you own
+      # View all owners of a gem
+      #
+      # The endpoint is public: the owners of a gem, including their email addresses, are returned without
+      # credentials, as they are on the gem's page.
       #
       # @api public
-      # @authenticated true
+      # @authenticated false
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @return [Array<Owner>]
       # @example
