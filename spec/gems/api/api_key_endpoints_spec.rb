@@ -133,6 +133,13 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(a_request(:post, exchange_url).with(headers: {"User-Agent" => "Custom User Agent"})).to have_been_made
     end
 
+    it "follows the redirects of the exchange as far as the client does" do
+      client.max_redirects = 0
+      stub_request(:post, exchange_url).to_return(status: 308, headers: {"Location" => "#{exchange_url}/moved"})
+
+      expect { client.exchange_trusted_publisher_token("ID_TOKEN") }.to raise_error(Gems::TooManyRedirects)
+    end
+
     it "uses the client's connection" do
       connection = client.send(:connection)
       allow(connection).to receive(:perform).and_call_original

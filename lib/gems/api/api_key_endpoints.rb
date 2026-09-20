@@ -65,7 +65,8 @@ module Gems
       # @example
       #   Gems.exchange_trusted_publisher_token(ENV.fetch("ID_TOKEN")).key
       def exchange_trusted_publisher_token(id_token)
-        TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:).exchange_token!
+        TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:,
+          redirect_handler:).exchange_token!
       end
 
       private

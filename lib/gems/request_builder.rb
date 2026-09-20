@@ -20,6 +20,8 @@ module Gems
     MULTIPART_FORM_DATA = "multipart/form-data"
     # Content type for binary request bodies
     OCTET_STREAM = "application/octet-stream"
+    # Content type for JSON request bodies
+    APPLICATION_JSON = "application/json"
     # Mapping of HTTP method symbols to Net::HTTP classes
     HTTP_METHODS = {
       get: Net::HTTP::Get,

@@ -7,6 +7,7 @@ require_relative "authenticator"
 require_relative "configuration"
 require_relative "connection"
 require_relative "json_parsing"
+require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "response_parser"
 
@@ -22,9 +23,7 @@ module Gems
 
     # The path of the token exchange endpoint
     EXCHANGE_TOKEN_PATH = "/api/v1/oidc/trusted_publisher/exchange_token"
-    # The content type of the token exchange request and response
-    JSON_CONTENT_TYPE = "application/json"
-    private_constant :EXCHANGE_TOKEN_PATH, :JSON_CONTENT_TYPE
+    private_constant :EXCHANGE_TOKEN_PATH
 
     # The OIDC ID token
     # @api public
@@ -54,6 +53,13 @@ module Gems
     #   authenticator.request_builder
     attr_reader :request_builder
 
+    # The redirect handler the token exchange is followed with
+    # @api public
+    # @return [RedirectHandler] the redirect handler
+    # @example Get the redirect handler
+    #   authenticator.redirect_handler
+    attr_reader :redirect_handler
+
     # The API key obtained from the token exchange
     # @api public
     # @return [String, nil] the API key, or nil before the token has been exchanged
@@ -68,15 +74,18 @@ module Gems
     # @param host [String] the host to exchange the token with, including scheme
     # @param connection [Connection] the connection used for the token exchange
     # @param request_builder [RequestBuilder] the request builder used for the token exchange
+    # @param redirect_handler [RedirectHandler] the redirect handler the token exchange is followed with
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
     def initialize(id_token:, host: Gems.default_host, connection: Connection.new,
-      request_builder: RequestBuilder.new)
+      request_builder: RequestBuilder.new,
+      redirect_handler: RedirectHandler.new(connection:, request_builder:))
       @id_token = id_token
       @host = host
       @connection = connection
       @request_builder = request_builder
+      @redirect_handler = redirect_handler
       @mutex = Mutex.new
     end
 
@@ -108,19 +117,36 @@ module Gems
 
     # Exchange the OIDC ID token for a RubyGems API key
     #
+    # The redirects of the exchange are followed as those of every other request are, so that a host that answers
+    # the endpoint with one is exchanged with rather than raising the {HTTPError} of the redirect. A redirect to
+    # another scheme, host, or port is followed without the `Accept` header of the exchange, as it is for a request
+    # of the client, and with the body only when the redirect preserves the method.
+    #
     # @api public
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     # @example Exchange the ID token
     #   authenticator.exchange_token!.expires_at
     def exchange_token!
-      uri = URI.join("#{host.chomp("/")}/", EXCHANGE_TOKEN_PATH.delete_prefix("/"))
-      request = request_builder.build(http_method: :post, uri:,
-        body: JSON.generate({jwt: id_token}), content_type: JSON_CONTENT_TYPE, headers: {"Accept" => JSON_CONTENT_TYPE})
-      response = connection.perform(request:)
-      api_key = APIKey.new(parse_json(ResponseParser.new.parse(response:)))
+      api_key = APIKey.new(parse_json(ResponseParser.new.parse(response: exchange_response)))
       @api_key = api_key.key
       api_key
+    end
+
+    private
+
+    # Send the token exchange request and follow the redirects of its response
+    #
+    # @api private
+    # @return [Net::HTTPResponse] the response the exchange ended at
+    def exchange_response
+      uri = URI.join("#{host.chomp("/")}/", EXCHANGE_TOKEN_PATH.delete_prefix("/"))
+      body = JSON.generate({jwt: id_token})
+      headers = {"Accept" => RequestBuilder::APPLICATION_JSON}
+      request = request_builder.build(http_method: :post, uri:, body:,
+        content_type: RequestBuilder::APPLICATION_JSON, headers:)
+      redirect_handler.handle(response: connection.perform(request:), request:, body:,
+        content_type: RequestBuilder::APPLICATION_JSON, headers:)
     end
   end
 end

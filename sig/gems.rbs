@@ -150,20 +150,24 @@ module Gems
     include JSONParsing
 
     EXCHANGE_TOKEN_PATH: String
-    JSON_CONTENT_TYPE: String
 
     attr_reader id_token: String
     attr_reader host: String
     attr_reader connection: Connection
     attr_reader request_builder: RequestBuilder
+    attr_reader redirect_handler: RedirectHandler
     attr_reader api_key: String?
 
     @mutex: Thread::Mutex
 
-    def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder) -> void
+    def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder, ?redirect_handler: RedirectHandler) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
     def inspect: () -> String
     def exchange_token!: () -> APIKey
+
+    private
+
+    def exchange_response: () -> Net::HTTPResponse
   end
 
   module ClientCredentials
@@ -172,6 +176,7 @@ module Gems
     @host: String
     @connection: Connection
     @request_builder: RequestBuilder
+    @redirect_handler: RedirectHandler
     @key_configured: bool
     @trusted_publisher_authenticator: TrustedPublisherAuthenticator?
 
@@ -394,6 +399,7 @@ module Gems
 
     def connection: () -> Connection
     def request_builder: () -> RequestBuilder
+    def redirect_handler: () -> RedirectHandler
     def validate_scopes: (Hash[Symbol, bool] scopes) -> void
   end
 
@@ -710,6 +716,7 @@ module Gems
     FORM_URLENCODED: String
     MULTIPART_FORM_DATA: String
     OCTET_STREAM: String
+    APPLICATION_JSON: String
     HTTP_METHODS: Hash[Symbol, singleton(Net::HTTP::Get) | singleton(Net::HTTP::Post) | singleton(Net::HTTP::Put) | singleton(Net::HTTP::Patch) | singleton(Net::HTTP::Delete)]
 
     attr_accessor user_agent: String

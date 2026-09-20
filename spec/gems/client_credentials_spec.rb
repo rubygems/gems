@@ -267,6 +267,10 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.authenticator.request_builder).to equal(client.send(:request_builder))
     end
 
+    it "builds an authenticator with the client's redirect handler, so the exchange follows what the client does" do
+      expect(client.authenticator.redirect_handler).to equal(client.send(:redirect_handler))
+    end
+
     it "keeps the authenticator when another credential changes, so the exchanged key is not thrown away" do
       authenticator = client.authenticator
       client.otp = "123456"
