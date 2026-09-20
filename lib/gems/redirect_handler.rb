@@ -7,29 +7,30 @@ require_relative "request_builder"
 
 module Gems
   # Handles HTTP redirects for API requests
-  # @api public
+  # @api private
   class RedirectHandler
     # Default maximum number of redirects to follow
     DEFAULT_MAX_REDIRECTS = 10
     # HTTP status codes that preserve the request method and body
     METHOD_PRESERVING_CODES = [307, 308].freeze
+    private_constant :METHOD_PRESERVING_CODES
 
     # The maximum number of redirects to follow
-    # @api public
+    # @api private
     # @return [Integer] the maximum number of redirects to follow
     # @example Get or set the maximum redirects
     #   handler.max_redirects = 5
     attr_accessor :max_redirects
 
     # The connection for making requests
-    # @api public
+    # @api private
     # @return [Connection] the connection for making requests
     # @example Get the connection
     #   handler.connection
     attr_reader :connection
 
     # The request builder for creating requests
-    # @api public
+    # @api private
     # @return [RequestBuilder] the request builder for creating requests
     # @example Get the request builder
     #   handler.request_builder
@@ -37,7 +38,7 @@ module Gems
 
     # Initialize a new RedirectHandler
     #
-    # @api public
+    # @api private
     # @param connection [Connection] the connection for making requests
     # @param request_builder [RequestBuilder] the request builder for creating requests
     # @param max_redirects [Integer] the maximum number of redirects to follow
@@ -61,7 +62,7 @@ module Gems
     # valid URL, or is not an HTTP or HTTPS URL, is returned as it is, so that the caller raises the HTTPError of its
     # status.
     #
-    # @api public
+    # @api private
     # @param response [Net::HTTPResponse] the HTTP response to handle
     # @param request [Net::HTTPRequest] the original HTTP request
     # @param authenticator [Authenticator] the authenticator for requests

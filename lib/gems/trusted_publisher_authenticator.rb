@@ -22,34 +22,35 @@ module Gems
     EXCHANGE_TOKEN_PATH = "/api/v1/oidc/trusted_publisher/exchange_token".freeze
     # The content type of the token exchange request and response
     JSON_CONTENT_TYPE = "application/json".freeze
+    private_constant :EXCHANGE_TOKEN_PATH, :JSON_CONTENT_TYPE
 
     # The OIDC ID token
     # @api public
     # @return [String] the OIDC ID token
-    # @example Get or set the ID token
+    # @example Get the ID token
     #   authenticator.id_token = ENV.fetch("ID_TOKEN")
-    attr_accessor :id_token
+    attr_reader :id_token
 
     # The host to exchange the token with
     # @api public
     # @return [String] the host, including scheme
-    # @example Get or set the host
+    # @example Get the host
     #   authenticator.host = "https://rubygems.org"
-    attr_accessor :host
+    attr_reader :host
 
     # The connection used for the token exchange
     # @api public
     # @return [Connection] the connection
-    # @example Get or set the connection
+    # @example Get the connection
     #   authenticator.connection = Gems::Connection.new(proxy_url: "http://proxy.example.com:8080")
-    attr_accessor :connection
+    attr_reader :connection
 
     # The request builder used for the token exchange
     # @api public
     # @return [RequestBuilder] the request builder
-    # @example Get or set the request builder
+    # @example Get the request builder
     #   authenticator.request_builder = Gems::RequestBuilder.new(user_agent: "Custom User Agent")
-    attr_accessor :request_builder
+    attr_reader :request_builder
 
     # The API key obtained from the token exchange
     # @api public

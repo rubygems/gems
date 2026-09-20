@@ -4,6 +4,7 @@ module Gems
   class Authenticator
     # The HTTP header name for authentication
     AUTHENTICATION_HEADER = "Authorization".freeze
+    private_constant :AUTHENTICATION_HEADER
 
     # Generate the authentication headers for a request
     #

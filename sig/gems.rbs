@@ -89,15 +89,15 @@ module Gems
   end
 
   class ApiKeyAuthenticator < Authenticator
-    attr_accessor key: String
+    attr_reader key: String
 
     def initialize: (key: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
   end
 
   class BasicAuthenticator < Authenticator
-    attr_accessor username: String
-    attr_accessor password: String
+    attr_reader username: String
+    attr_reader password: String
 
     def initialize: (username: String, password: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
@@ -107,8 +107,8 @@ module Gems
   class OtpAuthenticator < Authenticator
     OTP_HEADER: String
 
-    attr_accessor authenticator: Authenticator
-    attr_accessor otp: String
+    attr_reader authenticator: Authenticator
+    attr_reader otp: String
 
     def initialize: (authenticator: Authenticator, otp: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
@@ -121,10 +121,10 @@ module Gems
     EXCHANGE_TOKEN_PATH: String
     JSON_CONTENT_TYPE: String
 
-    attr_accessor id_token: String
-    attr_accessor host: String
-    attr_accessor connection: Connection
-    attr_accessor request_builder: RequestBuilder
+    attr_reader id_token: String
+    attr_reader host: String
+    attr_reader connection: Connection
+    attr_reader request_builder: RequestBuilder
     attr_reader api_key: String?
 
     def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder) -> void
@@ -291,8 +291,6 @@ module Gems
 
   interface _Requests
     def host: () -> String
-    def connection: () -> Connection
-    def request_builder: () -> RequestBuilder
     def get: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
     def delete: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
     def post: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
@@ -340,6 +338,11 @@ module Gems
     def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
     def update_api_key: (api_key_identifier key, **bool scopes) -> String
     def exchange_trusted_publisher_token: (String id_token) -> ApiKey
+
+    private
+
+    def connection: () -> Connection
+    def request_builder: () -> RequestBuilder
   end
 
   module API::DownloadEndpoints : Object, _Requests, API::VersionEndpoints
@@ -426,8 +429,6 @@ module Gems
     @response_parser: ResponseParser
 
     attr_reader host: String
-    attr_reader connection: Connection
-    attr_reader request_builder: RequestBuilder
 
     def host=: (String host) -> void
     def inspect: () -> String
@@ -454,6 +455,9 @@ module Gems
     def patch: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
 
     private
+
+    attr_reader connection: Connection
+    attr_reader request_builder: RequestBuilder
 
     def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
 

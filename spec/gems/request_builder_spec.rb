@@ -14,7 +14,7 @@ RSpec.describe Gems::RequestBuilder do
   end
 
   describe "#build" do
-    described_class::HTTP_METHODS.each do |http_method, request_class|
+    {get: Net::HTTP::Get, post: Net::HTTP::Post, put: Net::HTTP::Put, patch: Net::HTTP::Patch, delete: Net::HTTP::Delete}.each do |http_method, request_class|
       it "builds a #{http_method.upcase} request" do
         expect(builder.build(http_method:, uri:)).to be_an_instance_of(request_class)
       end

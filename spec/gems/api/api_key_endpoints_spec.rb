@@ -115,7 +115,7 @@ RSpec.describe Gems::API::ApiKeyEndpoints do
     end
 
     it "uses the client's connection" do
-      connection = client.connection
+      connection = client.send(:connection)
       allow(connection).to receive(:perform).and_call_original
       client.exchange_trusted_publisher_token("ID_TOKEN")
 

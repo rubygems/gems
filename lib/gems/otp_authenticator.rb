@@ -9,20 +9,21 @@ module Gems
   class OtpAuthenticator < Authenticator
     # The HTTP header name for the one-time passcode
     OTP_HEADER = "OTP".freeze
+    private_constant :OTP_HEADER
 
     # The authenticator providing the underlying credentials
     # @api public
     # @return [Authenticator] the wrapped authenticator
-    # @example Get or set the wrapped authenticator
+    # @example Get the wrapped authenticator
     #   authenticator.authenticator = Gems::ApiKeyAuthenticator.new(key: "key")
-    attr_accessor :authenticator
+    attr_reader :authenticator
 
     # The one-time passcode
     # @api public
     # @return [String] the one-time passcode
-    # @example Get or set the one-time passcode
+    # @example Get the one-time passcode
     #   authenticator.otp = "123456"
-    attr_accessor :otp
+    attr_reader :otp
 
     # Initialize a new OtpAuthenticator
     #

@@ -23,20 +23,6 @@ module Gems
     #   client.host
     attr_reader :host
 
-    # The connection used for API requests
-    # @api public
-    # @return [Connection] the connection
-    # @example Get the connection
-    #   client.connection.proxy_url
-    attr_reader :connection
-
-    # The request builder used for API requests
-    # @api public
-    # @return [RequestBuilder] the request builder
-    # @example Get the request builder
-    #   client.request_builder.user_agent
-    attr_reader :request_builder
-
     def_delegators :@connection, :open_timeout, :read_timeout, :write_timeout, :proxy_url, :debug_output
     def_delegators :@connection, :open_timeout=, :read_timeout=, :write_timeout=, :proxy_url=, :debug_output=
     def_delegators :@redirect_handler, :max_redirects
@@ -184,6 +170,18 @@ module Gems
       execute_request(:patch, path, body:, content_type:, host:)
     end
 
+    private
+
+    # The connection used for API requests
+    # @api private
+    # @return [Connection] the connection
+    attr_reader :connection
+
+    # The request builder used for API requests
+    # @api private
+    # @return [RequestBuilder] the request builder
+    attr_reader :request_builder
+
     # Execute an HTTP request to the RubyGems API
     # @api private
     # @param http_method [Symbol] the HTTP method
@@ -200,8 +198,6 @@ module Gems
       response = @redirect_handler.handle(response:, request:, authenticator:)
       @response_parser.parse(response:)
     end
-
-    private
 
     # Join a host and a request path, keeping any path prefix on the host
     #

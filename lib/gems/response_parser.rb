@@ -16,7 +16,7 @@ require_relative "errors/unprocessable_entity"
 
 module Gems
   # Parses HTTP responses from the RubyGems API
-  # @api public
+  # @api private
   class ResponseParser
     # Mapping of HTTP status codes to error classes
     ERROR_MAP = {
@@ -35,10 +35,11 @@ module Gems
 
     # The error classes for the 4xx and 5xx statuses ERROR_MAP does not name
     STATUS_CLASS_ERRORS = {4 => ClientError, 5 => ServerError}.freeze
+    private_constant :ERROR_MAP, :STATUS_CLASS_ERRORS
 
     # Parse an HTTP response
     #
-    # @api public
+    # @api private
     # @param response [Net::HTTPResponse] the HTTP response to parse
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful

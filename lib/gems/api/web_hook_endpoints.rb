@@ -12,6 +12,7 @@ module Gems
 
       # Mapping of the gem name groupings returned by the web hooks endpoint to the names used to register hooks
       WEB_HOOK_GEM_NAMES = {"all gems" => "*"}.freeze
+      private_constant :WEB_HOOK_GEM_NAMES
 
       # List the webhooks registered under your account
       #

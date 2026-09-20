@@ -134,12 +134,16 @@ RSpec.describe Gems::Client do
       expect(client.get("/path")).to eq("body")
     end
 
-    it "exposes the connection" do
-      expect(client.connection).to be_an_instance_of(Gems::Connection)
+    it "keeps the connection private" do
+      expect(client).not_to respond_to(:connection)
     end
 
-    it "exposes the request builder" do
-      expect(client.request_builder).to be_an_instance_of(Gems::RequestBuilder)
+    it "keeps the request builder private" do
+      expect(client).not_to respond_to(:request_builder)
+    end
+
+    it "keeps execute_request private" do
+      expect(client).not_to respond_to(:execute_request)
     end
 
     it "shares the connection with the redirect handler" do

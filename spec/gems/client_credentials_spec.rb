@@ -151,11 +151,11 @@ RSpec.describe Gems::ClientCredentials do
     end
 
     it "builds an authenticator with the client's connection" do
-      expect(client.authenticator.connection).to equal(client.connection)
+      expect(client.authenticator.connection).to equal(client.send(:connection))
     end
 
     it "builds an authenticator with the client's request builder" do
-      expect(client.authenticator.request_builder).to equal(client.request_builder)
+      expect(client.authenticator.request_builder).to equal(client.send(:request_builder))
     end
   end
 

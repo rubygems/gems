@@ -7,9 +7,9 @@ module Gems
     # The API key
     # @api public
     # @return [String] the API key
-    # @example Get or set the API key
+    # @example Get the API key
     #   authenticator.key = "701243f217cdf23b1370c7b66b65ca97"
-    attr_accessor :key
+    attr_reader :key
 
     # Initialize a new ApiKeyAuthenticator
     #

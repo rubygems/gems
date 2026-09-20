@@ -5,7 +5,7 @@ require_relative "configuration"
 
 module Gems
   # Builds HTTP requests for the RubyGems API
-  # @api public
+  # @api private
   class RequestBuilder
     # Content type for form-encoded request bodies
     FORM_URLENCODED = "application/x-www-form-urlencoded".freeze
@@ -21,9 +21,10 @@ module Gems
       patch: Net::HTTP::Patch,
       delete: Net::HTTP::Delete
     }.freeze
+    private_constant :HTTP_METHODS
 
     # The 'User-Agent' HTTP header sent with requests
-    # @api public
+    # @api private
     # @return [String] the user agent
     # @example Get or set the user agent
     #   builder.user_agent = "Custom User Agent"
@@ -31,7 +32,7 @@ module Gems
 
     # Initialize a new RequestBuilder
     #
-    # @api public
+    # @api private
     # @param user_agent [String] the 'User-Agent' HTTP header sent with requests
     # @return [RequestBuilder] a new instance
     # @example Create a request builder
@@ -45,7 +46,7 @@ module Gems
     # The body may be a Hash (sent as a form-encoded body), an Array of multipart
     # fields (sent as multipart/form-data), or a String (sent with the given content type).
     #
-    # @api public
+    # @api private
     # @param http_method [Symbol] the HTTP method (:get, :post, :put, :patch, :delete)
     # @param uri [URI::Generic] the request URI
     # @param params [Hash] query parameters to append to the URI

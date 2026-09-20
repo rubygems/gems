@@ -26,7 +26,9 @@ RSpec.describe Gems::ResponseParser do
       expect(parser.parse(response:)).to eq("created")
     end
 
-    described_class::ERROR_MAP.each do |status, error_class|
+    {400 => Gems::BadRequest, 401 => Gems::Unauthorized, 403 => Gems::Forbidden, 404 => Gems::NotFound, 409 => Gems::Conflict,
+     422 => Gems::UnprocessableEntity, 429 => Gems::TooManyRequests, 500 => Gems::InternalServerError,
+     502 => Gems::BadGateway, 503 => Gems::ServiceUnavailable, 504 => Gems::GatewayTimeout}.each do |status, error_class|
       it "raises #{error_class} for a #{status} response" do
         stub_request(:get, uri.to_s).to_return(status:)
 

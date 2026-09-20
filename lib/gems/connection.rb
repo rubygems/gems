@@ -25,6 +25,7 @@ module Gems
       Timeout::Error,
       Zlib::Error
     ].freeze
+    private_constant :NETWORK_ERRORS
 
     # The timeout for opening connections in seconds
     # @api public
