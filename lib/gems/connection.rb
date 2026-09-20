@@ -1,4 +1,3 @@
-require "forwardable"
 require "net/http"
 require "openssl"
 require "uri"
@@ -8,8 +7,6 @@ module Gems
   # Manages HTTP connections to the RubyGems API
   # @api public
   class Connection
-    extend Forwardable
-
     # Default timeout for opening connections in seconds
     DEFAULT_OPEN_TIMEOUT = 60 # seconds
     # Default timeout for reading responses in seconds
@@ -70,10 +67,52 @@ module Gems
     #   connection.proxy_uri
     attr_reader :proxy_uri
 
-    def_delegator :proxy_uri, :host, :proxy_host
-    def_delegator :proxy_uri, :port, :proxy_port
-    def_delegator :proxy_uri, :user, :proxy_user
-    def_delegator :proxy_uri, :password, :proxy_pass
+    # The host of the proxy
+    # @api public
+    # @return [String, nil] the proxy host, or nil without a proxy URL
+    # @example Get the proxy host
+    #   connection.proxy_host
+    def proxy_host
+      proxy_uri&.host
+    end
+
+    # The port of the proxy
+    # @api public
+    # @return [Integer, nil] the proxy port, or nil without a proxy URL
+    # @example Get the proxy port
+    #   connection.proxy_port
+    def proxy_port
+      proxy_uri&.port
+    end
+
+    # The user of the proxy, decoded from the proxy URL
+    # @api public
+    # @return [String, nil] the proxy user, or nil without one
+    # @example Get the proxy user
+    #   connection.proxy_user
+    def proxy_user
+      decode(proxy_uri&.user)
+    end
+
+    # The password of the proxy, decoded from the proxy URL
+    # @api public
+    # @return [String, nil] the proxy password, or nil without one
+    # @example Get the proxy password
+    #   connection.proxy_pass
+    def proxy_pass
+      decode(proxy_uri&.password)
+    end
+
+    # Summarize the connection for the console
+    #
+    # @api public
+    # @return [String] the summary, which includes the proxy URL without its user and password
+    # @example Inspect a connection
+    #   connection.inspect # => #<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60>
+    def inspect
+      "#<#{self.class} proxy_url=#{redact(proxy_url).inspect} open_timeout=#{open_timeout} " \
+        "read_timeout=#{read_timeout} write_timeout=#{write_timeout}>"
+    end
 
     # Initialize a new connection
     #
@@ -117,14 +156,15 @@ module Gems
     # @api public
     # @param proxy_url [String, nil] the proxy URL, or nil to read proxies from the environment again
     # @return [void]
-    # @raise [ArgumentError] if the proxy URL is invalid
+    # @raise [ArgumentError] if the proxy URL is invalid, in which case the proxy is left as it was
     # @example Set the proxy URL
     #   connection.proxy_url = "http://proxy.example.com:8080"
     # @example Clear the proxy URL
     #   connection.proxy_url = nil
     def proxy_url=(proxy_url)
+      proxy_uri = proxy_url && parse_proxy_uri(proxy_url)
       @proxy_url = proxy_url
-      @proxy_uri = proxy_url && parse_proxy_uri(proxy_url)
+      @proxy_uri = proxy_uri
     end
 
     private
@@ -133,12 +173,31 @@ module Gems
     # @api private
     # @param proxy_url [String] the proxy URL
     # @return [URI::HTTP] the proxy URI
-    # @raise [ArgumentError] if the proxy URL is not an HTTP or HTTPS URL
+    # @raise [ArgumentError] if the proxy URL is not a valid HTTP or HTTPS URL; the message leaves out its user and
+    #   password
     def parse_proxy_uri(proxy_url)
       proxy_uri = URI(proxy_url)
-      raise ArgumentError, "Invalid proxy URL: #{proxy_uri}" unless proxy_uri.is_a?(URI::HTTP)
+      raise ArgumentError, "Invalid proxy URL: #{redact(proxy_url)}" unless proxy_uri.is_a?(URI::HTTP)
 
       proxy_uri
+    rescue URI::InvalidURIError
+      raise ArgumentError, "Invalid proxy URL: #{redact(proxy_url)}"
+    end
+
+    # Remove the user and password from a URL
+    # @api private
+    # @param url [String, nil] the URL
+    # @return [String, nil] the URL without its userinfo, or nil for nil
+    def redact(url)
+      url&.sub(%r{(?<=//)[^/@]*@}, "")
+    end
+
+    # Decode a percent-encoded component of a URL
+    # @api private
+    # @param component [String, nil] the component
+    # @return [String, nil] the decoded component, or nil for nil
+    def decode(component)
+      component && URI.decode_uri_component(component)
     end
 
     # Build an HTTP client for the given URI
@@ -154,10 +213,19 @@ module Gems
       host = uri.host
       raise ArgumentError, "URI has no host: #{uri}" if host.nil?
 
-      proxy = proxy_uri || uri.find_proxy
-      http_client = Net::HTTP.new(host, uri.port, proxy&.host, proxy&.port, proxy&.user, proxy&.password)
+      proxy_host, proxy_port, proxy_user, proxy_pass = proxy_arguments_for(uri)
+      http_client = Net::HTTP.new(host, uri.port, proxy_host, proxy_port, proxy_user, proxy_pass)
       http_client.use_ssl = uri.scheme.eql?("https")
       configure_http_client(http_client)
+    end
+
+    # The proxy host, port, user, and password for a URI, with the user and password decoded
+    # @api private
+    # @param uri [URI::Generic] the URI to connect to
+    # @return [Array] the proxy host, port, user, and password, each nil without a proxy
+    def proxy_arguments_for(uri)
+      proxy = proxy_uri || uri.find_proxy
+      [proxy&.host, proxy&.port, decode(proxy&.user), decode(proxy&.password)]
     end
 
     # Configure an HTTP client with timeout settings

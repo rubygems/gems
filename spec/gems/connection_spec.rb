@@ -106,6 +106,39 @@ RSpec.describe Gems::Connection do
         .to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com/")
     end
 
+    it "raises an ArgumentError for a proxy URL that cannot be parsed" do
+      expect { connection.proxy_url = "http://proxy example.com/" }
+        .to raise_error(ArgumentError, "Invalid proxy URL: http://proxy example.com/")
+    end
+
+    it "leaves the user and password out of the error message" do
+      expect { connection.proxy_url = "ftp://user:secret@proxy.example.com/" }
+        .to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com/")
+    end
+
+    it "leaves the proxy as it was after an invalid URL" do
+      connection.proxy_url = "ftp://proxy.example.com/"
+    rescue ArgumentError
+      expect(connection.proxy_uri).to eq(URI("https://user:pass@proxy.example.com:8080"))
+    end
+
+    it "leaves the user and password out of the error message for a URL that cannot be parsed" do
+      expect { connection.proxy_url = "http://user:secret@proxy example.com/" }
+        .to raise_error(ArgumentError, "Invalid proxy URL: http://proxy example.com/")
+    end
+
+    it "decodes a percent-encoded proxy user" do
+      connection.proxy_url = "http://us%40er:p%40ss@proxy.example.com:8080"
+
+      expect(connection.proxy_user).to eq("us@er")
+    end
+
+    it "decodes a percent-encoded proxy password" do
+      connection.proxy_url = "http://us%40er:p%40ss@proxy.example.com:8080"
+
+      expect(connection.proxy_pass).to eq("p@ss")
+    end
+
     context "when set to nil" do
       before { connection.proxy_url = nil }
 
@@ -116,6 +149,47 @@ RSpec.describe Gems::Connection do
       it "clears the proxy URI" do
         expect(connection.proxy_uri).to be_nil
       end
+
+      it "returns nil from proxy_host" do
+        expect(connection.proxy_host).to be_nil
+      end
+
+      it "returns nil from proxy_port" do
+        expect(connection.proxy_port).to be_nil
+      end
+
+      it "returns nil from proxy_user" do
+        expect(connection.proxy_user).to be_nil
+      end
+
+      it "returns nil from proxy_pass" do
+        expect(connection.proxy_pass).to be_nil
+      end
+    end
+  end
+
+  describe "#inspect" do
+    it "shows the proxy URL without its user and password" do
+      connection.proxy_url = "http://user:secret@proxy.example.com:8080"
+
+      expect(connection.inspect).to eq('#<Gems::Connection proxy_url="http://proxy.example.com:8080" open_timeout=60 ' \
+        "read_timeout=60 write_timeout=60>")
+    end
+
+    it "shows a proxy URL with an empty user and password without the separator" do
+      connection.proxy_url = "http://@proxy.example.com:8080"
+
+      expect(connection.inspect).to include('proxy_url="http://proxy.example.com:8080"')
+    end
+
+    it "shows a nil proxy URL" do
+      expect(connection.inspect).to eq("#<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60>")
+    end
+
+    it "shows the timeouts" do
+      connection = described_class.new(open_timeout: 1, read_timeout: 2, write_timeout: 3)
+
+      expect(connection.inspect).to eq("#<Gems::Connection proxy_url=nil open_timeout=1 read_timeout=2 write_timeout=3>")
     end
   end
 
@@ -269,6 +343,13 @@ RSpec.describe Gems::Connection do
         expect(build_http_client(https_uri).proxy_pass).to eq("pass")
       end
 
+      it "decodes the proxy user and password" do
+        connection = described_class.new(proxy_url: "http://us%40er:p%40ss@proxy.example.com:8080")
+        http_client = connection.send(:build_http_client, https_uri)
+
+        expect([http_client.proxy_user, http_client.proxy_pass]).to eq(["us@er", "p@ss"])
+      end
+
       it "takes precedence over the environment" do
         with_env("https_proxy" => "http://env.example.com:9999") do
           expect(build_http_client(https_uri).proxy_address).to eq("proxy.example.com")
@@ -297,6 +378,14 @@ RSpec.describe Gems::Connection do
 
       it "uses the proxy password" do
         expect(build_http_client(https_uri).proxy_pass).to eq("env_pass")
+      end
+
+      it "decodes the proxy user and password" do
+        with_env("https_proxy" => "http://env%40user:env%40pass@env.example.com:9999") do
+          http_client = build_http_client(https_uri)
+
+          expect([http_client.proxy_user, http_client.proxy_pass]).to eq(["env@user", "env@pass"])
+        end
       end
 
       it "does not use the proxy for other schemes" do

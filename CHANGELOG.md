@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add a `role` option to `add_owner` and `update_owner` for changing an owner's role
 * Add `profile` and `me` for user information
 * Add `expires_at`, `rubygem_name`, and `mfa` options to `create_api_key`
-* Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client
+* Add `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, configurable globally or per client; the user and password of a proxy URL are decoded before they are sent to the proxy, and kept out of error messages and `Connection#inspect`
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and the status `code` as an Integer; any other 4xx or 5xx status raises `ClientError` or `ServerError`
 * Add `TooManyRedirects`, raised instead of looping forever on redirects; a redirect that cannot be followed, such as 304 Not Modified or one whose `Location` is missing, is not a valid URL, or is not an HTTP or HTTPS URL, raises the `HTTPError` of its status
 * Add `InvalidResponse`, raised with the `body` when a successful response is not JSON, such as the page of a proxy or captive portal, instead of `JSON::ParserError`

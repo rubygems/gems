@@ -533,8 +533,6 @@ module Gems
   end
 
   class Connection
-    extend Forwardable
-
     DEFAULT_OPEN_TIMEOUT: Integer
     DEFAULT_READ_TIMEOUT: Integer
     DEFAULT_WRITE_TIMEOUT: Integer
@@ -553,13 +551,17 @@ module Gems
     def proxy_pass: () -> String?
 
     def initialize: (?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?) -> void
+    def inspect: () -> String
     def perform: (request: Net::HTTPRequest) -> Net::HTTPResponse
     def proxy_url=: (String? proxy_url) -> void
 
     private
 
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
+    def redact: (String? url) -> String?
+    def decode: (String? component) -> String?
     def build_http_client: (URI::Generic uri) -> Net::HTTP
+    def proxy_arguments_for: (URI::Generic uri) -> [String?, Integer?, String?, String?]
     def configure_http_client: (Net::HTTP http_client) -> Net::HTTP
   end
 
