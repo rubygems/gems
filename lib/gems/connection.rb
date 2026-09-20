@@ -1,7 +1,5 @@
 require "net/http"
-require "openssl"
 require "uri"
-require "zlib"
 require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
