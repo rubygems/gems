@@ -79,12 +79,14 @@ module Gems
     # These are the readers declared with attribute, predicate, and time_attribute, and a pattern matches a resource
     # by these names (see {#deconstruct_keys}).
     #
+    # A subclass of a resource inherits the readers its superclass declared, until it declares readers of its own.
+    #
     # @api public
     # @return [Array<Symbol>] the reader names, in the order they were declared
     # @example
     #   Gems::Owner.attribute_names # => [:id, :handle, :email, :role]
     def self.attribute_names
-      @attribute_names || []
+      @attribute_names || (superclass.attribute_names if superclass.respond_to?(:attribute_names)) || [] # steep:ignore NoMethod
     end
 
     # Record a declared reader for {.attribute_names}
@@ -121,9 +123,9 @@ module Gems
     # The readers shown in the inspect output
     #
     # @api private
-    # @return [Array<Symbol>] the readers to show
+    # @return [Array<Symbol>] the readers to show, inherited from the superclass until the class declares its own
     def self.inspect_readers
-      @inspect_readers || []
+      @inspect_readers || (superclass.inspect_readers if superclass.respond_to?(:inspect_readers)) || [] # steep:ignore NoMethod
     end
 
     # Declare which readers identify the resource
@@ -140,9 +142,10 @@ module Gems
     # The readers that identify the resource
     #
     # @api private
-    # @return [Array<Symbol>] the identifying readers, empty when the resource is identified by all of its attributes
+    # @return [Array<Symbol>] the identifying readers, inherited from the superclass until the class declares its
+    #   own, and empty when the resource is identified by all of its attributes
     def self.identity_readers
-      @identity_readers || []
+      @identity_readers || (superclass.identity_readers if superclass.respond_to?(:identity_readers)) || [] # steep:ignore NoMethod
     end
 
     # Initialize a new resource

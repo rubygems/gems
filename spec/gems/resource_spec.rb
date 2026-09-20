@@ -232,6 +232,40 @@ RSpec.describe Gems::Resource do
 
       expect(resource_class.attribute_names).not_to include(:other)
     end
+
+    it "is inherited by a subclass that declares nothing" do
+      expect(Class.new(resource_class).attribute_names).to eq(resource_class.attribute_names)
+    end
+
+    it "appends the names a subclass declares to the inherited ones" do
+      declaring = Class.new(resource_class) { attribute :number }
+
+      expect(declaring.attribute_names).to eq([*resource_class.attribute_names, :number])
+    end
+
+    it "keeps the names a subclass declares out of its superclass" do
+      Class.new(resource_class) { attribute :number }
+
+      expect(resource_class.attribute_names).not_to include(:number)
+    end
+  end
+
+  describe "a subclass of a resource" do
+    let(:subclass) { Class.new(resource_class) }
+
+    it "matches a pattern by the inherited readers" do
+      matched = case subclass.new(attributes)
+      in {name:, yanked?: true} then name
+      end
+
+      expect(matched).to eq("rails")
+    end
+
+    it "compares by the inherited identity" do
+      identified = Class.new(Class.new(resource_class) { identified_by :name })
+
+      expect(identified.new(attributes)).to eq(identified.new("name" => "rails"))
+    end
   end
 
   describe "#deconstruct_keys" do
@@ -295,6 +329,10 @@ RSpec.describe Gems::Resource do
     it "defaults to no readers" do
       expect(Class.new(described_class).inspect_readers).to eq([])
     end
+
+    it "is inherited by a subclass that declares nothing" do
+      expect(Class.new(resource_class).inspect_readers).to eq(%i[name yanked?])
+    end
   end
 
   describe "#inspect" do
@@ -336,6 +374,12 @@ RSpec.describe Gems::Resource do
 
     it "defaults to no readers" do
       expect(resource_class.identity_readers).to eq([])
+    end
+
+    it "is inherited by a subclass that declares nothing" do
+      identified = Class.new(resource_class) { identified_by :name }
+
+      expect(Class.new(identified).identity_readers).to eq(%i[name])
     end
   end
 
