@@ -11,6 +11,20 @@ module Gems
       include Identifiers
       include JSONParsing
 
+      # The scopes the RubyGems API defines for an API key
+      API_KEY_SCOPES = %i[
+        access_webhooks
+        add_owner
+        configure_trusted_publishers
+        index_rubygems
+        push_rubygem
+        remove_owner
+        show_dashboard
+        update_owner
+        yank_rubygem
+      ].freeze
+      private_constant :API_KEY_SCOPES
+
       # Create an API key using HTTP basic auth
       #
       # The key is only returned once, so store it somewhere safe.
@@ -33,6 +47,7 @@ module Gems
       # @example
       #   Gems.create_api_key("ci-push", push_rubygem: true, rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
       def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
+        validate_scopes(scopes)
         settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
         APIKey.new(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
       end
@@ -47,6 +62,7 @@ module Gems
       # @example
       #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
       def update_api_key(key, **scopes)
+        validate_scopes(scopes)
         patch("/api/v1/api_key", {**scopes, api_key: key_of(key)})
       end
 
@@ -60,6 +76,25 @@ module Gems
       #   Gems.exchange_trusted_publisher_token(ENV.fetch("ID_TOKEN")).key
       def exchange_trusted_publisher_token(id_token)
         TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:).exchange_token!
+      end
+
+      private
+
+      # Check that every scope is one the RubyGems API defines
+      #
+      # A scope the API does not define would be ignored by the server, leaving a key scoped differently than it
+      # was meant to be, so a misspelled scope is reported rather than sent.
+      #
+      # @api private
+      # @param scopes [Hash{Symbol => Boolean}] the scopes
+      # @return [void]
+      # @raise [ArgumentError] if a scope is not one the API defines
+      def validate_scopes(scopes)
+        unknown = scopes.keys - API_KEY_SCOPES
+        return if unknown.empty?
+
+        raise ArgumentError, "Unknown API key scope: #{unknown.join(", ")}. " \
+          "The scopes the API defines are: #{API_KEY_SCOPES.join(", ")}"
       end
     end
   end

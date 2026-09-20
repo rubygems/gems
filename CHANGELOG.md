@@ -57,6 +57,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Resolve the default API key for the host a request is sent to, as `gem push --host` resolves it, so that a client built for another host, and a request made to one with `host:`, send the key `gem signin --host` stored for it rather than the RubyGems.org key; a configured key, basic authentication, and a trusted publishing ID token are sent wherever the client sends a request, as `gem push --key` is
 * Exchange a trusted publishing ID token once when requests are made concurrently, since RubyGems.org issues the API key only once per token
 * Raise `ArgumentError` for a `host` that is not an HTTP or HTTPS URL, when a client is built and when `host` is assigned, rather than letting `URI::BadURIError` or `URI::InvalidURIError` escape when a request is made; an invalid host leaves the host as it was, as an invalid `proxy_url` does
+* Raise `ArgumentError` for an API key scope the RubyGems API does not define, rather than sending a misspelled scope for the server to ignore and leaving the key scoped differently than it was meant to be
 
 ### Removed
 * Require Ruby 3.4 or later: Ruby 3.1 and 3.2 have reached end of life, Ruby 3.3 reaches it in March 2027, within the life of 3.x, and Ruby 3.4 bundles the net-http that connects to an HTTPS proxy over TLS

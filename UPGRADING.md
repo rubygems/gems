@@ -207,6 +207,9 @@ end
 Gems.create_api_key("ci-push", push_rubygem: true).key
 ```
 
+`create_api_key` and `update_api_key` raise `ArgumentError` for a scope the RubyGems API does not define, where 2.x
+sent whatever it was given for the server to ignore, leaving the key scoped differently than it was meant to be.
+
 `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE` are gone. `Gems::VERSION` is the library's version string, and
 `Gems::Version` is the object returned for a version of a gem.
 

@@ -19,10 +19,22 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
     end
 
-    it "keeps the positional name when the scopes include one" do
-      client.create_api_key("ci-push", name: "other")
+    it "rejects a scope the API does not define" do
+      expect { client.create_api_key("ci-push", push_rubygems: true) }
+        .to raise_error(ArgumentError, "Unknown API key scope: push_rubygems. The scopes the API defines are: " \
+          "access_webhooks, add_owner, configure_trusted_publishers, index_rubygems, push_rubygem, remove_owner, " \
+          "show_dashboard, update_owner, yank_rubygem")
+    end
 
-      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
+    it "reports every scope the API does not define" do
+      expect { client.create_api_key("ci-push", push_rubygems: true, name: "other") }
+        .to raise_error(ArgumentError, /\AUnknown API key scope: push_rubygems, name\./)
+    end
+
+    it "does not post a key with a scope the API does not define" do
+      client.create_api_key("ci-push", push_rubygems: true)
+    rescue ArgumentError
+      expect(a_post("/api/v1/api_key.json")).not_to have_been_made
     end
 
     it "posts an expiry, a gem restriction, and a passcode requirement" do
@@ -38,10 +50,11 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", expires_at: "2027-01-01T00:00:00Z"})).to have_been_made
     end
 
-    it "keeps the positional name when the settings include one" do
-      client.create_api_key("ci-push", name: "other", mfa: true)
+    it "posts scopes alongside settings" do
+      client.create_api_key("ci-push", push_rubygem: true, mfa: true)
 
-      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", mfa: "true"})).to have_been_made
+      expect(a_post("/api/v1/api_key.json")
+        .with(body: {name: "ci-push", push_rubygem: "true", mfa: "true"})).to have_been_made
     end
 
     it "returns the new API key" do
@@ -71,11 +84,15 @@ RSpec.describe Gems::API::APIKeyEndpoints do
         body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
     end
 
-    it "keeps the positional key when the scopes include one" do
-      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", api_key: "other")
+    it "rejects a scope the API does not define" do
+      expect { client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", api_key: "other") }
+        .to raise_error(ArgumentError, /\AUnknown API key scope: api_key\./)
+    end
 
-      expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
-        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97"})).to have_been_made
+    it "does not patch a key with a scope the API does not define" do
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygems: true)
+    rescue ArgumentError
+      expect(a_request(:patch, rubygems_url("/api/v1/api_key"))).not_to have_been_made
     end
 
     it "returns the response body" do
