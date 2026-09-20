@@ -1,7 +1,7 @@
 require "net/http"
 require "uri"
 require_relative "authenticator"
-require_relative "version"
+require_relative "library_version"
 
 module Gems
   # Builds HTTP requests for the RubyGems API

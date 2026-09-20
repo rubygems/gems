@@ -1,4 +1,4 @@
-require_relative "lib/gems/version"
+require_relative "lib/gems/library_version"
 
 Gem::Specification.new do |spec|
   spec.name = "gems"

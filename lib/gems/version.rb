@@ -2,9 +2,6 @@ require_relative "errors/invalid_response"
 require_relative "resource"
 
 module Gems
-  # The current version of the Gems gem
-  VERSION = "2.0.0".freeze
-
   # A version of a gem, as returned by the versions, downloads, and API v2 endpoints
   # @api public
   class Version < Resource

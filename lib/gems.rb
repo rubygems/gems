@@ -1,6 +1,7 @@
 require "forwardable"
 require_relative "gems/client"
 require_relative "gems/configuration"
+require_relative "gems/library_version"
 require_relative "gems/version"
 
 # A Ruby wrapper for the RubyGems.org API
