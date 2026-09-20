@@ -65,11 +65,14 @@ module Gems
 
   # Build the client again from the global configuration
   #
-  # The rest of the configuration is applied to it afterwards, which is what records the values it was applied from.
+  # The connections the client being replaced keeps open are closed, since no request of the module will be sent on
+  # them again. The rest of the configuration is applied to the new client afterwards, which is what records the
+  # values it was applied from.
   #
   # @api private
   # @return [Array<Object>] the credentials the client was built from
   def self.rebuild_client
+    @client&.close
     @client = new
     @credential_values = credential_values
   end

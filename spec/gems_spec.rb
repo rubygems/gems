@@ -57,6 +57,15 @@ RSpec.describe Gems do
       end
     end
 
+    it "closes the connections of the client it replaces" do
+      client = described_class.client
+      allow(client).to receive(:close)
+      described_class.key = "OTHER_KEY"
+      described_class.client
+
+      expect(client).to have_received(:close)
+    end
+
     {
       user_agent: "Custom User Agent",
       open_timeout: 1,
