@@ -241,6 +241,9 @@ portal, one whose JSON lacks a field the library reads, or one with a timestamp 
 latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`,
 raises `Gems::NoLatestVersion`.
 
+Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or `proxy_url` that is not an HTTP or
+HTTPS URL.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the tests,

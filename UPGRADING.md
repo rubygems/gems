@@ -50,6 +50,9 @@ Gems.key = nil                  # send requests without an API key
 Gems.configure { |config| config.key = nil }
 ```
 
+A `host` that is not an HTTP or HTTPS URL raises `ArgumentError` when a client is built and when `host` is assigned,
+where 2.x let `URI::BadURIError` or `URI::InvalidURIError` escape when a request was made.
+
 The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and
 `max_redirects` are new, and every option can be set globally or per client.
 

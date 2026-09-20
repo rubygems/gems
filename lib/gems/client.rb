@@ -57,6 +57,7 @@ module Gems
     #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97", otp: "123456")
     # @example Create a client for trusted publishing
     #   client = Gems::Client.new(id_token: ENV.fetch("ID_TOKEN"))
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
     def initialize(host: Gems.host, key: Gems.key, username: Gems.username, password: Gems.password,
       otp: Gems.otp, id_token: Gems.id_token,
       user_agent: Gems.user_agent,
@@ -66,7 +67,7 @@ module Gems
       debug_output: Gems.debug_output,
       proxy_url: Gems.proxy_url,
       max_redirects: Gems.max_redirects)
-      @host = host
+      @host = validate_host(host)
       @connection = Connection.new(open_timeout:, read_timeout:, write_timeout:, debug_output:, proxy_url:)
       @request_builder = RequestBuilder.new(user_agent:)
       initialize_credentials(key:, username:, password:, otp:, id_token:)
@@ -80,10 +81,11 @@ module Gems
     # @api public
     # @param host [String] the host for API requests, including scheme
     # @return [void]
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL, in which case the host is left as it was
     # @example Set the host
     #   client.host = "https://gems.example.com"
     def host=(host)
-      @host = host
+      @host = validate_host(host)
       initialize_authenticator
     end
 
@@ -192,11 +194,35 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     def execute_request(http_method, path, host:, params: {}, body: nil, content_type: nil)
+      host = validate_host(host) unless host.nil?
       uri = build_uri(host || @host, path)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
       response = @connection.perform(request:)
       response = @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:)
       @response_parser.parse(response:)
+    end
+
+    # Check that a host is a URL requests can be sent to
+    #
+    # @api private
+    # @param host [String] the host, including scheme
+    # @return [String] the host
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
+    def validate_host(host)
+      raise ArgumentError, "Invalid host: #{host}" unless http_url?(host)
+
+      host
+    end
+
+    # Whether a host is an HTTP or HTTPS URL with a host
+    # @api private
+    # @param host [Object] the host
+    # @return [Boolean] whether the host is a URL requests can be sent to
+    def http_url?(host)
+      uri = URI(host)
+      uri.is_a?(URI::HTTP) && !uri.host.to_s.empty?
+    rescue ArgumentError, URI::InvalidURIError
+      false
     end
 
     # Join a host and a request path, keeping any path prefix on the host

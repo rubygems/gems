@@ -8,6 +8,31 @@ RSpec.describe Gems::Client do
       expect(described_class.new.host).to eq("http://example.com")
     end
 
+    it "raises an ArgumentError for a host without a scheme" do
+      expect { described_class.new(host: "rubygems.org") }.to raise_error(ArgumentError, "Invalid host: rubygems.org")
+    end
+
+    it "raises an ArgumentError for a host that is not an HTTP or HTTPS URL" do
+      expect { described_class.new(host: "ftp://rubygems.org") }
+        .to raise_error(ArgumentError, "Invalid host: ftp://rubygems.org")
+    end
+
+    it "raises an ArgumentError for a host that cannot be parsed" do
+      expect { described_class.new(host: "not a url") }.to raise_error(ArgumentError, "Invalid host: not a url")
+    end
+
+    it "raises an ArgumentError for a URL with an empty host" do
+      expect { described_class.new(host: "https://") }.to raise_error(ArgumentError, "Invalid host: https://")
+    end
+
+    it "raises an ArgumentError for a URL without a host" do
+      expect { described_class.new(host: "https:") }.to raise_error(ArgumentError, "Invalid host: https:")
+    end
+
+    it "raises an ArgumentError for a host that is not a URL at all" do
+      expect { described_class.new(host: nil) }.to raise_error(ArgumentError, "Invalid host: ")
+    end
+
     it "defaults the key to the global configuration" do
       Gems.key = TEST_KEY
 
@@ -180,6 +205,16 @@ RSpec.describe Gems::Client do
 
       expect(client.authenticator.host).to eq("http://example.com")
     end
+
+    it "raises an ArgumentError for an invalid host" do
+      expect { client.host = "rubygems.org" }.to raise_error(ArgumentError, "Invalid host: rubygems.org")
+    end
+
+    it "leaves the host as it was after an invalid host" do
+      client.host = "rubygems.org"
+    rescue ArgumentError
+      expect(client.host).to eq(TEST_HOST)
+    end
   end
 
   %i[open_timeout read_timeout write_timeout max_redirects].each do |option|
@@ -250,6 +285,10 @@ RSpec.describe Gems::Client do
       client.get("/path", host: "http://example.com")
 
       expect(a_request(:get, "http://example.com/path")).to have_been_made
+    end
+
+    it "raises an ArgumentError for an invalid per-request host" do
+      expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
   end
 
@@ -388,6 +427,10 @@ RSpec.describe Gems::Client do
       client.get("/path", host: "http://example.com")
 
       expect(a_request(:get, "http://example.com/path")).to have_been_made
+    end
+
+    it "raises an ArgumentError for an invalid per-request host" do
+      expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
 
     it "authenticates requests" do
