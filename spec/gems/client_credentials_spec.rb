@@ -372,4 +372,50 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
     end
   end
+
+  describe "#resolve_key_for_host" do
+    before { stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"}) }
+
+    it "resolves the key stored for the new host" do
+      client = Gems::Client.new
+      client.host = "https://gems.example.com"
+
+      expect(client.key).to eq("HOST_KEY")
+    end
+
+    it "resolves it again for each host" do
+      client = Gems::Client.new(host: "https://gems.example.com")
+      client.host = TEST_HOST
+
+      expect(client.key).to eq("FILE_KEY")
+    end
+
+    it "authenticates a request to the new host with the key stored for it" do
+      client = Gems::Client.new
+      client.host = "https://gems.example.com"
+
+      expect(client.authenticator.key).to eq("HOST_KEY")
+    end
+
+    it "keeps a key configured for the client" do
+      client = Gems::Client.new(key: TEST_KEY)
+      client.host = "https://gems.example.com"
+
+      expect(client.key).to eq(TEST_KEY)
+    end
+
+    it "keeps a key configured globally" do
+      Gems.key = TEST_KEY
+      client = Gems::Client.new
+      client.host = "https://gems.example.com"
+
+      expect(client.key).to eq(TEST_KEY)
+    end
+
+    it "keeps a key of nil given to the client" do
+      client.host = "https://gems.example.com"
+
+      expect(client.key).to be_nil
+    end
+  end
 end

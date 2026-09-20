@@ -228,6 +228,61 @@ RSpec.describe Gems::Client do
     rescue ArgumentError
       expect(client.host).to eq(TEST_HOST)
     end
+
+    context "when a key is stored for the new host" do
+      let(:client) { described_class.new }
+
+      before do
+        stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+        stub_request(:post, "https://gems.example.com/path")
+      end
+
+      it "resolves the key stored for the new host" do
+        client.host = "https://gems.example.com"
+
+        expect(client.key).to eq("HOST_KEY")
+      end
+
+      it "sends the key stored for the new host" do
+        client.host = "https://gems.example.com"
+        client.post("/path")
+
+        expect(a_request(:post, "https://gems.example.com/path")
+          .with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+      end
+
+      it "keeps a key configured for the client" do
+        client = described_class.new(key: TEST_KEY)
+        client.host = "https://gems.example.com"
+
+        expect(client.key).to eq(TEST_KEY)
+      end
+
+      it "keeps a key configured globally" do
+        Gems.key = TEST_KEY
+        client = described_class.new
+        client.host = "https://gems.example.com"
+
+        expect(client.key).to eq(TEST_KEY)
+      end
+    end
+
+    context "when no key is stored for the new host" do
+      let(:client) { described_class.new }
+
+      before do
+        stub_rubygems_configuration(rubygems_api_key: nil)
+        stub_request(:post, "https://gems.example.com/path")
+      end
+
+      it "sends no key to the new host" do
+        client.host = "https://gems.example.com"
+        client.post("/path")
+
+        expect(a_request(:post, "https://gems.example.com/path")
+          .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+      end
+    end
   end
 
   %i[open_timeout read_timeout write_timeout max_redirects].each do |option|

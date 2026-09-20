@@ -140,6 +140,17 @@ module Gems
       @id_token = id_token
     end
 
+    # Resolve the API key stored for the client's host again
+    #
+    # Only a key the client fell back to is resolved again: a configured key, like the key of `gem push --key`, is
+    # sent wherever the client sends a request, and is left as it is.
+    #
+    # @api private
+    # @return [void]
+    def resolve_key_for_host
+      @key = Gems.default_key(@host) unless @key_configured
+    end
+
     # The API key to use when none was given to the client
     #
     # The configured key, else the key stored for the client's host, so that a client for another host uses the

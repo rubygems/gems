@@ -169,6 +169,7 @@ module Gems
     private
 
     def initialize_credentials: (key: api_key_identifier?, username: String?, password: String?, otp: String?, id_token: String?) -> void
+    def resolve_key_for_host: () -> void
     def configured_key: () -> String?
     def credentials_configured?: () -> bool
     def initialize_authenticator: () -> Authenticator

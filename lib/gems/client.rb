@@ -78,6 +78,11 @@ module Gems
 
     # Set the host for API requests
     #
+    # When no credentials were configured for the client, the API key stored for the new host is resolved, so that a
+    # client pointed at another host sends the key `gem signin --host` stored for it rather than the key of the host
+    # the client was built for. A configured key, basic authentication, and a trusted publishing ID token are left as
+    # they are, and are sent wherever the client sends a request.
+    #
     # @api public
     # @param host [String] the host for API requests, including scheme
     # @return [void]
@@ -86,6 +91,7 @@ module Gems
     #   client.host = "https://gems.example.com"
     def host=(host)
       @host = validate_host(host)
+      resolve_key_for_host
       initialize_authenticator
     end
 
