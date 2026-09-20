@@ -1,6 +1,7 @@
 require_relative "../errors/no_latest_version"
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../pagination"
 require_relative "../path_escaping"
 require_relative "../gem"
 require_relative "../version"
@@ -12,6 +13,7 @@ module Gems
     module VersionEndpoints
       include Identifiers
       include JSONParsing
+      include Pagination
       include PathEscaping
 
       # Returns an array of gem version details
@@ -113,6 +115,23 @@ module Gems
       def timeframe_versions(from:, to: nil, page: nil)
         params = {from: timestamp_of(from), to: timestamp_of(to), page:}.compact
         Gem.list(parse_json(get("/api/v1/timeframe_versions.json", params)))
+      end
+
+      # Enumerates the gem versions created within a timeframe, a page at a time
+      #
+      # The timeframe may span up to seven days. A page is requested only when the versions of the page before it
+      # have been enumerated, and the enumeration ends with the first empty page.
+      #
+      # @api public
+      # @authenticated false
+      # @param from [Time, String] The start of the timeframe, as a Time or an ISO 8601 string.
+      # @param to [Time, String, nil] The end of the timeframe; defaults to now.
+      # @yield [gem] each version, when a block is given
+      # @return [Enumerator<Gem>] the versions
+      # @example
+      #   Gems.timeframe_versions_each(from: Time.now - 86_400).count
+      def timeframe_versions_each(from:, to: nil, &block)
+        each_page(block) { |page| timeframe_versions(from:, to:, page:) }
       end
     end
   end

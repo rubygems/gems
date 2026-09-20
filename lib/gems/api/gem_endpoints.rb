@@ -1,6 +1,7 @@
 require "pathname"
 require_relative "../identifiers"
 require_relative "../json_parsing"
+require_relative "../pagination"
 require_relative "../path_escaping"
 require_relative "../gem"
 require_relative "../request_builder"
@@ -12,6 +13,7 @@ module Gems
     module GemEndpoints
       include Identifiers
       include JSONParsing
+      include Pagination
       include PathEscaping
 
       # Returns some basic information about the given gem
@@ -37,6 +39,22 @@ module Gems
       #   Gems.search "cucumber", page: 2
       def search(query, page: nil)
         Gem.list(parse_json(get("/api/v1/search.json", {query:, page:}.compact)))
+      end
+
+      # Enumerates the active gems that match the query, a page at a time
+      #
+      # A page is requested only when the gems of the page before it have been enumerated, and the enumeration ends
+      # with the first empty page.
+      #
+      # @api public
+      # @authenticated false
+      # @param query [String] A term to search for.
+      # @yield [gem] each gem, when a block is given
+      # @return [Enumerator<Gem>] the gems
+      # @example
+      #   Gems.search_each("cucumber").first(100)
+      def search_each(query, &block)
+        each_page(block) { |page| search(query, page:) }
       end
 
       # Returns the names of gems matching the query, for populating a search box

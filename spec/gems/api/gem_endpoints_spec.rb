@@ -68,6 +68,42 @@ RSpec.describe Gems::API::GemEndpoints do
     end
   end
 
+  describe "#search_each" do
+    before do
+      stub_get("/api/v1/search.json?query=cucumber&page=1").to_return(body: fixture("search.json"))
+      stub_get("/api/v1/search.json?query=cucumber&page=2").to_return(body: "[]")
+    end
+
+    it "returns an enumerator" do
+      expect(client.search_each("cucumber")).to be_a(Enumerator)
+    end
+
+    it "enumerates the gems of every page until one is empty" do
+      client.search_each("cucumber").to_a
+
+      expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
+    end
+
+    it "returns the gems that match the query" do
+      gem = client.search_each("cucumber").first
+
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "cucumber"])
+    end
+
+    it "does not request a page the enumeration does not reach" do
+      client.search_each("cucumber").first
+
+      expect(a_get("/api/v1/search.json?query=cucumber&page=2")).not_to have_been_made
+    end
+
+    it "calls a block with each gem" do
+      names = []
+      client.search_each("cucumber") { |gem| names << gem.name }
+
+      expect(names.first).to eq("cucumber")
+    end
+  end
+
   describe "#autocomplete" do
     before { stub_get("/api/v1/search/autocomplete?query=nokogiri").to_return(body: fixture("autocomplete.json")) }
 

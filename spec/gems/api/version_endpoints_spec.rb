@@ -280,4 +280,45 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(client.timeframe_versions(from:, to:).uniq.map(&:version)).to eq(%w[6.0.0.beta1 6.0.0.beta2])
     end
   end
+
+  describe "#timeframe_versions_each" do
+    let(:from) { Time.utc(2019, 1, 18, 21, 24, 29) }
+    let(:query) { "from=2019-01-18T21:24:29Z" }
+
+    before do
+      stub_get("/api/v1/timeframe_versions.json?#{query}&page=1").to_return(body: fixture("timeframe_versions.json"))
+      stub_get("/api/v1/timeframe_versions.json?#{query}&page=2").to_return(body: "[]")
+    end
+
+    it "returns an enumerator" do
+      expect(client.timeframe_versions_each(from:)).to be_a(Enumerator)
+    end
+
+    it "enumerates the versions of every page until one is empty" do
+      client.timeframe_versions_each(from:).to_a
+
+      expect(a_get("/api/v1/timeframe_versions.json?#{query}&page=2")).to have_been_made
+    end
+
+    it "passes the end of the timeframe" do
+      to = Time.utc(2019, 1, 18, 21, 24, 31)
+      stub_get("/api/v1/timeframe_versions.json?#{query}&to=2019-01-18T21:24:31Z&page=1").to_return(body: "[]")
+      client.timeframe_versions_each(from:, to:).to_a
+
+      expect(a_get("/api/v1/timeframe_versions.json?#{query}&to=2019-01-18T21:24:31Z&page=1")).to have_been_made
+    end
+
+    it "returns the versions" do
+      gem = client.timeframe_versions_each(from:).first
+
+      expect(gem.class).to eq(Gems::Gem)
+    end
+
+    it "calls a block with each version" do
+      gems = []
+      client.timeframe_versions_each(from:) { |gem| gems << gem }
+
+      expect(gems.first.class).to eq(Gems::Gem)
+    end
+  end
 end
