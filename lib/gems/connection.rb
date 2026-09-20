@@ -22,21 +22,21 @@ module Gems
 
     # The timeout for opening connections in seconds
     # @api public
-    # @return [Integer] the timeout for opening connections in seconds
+    # @return [Numeric] the timeout for opening connections in seconds
     # @example Get or set the open timeout
     #   connection.open_timeout = 30
     attr_accessor :open_timeout
 
     # The timeout for reading responses in seconds
     # @api public
-    # @return [Integer] the timeout for reading responses in seconds
+    # @return [Numeric] the timeout for reading responses in seconds
     # @example Get or set the read timeout
     #   connection.read_timeout = 30
     attr_accessor :read_timeout
 
     # The timeout for writing requests in seconds
     # @api public
-    # @return [Integer] the timeout for writing requests in seconds
+    # @return [Numeric] the timeout for writing requests in seconds
     # @example Get or set the write timeout
     #   connection.write_timeout = 30
     attr_accessor :write_timeout
@@ -47,7 +47,7 @@ module Gems
     # a series of requests does not open a connection each. Zero closes every connection when its request is done.
     #
     # @api public
-    # @return [Integer] the seconds an idle connection is kept open
+    # @return [Numeric] the seconds an idle connection is kept open
     # @example Get or set the keep-alive timeout
     #   connection.keep_alive_timeout = 0
     attr_accessor :keep_alive_timeout
@@ -126,12 +126,12 @@ module Gems
     # Initialize a new connection
     #
     # @api public
-    # @param open_timeout [Integer] the timeout for opening connections in seconds
-    # @param read_timeout [Integer] the timeout for reading responses in seconds
-    # @param write_timeout [Integer] the timeout for writing requests in seconds
+    # @param open_timeout [Numeric] the timeout for opening connections in seconds
+    # @param read_timeout [Numeric] the timeout for reading responses in seconds
+    # @param write_timeout [Numeric] the timeout for writing requests in seconds
     # @param debug_output [IO, nil] the IO object for debug output
     # @param proxy_url [String, nil] the proxy URL for requests
-    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open for another request
+    # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open for another request
     # @return [Connection] a new connection instance
     # @example Create a connection with default settings
     #   connection = Gems::Connection.new

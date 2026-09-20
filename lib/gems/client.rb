@@ -48,15 +48,15 @@ module Gems
     # @param otp [String, nil] the one-time passcode for multi-factor authentication
     # @param id_token [String, nil] the OIDC ID token for trusted publishing
     # @param user_agent [String] the 'User-Agent' HTTP header sent with requests
-    # @param open_timeout [Integer] the timeout for opening connections in seconds
-    # @param read_timeout [Integer] the timeout for reading responses in seconds
-    # @param write_timeout [Integer] the timeout for writing requests in seconds
+    # @param open_timeout [Numeric] the timeout for opening connections in seconds
+    # @param read_timeout [Numeric] the timeout for reading responses in seconds
+    # @param write_timeout [Numeric] the timeout for writing requests in seconds
     # @param debug_output [IO, nil] the IO object for debug output
     # @param proxy_url [String, nil] the proxy URL for requests
-    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open for another request
+    # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open for another request
     # @param max_redirects [Integer] the maximum number of redirects to follow
     # @param max_retries [Integer] the number of times a rate-limited request is sent again
-    # @param max_retry_delay [Integer] the longest a request waits before it is sent again, in seconds
+    # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
     # @return [Client] a new client instance
     # @example Create a client with an API key
     #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")

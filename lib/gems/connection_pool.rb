@@ -31,7 +31,7 @@ module Gems
     # @api private
     # @param request [Net::HTTPRequest] the request
     # @param settings [Object] the settings a connection must have been opened with to be reused
-    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open, or zero to open one each time
+    # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open, or zero to open one each time
     # @yield the connection to open when none is kept for the host of the request
     # @return [Net::HTTP] the connection, which is open
     # @example Take the connection to send a request on
@@ -47,7 +47,7 @@ module Gems
     # @param request [Net::HTTPRequest] the request
     # @param http_client [Net::HTTP] the connection it was sent on
     # @param settings [Object] the settings the connection was opened with
-    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open, or zero to close it
+    # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open, or zero to close it
     # @return [void]
     # @example Give back the connection a request was sent on
     #   pool.checkin(request:, http_client:, settings:, keep_alive_timeout: 2)
@@ -139,7 +139,7 @@ module Gems
     #
     # @api private
     # @param request [Net::HTTPRequest] the request
-    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open
+    # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open
     # @return [Boolean] whether the connection is kept open
     def keep_alive?(request, keep_alive_timeout)
       keep_alive_timeout.positive? && idempotent?(request)

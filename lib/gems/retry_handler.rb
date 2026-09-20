@@ -37,7 +37,7 @@ module Gems
 
     # The longest a request waits before it is sent again, in seconds
     # @api private
-    # @return [Integer] the longest a request waits before it is sent again, in seconds
+    # @return [Numeric] the longest a request waits before it is sent again, in seconds
     # @example Get or set the maximum retry delay
     #   handler.max_retry_delay = 30
     attr_accessor :max_retry_delay
@@ -46,7 +46,7 @@ module Gems
     #
     # @api private
     # @param max_retries [Integer] the number of times a request is sent again
-    # @param max_retry_delay [Integer] the longest a request waits before it is sent again, in seconds
+    # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
     # @return [RetryHandler] a new instance
     # @example Create a retry handler
     #   handler = Gems::RetryHandler.new(max_retries: 3)

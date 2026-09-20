@@ -91,21 +91,21 @@ module Gems
 
     # The timeout for opening connections in seconds
     # @api public
-    # @return [Integer] the timeout for opening connections in seconds
+    # @return [Numeric] the timeout for opening connections in seconds
     # @example Get or set the open timeout
     #   Gems.open_timeout = 30
     attr_accessor :open_timeout
 
     # The timeout for reading responses in seconds
     # @api public
-    # @return [Integer] the timeout for reading responses in seconds
+    # @return [Numeric] the timeout for reading responses in seconds
     # @example Get or set the read timeout
     #   Gems.read_timeout = 30
     attr_accessor :read_timeout
 
     # The timeout for writing requests in seconds
     # @api public
-    # @return [Integer] the timeout for writing requests in seconds
+    # @return [Numeric] the timeout for writing requests in seconds
     # @example Get or set the write timeout
     #   Gems.write_timeout = 30
     attr_accessor :write_timeout
@@ -115,7 +115,7 @@ module Gems
     # Zero closes every connection when its request is done.
     #
     # @api public
-    # @return [Integer] the seconds an idle connection is kept open
+    # @return [Numeric] the seconds an idle connection is kept open
     # @example Get or set the keep-alive timeout
     #   Gems.keep_alive_timeout = 0
     attr_accessor :keep_alive_timeout
@@ -176,7 +176,7 @@ module Gems
     # A response asking to wait longer than this raises rather than being waited for.
     #
     # @api public
-    # @return [Integer] the longest a request waits before it is sent again, in seconds
+    # @return [Numeric] the longest a request waits before it is sent again, in seconds
     # @example Get or set the maximum retry delay
     #   Gems.max_retry_delay = 30
     attr_accessor :max_retry_delay
