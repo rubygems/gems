@@ -3,6 +3,7 @@ require "openssl"
 require "uri"
 require "zlib"
 require_relative "errors/network_error"
+require_relative "redacted_output"
 
 module Gems
   # Manages HTTP connections to the RubyGems API
@@ -49,6 +50,9 @@ module Gems
     attr_accessor :write_timeout
 
     # The IO object for debug output
+    #
+    # The `Authorization` and `OTP` headers of requests are redacted from what is written to it.
+    #
     # @api public
     # @return [IO, nil] the IO object for debug output
     # @example Get or set the debug output
@@ -234,6 +238,10 @@ module Gems
     end
 
     # Configure an HTTP client with timeout settings
+    #
+    # The debug output is wrapped, so that the credentials Net::HTTP writes with the headers of a request do not
+    # reach the IO.
+    #
     # @api private
     # @param http_client [Net::HTTP] the HTTP client to configure
     # @return [Net::HTTP] the configured HTTP client
@@ -242,7 +250,7 @@ module Gems
         c.open_timeout = open_timeout
         c.read_timeout = read_timeout
         c.write_timeout = write_timeout
-        c.set_debug_output(debug_output)
+        c.set_debug_output(debug_output && RedactedOutput.new(debug_output))
       end
     end
   end

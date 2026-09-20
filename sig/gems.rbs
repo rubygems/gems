@@ -572,6 +572,18 @@ module Gems
                   | [T] (String body) { (untyped json) -> T } -> T
   end
 
+  class RedactedOutput
+    REDACTION: String
+    CREDENTIALS: Array[Regexp]
+
+    @output: IO
+
+    attr_reader output: IO
+
+    def initialize: (IO output) -> void
+    def <<: (String string) -> self
+  end
+
   class Connection
     DEFAULT_OPEN_TIMEOUT: Integer
     DEFAULT_READ_TIMEOUT: Integer

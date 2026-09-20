@@ -217,7 +217,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `open_timeout` | The timeout for opening connections, in seconds         | `60`                                   |
 | `read_timeout` | The timeout for reading responses, in seconds           | `60`                                   |
 | `write_timeout` | The timeout for writing requests, in seconds           | `60`                                   |
-| `debug_output` | An IO that receives HTTP debug output                   | `nil`                                  |
+| `debug_output` | An IO that receives HTTP debug output, with credentials redacted | `nil`                          |
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
 
@@ -236,6 +236,10 @@ Gems.push 'gemcutter-0.2.1.gem', host: 'https://gems.example.com'
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
 An `https://` proxy is connected to over TLS.
+
+Debug output is redacted before it reaches the IO `debug_output` is set to: the `Authorization` and `OTP` headers of
+every request, and the ID token of a trusted publishing token exchange, are written as `[REDACTED]`, so the output can
+be kept in a log. Everything else Net::HTTP writes, including the rest of the headers, is left as it is.
 
 ## Errors
 

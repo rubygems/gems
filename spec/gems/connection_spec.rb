@@ -313,7 +313,14 @@ RSpec.describe Gems::Connection do
     it "applies the debug output" do
       connection = described_class.new(debug_output: $stderr)
 
-      expect(build_http_client(https_uri, connection:).instance_variable_get(:@debug_output)).to equal($stderr)
+      expect(build_http_client(https_uri, connection:).instance_variable_get(:@debug_output).output).to equal($stderr)
+    end
+
+    it "redacts credentials from the debug output" do
+      connection = described_class.new(debug_output: $stderr)
+
+      expect(build_http_client(https_uri, connection:).instance_variable_get(:@debug_output))
+        .to be_an_instance_of(Gems::RedactedOutput)
     end
 
     it "does not set debug output by default" do

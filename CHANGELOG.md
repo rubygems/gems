@@ -70,5 +70,6 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 
 ### Security
 * Verify SSL certificates instead of disabling verification
+* Redact credentials from `debug_output`, which Net::HTTP would otherwise write in the clear: the `Authorization` and `OTP` headers of every request, and the ID token a trusted publishing token exchange sends, are written as `[REDACTED]`
 
 [unreleased]: https://github.com/rubygems/gems/compare/v2.0.0...HEAD
