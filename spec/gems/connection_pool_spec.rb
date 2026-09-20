@@ -257,6 +257,13 @@ RSpec.describe Gems::ConnectionPool do
       expect(http_client).to have_received(:finish)
     end
 
+    it "reads the keys under the lock" do
+      mutex = spy_on_lock
+      pool.close
+
+      expect(mutex).to have_received(:synchronize)
+    end
+
     it "keeps no connection afterwards" do
       pool.store(key, http_client, settings)
       pool.close

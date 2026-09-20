@@ -109,15 +109,18 @@ module Gems
 
     # Close every connection the pool keeps
     #
-    # The connections are taken one at a time, so that a connection given back while the pool is closing is either
-    # closed with the rest or kept for the next request, rather than dropped without being closed.
+    # The keys are read under the lock, as every other read and write of the connections is, since a request giving
+    # its connection back at that moment writes to them from another thread. The connections are then taken one at a
+    # time, so that a connection given back while the pool is closing is either closed with the rest or kept for the
+    # next request, rather than dropped without being closed.
     #
     # @api private
     # @return [ConnectionPool] the pool
     # @example Close the connections of a pool
     #   pool.close
     def close
-      @connections.keys.each { |key| discard(delete(key)) }
+      keys = @mutex.synchronize { @connections.keys }
+      keys.each { |key| discard(delete(key)) }
       self
     end
 
