@@ -78,15 +78,19 @@ RSpec.describe Gems::API::DownloadEndpoints do
     it "returns the most downloaded gem versions" do
       version = client.most_downloaded.first
 
-      expect([version.class, version.full_name]).to eq([Gems::Version, "abstract-1.0.0"])
+      expect([version.class, version.full_name]).to eq([Gems::Version, "jmespath-1.6.2"])
     end
 
     it "includes each version's download count" do
-      expect(client.most_downloaded.first.downloads_count).to eq(1)
+      expect(client.most_downloaded.first.downloads_count).to eq(670_252_649)
     end
 
     it "derives each version's gem name from its full name" do
-      expect(client.most_downloaded.first.name).to eq("abstract")
+      expect(client.most_downloaded.first.name).to eq("jmespath")
+    end
+
+    it "returns each version's checksum in hex" do
+      expect(client.most_downloaded.first.sha).to eq("238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1")
     end
 
     it "excludes the platform from the derived gem name" do

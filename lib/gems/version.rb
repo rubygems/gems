@@ -130,13 +130,21 @@ module Gems
     #     version.rubygems_version
     attribute :rubygems_version, "rubygems_version", "required_rubygems_version"
 
-    # @!method sha
-    #   The SHA-256 checksum of the gem file
-    #   @api public
-    #   @return [String, nil] the SHA-256 checksum of the gem file
-    #   @example
-    #     version.sha
-    attribute :sha, "sha", "sha256"
+    # The SHA-256 checksum of the gem file, in hex
+    #
+    # The downloads endpoint returns the checksum base64-encoded under sha256, where the other endpoints return it
+    # in hex under sha, so it is decoded, and the checksum reads the same from every endpoint.
+    #
+    # @api public
+    # @return [String, nil] the SHA-256 checksum of the gem file, in hex
+    # @example
+    #   version.sha
+    def sha
+      return self["sha"] if attributes.key?("sha")
+
+      self["sha256"]&.unpack1("m0")&.unpack1("H*")
+    end
+    record_attribute(:sha)
 
     # @!method spdx_identifier
     #   The SPDX license identifier
