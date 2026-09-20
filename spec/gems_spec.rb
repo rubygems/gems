@@ -97,6 +97,22 @@ RSpec.describe Gems do
       expect(described_class.client.user_agent).to eq("Custom User Agent")
     end
 
+    context "when another client cannot be built from the configuration" do
+      let(:client) { described_class.client }
+
+      before do
+        allow(client).to receive(:close)
+        described_class.key = TEST_KEY
+        allow(Gems::Client).to receive(:new).and_raise(ArgumentError)
+      end
+
+      it "keeps the connections of the client it has open" do
+        described_class.client
+      rescue ArgumentError
+        expect(client).not_to have_received(:close)
+      end
+    end
+
     it "keeps a setting assigned to the client after the configuration is applied" do
       described_class.client
       described_class.user_agent = "Custom User Agent"
@@ -170,6 +186,48 @@ RSpec.describe Gems do
       described_class.reset
 
       expect(described_class.client).not_to equal(client)
+    end
+
+    it "closes the connections of the client it forgets" do
+      client = described_class.client
+      allow(client).to receive(:close)
+      described_class.reset
+
+      expect(client).to have_received(:close)
+    end
+
+    context "when a client is being built" do
+      let(:entered) { Queue.new }
+      let(:proceed) { Queue.new }
+
+      before do
+        allow(Gems::Client).to receive(:new).and_wrap_original do |original, **options|
+          entered << true
+          proceed.pop
+          original.call(**options)
+        end
+      end
+
+      # Reset while another thread is inside Gems::Client.new, returning whether the reset waited for it
+      def reset_during_build
+        build = Thread.new { Gems.client }
+        entered.pop
+        reset = Thread.new { Gems.reset }
+        waited = reset.join(0.1).nil?
+        proceed << true
+        [build, reset].each { |thread| thread.join(5) }
+        waited
+      end
+
+      it "waits for the client to be built before forgetting it" do
+        expect(reset_during_build).to be(true)
+      end
+    end
+
+    it "closes nothing when no client has been built" do
+      described_class.send(:remove_instance_variable, :@client) if described_class.instance_variable_defined?(:@client)
+
+      expect(described_class.reset).to equal(described_class)
     end
   end
 

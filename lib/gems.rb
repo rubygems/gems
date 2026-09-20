@@ -52,28 +52,34 @@ module Gems
   # Reset the global configuration and forget the client
   #
   # The client is forgotten as well as the configuration it was built from, so that what it learned from credentials
-  # that have been reset, such as the API key an ID token was exchanged for, is not kept.
+  # that have been reset, such as the API key an ID token was exchanged for, is not kept. Its connections are closed,
+  # since no request of the module will be sent on them again.
   #
   # @api public
   # @return [self]
   # @example Reset the configuration
   #   Gems.reset
   def self.reset
-    @credential_values = nil
+    CLIENT_MUTEX.synchronize do
+      @client&.close
+      @credential_values = nil
+    end
     super
   end
 
   # Build the client again from the global configuration
   #
-  # The connections the client being replaced keeps open are closed, since no request of the module will be sent on
-  # them again. The rest of the configuration is applied to the new client afterwards, which is what records the
-  # values it was applied from.
+  # The client being replaced is closed once the new one has been built, since no request of the module will be sent
+  # on its connections again, and so that a configuration a client cannot be built from leaves the client the module
+  # has open rather than closing it on the way to raising. The rest of the configuration is applied to the new client
+  # afterwards, which is what records the values it was applied from.
   #
   # @api private
   # @return [Array<Object>] the credentials the client was built from
   def self.rebuild_client
+    client = new
     @client&.close
-    @client = new
+    @client = client
     @credential_values = credential_values
   end
   private_class_method :rebuild_client
