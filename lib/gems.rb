@@ -9,6 +9,10 @@ module Gems
   extend Configuration
   extend SingleForwardable
 
+  # The mutex that guards the client the API methods of the module delegate to
+  CLIENT_MUTEX = Mutex.new
+  private_constant :CLIENT_MUTEX
+
   # @!method self.new(**options)
   #   Alias for Gems::Client.new
   #   @api public
@@ -22,30 +26,86 @@ module Gems
 
   # The client the API methods of the module delegate to
   #
-  # The client is built from the global configuration, and built again when the configuration changes, so that what
-  # it learns is kept between calls: the API key a trusted publishing ID token is exchanged for, which RubyGems.org
-  # issues once per token.
+  # The client is built from the global configuration, and built again when the credentials it was built from change,
+  # so that what it learns is kept between calls: the API key a trusted publishing ID token is exchanged for, which
+  # RubyGems.org issues once per token. A change to the rest of the configuration, such as the user agent or a
+  # timeout, is applied to the client it has rather than building another one, which would throw that key away.
   #
   # @api public
   # @return [Client] the client
   # @example Perform a raw request with the module's client
   #   Gems.client.get("/api/v1/gems/rails.json")
   def self.client
-    values = configuration_values
-    @client = new unless values.eql?(@client_values)
-    @client_values = values
-    @client
+    CLIENT_MUTEX.synchronize do
+      rebuild_client unless credential_values.eql?(@credential_values)
+      apply_connection_values unless connection_values.eql?(@connection_values)
+      @client
+    end
   end
 
-  # The values of the global configuration a client is built from
+  # Reset the global configuration and forget the client
   #
-  # They are compared between calls to notice when the configuration changes.
+  # The client is forgotten as well as the configuration it was built from, so that what it learned from credentials
+  # that have been reset, such as the API key an ID token was exchanged for, is not kept.
+  #
+  # @api public
+  # @return [self]
+  # @example Reset the configuration
+  #   Gems.reset
+  def self.reset
+    @credential_values = nil
+    super
+  end
+
+  # Build the client again from the global configuration
+  #
+  # The rest of the configuration is applied to it afterwards, which is what records the values it was applied from.
+  #
+  # @api private
+  # @return [Array<Object>] the credentials the client was built from
+  def self.rebuild_client
+    @client = new
+    @credential_values = credential_values
+  end
+  private_class_method :rebuild_client
+
+  # The credentials of the global configuration a client is built from
+  #
+  # They are compared between calls to notice when the credentials change, which a client cannot be given without
+  # losing what it learned from the ones it has. The host is one of them, since the API key a client falls back to,
+  # and the host a trusted publishing ID token is exchanged with, are resolved for it.
   #
   # @api private
   # @return [Array<Object>] the values
-  def self.configuration_values
-    [host, key, username, password, otp, id_token, user_agent, open_timeout, read_timeout, write_timeout, debug_output,
-      proxy_url, max_redirects]
+  def self.credential_values
+    [host, key, username, password, otp, id_token]
   end
-  private_class_method :configuration_values
+  private_class_method :credential_values
+
+  # The rest of the global configuration
+  #
+  # These are applied to the client the module has rather than building another one.
+  #
+  # @api private
+  # @return [Array<Object>] the values
+  def self.connection_values
+    [user_agent, open_timeout, read_timeout, write_timeout, debug_output, proxy_url, max_redirects]
+  end
+  private_class_method :connection_values
+
+  # Apply the rest of the global configuration to the client the module has
+  #
+  # @api private
+  # @return [Array<Object>] the configuration applied to the client
+  def self.apply_connection_values
+    @client.user_agent = user_agent
+    @client.open_timeout = open_timeout
+    @client.read_timeout = read_timeout
+    @client.write_timeout = write_timeout
+    @client.debug_output = debug_output
+    @client.proxy_url = proxy_url
+    @client.max_redirects = max_redirects
+    @connection_values = connection_values
+  end
+  private_class_method :apply_connection_values
 end

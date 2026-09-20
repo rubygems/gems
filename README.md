@@ -174,7 +174,7 @@ Gems.configure do |config|
 end
 
 # The methods of the Gems module share one client, Gems.client, which is built again when the
-# configuration changes. Use it for raw requests.
+# configured credentials change. Use it for raw requests.
 Gems.client.get '/api/v1/gems/rails.json'
 
 # Alternatively, create a client with its own credentials and settings.

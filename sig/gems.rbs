@@ -15,10 +15,17 @@ module Gems
   extend SingleForwardable
 
   self.@client: Client
-  self.@client_values: Array[untyped]
+  self.@credential_values: Array[untyped]?
+  self.@connection_values: Array[untyped]
+
+  CLIENT_MUTEX: Thread::Mutex
 
   def self.client: () -> Client
-  def self.configuration_values: () -> Array[untyped]
+  def self.reset: () -> self
+  def self.rebuild_client: () -> Array[untyped]
+  def self.credential_values: () -> Array[untyped]
+  def self.connection_values: () -> Array[untyped]
+  def self.apply_connection_values: () -> void
 
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?max_redirects: Integer) -> Client
   def self.rubygem: (gem_identifier gem_name) -> Gem

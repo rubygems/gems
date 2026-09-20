@@ -47,14 +47,7 @@ RSpec.describe Gems do
       username: TEST_USERNAME,
       password: TEST_PASSWORD,
       otp: "123456",
-      id_token: "ID_TOKEN",
-      user_agent: "Custom User Agent",
-      open_timeout: 1,
-      read_timeout: 1,
-      write_timeout: 1,
-      debug_output: $stderr,
-      proxy_url: "http://proxy.example.com:8080",
-      max_redirects: 1
+      id_token: "ID_TOKEN"
     }.each do |option, value|
       it "builds a new client when #{option} changes" do
         client = described_class.client
@@ -64,13 +57,109 @@ RSpec.describe Gems do
       end
     end
 
-    it "exchanges a trusted publishing ID token once across calls" do
-      exchange = stub_post("/api/v1/oidc/trusted_publisher/exchange_token").to_return(body: fixture("exchange_token.json"))
-      stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json"))
-      described_class.id_token = "ID_TOKEN"
-      2.times { described_class.rubygem("rails") }
+    {
+      user_agent: "Custom User Agent",
+      open_timeout: 1,
+      read_timeout: 1,
+      write_timeout: 1,
+      debug_output: $stderr,
+      proxy_url: "http://proxy.example.com:8080",
+      max_redirects: 1
+    }.each do |option, value|
+      it "keeps the client it has when #{option} changes" do
+        client = described_class.client
+        described_class.public_send(:"#{option}=", value)
 
-      expect(exchange).to have_been_requested.once
+        expect(described_class.client).to equal(client)
+      end
+
+      it "applies #{option} to the client it has" do
+        described_class.client
+        described_class.public_send(:"#{option}=", value)
+
+        expect(described_class.client.public_send(option)).to eq(value)
+      end
+    end
+
+    it "keeps a setting assigned to the client it has" do
+      described_class.client.user_agent = "Custom User Agent"
+
+      expect(described_class.client.user_agent).to eq("Custom User Agent")
+    end
+
+    it "keeps a setting assigned to the client after the configuration is applied" do
+      described_class.client
+      described_class.user_agent = "Custom User Agent"
+      described_class.client.user_agent = "Assigned User Agent"
+
+      expect(described_class.client.user_agent).to eq("Assigned User Agent")
+    end
+
+    context "with a trusted publishing ID token" do
+      let(:exchange) { stub_post("/api/v1/oidc/trusted_publisher/exchange_token").to_return(body: fixture("exchange_token.json")) }
+
+      before do
+        exchange
+        stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json"))
+        described_class.id_token = "ID_TOKEN"
+      end
+
+      it "exchanges the ID token once across calls" do
+        2.times { described_class.rubygem("rails") }
+
+        expect(exchange).to have_been_requested.once
+      end
+
+      it "keeps the exchanged API key when the rest of the configuration changes" do
+        described_class.rubygem("rails")
+        described_class.user_agent = "Custom User Agent"
+        described_class.rubygem("rails")
+
+        expect(exchange).to have_been_requested.once
+      end
+    end
+
+    context "when threads call it at once" do
+      let(:entered) { Queue.new }
+      let(:proceed) { Queue.new }
+      let(:built) { Queue.new }
+
+      before do
+        allow(Gems::Client).to receive(:new).and_wrap_original do |original, **options|
+          built << true
+          entered << true
+          proceed.pop
+          original.call(**options)
+        end
+      end
+
+      # Call the client from two threads, with the first inside Gems::Client.new when the second starts
+      def call_from_two_threads
+        threads = [Thread.new { Gems.client }]
+        entered.pop
+        threads << Thread.new { Gems.client }
+        2.times { proceed << true }
+        threads.each { |thread| thread.join(5) }
+      end
+
+      it "builds one client" do
+        call_from_two_threads
+
+        expect(built.size).to eq(1)
+      end
+    end
+  end
+
+  describe ".reset" do
+    it "returns the configuration" do
+      expect(described_class.reset).to equal(described_class)
+    end
+
+    it "forgets the client built from the configuration" do
+      client = described_class.client
+      described_class.reset
+
+      expect(described_class.client).not_to equal(client)
     end
   end
 
