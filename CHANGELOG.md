@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 
 ### Removed
+* Drop support for Ruby 3.1 and 3.2, which have reached end of life; Ruby 3.3 or later is required
 * Remove `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE`; `Gems::Version` is now a response object and `Gems::VERSION` remains the library version string
 * Remove `dependencies` and `api_key`, whose endpoints have been retired by RubyGems.org; use `create_api_key` instead
 * Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`

@@ -6,7 +6,7 @@ plugins:
   - standard-performance
 
 inherit_gem:
-  standard: config/ruby-3.1.yml
+  standard: config/ruby-3.3.yml
 
 AllCops:
   NewCops: enable

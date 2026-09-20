@@ -34,7 +34,7 @@ task :mutant do
   if Gem.loaded_specs.key?("mutant-rspec")
     sh "bundle exec mutant run"
   else
-    warn "Mutant is not available on Ruby #{RUBY_VERSION}"
+    warn "Mutant is not available on #{RUBY_ENGINE}"
   end
 end
 
