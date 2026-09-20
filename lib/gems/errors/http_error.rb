@@ -50,20 +50,13 @@ module Gems
       value = response["Retry-After"]
       return if value.nil?
 
-      Integer(value, exception: false) || seconds_until(Time.httpdate(value))
+      seconds = Integer(value, exception: false) || (Time.httpdate(value) - Time.now).ceil
+      [seconds, 0].max
     rescue ArgumentError
       nil
     end
 
     private
-
-    # The seconds from now until a time, rounded up and never negative
-    # @api private
-    # @param time [Time] the time
-    # @return [Integer] the seconds
-    def seconds_until(time)
-      [(time - Time.now).ceil, 0].max
-    end
 
     # Get the error message from the response
     # @api private

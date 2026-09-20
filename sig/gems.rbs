@@ -489,7 +489,6 @@ module Gems
 
     private
 
-    def seconds_until: (Time time) -> Integer
     def error_message: (Net::HTTPResponse response) -> String
   end
 

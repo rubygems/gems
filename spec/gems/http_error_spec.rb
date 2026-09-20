@@ -62,6 +62,12 @@ RSpec.describe Gems::HTTPError do
       expect(described_class.new(response:).retry_after).to eq(120)
     end
 
+    it "returns zero for a negative number of seconds" do
+      response["Retry-After"] = "-5"
+
+      expect(described_class.new(response:).retry_after).to eq(0)
+    end
+
     it "returns the seconds until the HTTP date of a Retry-After header, rounded up" do
       response["Retry-After"] = date
       allow(Time).to receive(:now).and_return(Time.httpdate(date) - 1.2)
