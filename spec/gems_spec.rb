@@ -43,14 +43,7 @@ RSpec.describe Gems do
       expect(described_class.client).to equal(described_class.client)
     end
 
-    {
-      host: "http://example.com",
-      key: "OTHER_KEY",
-      username: TEST_USERNAME,
-      password: TEST_PASSWORD,
-      otp: "123456",
-      id_token: "ID_TOKEN"
-    }.each do |option, value|
+    {host: "http://example.com", id_token: "ID_TOKEN"}.each do |option, value|
       it "builds a new client when #{option} changes" do
         client = described_class.client
         described_class.public_send(:"#{option}=", value)
@@ -59,13 +52,63 @@ RSpec.describe Gems do
       end
     end
 
+    it "builds a new client when the API key it falls back to changes" do
+      stub_rubygems_configuration(rubygems_api_key: "FILE_KEY")
+      client = described_class.client
+      stub_rubygems_configuration(rubygems_api_key: "OTHER_FILE_KEY")
+
+      expect(described_class.client).not_to equal(client)
+    end
+
+    it "gives the new client the API key it falls back to" do
+      stub_rubygems_configuration(rubygems_api_key: "FILE_KEY")
+      described_class.client
+      stub_rubygems_configuration(rubygems_api_key: "OTHER_FILE_KEY")
+
+      expect(described_class.client.key).to eq("OTHER_FILE_KEY")
+    end
+
     it "closes the connections of the client it replaces" do
       client = described_class.client
       allow(client).to receive(:close)
-      described_class.key = "OTHER_KEY"
+      described_class.host = "http://example.com"
       described_class.client
 
       expect(client).to have_received(:close)
+    end
+
+    {key: "OTHER_KEY", username: TEST_USERNAME, password: TEST_PASSWORD, otp: "123456"}.each do |option, value|
+      it "keeps the client it has when the #{option} changes" do
+        described_class.key = TEST_KEY
+        client = described_class.client
+        described_class.public_send(:"#{option}=", value)
+
+        expect(described_class.client).to equal(client)
+      end
+
+      it "applies the #{option} to the client it has" do
+        described_class.key = TEST_KEY
+        described_class.client
+        described_class.public_send(:"#{option}=", value)
+
+        expect(described_class.client.public_send(option)).to eq(value)
+      end
+    end
+
+    context "when a passcode is assigned after the client is built" do
+      before do
+        stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+        stub_request(:post, "https://gems.example.com/path")
+        described_class.client
+        described_class.otp = "123456"
+      end
+
+      it "keeps resolving the API key for the host of a request" do
+        described_class.client.post("/path", host: "https://gems.example.com")
+
+        expect(a_request(:post, "https://gems.example.com/path")
+          .with(headers: {"Authorization" => "HOST_KEY", "OTP" => "123456"})).to have_been_made
+      end
     end
 
     {
@@ -99,12 +142,18 @@ RSpec.describe Gems do
       expect(described_class.client.user_agent).to eq("Custom User Agent")
     end
 
+    it "keeps a credential assigned to the client it has" do
+      described_class.client.otp = "123456"
+
+      expect(described_class.client.otp).to eq("123456")
+    end
+
     context "when another client cannot be built from the configuration" do
       let(:client) { described_class.client }
 
       before do
         allow(client).to receive(:close)
-        described_class.key = TEST_KEY
+        described_class.host = "http://example.com"
         allow(Gems::Client).to receive(:new).and_raise(ArgumentError)
       end
 
@@ -141,6 +190,14 @@ RSpec.describe Gems do
       it "keeps the exchanged API key when the rest of the configuration changes" do
         described_class.rubygem("rails")
         described_class.user_agent = "Custom User Agent"
+        described_class.rubygem("rails")
+
+        expect(exchange).to have_been_requested.once
+      end
+
+      it "keeps the exchanged API key when another credential changes" do
+        described_class.rubygem("rails")
+        described_class.otp = "123456"
         described_class.rubygem("rails")
 
         expect(exchange).to have_been_requested.once

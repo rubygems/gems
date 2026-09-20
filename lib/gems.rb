@@ -35,10 +35,14 @@ module Gems
 
   # The client the API methods of the module delegate to
   #
-  # The client is built from the global configuration, and built again when the credentials it was built from change,
-  # so that what it learns is kept between calls: the API key a trusted publishing ID token is exchanged for, which
-  # RubyGems.org issues once per token. A change to the rest of the configuration, such as the user agent or a
-  # timeout, is applied to the client it has rather than building another one, which would throw that key away.
+  # The client is built from the global configuration, and a change to that configuration is applied to the client it
+  # has rather than building another one, which would throw away what the client learned: the API key a trusted
+  # publishing ID token is exchanged for, which RubyGems.org issues once per token. A configured credential is applied
+  # through the setter the client has for it, as the user agent and the timeouts are, so that assigning a passcode or
+  # a password after a token has been exchanged keeps the key it was exchanged for.
+  #
+  # Another client is built only for what a client cannot be given: the host, the ID token, and the fallback resolved
+  # for a key that has not been assigned (see {.client_values}).
   #
   # @api public
   # @return [Client] the client
@@ -46,7 +50,8 @@ module Gems
   #   Gems.client.get("/api/v1/gems/rails.json")
   def self.client
     CLIENT_MUTEX.synchronize do
-      rebuild_client unless credential_values.eql?(@credential_values)
+      rebuild_client unless client_values.eql?(@client_values)
+      apply_credential_values unless credential_values.eql?(@credential_values)
       apply_connection_values unless connection_values.eql?(@connection_values)
       @client
     end
@@ -69,7 +74,7 @@ module Gems
   def self.reset
     CLIENT_MUTEX.synchronize do
       @client&.close
-      @credential_values = nil
+      @client_values = nil
       super
     end
   end
@@ -82,27 +87,64 @@ module Gems
   # afterwards, which is what records the values it was applied from.
   #
   # @api private
-  # @return [Array<Object>] the credentials the client was built from
+  # @return [Array<Object>] the settings the client was built from
   def self.rebuild_client
     client = new
     @client&.close
     @client = client
-    @credential_values = credential_values
+    @client_values = client_values
   end
   private_class_method :rebuild_client
 
-  # The credentials of the global configuration a client is built from
+  # The settings a client cannot be given without building another one
   #
-  # They are compared between calls to notice when the credentials change, which a client cannot be given without
-  # losing what it learned from the ones it has. The host is one of them, since the API key a client falls back to,
-  # and the host a trusted publishing ID token is exchanged with, are resolved for it.
+  # The host is one of them, since a client resolves the API key it falls back to, and exchanges a trusted publishing
+  # ID token, for the host it was built with, and so is the ID token, since the key it is exchanged for is issued
+  # once per token and a client that has one cannot be given another. The fallback resolved for a key that has not
+  # been assigned is the third: a client built without a key of its own resolves one for the host of each request,
+  # which assigning a key to it would stop it doing, so a fallback that has changed is given to another client.
+  #
+  # @api private
+  # @return [Array<Object>] the values
+  def self.client_values
+    [host, id_token, fallback_key]
+  end
+  private_class_method :client_values
+
+  # The API key of the global configuration, unless one has been assigned
+  #
+  # @api private
+  # @return [String, nil] the fallback the library resolves, or nil when a key has been assigned
+  def self.fallback_key
+    key unless key_configured?
+  end
+  private_class_method :fallback_key
+
+  # The credentials applied to the client the module has
   #
   # @api private
   # @return [Array<Object>] the values
   def self.credential_values
-    [host, key, username, password, otp, id_token]
+    [key, username, password, otp]
   end
   private_class_method :credential_values
+
+  # Apply the credentials of the global configuration to the client the module has
+  #
+  # A key is applied only when one has been assigned, since assigning a key to a client is what tells it to send
+  # that key wherever it sends a request rather than resolving one for the host of each request; a fallback that has
+  # changed is given to another client instead (see {.client_values}).
+  #
+  # @api private
+  # @return [Array<Object>] the credentials applied to the client
+  def self.apply_credential_values
+    @client.key = key if key_configured?
+    @client.username = username
+    @client.password = password
+    @client.otp = otp
+    @credential_values = credential_values
+  end
+  private_class_method :apply_credential_values
 
   # The rest of the global configuration
   #

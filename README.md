@@ -358,11 +358,11 @@ threads = 10.times.map { |i| Thread.new { Gems.search('cucumber', page: i + 1) }
 threads.each(&:join)
 ```
 
-Assigning to `Gems.key`, `Gems.host`, or another credential afterwards builds the shared client again, and a request
-another thread is making at that moment carries the credentials it started with. A `Gems::Client` of your own is the
-same: it is safe to make requests with from several threads, and its `key=`, `host=`, and `otp=` writers are meant
-for the thread that owns it rather than for one racing a request. Give each thread a client of its own when they
-need different credentials.
+Assigning to `Gems.key`, `Gems.otp`, or another credential afterwards applies it to the shared client, and assigning
+to `Gems.host` or `Gems.id_token` builds that client again; either way, a request another thread is making at that
+moment carries the credentials it started with. A `Gems::Client` of your own is the same: it is safe to make requests
+with from several threads, and its `key=`, `host=`, and `otp=` writers are meant for the thread that owns it rather
+than for one racing a request. Give each thread a client of its own when they need different credentials.
 
 ## Errors
 
