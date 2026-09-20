@@ -48,6 +48,40 @@ RSpec.describe Gems::HTTPError do
     end
   end
 
+  describe "#retry_after" do
+    let(:response) { build_response(Net::HTTPTooManyRequests, "429", "Too Many Requests", "") }
+    let(:date) { "Wed, 21 Oct 2015 07:28:00 GMT" }
+
+    it "is nil without a Retry-After header" do
+      expect(described_class.new(response:).retry_after).to be_nil
+    end
+
+    it "returns the seconds of a Retry-After header" do
+      response["Retry-After"] = "120"
+
+      expect(described_class.new(response:).retry_after).to eq(120)
+    end
+
+    it "returns the seconds until the HTTP date of a Retry-After header, rounded up" do
+      response["Retry-After"] = date
+      allow(Time).to receive(:now).and_return(Time.httpdate(date) - 1.2)
+
+      expect(described_class.new(response:).retry_after).to eq(2)
+    end
+
+    it "returns zero for an HTTP date that has passed" do
+      response["Retry-After"] = date
+
+      expect(described_class.new(response:).retry_after).to eq(0)
+    end
+
+    it "is nil for a Retry-After header that is neither seconds nor an HTTP date" do
+      response["Retry-After"] = "soon"
+
+      expect(described_class.new(response:).retry_after).to be_nil
+    end
+  end
+
   {
     Gems::ClientError => described_class,
     Gems::ServerError => described_class,

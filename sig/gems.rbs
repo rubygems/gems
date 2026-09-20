@@ -482,9 +482,11 @@ module Gems
     attr_reader code: Integer
 
     def initialize: (response: Net::HTTPResponse) -> void
+    def retry_after: () -> Integer?
 
     private
 
+    def seconds_until: (Time time) -> Integer
     def error_message: (Net::HTTPResponse response) -> String
   end
 

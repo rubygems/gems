@@ -1,4 +1,5 @@
 require "net/http"
+require "time"
 require_relative "error"
 
 module Gems
@@ -35,7 +36,34 @@ module Gems
       @code = Integer(response.code)
     end
 
+    # The seconds to wait before retrying the request
+    #
+    # RubyGems.org sends a Retry-After header with a 429 Too Many Requests response, and may send one with a 503
+    # Service Unavailable response, as a number of seconds or an HTTP date.
+    #
+    # @api public
+    # @return [Integer, nil] the seconds to wait, rounded up and never negative, or nil when the response has no
+    #   Retry-After header or one that is neither a number of seconds nor an HTTP date
+    # @example Wait before retrying
+    #   sleep(error.retry_after || 1)
+    def retry_after
+      value = response["Retry-After"]
+      return if value.nil?
+
+      Integer(value, exception: false) || seconds_until(Time.httpdate(value))
+    rescue ArgumentError
+      nil
+    end
+
     private
+
+    # The seconds from now until a time, rounded up and never negative
+    # @api private
+    # @param time [Time] the time
+    # @return [Integer] the seconds
+    def seconds_until(time)
+      [(time - Time.now).ceil, 0].max
+    end
 
     # Get the error message from the response
     # @api private
