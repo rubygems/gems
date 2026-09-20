@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
 * Match resources against `case`/`in` patterns by their readers, such as `in {name:, version:}`, with `Resource#deconstruct_keys` and `Resource.attribute_names`
-* Add `key_configured?`, and a host argument to `default_key`, for the API key stored for a host other than the configured one
+* Add `key_configured?` and `otp_configured?`, which tell a configured credential from the fallback the library resolves, and a host argument to `default_key`, for the API key stored for a host other than the configured one
 * Add `default_host`, the host `gem push` would use, which reads the `RUBYGEMS_HOST` environment variable when it is called rather than when the library is required
 * Add `default_otp` and `otp_configured?`, and fall back to the one-time passcode `gem push` would use, the `GEM_HOST_OTP_CODE` environment variable, until a passcode is assigned, so that a continuous integration job that already exports it for `gem push` authenticates without code of its own; an empty `GEM_HOST_OTP_CODE` counts as no passcode, as an empty `GEM_HOST_API_KEY` counts as no key, and assigning nil disables the fallback
 * Reuse the connection a request left open for the next request to the same host, so that a series of requests does not open a connection each; a `keep_alive_timeout` option sets the seconds an idle connection is kept open, which zero turns off, and `Client#close` closes the connections a client keeps open, which are opened again as they are needed

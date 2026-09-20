@@ -294,9 +294,12 @@ module Gems
 
     # Whether an API key has been assigned, rather than falling back to {#default_key}
     #
-    # @api private
+    # A client built without a key of its own asks this to tell a configured key, which it sends wherever it sends
+    # a request, from the fallback it resolves for the host of each request.
+    #
+    # @api public
     # @return [Boolean] whether an API key has been assigned
-    # @example
+    # @example Tell a configured key from the one resolved for the host
     #   Gems.key_configured?
     def key_configured?
       instance_variable_defined?(:@key)
@@ -306,9 +309,9 @@ module Gems
     #
     # When none has been, {#otp} falls back to {#default_otp}.
     #
-    # @api private
+    # @api public
     # @return [Boolean] whether a one-time passcode has been assigned
-    # @example
+    # @example Tell a configured passcode from the one the environment carries
     #   Gems.otp_configured?
     def otp_configured?
       instance_variable_defined?(:@otp)
