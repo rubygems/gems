@@ -294,12 +294,18 @@ Gems.max_retries = 3
 Gems.rubygem 'rails'
 ```
 
+A 502 Bad Gateway and a 504 Gateway Timeout are retried too, as is a `Gems::NetworkError`: a connection that was
+refused, reset, or timed out never reached the endpoint, so sending the request again is as safe as it is after a
+429. When the retries run out, the response raises the `Gems::HTTPError` of its status and a network failure is
+raised as it was.
+
 Retrying is off by default, so a rate-limited request raises rather than pausing the thread unless you asked for it.
 Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
 idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
-`Retry-After` asks for, and doubles from one second when the response does not carry the header. A response asking to
-wait longer than `max_retry_delay` raises instead, so that a server cannot pause your program for as long as it likes.
-`HTTPError#retry_after` reads the header yourself when you would rather handle it in your own code.
+`Retry-After` asks for, and doubles from one second when the response does not carry the header, which is the wait
+after a network failure too, since a request that never arrived has no response to read a wait from. A response
+asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your program for as long
+as it likes. `HTTPError#retry_after` reads the header yourself when you would rather handle it in your own code.
 
 ## Errors
 

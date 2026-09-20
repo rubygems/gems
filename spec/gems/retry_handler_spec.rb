@@ -15,12 +15,27 @@ RSpec.describe Gems::RetryHandler do
     build_response(Net::HTTPServiceUnavailable, "503", "Service Unavailable", "down")
   end
 
-  # Send the given responses in turn, recording the seconds waited between them
+  def bad_gateway
+    build_response(Net::HTTPBadGateway, "502", "Bad Gateway", "bad gateway")
+  end
+
+  def gateway_timeout
+    build_response(Net::HTTPGatewayTimeout, "504", "Gateway Timeout", "gateway timeout")
+  end
+
+  def network_error
+    Gems::NetworkError.new("Network error: connection reset")
+  end
+
+  # Send the given responses in turn, raising the ones that are errors, and recording the seconds waited between them
   def handle(handler, responses, request: self.request)
     waited = []
     allow(handler).to receive(:sleep) { |seconds| waited << seconds }
     remaining = responses.dup
-    response = handler.handle(request:) { remaining.shift }
+    response = handler.handle(request:) do
+      answer = remaining.shift
+      answer.is_a?(Exception) ? raise(answer) : answer
+    end
     [response, waited]
   end
 
@@ -71,6 +86,25 @@ RSpec.describe Gems::RetryHandler do
       expect(response).to equal(success)
     end
 
+    it "sends the request again after a 502" do
+      response, = handle(handler, [bad_gateway, success])
+
+      expect(response).to equal(success)
+    end
+
+    it "sends the request again after a 504" do
+      response, = handle(handler, [gateway_timeout, success])
+
+      expect(response).to equal(success)
+    end
+
+    it "does not send the request again after a 500" do
+      internal = build_response(Net::HTTPInternalServerError, "500", "Internal Server Error", "boom")
+      response, waited = handle(handler, [internal, success])
+
+      expect([response, waited]).to eq([internal, []])
+    end
+
     it "waits the seconds the Retry-After header asks for" do
       _, waited = handle(handler, [rate_limited(retry_after: "5"), success])
 
@@ -118,6 +152,48 @@ RSpec.describe Gems::RetryHandler do
       _, waited = handle(handler, [rate_limited(retry_after: "60"), success])
 
       expect(waited).to eq([60])
+    end
+
+    context "when the request is lost to the network" do
+      it "sends the request again" do
+        response, = handle(handler, [network_error, success])
+
+        expect(response).to equal(success)
+      end
+
+      it "doubles the wait between attempts" do
+        _, waited = handle(handler, [network_error, network_error, success])
+
+        expect(waited).to eq([1, 2])
+      end
+
+      it "raises the error after the maximum number of retries" do
+        last = network_error
+
+        expect { handle(handler, [network_error, network_error, last]) }.to raise_error(last)
+      end
+
+      it "raises the error when the maximum is zero" do
+        expect { handle(described_class.new, [network_error, success]) }
+          .to raise_error(Gems::NetworkError, "Network error: connection reset")
+      end
+
+      it "raises the error for a request that is not idempotent" do
+        expect { handle(handler, [network_error, success], request: post_request) }.to raise_error(Gems::NetworkError)
+      end
+
+      it "raises the error rather than waiting longer than the maximum retry delay" do
+        handler = described_class.new(max_retries: 2, max_retry_delay: 0)
+
+        expect { handle(handler, [network_error, success]) }.to raise_error(Gems::NetworkError)
+      end
+
+      it "waits a delay equal to the maximum retry delay" do
+        handler = described_class.new(max_retries: 2, max_retry_delay: 1)
+        _, waited = handle(handler, [network_error, success])
+
+        expect(waited).to eq([1])
+      end
     end
   end
 end
