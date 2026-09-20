@@ -22,13 +22,13 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/rubygems/gems"
   }
 
-  spec.files = Dir[
+  spec.files = Dir.glob([
     ".yardopts",
     "lib/**/*.rb",
     "sig/*.rbs",
     "sig/manifest.yaml",
     "*.md",
     "LICENSE.md"
-  ]
+  ], base: __dir__)
   spec.require_paths = ["lib"]
 end
