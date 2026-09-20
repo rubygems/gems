@@ -72,6 +72,10 @@ Gems.host = "rubygems.org"      # ArgumentError: Invalid host: rubygems.org
 An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, so a continuous integration job whose
 secret is not set sends an unauthenticated request instead of an empty `Authorization` header.
 
+The one-time passcode is resolved the way the API key is: until one is assigned, it is the `GEM_HOST_OTP_CODE`
+environment variable `gem push` falls back to, and an empty one counts as no passcode. Assigning nil to `otp`, as to
+`key`, disables that fallback.
+
 The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`,
 `max_redirects`, `max_retries`, and `max_retry_delay` are new, and every option can be set globally or per client.
 

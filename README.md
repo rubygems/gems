@@ -178,6 +178,7 @@ Gems.configure do |config|
 end
 
 # If your account requires multi-factor authentication, provide a one-time passcode.
+# By default, we load it as `gem push` does: from GEM_HOST_OTP_CODE.
 Gems.configure do |config|
   config.otp = '123456'
 end
@@ -246,7 +247,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or the key stored for the host in `~/.gem/credentials` |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
-| `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
+| `otp`         | The one-time passcode sent in the `OTP` header           | `GEM_HOST_OTP_CODE`                    |
 | `id_token`    | The OIDC ID token exchanged for an API key               | `nil`                                  |
 | `user_agent`  | The `User-Agent` header                                  | `gems/<version> (<ruby> <version>; <platform>)` |
 | `open_timeout` | The timeout for opening connections, in seconds         | `60`                                   |

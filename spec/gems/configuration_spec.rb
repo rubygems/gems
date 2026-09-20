@@ -150,6 +150,80 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  describe "#otp_configured?" do
+    it "is false until a passcode is assigned" do
+      expect(Gems.otp_configured?).to be(false)
+    end
+
+    it "is true once a passcode is assigned" do
+      Gems.otp = "123456"
+
+      expect(Gems.otp_configured?).to be(true)
+    end
+
+    it "is true once a passcode is assigned nil" do
+      Gems.otp = nil
+
+      expect(Gems.otp_configured?).to be(true)
+    end
+
+    it "is false again after a reset" do
+      Gems.otp = "123456"
+      Gems.reset
+
+      expect(Gems.otp_configured?).to be(false)
+    end
+  end
+
+  describe "#default_otp" do
+    it "reads the GEM_HOST_OTP_CODE environment variable, as gem push does" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => "123456"))
+
+      expect(Gems.default_otp).to eq("123456")
+    end
+
+    it "ignores an empty GEM_HOST_OTP_CODE" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => ""))
+
+      expect(Gems.default_otp).to be_nil
+    end
+
+    it "returns nil without a GEM_HOST_OTP_CODE" do
+      stub_const("ENV", ENV.to_h.except("GEM_HOST_OTP_CODE"))
+
+      expect(Gems.default_otp).to be_nil
+    end
+  end
+
+  describe "#otp" do
+    it "returns the configured passcode" do
+      Gems.otp = "123456"
+
+      expect(Gems.otp).to eq("123456")
+    end
+
+    it "falls back to the default passcode" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => "123456"))
+
+      expect(Gems.otp).to eq("123456")
+    end
+
+    it "stays without a passcode after being set to nil" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => "123456"))
+      Gems.otp = nil
+
+      expect(Gems.otp).to be_nil
+    end
+
+    it "sends the default passcode with a request" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => "123456"))
+      stub_get("/api/v1/gems/rails.json").to_return(body: fixture("rails.json"))
+      Gems.rubygem("rails")
+
+      expect(a_get("/api/v1/gems/rails.json").with(headers: {"OTP" => "123456"})).to have_been_made
+    end
+  end
+
   describe "#host=" do
     it "assigns an HTTP URL" do
       Gems.host = "http://gems.example.com"
@@ -298,6 +372,14 @@ RSpec.describe Gems::Configuration do
 
         expect(Gems.public_send(option)).to eq(default)
       end
+    end
+
+    it "restores the default passcode" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_OTP_CODE" => "123456"))
+      Gems.otp = nil
+      Gems.reset
+
+      expect(Gems.otp).to eq("123456")
     end
 
     it "restores the default key" do

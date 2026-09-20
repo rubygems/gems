@@ -71,6 +71,7 @@ module Gems
     include URLValidation
 
     @key: String?
+    @otp: String?
 
     DEFAULT_HOST: String
     DEFAULT_USER_AGENT: String
@@ -79,7 +80,7 @@ module Gems
     def host=: (String host) -> void
     attr_accessor id_token: String?
     def key=: (api_key_identifier? key) -> void
-    attr_accessor otp: String?
+    attr_writer otp: String?
     attr_accessor password: String?
     attr_accessor user_agent: String
     attr_accessor username: String?
@@ -96,9 +97,12 @@ module Gems
 
     def self.extended: (Configuration base) -> void
     def key: () -> String?
+    def otp: () -> String?
     def default_host: () -> String
     def default_key: (?String host) -> String?
+    def default_otp: () -> String?
     def key_configured?: () -> bool
+    def otp_configured?: () -> bool
     def configure: () { (self) -> void } -> self
     def reset: () -> self
 

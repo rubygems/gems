@@ -63,12 +63,14 @@ module Gems
       @key = key_of(key)
     end
 
-    # The one-time passcode used for multi-factor authentication
+    # Set the one-time passcode used for multi-factor authentication
+    #
     # @api public
-    # @return [String, nil] the one-time passcode
-    # @example Get or set the one-time passcode
+    # @param otp [String, nil] the one-time passcode, or nil to send requests without one
+    # @return [void]
+    # @example Set the one-time passcode
     #   Gems.otp = "123456"
-    attr_accessor :otp
+    attr_writer :otp
 
     # The password used for HTTP basic authentication
     # @api public
@@ -210,6 +212,23 @@ module Gems
       end
     end
 
+    # The one-time passcode used for multi-factor authentication
+    #
+    # Falls back to {#default_otp} until a passcode is assigned. Assigning nil disables that fallback, so that
+    # requests are sent without a passcode.
+    #
+    # @api public
+    # @return [String, nil] the one-time passcode
+    # @example Get the one-time passcode
+    #   Gems.otp
+    def otp
+      if otp_configured?
+        @otp
+      else
+        default_otp
+      end
+    end
+
     # The host `gem push` would use
     #
     # This is the `RUBYGEMS_HOST` environment variable, else RubyGems.org. The environment is read when this method
@@ -253,6 +272,26 @@ module Gems
       nil
     end
 
+    # The one-time passcode `gem push` would use
+    #
+    # This is the `GEM_HOST_OTP_CODE` environment variable, which `gem push` falls back to when it is not given a
+    # passcode of its own. The environment is read when this method is called, as it is for {#default_key}, rather
+    # than when the library is required.
+    #
+    # An empty `GEM_HOST_OTP_CODE` counts as no passcode rather than as an empty one, as an empty
+    # `GEM_HOST_API_KEY` counts as no key, since a continuous integration service sets a variable to the empty
+    # string when the secret it was given is not set, and an empty `OTP` header is refused where a request without
+    # one is answered with the error the endpoint has for a request that needs a passcode.
+    #
+    # @api public
+    # @return [String, nil] the one-time passcode, or nil when the environment does not carry one
+    # @example Get the default one-time passcode
+    #   Gems.default_otp
+    def default_otp
+      code = ENV.fetch("GEM_HOST_OTP_CODE", "")
+      code unless code.empty?
+    end
+
     # Whether an API key has been assigned, rather than falling back to {#default_key}
     #
     # @api private
@@ -261,6 +300,18 @@ module Gems
     #   Gems.key_configured?
     def key_configured?
       instance_variable_defined?(:@key)
+    end
+
+    # Whether a one-time passcode has been assigned
+    #
+    # When none has been, {#otp} falls back to {#default_otp}.
+    #
+    # @api private
+    # @return [Boolean] whether a one-time passcode has been assigned
+    # @example
+    #   Gems.otp_configured?
+    def otp_configured?
+      instance_variable_defined?(:@otp)
     end
 
     # Convenience method to allow configuration options to be set in a block
@@ -303,7 +354,7 @@ module Gems
     def reset_credentials
       self.id_token = nil
       remove_instance_variable(:@key) if key_configured?
-      self.otp = nil
+      remove_instance_variable(:@otp) if otp_configured?
       self.password = nil
       self.username = nil
     end
