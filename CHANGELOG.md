@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `OTPAuthenticator` and an `otp` option for multi-factor authentication
 * Add `TrustedPublisherAuthenticator`, an `id_token` option, and `exchange_trusted_publisher_token` for trusted publishing
 * Add `create_api_key` and `update_api_key` for the current API key endpoints
+* Add `trusted_publishers`, `trusted_publisher`, `add_trusted_publisher`, and `remove_trusted_publisher` for the trusted publishers of a gem, which are the workflows allowed to push it without an API key; they need a key with the `configure_trusted_publishers` scope, and a GitHub Actions workflow is trusted by the repository it runs in, its filename, and optionally the environment it runs in and the repository a reusable workflow lives in
+* Add `Gems::TrustedPublisher`, which wraps a trusted publisher and reads the fields of the publisher nested in it, such as `repository_owner` and `workflow_filename`, and `Gems::TrustedPublisher::GITHUB_ACTION`, the type `add_trusted_publisher` sends unless it is given another
 * Add `autocomplete` for gem name suggestions
 * Add a `platform` option to `version` and to `downloads`
 * Add `contents` for the file checksums of a version

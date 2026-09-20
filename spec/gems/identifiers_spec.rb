@@ -168,4 +168,18 @@ RSpec.describe Gems::Identifiers do
       expect(client.send(:key_of, nil)).to be_nil
     end
   end
+
+  describe "#id_of" do
+    it "returns an ID unchanged" do
+      expect(client.send(:id_of, 1)).to eq(1)
+    end
+
+    it "returns the ID of a trusted publisher" do
+      expect(client.send(:id_of, Gems::TrustedPublisher.new("id" => 1))).to eq(1)
+    end
+
+    it "returns nil for nil" do
+      expect(client.send(:id_of, nil)).to be_nil
+    end
+  end
 end

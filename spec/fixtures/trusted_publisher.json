@@ -1,0 +1,14 @@
+{
+  "id": 1,
+  "trusted_publisher_type": "OIDC::TrustedPublisher::GitHubAction",
+  "trusted_publisher": {
+    "name": "GitHub Actions rubygems/gems @ .github/workflows/push_gem.yml",
+    "repository_owner": "rubygems",
+    "repository_name": "gems",
+    "repository_owner_id": "3430433",
+    "workflow_filename": "push_gem.yml",
+    "environment": null,
+    "workflow_repository_owner": null,
+    "workflow_repository_name": null
+  }
+}

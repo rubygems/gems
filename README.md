@@ -169,6 +169,26 @@ Gems::APIKey::SCOPES
 # Exchange an OIDC ID token for an API key via trusted publishing.
 Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 
+# Trust a GitHub Actions workflow to publish a gem, so that it can push without an API key.
+Gems.add_trusted_publisher('gems', repository_owner: 'rubygems', repository_name: 'gems',
+  workflow_filename: 'push_gem.yml')
+
+# Restrict a trusted publisher to one GitHub Actions environment.
+Gems.add_trusted_publisher('gems', repository_owner: 'rubygems', repository_name: 'gems',
+  workflow_filename: 'push_gem.yml', environment: 'release')
+
+# Trust a reusable workflow that lives in another repository.
+Gems.add_trusted_publisher('gems', repository_owner: 'rubygems', repository_name: 'gems',
+  workflow_filename: 'release.yml', workflow_repository_owner: 'rubygems',
+  workflow_repository_name: 'workflows')
+
+# List the trusted publishers of a gem, and read one of them.
+Gems.trusted_publishers('gems').map(&:name)
+Gems.trusted_publisher('gems', 1).workflow_filename
+
+# Stop trusting a publisher.
+Gems.remove_trusted_publisher 'gems', Gems.trusted_publishers('gems').first
+
 # The following methods require authentication.
 # By default, we load your API key as `gem push` does: from GEM_HOST_API_KEY, or from
 # ~/.gem/credentials, where `gem signin` stores it (`gem signin --host` for another host).
@@ -204,10 +224,11 @@ client.rubygem 'rails'
 ## Response objects
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
-`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::APIKey`.
+`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, `Gems::APIKey`, and
+`Gems::TrustedPublisher`.
 Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
-accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and
-`Gems.key = api_key` all work.
+accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`,
+`Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Objects are immutable, with

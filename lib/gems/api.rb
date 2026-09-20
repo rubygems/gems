@@ -6,6 +6,7 @@ require_relative "api/download_endpoints"
 require_relative "api/gem_endpoints"
 require_relative "api/owner_endpoints"
 require_relative "api/profile_endpoints"
+require_relative "api/trusted_publisher_endpoints"
 require_relative "api/version_endpoints"
 require_relative "api/web_hook_endpoints"
 
@@ -23,6 +24,7 @@ module Gems
     include GemEndpoints
     include OwnerEndpoints
     include ProfileEndpoints
+    include TrustedPublisherEndpoints
     include VersionEndpoints
     include WebHookEndpoints
   end

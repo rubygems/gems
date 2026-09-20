@@ -4,6 +4,7 @@ require_relative "api_key"
 require_relative "gem"
 require_relative "owner"
 require_relative "profile"
+require_relative "trusted_publisher"
 require_relative "version"
 require_relative "web_hook"
 
@@ -113,6 +114,17 @@ module Gems
       case time
       when Time then time.iso8601
       else time
+      end
+    end
+
+    # Resolve the ID of a trusted publisher from an ID or a trusted publisher
+    # @api private
+    # @param trusted_publisher [Integer, String, TrustedPublisher] an ID, or a trusted publisher
+    # @return [Integer, String, nil] the ID
+    def id_of(trusted_publisher)
+      case trusted_publisher
+      when TrustedPublisher then trusted_publisher.id
+      else trusted_publisher
       end
     end
 
