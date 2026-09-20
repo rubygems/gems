@@ -19,7 +19,7 @@ module Gems
       # @example
       #   Gems.total_downloads
       def total_downloads
-        parse_json(get("/api/v1/downloads.json")).fetch("total")
+        parse_json(get("/api/v1/downloads.json")) { |json| json.fetch("total") }
       end
 
       # Returns the number of downloads of a gem and of one of its versions
@@ -51,8 +51,10 @@ module Gems
       # @example
       #   Gems.most_downloaded.first.full_name
       def most_downloaded
-        parse_json(get("/api/v1/downloads/all.json")).fetch("gems").map do |version, downloads|
-          Version.new(version.merge("name" => gem_name_from(version), "downloads_count" => downloads))
+        parse_json(get("/api/v1/downloads/all.json")) do |json|
+          json.fetch("gems").map do |version, downloads|
+            Version.new(version.merge("name" => gem_name_from(version), "downloads_count" => downloads))
+          end
         end
       end
 

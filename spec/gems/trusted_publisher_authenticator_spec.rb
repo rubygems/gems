@@ -118,6 +118,12 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
   describe "#header" do
     before { stub_exchange }
 
+    it "raises InvalidResponse when the exchange answers without a key" do
+      stub_request(:post, exchange_url).to_return(body: '{"name":"ci-push"}')
+
+      expect { authenticator.header(nil) }.to raise_error(Gems::InvalidResponse)
+    end
+
     it "returns an Authorization header with the exchanged API key" do
       expect(authenticator.header(request)).to eq("Authorization" => "rubygems_701243f217cdf23b1370c7b66b65ca97")
     end

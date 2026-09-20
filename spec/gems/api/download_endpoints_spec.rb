@@ -13,6 +13,12 @@ RSpec.describe Gems::API::DownloadEndpoints do
     it "returns the total downloads of all gems" do
       expect(client.total_downloads).to eq(244_368_950)
     end
+
+    it "raises InvalidResponse when the response has no total" do
+      stub_get("/api/v1/downloads.json").to_return(body: "{}")
+
+      expect { client.total_downloads }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "{}")))
+    end
   end
 
   describe "#downloads" do
@@ -87,6 +93,18 @@ RSpec.describe Gems::API::DownloadEndpoints do
 
     it "derives each version's gem name from its full name" do
       expect(client.most_downloaded.first.name).to eq("jmespath")
+    end
+
+    it "raises InvalidResponse when the response has no gems" do
+      stub_get("/api/v1/downloads/all.json").to_return(body: "{}")
+
+      expect { client.most_downloaded }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "{}")))
+    end
+
+    it "raises InvalidResponse when a version has no full name" do
+      stub_get("/api/v1/downloads/all.json").to_return(body: '{"gems":[[{"number":"1.0.0"},1]]}')
+
+      expect { client.most_downloaded }.to raise_error(Gems::InvalidResponse)
     end
 
     it "returns each version's checksum in hex" do

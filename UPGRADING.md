@@ -146,7 +146,9 @@ Failures that 2.x let through as other exceptions are `Gems::Error` subclasses n
 * Connection failures, DNS errors, timeouts, and SSL errors raise `Gems::NetworkError` rather than the underlying
   `Errno`, `Net`, `Socket`, `OpenSSL`, and `Timeout` errors.
 * A successful response whose body is not JSON raises `Gems::InvalidResponse` rather than `JSON::ParserError`, and
-  `rubygem` and `version` raise it rather than return `{}`.
+  `rubygem` and `version` raise it rather than return `{}`. A response whose JSON lacks a field the library reads,
+  such as the `version` of `latest_version` or the key of an API key, raises it rather than `KeyError`, and a
+  timestamp that cannot be parsed raises it rather than `ArgumentError`.
 * Asking for the latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`,
   or `downloads`, raises `Gems::NoLatestVersion` rather than sending `"unknown"` as the version.
 * A redirect loop raises `Gems::TooManyRedirects` after `max_redirects` hops rather than recursing forever.

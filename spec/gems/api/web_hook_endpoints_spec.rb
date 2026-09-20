@@ -34,6 +34,12 @@ RSpec.describe Gems::API::WebHookEndpoints do
     it "keeps the other attributes" do
       expect(client.web_hooks.last.failure_count).to eq(1)
     end
+
+    it "raises InvalidResponse when the hooks of a gem are not a list" do
+      stub_get("/api/v1/web_hooks.json").to_return(body: '{"rails":1}')
+
+      expect { client.web_hooks }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '{"rails":1}')))
+    end
   end
 
   describe "#add_web_hook" do

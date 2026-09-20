@@ -1,3 +1,5 @@
+require "json"
+require_relative "errors/invalid_response"
 require_relative "resource"
 
 module Gems
@@ -34,11 +36,13 @@ module Gems
     #
     # @api public
     # @return [String] the API key
-    # @raise [KeyError] if the response has no key
+    # @raise [InvalidResponse] if the response has no key
     # @example Get the key
     #   api_key.key
     def key
-      attributes.fetch("rubygems_api_key")
+      attributes.fetch("rubygems_api_key") do
+        raise InvalidResponse.new(body: JSON.generate(attributes), message: "The API key response has no rubygems_api_key")
+      end
     end
   end
 end

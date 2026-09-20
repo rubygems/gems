@@ -15,8 +15,13 @@ RSpec.describe Gems::ApiKey do
     expect(api_key.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
   end
 
-  it "raises KeyError without a key" do
-    expect { described_class.new({}).key }.to raise_error(KeyError)
+  it "raises InvalidResponse without a key" do
+    expect { described_class.new({}).key }
+      .to raise_error(Gems::InvalidResponse, "The API key response has no rubygems_api_key")
+  end
+
+  it "attaches the attributes as JSON to the error" do
+    expect { described_class.new("name" => "ci-push").key }.to raise_error(having_attributes(body: '{"name":"ci-push"}'))
   end
 
   it "exposes the name" do

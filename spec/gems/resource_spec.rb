@@ -138,6 +138,26 @@ RSpec.describe Gems::Resource do
     it "returns the name of the reader" do
       expect(resource_class.time_attribute(:pushed_at)).to eq(:pushed_at)
     end
+
+    it "raises InvalidResponse for a string that is not a timestamp" do
+      expect { resource_class.new("created_at" => "soon").created_at }
+        .to raise_error(Gems::InvalidResponse, '"soon" is not a timestamp')
+    end
+
+    it "raises InvalidResponse for a value that is not a string" do
+      expect { resource_class.new("created_at" => 1_688_000_000).created_at }
+        .to raise_error(Gems::InvalidResponse, "1688000000 is not a timestamp")
+    end
+
+    it "attaches the value to the error" do
+      expect { resource_class.new("created_at" => 1_688_000_000).created_at }
+        .to raise_error(having_attributes(body: "1688000000"))
+    end
+
+    it "keeps the parser error as the cause" do
+      expect { resource_class.new("created_at" => "soon").created_at }
+        .to raise_error(having_attributes(cause: an_instance_of(ArgumentError)))
+    end
   end
 
   describe "#initialize" do

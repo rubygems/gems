@@ -194,6 +194,7 @@ module Gems
     private
 
     def value_of: (Array[String] keys) -> untyped
+    def parse_time: (untyped value) -> Time
     def deep_freeze: (untyped value) -> untyped
   end
 
@@ -532,13 +533,16 @@ module Gems
   class InvalidResponse < Error
     attr_reader body: String
 
-    def initialize: (body: String) -> void
+    def initialize: (body: String, ?message: String) -> void
   end
 
   module JSONParsing
+    SHAPE_ERRORS: Array[singleton(KeyError) | singleton(NoMethodError) | singleton(TypeError)]
+
     private
 
     def parse_json: (String body) -> untyped
+                  | [T] (String body) { (untyped json) -> T } -> T
   end
 
   class Connection

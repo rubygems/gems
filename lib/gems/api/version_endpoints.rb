@@ -36,7 +36,7 @@ module Gems
       #   Gems.latest_version "coulda"
       def latest_version(gem_name)
         response = get("/api/v1/versions/#{name_of(gem_name)}/latest.json")
-        version = parse_json(response).fetch("version")
+        version = parse_json(response) { |json| json.fetch("version") }
         # The endpoint answers 200 with "unknown" rather than 404 for a gem with no published version
         raise NoLatestVersion, "#{name_of(gem_name)} has no latest version" if version.eql?("unknown")
 

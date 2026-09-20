@@ -63,10 +63,10 @@ RSpec.describe Gems::API::VersionEndpoints do
         .to raise_error(Gems::NoLatestVersion, "script_helpers has no latest version")
     end
 
-    it "raises KeyError when the response has no version" do
+    it "raises InvalidResponse when the response has no version" do
       stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: "{}")
 
-      expect { client.latest_version("script_helpers") }.to raise_error(KeyError)
+      expect { client.latest_version("script_helpers") }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "{}")))
     end
   end
 

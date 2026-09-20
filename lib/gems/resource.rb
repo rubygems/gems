@@ -1,4 +1,5 @@
 require "time"
+require_relative "errors/invalid_response"
 
 module Gems
   # Base class for objects that wrap RubyGems API responses
@@ -57,6 +58,8 @@ module Gems
 
     # Define a reader that parses a timestamp attribute
     #
+    # The reader raises {InvalidResponse} when the attribute is not a timestamp.
+    #
     # @api private
     # @param name [Symbol] the name of the reader
     # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
@@ -66,7 +69,7 @@ module Gems
       define_method(name) do
         # @type self: Resource
         value = value_of(keys)
-        value && Time.parse(value)
+        value && parse_time(value)
       end
       record_attribute(name)
     end
@@ -203,11 +206,7 @@ module Gems
     #   gem.identity # => ["rails"]
     def identity
       readers = self.class.identity_readers
-      if readers.empty?
-        attributes
-      else
-        readers.map { |reader| public_send(reader) }
-      end
+      readers.empty? ? attributes : readers.map { |reader| public_send(reader) }
     end
 
     # Compare with another resource
@@ -266,6 +265,17 @@ module Gems
     def value_of(keys)
       keys.each { |key| return self[key] if attributes.key?(key) }
       nil
+    end
+
+    # Parse a timestamp attribute
+    # @api private
+    # @param value [Object] the attribute value
+    # @return [Time] the parsed time
+    # @raise [InvalidResponse] if the value is not a timestamp
+    def parse_time(value)
+      Time.parse(value)
+    rescue ArgumentError, TypeError
+      raise InvalidResponse.new(body: value.to_s, message: "#{value.inspect} is not a timestamp")
     end
 
     # Copy a value, freezing the copy and everything nested inside it
