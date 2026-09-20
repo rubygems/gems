@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::JSONParsing do
   subject(:parser) { Class.new { include Gems::JSONParsing }.new }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gems
   # Wraps the IO that receives HTTP debug output, redacting the credentials it would otherwise write in the clear
   #
@@ -9,7 +11,7 @@ module Gems
   # @api private
   class RedactedOutput
     # The value written in place of a credential
-    REDACTION = "[REDACTED]".freeze
+    REDACTION = "[REDACTED]"
     # The patterns of the credentials the library sends and receives, each capturing what introduces the value it
     # redacts
     #

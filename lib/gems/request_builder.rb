@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "net/http"
 require "uri"
 require_relative "authenticator"
@@ -13,11 +15,11 @@ module Gems
     # RubyGems.org operators can tell which client and which Ruby a request came from.
     DEFAULT_USER_AGENT = "gems/#{VERSION} (#{RUBY_ENGINE} #{RUBY_ENGINE_VERSION}; #{RUBY_PLATFORM})".freeze
     # Content type for form-encoded request bodies
-    FORM_URLENCODED = "application/x-www-form-urlencoded".freeze
+    FORM_URLENCODED = "application/x-www-form-urlencoded"
     # Content type for multipart request bodies
-    MULTIPART_FORM_DATA = "multipart/form-data".freeze
+    MULTIPART_FORM_DATA = "multipart/form-data"
     # Content type for binary request bodies
-    OCTET_STREAM = "application/octet-stream".freeze
+    OCTET_STREAM = "application/octet-stream"
     # Mapping of HTTP method symbols to Net::HTTP classes
     HTTP_METHODS = {
       get: Net::HTTP::Get,

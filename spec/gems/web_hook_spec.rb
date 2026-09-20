@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::WebHook do
   subject(:web_hook) { described_class.new("gem_name" => "rails", "url" => "http://example.com", "failure_count" => 2) }
 

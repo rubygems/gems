@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Pagination do
   let(:paginated) do
     Class.new do

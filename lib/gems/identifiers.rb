@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "api_key"
 require_relative "gem"
 require_relative "owner"

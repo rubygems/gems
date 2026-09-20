@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Dependency do
   subject(:dependency) { described_class.new("name" => "thor", "requirements" => ">= 0.14.6") }
 

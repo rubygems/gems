@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module Gems
   # Base class for authentication (no authentication)
   # @api public
   class Authenticator
     # The HTTP header name for authentication
-    AUTHENTICATION_HEADER = "Authorization".freeze
+    AUTHENTICATION_HEADER = "Authorization"
     private_constant :AUTHENTICATION_HEADER
 
     # Generate the authentication headers for a request

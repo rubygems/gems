@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Profile do
   subject(:profile) { described_class.new("id" => 1, "handle" => "qrush", "email" => "nick@quaran.to", "mfa" => "ui_and_api") }
 

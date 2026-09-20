@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "api_key_authenticator"
 require_relative "authenticator"
 require_relative "basic_authenticator"

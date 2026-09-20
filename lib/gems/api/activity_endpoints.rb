@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../identifiers"
 require_relative "../json_parsing"
 require_relative "../pagination"

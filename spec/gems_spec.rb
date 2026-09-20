@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems do
   it "extends Gems::Configuration" do
     expect(described_class).to be_a(Gems::Configuration)

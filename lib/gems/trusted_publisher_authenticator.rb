@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "uri"
 require_relative "api_key"
@@ -19,9 +21,9 @@ module Gems
     include JSONParsing
 
     # The path of the token exchange endpoint
-    EXCHANGE_TOKEN_PATH = "/api/v1/oidc/trusted_publisher/exchange_token".freeze
+    EXCHANGE_TOKEN_PATH = "/api/v1/oidc/trusted_publisher/exchange_token"
     # The content type of the token exchange request and response
-    JSON_CONTENT_TYPE = "application/json".freeze
+    JSON_CONTENT_TYPE = "application/json"
     private_constant :EXCHANGE_TOKEN_PATH, :JSON_CONTENT_TYPE
 
     # The OIDC ID token

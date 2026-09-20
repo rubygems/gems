@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Resource do
   let(:resource_class) do
     Class.new(described_class) do

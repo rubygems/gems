@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Owner do
   subject(:owner) { described_class.new("id" => 1, "handle" => "sferik", "email" => "sferik@gmail.com", "role" => "owner") }
 

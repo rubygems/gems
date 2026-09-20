@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Client do
   subject(:client) { described_class.new(key: nil, username: nil, password: nil) }
 

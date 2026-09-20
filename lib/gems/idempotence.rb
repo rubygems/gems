@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gems
   # Tells whether a request can be sent again, mixed into the connection pool and the retry handler
   #

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::RetryHandler do
   subject(:handler) { described_class.new(max_retries: 2) }
 

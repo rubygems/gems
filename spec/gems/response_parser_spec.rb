@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::ResponseParser do
   subject(:parser) { described_class.new }
 

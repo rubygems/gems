@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gems
   # Walks the pages of the endpoints that answer one page at a time, mixed into the API endpoints
   #

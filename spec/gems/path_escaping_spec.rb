@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::PathEscaping do
   subject(:escaper) { Class.new { include Gems::PathEscaping }.new }
 

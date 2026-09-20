@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rubygems"
 require_relative "connection"
 require_relative "identifiers"
@@ -14,7 +16,7 @@ module Gems
     include URLValidation
 
     # The API endpoint used when the RUBYGEMS_HOST environment variable is not set
-    DEFAULT_HOST = "https://rubygems.org".freeze
+    DEFAULT_HOST = "https://rubygems.org"
 
     # The default 'User-Agent' HTTP header
     DEFAULT_USER_AGENT = RequestBuilder::DEFAULT_USER_AGENT

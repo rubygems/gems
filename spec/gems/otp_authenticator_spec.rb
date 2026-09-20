@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::OTPAuthenticator do
   subject(:authenticator) { described_class.new(authenticator: api_key_authenticator, otp: "123456") }
 

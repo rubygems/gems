@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Configuration do
   describe "::DEFAULT_HOST" do
     it "defaults to rubygems.org" do

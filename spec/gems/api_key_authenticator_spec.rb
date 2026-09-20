@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::APIKeyAuthenticator do
   subject(:authenticator) { described_class.new(key: TEST_KEY) }
 

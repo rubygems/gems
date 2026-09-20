@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "net/http"
 require_relative "errors/bad_gateway"
 require_relative "errors/bad_request"

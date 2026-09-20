@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Downloads do
   it "is a Resource" do
     expect(described_class.new({})).to be_a(Gems::Resource)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::BasicAuthenticator do
   subject(:authenticator) { described_class.new(username: "user", password: "pass") }
 

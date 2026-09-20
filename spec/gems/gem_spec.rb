@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Gem do
   subject(:gem) { described_class.new(JSON.parse(fixture("v2/rails-7.0.6.json").read)) }
 

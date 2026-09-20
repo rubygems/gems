@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "authenticator"
 
 module Gems
@@ -8,7 +10,7 @@ module Gems
   # @api public
   class OTPAuthenticator < Authenticator
     # The HTTP header name for the one-time passcode
-    OTP_HEADER = "OTP".freeze
+    OTP_HEADER = "OTP"
     private_constant :OTP_HEADER
 
     # The authenticator providing the underlying credentials

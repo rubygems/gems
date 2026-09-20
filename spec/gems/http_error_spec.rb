@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::HTTPError do
   let(:response) { build_response(Net::HTTPNotFound, "404", "Not Found", "This rubygem could not be found.") }
 

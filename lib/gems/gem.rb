@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "dependency"
 require_relative "resource"
 

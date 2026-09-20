@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::RedactedOutput do
   subject(:redacted_output) { described_class.new(io) }
 

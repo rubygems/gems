@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "lib/gems/library_version"
 
 Gem::Specification.new do |spec|

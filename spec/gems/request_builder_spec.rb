@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::RequestBuilder do
   subject(:builder) { described_class.new }
 

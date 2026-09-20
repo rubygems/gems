@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::Version do
   subject(:version) { described_class.new(JSON.parse(fixture("v2/rails-7.0.6.json").read)) }
 

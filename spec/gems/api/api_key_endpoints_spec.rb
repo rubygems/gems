@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::API::APIKeyEndpoints do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 

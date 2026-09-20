@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "net/http"
 require_relative "errors/network_error"
 require_relative "idempotence"

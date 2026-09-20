@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::RedirectHandler do
   subject(:handler) { described_class.new(connection:, request_builder:) }
 

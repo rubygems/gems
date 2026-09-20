@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../errors/no_latest_version"
 require_relative "../identifiers"
 require_relative "../json_parsing"

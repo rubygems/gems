@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 unless $PROGRAM_NAME.include?("mutant") || RUBY_ENGINE.eql?("jruby")
@@ -12,10 +14,10 @@ require "webmock/rspec"
 
 WebMock.disable_net_connect!
 
-TEST_HOST = "https://rubygems.org".freeze
-TEST_KEY = "TEST_KEY".freeze
-TEST_USERNAME = "TEST_USERNAME".freeze
-TEST_PASSWORD = "TEST_PASSWORD".freeze
+TEST_HOST = "https://rubygems.org"
+TEST_KEY = "TEST_KEY"
+TEST_USERNAME = "TEST_USERNAME"
+TEST_PASSWORD = "TEST_PASSWORD"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|

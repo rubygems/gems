@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "api/activity_endpoints"
 require_relative "api/api_key_endpoints"
 require_relative "api/download_endpoints"

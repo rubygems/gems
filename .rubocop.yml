@@ -11,6 +11,10 @@ inherit_gem:
 AllCops:
   NewCops: enable
 
+# Standard leaves this off; the library freezes its string literals
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
 # Standard disables the Metrics cops; enforce them at RuboCop's defaults
 Metrics/AbcSize:
   Enabled: true

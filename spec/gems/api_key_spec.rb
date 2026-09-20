@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::APIKey do
   subject(:api_key) { described_class.new(JSON.parse(fixture("exchange_token.json").read)) }
 

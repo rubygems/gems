@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Gems::TrustedPublisherAuthenticator do
   subject(:authenticator) { described_class.new(id_token: "ID_TOKEN") }
 
