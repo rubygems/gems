@@ -14,6 +14,11 @@ module Gems
       include JSONParsing
 
       # The scopes the RubyGems API defines for an API key
+      #
+      # A scope the API does not define is refused by {#create_api_key} and {#update_api_key} rather than sent, so
+      # this is the list a caller building its own scopes can check against.
+      #
+      # @api public
       API_KEY_SCOPES = %i[
         access_webhooks
         add_owner
@@ -25,7 +30,6 @@ module Gems
         update_owner
         yank_rubygem
       ].freeze
-      private_constant :API_KEY_SCOPES
 
       # Create an API key using HTTP basic auth
       #
