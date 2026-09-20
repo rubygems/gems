@@ -202,6 +202,13 @@ RSpec.describe Gems::Client do
 
       expect(client.proxy_url).to eq("http://proxy.example.com:8080")
     end
+
+    it "clears the proxy URL" do
+      client.proxy_url = "http://proxy.example.com:8080"
+      client.proxy_url = nil
+
+      expect(client.proxy_url).to be_nil
+    end
   end
 
   describe "#user_agent=" do

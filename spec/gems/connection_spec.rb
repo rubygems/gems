@@ -105,6 +105,18 @@ RSpec.describe Gems::Connection do
       expect { connection.proxy_url = "ftp://proxy.example.com/" }
         .to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com/")
     end
+
+    context "when set to nil" do
+      before { connection.proxy_url = nil }
+
+      it "clears the proxy URL" do
+        expect(connection.proxy_url).to be_nil
+      end
+
+      it "clears the proxy URI" do
+        expect(connection.proxy_uri).to be_nil
+      end
+    end
   end
 
   describe "#perform" do

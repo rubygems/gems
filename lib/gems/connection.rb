@@ -94,7 +94,7 @@ module Gems
       @read_timeout = read_timeout
       @write_timeout = write_timeout
       @debug_output = debug_output
-      self.proxy_url = proxy_url unless proxy_url.nil?
+      self.proxy_url = proxy_url
     end
 
     # Perform an HTTP request
@@ -115,20 +115,31 @@ module Gems
     # Set the proxy URL for requests
     #
     # @api public
-    # @param proxy_url [String] the proxy URL
+    # @param proxy_url [String, nil] the proxy URL, or nil to read proxies from the environment again
     # @return [void]
     # @raise [ArgumentError] if the proxy URL is invalid
     # @example Set the proxy URL
     #   connection.proxy_url = "http://proxy.example.com:8080"
+    # @example Clear the proxy URL
+    #   connection.proxy_url = nil
     def proxy_url=(proxy_url)
       @proxy_url = proxy_url
-      proxy_uri = URI(proxy_url)
-      raise ArgumentError, "Invalid proxy URL: #{proxy_uri}" unless proxy_uri.is_a?(URI::HTTP)
-
-      @proxy_uri = proxy_uri
+      @proxy_uri = proxy_url && parse_proxy_uri(proxy_url)
     end
 
     private
+
+    # Parse and validate a proxy URL
+    # @api private
+    # @param proxy_url [String] the proxy URL
+    # @return [URI::HTTP] the proxy URI
+    # @raise [ArgumentError] if the proxy URL is not an HTTP or HTTPS URL
+    def parse_proxy_uri(proxy_url)
+      proxy_uri = URI(proxy_url)
+      raise ArgumentError, "Invalid proxy URL: #{proxy_uri}" unless proxy_uri.is_a?(URI::HTTP)
+
+      proxy_uri
+    end
 
     # Build an HTTP client for the given URI
     #

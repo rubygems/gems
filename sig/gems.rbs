@@ -425,7 +425,7 @@ module Gems
     def open_timeout=: (Integer open_timeout) -> void
     def read_timeout=: (Integer read_timeout) -> void
     def write_timeout=: (Integer write_timeout) -> void
-    def proxy_url=: (String proxy_url) -> void
+    def proxy_url=: (String? proxy_url) -> void
     def debug_output=: (IO? debug_output) -> void
     def max_redirects: () -> Integer
     def max_redirects=: (Integer max_redirects) -> void
@@ -532,10 +532,11 @@ module Gems
 
     def initialize: (?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?) -> void
     def perform: (request: Net::HTTPRequest) -> Net::HTTPResponse
-    def proxy_url=: (String proxy_url) -> void
+    def proxy_url=: (String? proxy_url) -> void
 
     private
 
+    def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def build_http_client: (URI::Generic uri) -> Net::HTTP
     def configure_http_client: (Net::HTTP http_client) -> Net::HTTP
   end
