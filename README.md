@@ -213,6 +213,7 @@ Each authentication method has its own authenticator class: `Gems::ApiKeyAuthent
 HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
+An `https://` proxy is connected to over TLS.
 
 ## Errors
 

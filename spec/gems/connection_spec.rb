@@ -324,6 +324,10 @@ RSpec.describe Gems::Connection do
       it "does not use a proxy" do
         expect(build_http_client(https_uri)).not_to be_proxy
       end
+
+      it "does not set TLS for the proxy" do
+        expect(build_http_client(https_uri).instance_variable_get(:@proxy_use_ssl)).to be_nil
+      end
     end
 
     context "with a proxy URL" do
@@ -354,6 +358,16 @@ RSpec.describe Gems::Connection do
         http_client = connection.send(:build_http_client, https_uri)
 
         expect([http_client.proxy_user, http_client.proxy_pass]).to eq(["us@er", "p@ss"])
+      end
+
+      it "does not use TLS for an http proxy" do
+        expect(build_http_client(https_uri).instance_variable_get(:@proxy_use_ssl)).to be(false)
+      end
+
+      it "uses TLS for an https proxy" do
+        connection = described_class.new(proxy_url: "https://proxy.example.com:8443")
+
+        expect(build_http_client(https_uri, connection:).instance_variable_get(:@proxy_use_ssl)).to be(true)
       end
 
       it "takes precedence over the environment" do
@@ -391,6 +405,12 @@ RSpec.describe Gems::Connection do
           http_client = build_http_client(https_uri)
 
           expect([http_client.proxy_user, http_client.proxy_pass]).to eq(["env@user", "env@pass"])
+        end
+      end
+
+      it "uses TLS for an https proxy" do
+        with_env("https_proxy" => "https://env.example.com:9999") do
+          expect(build_http_client(https_uri).instance_variable_get(:@proxy_use_ssl)).to be(true)
         end
       end
 

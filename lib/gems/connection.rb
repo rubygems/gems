@@ -204,7 +204,7 @@ module Gems
     # Build an HTTP client for the given URI
     #
     # If no proxy URL is configured, the proxy is looked up from the environment
-    # (http_proxy, https_proxy, and no_proxy) for the URI's scheme.
+    # (http_proxy, https_proxy, and no_proxy) for the URI's scheme. An https:// proxy is connected to over TLS.
     #
     # @api private
     # @param uri [URI::Generic] the URI to connect to
@@ -214,22 +214,22 @@ module Gems
       host = uri.host
       raise ArgumentError, "URI has no host: #{uri}" if host.nil?
 
-      proxy_host, proxy_port, proxy_user, proxy_pass = proxy_arguments_for(uri)
-      http_client = Net::HTTP.new(host, uri.port, proxy_host, proxy_port, proxy_user, proxy_pass)
+      proxy_host, proxy_port, proxy_user, proxy_pass, proxy_use_ssl = proxy_arguments_for(uri)
+      http_client = Net::HTTP.new(host, uri.port, proxy_host, proxy_port, proxy_user, proxy_pass, nil, proxy_use_ssl)
       http_client.use_ssl = uri.scheme.eql?("https")
       configure_http_client(http_client)
     end
 
-    # The proxy host, port, user, and password for a URI
+    # The proxy host, port, user, password, and whether to use TLS for a URI
     #
-    # The user and password are decoded from the proxy URL.
+    # The user and password are decoded from the proxy URL, and an https:// proxy is connected to over TLS.
     #
     # @api private
     # @param uri [URI::Generic] the URI to connect to
-    # @return [Array] the proxy host, port, user, and password, each nil without a proxy
+    # @return [Array] the proxy host, port, user, password, and whether to use TLS, each nil without a proxy
     def proxy_arguments_for(uri)
       proxy = proxy_uri || uri.find_proxy
-      [proxy&.host, proxy&.port, decode(proxy&.user), decode(proxy&.password)]
+      [proxy&.host, proxy&.port, decode(proxy&.user), decode(proxy&.password), proxy&.instance_of?(URI::HTTPS)]
     end
 
     # Configure an HTTP client with timeout settings

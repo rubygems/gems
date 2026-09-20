@@ -1,6 +1,8 @@
 # Widen stdlib signatures to match runtime behavior used by Gems
 module Net
   class HTTP
+    def self.new: (String address, ?Integer? port, ?String | :ENV | nil p_addr, ?Integer? p_port, ?String? p_user, ?String? p_pass, ?untyped? p_no_proxy, ?bool? p_use_ssl) -> Net::HTTP
+
     def set_debug_output: (IO? output) -> void | ...
   end
 
