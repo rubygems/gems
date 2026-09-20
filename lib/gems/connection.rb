@@ -1,6 +1,7 @@
 require "net/http"
 require "openssl"
 require "uri"
+require "zlib"
 require_relative "errors/network_error"
 
 module Gems
@@ -17,12 +18,12 @@ module Gems
     NETWORK_ERRORS = [
       IOError,
       Net::HTTPBadResponse,
-      Net::OpenTimeout,
-      Net::ReadTimeout,
-      Net::WriteTimeout,
+      Net::ProtocolError,
       OpenSSL::SSL::SSLError,
       SocketError,
-      SystemCallError
+      SystemCallError,
+      Timeout::Error,
+      Zlib::Error
     ].freeze
 
     # The timeout for opening connections in seconds
@@ -219,7 +220,10 @@ module Gems
       configure_http_client(http_client)
     end
 
-    # The proxy host, port, user, and password for a URI, with the user and password decoded
+    # The proxy host, port, user, and password for a URI
+    #
+    # The user and password are decoded from the proxy URL.
+    #
     # @api private
     # @param uri [URI::Generic] the URI to connect to
     # @return [Array] the proxy host, port, user, and password, each nil without a proxy

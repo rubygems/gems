@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `InvalidResponse`, raised with the `body` when a successful response is not JSON, such as the page of a proxy or captive portal, instead of `JSON::ParserError`
 * Add `NoLatestVersion`, raised by `latest_version`, and by `yank`, `unyank`, and `downloads` without a version, when a gem has no published version
 * Add credential-free `inspect` output for clients and authenticators
-* Add `NetworkError`, raised for connection failures, DNS errors, and timeouts instead of the underlying `Errno`, `Net`, `Socket`, and `EOF` errors
+* Add `NetworkError`, raised for connection failures, DNS errors, timeouts, malformed responses, and bad compressed bodies instead of the underlying `Errno`, `Net`, `Socket`, `EOF`, `Timeout`, `OpenSSL`, and `Zlib` errors
 * Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `ApiKey` objects
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts

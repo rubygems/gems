@@ -223,13 +223,19 @@ RSpec.describe Gems::Connection do
       Errno::ENETUNREACH,
       Errno::EPIPE,
       Errno::ETIMEDOUT,
+      EOFError,
+      Errno::ECONNRESET,
       IOError,
       Net::HTTPBadResponse,
       Net::OpenTimeout,
+      Net::ProtocolError,
       Net::ReadTimeout,
       Net::WriteTimeout,
       OpenSSL::SSL::SSLError,
-      SocketError
+      SocketError,
+      Timeout::Error,
+      Zlib::BufError,
+      Zlib::DataError
     ].each do |error_class|
       it "wraps #{error_class} in a NetworkError" do
         stub_request(:get, https_uri.to_s).to_raise(error_class)
