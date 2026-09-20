@@ -3,6 +3,7 @@ require_relative "connection"
 require_relative "identifiers"
 require_relative "redirect_handler"
 require_relative "request_builder"
+require_relative "retry_handler"
 require_relative "url_validation"
 
 module Gems
@@ -160,6 +161,26 @@ module Gems
     #   Gems.max_redirects = 5
     attr_accessor :max_redirects
 
+    # The number of times a rate-limited request is sent again
+    #
+    # Zero, the default, raises {TooManyRequests} or {ServiceUnavailable} rather than waiting.
+    #
+    # @api public
+    # @return [Integer] the number of times a rate-limited request is sent again
+    # @example Get or set the maximum retries
+    #   Gems.max_retries = 3
+    attr_accessor :max_retries
+
+    # The longest a request waits before it is sent again, in seconds
+    #
+    # A response asking to wait longer than this raises rather than being waited for.
+    #
+    # @api public
+    # @return [Integer] the longest a request waits before it is sent again, in seconds
+    # @example Get or set the maximum retry delay
+    #   Gems.max_retry_delay = 30
+    attr_accessor :max_retry_delay
+
     # Reset the extending module to the default configuration
     #
     # @api private
@@ -296,6 +317,8 @@ module Gems
       self.debug_output = nil
       self.proxy_url = nil
       self.max_redirects = RedirectHandler::DEFAULT_MAX_REDIRECTS
+      self.max_retries = RetryHandler::DEFAULT_MAX_RETRIES
+      self.max_retry_delay = RetryHandler::DEFAULT_MAX_RETRY_DELAY
     end
   end
 end

@@ -7,6 +7,7 @@ require_relative "connection"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "response_parser"
+require_relative "retry_handler"
 require_relative "url_validation"
 
 module Gems
@@ -30,6 +31,8 @@ module Gems
     def_delegators :@connection, :keep_alive_timeout, :keep_alive_timeout=
     def_delegators :@redirect_handler, :max_redirects
     def_delegators :@redirect_handler, :max_redirects=
+    def_delegators :@retry_handler, :max_retries, :max_retry_delay
+    def_delegators :@retry_handler, :max_retries=, :max_retry_delay=
     def_delegators :@request_builder, :user_agent
     def_delegators :@request_builder, :user_agent=
 
@@ -52,6 +55,8 @@ module Gems
     # @param proxy_url [String, nil] the proxy URL for requests
     # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open for another request
     # @param max_redirects [Integer] the maximum number of redirects to follow
+    # @param max_retries [Integer] the number of times a rate-limited request is sent again
+    # @param max_retry_delay [Integer] the longest a request waits before it is sent again, in seconds
     # @return [Client] a new client instance
     # @example Create a client with an API key
     #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
@@ -71,7 +76,9 @@ module Gems
       debug_output: Gems.debug_output,
       proxy_url: Gems.proxy_url,
       keep_alive_timeout: Gems.keep_alive_timeout,
-      max_redirects: Gems.max_redirects)
+      max_redirects: Gems.max_redirects,
+      max_retries: Gems.max_retries,
+      max_retry_delay: Gems.max_retry_delay)
       @host = validate_host(host)
       @connection = Connection.new(open_timeout:, read_timeout:, write_timeout:, debug_output:, proxy_url:,
         keep_alive_timeout:)
@@ -79,6 +86,7 @@ module Gems
       initialize_credentials(key:, username:, password:, otp:, id_token:)
       initialize_authenticator
       @redirect_handler = RedirectHandler.new(connection: @connection, request_builder: @request_builder, max_redirects:)
+      @retry_handler = RetryHandler.new(max_retries:, max_retry_delay:)
       @response_parser = ResponseParser.new
     end
 
@@ -223,9 +231,24 @@ module Gems
       uri = build_uri(host, path)
       authenticator = authenticator_for(host)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
-      response = @connection.perform(request:)
-      response = @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:)
+      response = @retry_handler.handle(request:) { perform(request:, authenticator:, body:, content_type:) }
       @response_parser.parse(response:)
+    end
+
+    # Send a request and follow the redirects of its response
+    #
+    # This is what a retry sends again, so that a request that was redirected is followed again from the start
+    # rather than sent straight to where the redirect led the first time.
+    #
+    # @api private
+    # @param request [Net::HTTPRequest] the request to send
+    # @param authenticator [Authenticator] the authenticator the request was built with
+    # @param body [Hash, Array, String, nil] the body the request was built from
+    # @param content_type [String, nil] the content type the request was built with, for a String body
+    # @return [Net::HTTPResponse] the response
+    def perform(request:, authenticator:, body:, content_type:)
+      response = @connection.perform(request:)
+      @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:)
     end
 
     # The authenticator for a request to a host

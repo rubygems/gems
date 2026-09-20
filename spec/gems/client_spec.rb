@@ -83,7 +83,8 @@ RSpec.describe Gems::Client do
     end
 
     {open_timeout: 10, read_timeout: 20, write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
-     proxy_url: "http://proxy.example.com:8080", max_redirects: 3}.each do |option, value|
+     proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3,
+     max_retry_delay: 30}.each do |option, value|
       it "defaults the #{option} to the global configuration" do
         Gems.public_send(:"#{option}=", value)
 
@@ -119,6 +120,14 @@ RSpec.describe Gems::Client do
       expect(client.max_redirects).to eq(Gems::RedirectHandler::DEFAULT_MAX_REDIRECTS)
     end
 
+    it "defaults the maximum retries" do
+      expect(client.max_retries).to eq(Gems::RetryHandler::DEFAULT_MAX_RETRIES)
+    end
+
+    it "defaults the maximum retry delay" do
+      expect(client.max_retry_delay).to eq(Gems::RetryHandler::DEFAULT_MAX_RETRY_DELAY)
+    end
+
     it "initializes the authenticator from the credentials" do
       client = described_class.new(key: TEST_KEY)
 
@@ -130,7 +139,7 @@ RSpec.describe Gems::Client do
         described_class.new(host: "http://example.com", key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD,
           otp: "123456", id_token: "ID_TOKEN", user_agent: "Custom User Agent", open_timeout: 10, read_timeout: 20,
           write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
-          proxy_url: "http://proxy.example.com:8080", max_redirects: 3)
+          proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3, max_retry_delay: 30)
       end
 
       it "sets the host" do
@@ -172,6 +181,14 @@ RSpec.describe Gems::Client do
 
       it "sets the maximum redirects" do
         expect(client.max_redirects).to eq(3)
+      end
+
+      it "sets the maximum retries" do
+        expect(client.max_retries).to eq(3)
+      end
+
+      it "sets the maximum retry delay" do
+        expect(client.max_retry_delay).to eq(30)
       end
     end
 
@@ -308,7 +325,7 @@ RSpec.describe Gems::Client do
     end
   end
 
-  %i[open_timeout read_timeout write_timeout max_redirects].each do |option|
+  %i[open_timeout read_timeout write_timeout max_redirects max_retries max_retry_delay].each do |option|
     describe "##{option}=" do
       it "sets the #{option}" do
         client.public_send(:"#{option}=", 42)
@@ -740,6 +757,29 @@ RSpec.describe Gems::Client do
       client.put("/old", "raw", content_type: "text/plain")
 
       expect(a_put("/new").with(body: "raw", headers: {"Content-Type" => "text/plain"})).to have_been_made
+    end
+
+    it "raises TooManyRequests rather than retrying by default" do
+      stub_get("/path").to_return(status: 429, body: "throttled")
+
+      expect { client.get("/path") }.to raise_error(Gems::TooManyRequests)
+    end
+
+    it "sends a rate-limited request again once retries are allowed" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_get("/path").to_return({status: 429, headers: {"Retry-After" => "1"}}, {body: "body"})
+
+      expect(client.get("/path")).to eq("body")
+    end
+
+    it "follows the redirects of a request it sends again" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_get("/old").to_return({status: 429}, {status: 302, headers: {"Location" => "/new"}})
+      stub_get("/new").to_return(body: "redirected")
+
+      expect(client.get("/old")).to eq("redirected")
     end
 
     it "raises NotFound for 404 responses" do

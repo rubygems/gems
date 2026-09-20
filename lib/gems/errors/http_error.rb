@@ -1,11 +1,13 @@
 require "net/http"
-require "time"
+require_relative "../retry_after"
 require_relative "error"
 
 module Gems
   # Base class for HTTP errors from the RubyGems API
   # @api public
   class HTTPError < Error
+    include RetryAfter
+
     # The HTTP response
     # @api public
     # @return [Net::HTTPResponse] the HTTP response
@@ -47,13 +49,7 @@ module Gems
     # @example Wait before retrying
     #   sleep(error.retry_after || 1)
     def retry_after
-      value = response["Retry-After"]
-      return if value.nil?
-
-      seconds = Integer(value, exception: false) || (Time.httpdate(value) - Time.now).ceil
-      [seconds, 0].max
-    rescue ArgumentError
-      nil
+      retry_after_of(response)
     end
 
     private

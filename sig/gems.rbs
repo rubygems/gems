@@ -87,6 +87,8 @@ module Gems
     def proxy_url=: (String? proxy_url) -> void
     attr_accessor keep_alive_timeout: Integer
     attr_accessor max_redirects: Integer
+    attr_accessor max_retries: Integer
+    attr_accessor max_retry_delay: Integer
 
     def self.extended: (Configuration base) -> void
     def key: () -> String?
@@ -473,6 +475,7 @@ module Gems
     @connection: Connection
     @request_builder: RequestBuilder
     @redirect_handler: RedirectHandler
+    @retry_handler: RetryHandler
     @response_parser: ResponseParser
 
     attr_reader host: String
@@ -493,10 +496,14 @@ module Gems
     def keep_alive_timeout=: (Integer keep_alive_timeout) -> void
     def max_redirects: () -> Integer
     def max_redirects=: (Integer max_redirects) -> void
+    def max_retries: () -> Integer
+    def max_retries=: (Integer max_retries) -> void
+    def max_retry_delay: () -> Integer
+    def max_retry_delay=: (Integer max_retry_delay) -> void
     def user_agent: () -> String
     def user_agent=: (String user_agent) -> void
 
-    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Integer, ?max_redirects: Integer) -> void
+    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Integer, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Integer) -> void
     def close: () -> self
     def get: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
     def delete: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
@@ -510,6 +517,7 @@ module Gems
     attr_reader request_builder: RequestBuilder
 
     def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
+    def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?) -> Net::HTTPResponse
 
     def authenticator_for: (String host) -> Authenticator
     def same_origin?: (String host, String other) -> bool
@@ -524,6 +532,8 @@ module Gems
   GemError: singleton(Error)
 
   class HTTPError < Error
+    include RetryAfter
+
     attr_reader response: Net::HTTPResponse
     attr_reader code: Integer
 
@@ -618,10 +628,10 @@ module Gems
   end
 
   class ConnectionPool
+    include Idempotence
+
     @connections: Hash[untyped, [Net::HTTP, untyped]]
     @mutex: Thread::Mutex
-
-    IDEMPOTENT_METHODS: Array[String]
 
     def initialize: () -> void
     def checkout: (request: Net::HTTPRequest, settings: untyped, keep_alive_timeout: Integer) { () -> Net::HTTP } -> Net::HTTP
@@ -741,4 +751,38 @@ module Gems
     def redact: (String? url) -> String?
   end
 
+  module RetryAfter
+    private
+
+    def retry_after_of: (Net::HTTPResponse response) -> Integer?
+  end
+
+  module Idempotence
+    IDEMPOTENT_METHODS: Array[String]
+
+    private
+
+    def idempotent?: (Net::HTTPRequest request) -> bool
+  end
+
+  class RetryHandler
+    include Idempotence
+    include RetryAfter
+
+    DEFAULT_MAX_RETRIES: Integer
+    DEFAULT_MAX_RETRY_DELAY: Integer
+    RETRIED_STATUSES: Array[Integer]
+
+    attr_accessor max_retries: Integer
+    attr_accessor max_retry_delay: Integer
+
+    def initialize: (?max_retries: Integer, ?max_retry_delay: Integer) -> void
+    def handle: (request: Net::HTTPRequest) { () -> Net::HTTPResponse } -> Net::HTTPResponse
+
+    private
+
+    def retry_delay: (response: Net::HTTPResponse, request: Net::HTTPRequest, retries: Integer) -> Integer?
+    def retry?: (Net::HTTPResponse response, Net::HTTPRequest request) -> bool
+    def backoff: (Integer retries) -> Integer
+  end
 end
