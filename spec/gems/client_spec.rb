@@ -399,6 +399,13 @@ RSpec.describe Gems::Client do
       expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
 
+    it "sends headers of its own" do
+      stub_get("/path")
+      client.get("/path", headers: {"Accept" => "application/json"})
+
+      expect(a_get("/path").with(headers: {"Accept" => "application/json"})).to have_been_made
+    end
+
     it "authenticates a request to another host with the key stored for it" do
       stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
       stub_request(:post, "https://gems.example.com/path")
@@ -473,6 +480,13 @@ RSpec.describe Gems::Client do
 
       expect(a_request(:delete, "http://example.com/path")).to have_been_made
     end
+
+    it "sends headers of its own" do
+      stub_delete("/path")
+      client.delete("/path", headers: {"Accept" => "application/json"})
+
+      expect(a_delete("/path").with(headers: {"Accept" => "application/json"})).to have_been_made
+    end
   end
 
   %i[post put patch].each do |http_method|
@@ -519,6 +533,14 @@ RSpec.describe Gems::Client do
         client.public_send(http_method, "/path", host: "http://example.com")
 
         expect(a_request(http_method, "http://example.com/path")).to have_been_made
+      end
+
+      it "sends headers of its own" do
+        stub_request(http_method, rubygems_url("/path"))
+        client.public_send(http_method, "/path", headers: {"Accept" => "application/json"})
+
+        expect(a_request(http_method, rubygems_url("/path"))
+          .with(headers: {"Accept" => "application/json"})).to have_been_made
       end
     end
   end
@@ -652,6 +674,13 @@ RSpec.describe Gems::Client do
       expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
 
+    it "sends headers of its own" do
+      stub_get("/path")
+      client.get("/path", headers: {"Accept" => "application/json"})
+
+      expect(a_get("/path").with(headers: {"Accept" => "application/json"})).to have_been_made
+    end
+
     it "authenticates a request to another host with the key stored for it" do
       stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
       stub_request(:post, "https://gems.example.com/path")
@@ -734,6 +763,14 @@ RSpec.describe Gems::Client do
       client.get("/old")
 
       expect(a_get("/new").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "preserves the headers of the caller across redirects" do
+      stub_get("/old").to_return(status: 302, headers: {"Location" => "/new"})
+      stub_get("/new")
+      client.get("/old", headers: {"X-Trace-Id" => "abc123"})
+
+      expect(a_get("/new").with(headers: {"X-Trace-Id" => "abc123"})).to have_been_made
     end
 
     it "raises TooManyRedirects for redirect loops" do

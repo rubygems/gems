@@ -55,8 +55,9 @@ module Gems
     # Handle redirects for an HTTP response
     #
     # A redirect to another scheme, host, or port is followed without the credentials of the request, as curl and
-    # browsers do, so that a redirect cannot send them to a host they were not meant for. A later redirect back to
-    # the original host does not restore them.
+    # browsers do, so that a redirect cannot send them to a host they were not meant for. The headers the caller
+    # asked for are dropped along with them, since a header of the caller's own may carry a credential too. A later
+    # redirect back to the original host does not restore either.
     #
     # A redirect that cannot be followed, such as 304 Not Modified or one whose Location header is missing, is not a
     # valid URL, or is not an HTTP or HTTPS URL, is returned as it is, so that the caller raises the HTTPError of its
@@ -71,12 +72,14 @@ module Gems
     # @param authenticator [Authenticator] the authenticator for requests
     # @param body [Hash, Array, String, nil] the body the request was built from
     # @param content_type [String, nil] the content type the request was built with, for a String body
+    # @param headers [Hash{String => String}] the headers the request was built with
     # @param redirect_count [Integer] the current redirect count
     # @return [Net::HTTPResponse] the final HTTP response after following redirects
     # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
     # @example Handle a response
     #   response = handler.handle(response: resp, request: req)
-    def handle(response:, request:, authenticator: Authenticator.new, body: nil, content_type: nil, redirect_count: 0)
+    def handle(response:, request:, authenticator: Authenticator.new, body: nil, content_type: nil, headers: {},
+      redirect_count: 0)
       return response unless response.is_a?(Net::HTTPRedirection)
 
       raise TooManyRedirects, "Too many redirects" if redirect_count >= max_redirects
@@ -84,16 +87,35 @@ module Gems
       new_uri = build_new_uri(response, request)
       return response if new_uri.nil?
 
-      authenticator = Authenticator.new unless same_origin?(request.uri, new_uri)
-      new_request = build_request(request:, uri: new_uri, response_code: Integer(response.code), authenticator:, body:,
-        content_type:)
-      new_response = connection.perform(request: new_request)
-
-      handle(response: new_response, request: new_request, authenticator:, body:, content_type:,
-        redirect_count: redirect_count + 1)
+      follow(response:, request:, uri: new_uri, authenticator:, body:, content_type:, headers:, redirect_count:)
     end
 
     private
+
+    # Send the request again to where a redirect leads
+    #
+    # @api private
+    # @param response [Net::HTTPResponse] the redirect response
+    # @param request [Net::HTTPRequest] the request that was redirected
+    # @param uri [URI::HTTP] the URI the redirect leads to
+    # @param authenticator [Authenticator] the authenticator for requests
+    # @param body [Hash, Array, String, nil] the body the request was built from
+    # @param content_type [String, nil] the content type the request was built with, for a String body
+    # @param headers [Hash{String => String}] the headers the request was built with
+    # @param redirect_count [Integer] the current redirect count
+    # @return [Net::HTTPResponse] the final HTTP response after following redirects
+    # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
+    def follow(response:, request:, uri:, authenticator:, body:, content_type:, headers:, redirect_count:)
+      unless same_origin?(request.uri, uri)
+        authenticator = Authenticator.new
+        headers = {} #: Hash[String, String]
+      end
+      new_request = build_request(request:, uri:, response_code: Integer(response.code), authenticator:, body:,
+        content_type:, headers:)
+      new_response = connection.perform(request: new_request)
+      handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:,
+        redirect_count: redirect_count + 1)
+    end
 
     # Whether two URIs share a scheme, host, and port
     # @api private
@@ -138,13 +160,15 @@ module Gems
     # @param authenticator [Authenticator] the authenticator
     # @param body [Hash, Array, String, nil] the body the original request was built from
     # @param content_type [String, nil] the content type the original request was built with
+    # @param headers [Hash{String => String}] the headers the new request is built with
     # @return [Net::HTTPRequest] the new request, with the method and body of the original for a 307 or 308, or a
     #   GET without a body otherwise
-    def build_request(request:, uri:, response_code:, authenticator:, body:, content_type:)
+    def build_request(request:, uri:, response_code:, authenticator:, body:, content_type:, headers:)
       if METHOD_PRESERVING_CODES.include?(response_code)
-        request_builder.build(http_method: request.method.downcase.to_sym, uri:, body:, content_type:, authenticator:)
+        request_builder.build(http_method: request.method.downcase.to_sym, uri:, body:, content_type:, authenticator:,
+          headers:)
       else
-        request_builder.build(http_method: :get, uri:, authenticator:)
+        request_builder.build(http_method: :get, uri:, authenticator:, headers:)
       end
     end
   end

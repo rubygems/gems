@@ -189,6 +189,9 @@ end
 # configured credentials change. Use it for raw requests.
 Gems.client.get '/api/v1/gems/rails.json'
 
+# Raw requests take headers of your own, alongside the User-Agent and the credentials of the client.
+Gems.client.get '/api/v1/gems/rails.json', headers: {'X-Trace-Id' => 'abc123'}
+
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: 'rubygems_701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.rubygem 'rails'

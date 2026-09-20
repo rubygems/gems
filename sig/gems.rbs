@@ -332,11 +332,11 @@ module Gems
 
   interface _Requests
     def host: () -> String
-    def get: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
-    def delete: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
-    def post: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
-    def put: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
-    def patch: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
+    def get: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
+    def delete: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
+    def post: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
+    def put: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
+    def patch: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
   end
 
   module Identifiers
@@ -516,19 +516,19 @@ module Gems
 
     def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Integer, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Integer) -> void
     def close: () -> self
-    def get: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
-    def delete: (String path, ?Hash[Symbol | String, untyped] params, ?host: String?) -> String
-    def post: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
-    def put: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
-    def patch: (String path, ?request_body body, ?content_type: String?, ?host: String?) -> String
+    def get: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
+    def delete: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
+    def post: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
+    def put: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
+    def patch: (String path, ?request_body body, ?content_type: String?, ?headers: Hash[String, String], ?host: String?) -> String
 
     private
 
     attr_reader connection: Connection
     attr_reader request_builder: RequestBuilder
 
-    def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
-    def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?) -> Net::HTTPResponse
+    def execute_request: (Symbol http_method, String path, host: String?, headers: Hash[String, String], ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
+    def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPResponse
 
     def authenticator_for: (String host) -> Authenticator
     def same_origin?: (String host, String other) -> bool
@@ -731,14 +731,15 @@ module Gems
     attr_reader request_builder: RequestBuilder
 
     def initialize: (?connection: Connection, ?request_builder: RequestBuilder, ?max_redirects: Integer) -> void
-    def handle: (response: Net::HTTPResponse, request: Net::HTTPRequest, ?authenticator: Authenticator, ?body: request_body?, ?content_type: String?, ?redirect_count: Integer) -> Net::HTTPResponse
+    def handle: (response: Net::HTTPResponse, request: Net::HTTPRequest, ?authenticator: Authenticator, ?body: request_body?, ?content_type: String?, ?headers: Hash[String, String], ?redirect_count: Integer) -> Net::HTTPResponse
 
     private
 
+    def follow: (response: Net::HTTPResponse, request: Net::HTTPRequest, uri: URI::HTTP, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String], redirect_count: Integer) -> Net::HTTPResponse
     def same_origin?: (URI::Generic uri, URI::Generic other) -> bool
     def origin: (URI::Generic uri) -> [String?, String?, Integer?]
     def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::HTTP?
-    def build_request: (request: Net::HTTPRequest, uri: URI::Generic, response_code: Integer, authenticator: Authenticator, body: request_body?, content_type: String?) -> Net::HTTPRequest
+    def build_request: (request: Net::HTTPRequest, uri: URI::Generic, response_code: Integer, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPRequest
   end
 
   class ResponseParser

@@ -107,6 +107,15 @@ RSpec.describe Gems::RedirectHandler do
       expect(a_request(:get, "https://rubygems.org/third").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
     end
 
+    it "preserves the headers of the caller across redirects" do
+      stub_request(:get, "https://rubygems.org/second").to_return(status: 302, headers: {"Location" => "/third"})
+      stub_request(:get, "https://rubygems.org/third")
+      handler.handle(response: redirect(302, "/second"), request:, headers: {"X-Trace-Id" => "abc123"})
+
+      expect(a_request(:get, "https://rubygems.org/third")
+        .with(headers: {"X-Trace-Id" => "abc123"})).to have_been_made
+    end
+
     context "when a redirect leaves the origin" do
       let(:authenticator) { Gems::OTPAuthenticator.new(authenticator: Gems::APIKeyAuthenticator.new(key: TEST_KEY), otp: "123456") }
 
@@ -140,6 +149,14 @@ RSpec.describe Gems::RedirectHandler do
 
       it "keeps the credentials for the same origin with an explicit default port" do
         expect(headers_sent_to("https://rubygems.org:443/new")).to include("Authorization" => TEST_KEY)
+      end
+
+      it "drops the headers of the caller for another host" do
+        stub_request(:get, "https://example.com/new")
+        handler.handle(response: redirect(302, "https://example.com/new"), request:, authenticator:,
+          headers: {"X-Trace-Id" => "abc123"})
+
+        expect(a_request(:get, "https://example.com/new").with { |req| !req.headers.key?("X-Trace-Id") }).to have_been_made
       end
 
       it "does not restore the credentials on a redirect back" do
@@ -236,6 +253,15 @@ RSpec.describe Gems::RedirectHandler do
         handler.handle(response: redirect(code, "/new", klass:), request:)
 
         expect(a_request(:put, "https://rubygems.org/new")).to have_been_made
+      end
+
+      it "preserves the headers of the caller on a #{code}" do
+        stub_request(:post, "https://rubygems.org/new")
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request, body: form_body,
+          headers: {"X-Trace-Id" => "abc123"})
+
+        expect(a_request(:post, "https://rubygems.org/new")
+          .with(headers: {"X-Trace-Id" => "abc123"})).to have_been_made
       end
 
       it "preserves the body on a #{code}" do
