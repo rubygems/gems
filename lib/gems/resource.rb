@@ -37,6 +37,7 @@ module Gems
         # @type self: Resource
         value_of(keys)
       end
+      record_attribute(name)
     end
 
     # Define a predicate for a boolean attribute
@@ -51,6 +52,7 @@ module Gems
         # @type self: Resource
         !!value_of(keys)
       end
+      record_attribute(:"#{name}?")
     end
 
     # Define a reader that parses a timestamp attribute
@@ -66,7 +68,32 @@ module Gems
         value = value_of(keys)
         value && Time.parse(value)
       end
+      record_attribute(name)
     end
+
+    # The names of the readers the class declares
+    #
+    # These are the readers declared with attribute, predicate, and time_attribute, and a pattern matches a resource
+    # by these names (see {#deconstruct_keys}).
+    #
+    # @api public
+    # @return [Array<Symbol>] the reader names, in the order they were declared
+    # @example
+    #   Gems::Owner.attribute_names # => [:id, :handle, :email, :role]
+    def self.attribute_names
+      @attribute_names || []
+    end
+
+    # Record a declared reader for {.attribute_names}
+    #
+    # @api private
+    # @param name [Symbol] the name of the reader
+    # @return [Symbol] the name of the reader
+    def self.record_attribute(name)
+      @attribute_names = [*attribute_names, name]
+      name
+    end
+    private_class_method :record_attribute
 
     # The attribute keys a reader reads
     #
@@ -148,6 +175,24 @@ module Gems
     #   gem.to_h
     def to_h
       attributes
+    end
+
+    # The attributes a pattern asks for, read by the declared readers
+    #
+    # A resource matches a `case`/`in` pattern by the names in {.attribute_names}, read as the readers read them, so
+    # a pattern sees a timestamp as a `Time` and a boolean as a predicate such as `yanked?`.
+    #
+    # @api public
+    # @param keys [Array<Symbol>, nil] the names the pattern asks for, or nil for all of them
+    # @return [Hash{Symbol => Object}] the requested attributes
+    # @example Match a gem by its name and version
+    #   case Gems.rubygem("rails")
+    #   in {name: "rails", version:} then version
+    #   end
+    def deconstruct_keys(keys)
+      names = self.class.attribute_names
+      names &= keys unless keys.nil?
+      names.to_h { |name| [name, public_send(name)] }
     end
 
     # The values that identify the resource

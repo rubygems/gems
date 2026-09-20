@@ -178,6 +178,7 @@ Responses are wrapped in objects with readers for each documented field: `Gems::
 Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
 accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and
 `Gems.key = api_key` all work.
+Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Every object also exposes
 the raw response through `[]` and `to_h`, so fields without a reader remain accessible:

@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
+* Match resources against `case`/`in` patterns by their readers, such as `in {name:, version:}`, with `Resource#deconstruct_keys` and `Resource.attribute_names`
 * Add RBS signatures, with a manifest naming the standard libraries they refer to
 
 ### Changed

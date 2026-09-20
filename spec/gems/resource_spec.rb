@@ -37,6 +37,12 @@ RSpec.describe Gems::Resource do
       expect(resource.name).to eq("rails")
     end
 
+    it "records the reader in attribute_names" do
+      klass = Class.new(described_class) { attribute :name }
+
+      expect(klass.attribute_names).to eq([:name])
+    end
+
     it "reads a custom key" do
       expect(resource.key).to eq(TEST_KEY)
     end
@@ -67,6 +73,12 @@ RSpec.describe Gems::Resource do
   end
 
   describe ".predicate" do
+    it "records the predicate in attribute_names" do
+      klass = Class.new(described_class) { predicate :yanked }
+
+      expect(klass.attribute_names).to eq([:yanked?])
+    end
+
     it "defines a predicate for the attribute" do
       expect(resource.yanked?).to be(true)
     end
@@ -97,6 +109,12 @@ RSpec.describe Gems::Resource do
   end
 
   describe ".time_attribute" do
+    it "records the reader in attribute_names" do
+      klass = Class.new(described_class) { time_attribute :created_at }
+
+      expect(klass.attribute_names).to eq([:created_at])
+    end
+
     it "parses the attribute as a time" do
       expect(resource.created_at).to eq(Time.utc(2023, 6, 29, 20, 57, 24))
     end
@@ -162,6 +180,56 @@ RSpec.describe Gems::Resource do
 
     it "freezes strings" do
       expect(resource_class.new("name" => +"rails").name).to be_frozen
+    end
+  end
+
+  describe ".attribute_names" do
+    it "lists the declared readers in order" do
+      expect(resource_class.attribute_names)
+        .to eq(%i[name key sha yanked? indexed? removed? created_at updated_at built_at])
+    end
+
+    it "is empty for a class that declares nothing" do
+      expect(Class.new(described_class).attribute_names).to eq([])
+    end
+
+    it "keeps record_attribute private" do
+      expect(resource_class).not_to respond_to(:record_attribute)
+    end
+
+    it "does not share names between classes" do
+      Class.new(described_class) { attribute :other }
+
+      expect(resource_class.attribute_names).not_to include(:other)
+    end
+  end
+
+  describe "#deconstruct_keys" do
+    it "reads every declared attribute for nil" do
+      expect(resource.deconstruct_keys(nil)).to eq(name: "rails", key: TEST_KEY, sha: nil, yanked?: true, indexed?: false,
+        removed?: false, created_at: Time.utc(2023, 6, 29, 20, 57, 24), updated_at: nil, built_at: nil)
+    end
+
+    it "reads only the attributes a pattern asks for" do
+      expect(resource.deconstruct_keys(%i[name yanked?])).to eq(name: "rails", yanked?: true)
+    end
+
+    it "leaves out names it does not declare" do
+      expect(resource.deconstruct_keys(%i[name other])).to eq(name: "rails")
+    end
+
+    it "matches a case/in pattern" do
+      matched = case resource
+      in {name: "rails", created_at: Time => created_at} then created_at
+      end
+
+      expect(matched).to eq(Time.utc(2023, 6, 29, 20, 57, 24))
+    end
+
+    it "does not match a pattern with another value" do
+      matched = (resource in {name: "thor"})
+
+      expect(matched).to be(false)
     end
   end
 
