@@ -453,7 +453,7 @@ module Gems
 
   class HTTPError < Error
     attr_reader response: Net::HTTPResponse
-    attr_reader code: String
+    attr_reader code: Integer
 
     def initialize: (response: Net::HTTPResponse) -> void
 

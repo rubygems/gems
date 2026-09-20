@@ -31,7 +31,7 @@ RSpec.describe Gems::HTTPError do
     end
 
     it "exposes the status code" do
-      expect(described_class.new(response:).code).to eq("404")
+      expect(described_class.new(response:).code).to eq(404)
     end
   end
 

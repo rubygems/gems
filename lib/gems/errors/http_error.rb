@@ -14,7 +14,7 @@ module Gems
 
     # The HTTP status code
     # @api public
-    # @return [String] the HTTP status code
+    # @return [Integer] the HTTP status code
     # @example Get the status code
     #   error.code
     attr_reader :code
@@ -29,7 +29,7 @@ module Gems
     def initialize(response:)
       super(error_message(response))
       @response = response
-      @code = response.code
+      @code = Integer(response.code)
     end
 
     private
