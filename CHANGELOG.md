@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-26
+
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x
 needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) for how each feature behaves.
 
@@ -67,4 +69,5 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Send the name of a pushed gem file rather than its path
 * Keep credentials out of the `inspect` output of clients and out of error messages
 
-[unreleased]: https://github.com/rubygems/gems/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/rubygems/gems/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/rubygems/gems/compare/v2.0.0...v3.0.0
