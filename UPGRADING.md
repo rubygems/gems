@@ -60,11 +60,20 @@ request, as `gem push --key` is:
 Gems.push "gems-0.0.8.gem", host: "https://gems.example.com"   # uses the key stored for gems.example.com
 ```
 
-A `host` that is not an HTTP or HTTPS URL raises `ArgumentError` when a client is built and when `host` is assigned,
-where 2.x let `URI::BadURIError` or `URI::InvalidURIError` escape when a request was made.
+A `host` that is not an HTTP or HTTPS URL raises `ArgumentError` where it is assigned, whether that is `Gems.host`,
+a client's `host`, or the `host:` a client is built with, and an invalid `proxy_url` does the same. 2.x let
+`URI::BadURIError` or `URI::InvalidURIError` escape when a request was made:
 
-The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`, and
-`max_redirects` are new, and every option can be set globally or per client.
+```ruby
+# 3.0
+Gems.host = "rubygems.org"      # ArgumentError: Invalid host: rubygems.org
+```
+
+An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, so a continuous integration job whose
+secret is not set sends an unauthenticated request instead of an empty `Authorization` header.
+
+The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`,
+`max_redirects`, `max_retries`, and `max_retry_delay` are new, and every option can be set globally or per client.
 
 ### Renamed methods
 
@@ -97,6 +106,28 @@ Gems.yank "gems", "0.0.8", platform: "java"
 
 `latest`, `just_updated`, `unyank`, `reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same
 way.
+
+### Pagination
+
+The endpoints that take a `page` option have an `_each` counterpart that walks the pages, so the loops 2.x needed
+are no longer yours to write:
+
+```ruby
+# 2.x
+page = 1
+gems = []
+loop do
+  results = Gems.search("cucumber", :page => page)
+  break if results.empty?
+  gems += results
+  page += 1
+end
+
+# 3.0
+gems = Gems.search_each("cucumber").to_a
+```
+
+`latest_each`, `just_updated_each`, and `timeframe_versions_each` do the same for their endpoints.
 
 ### Return values
 

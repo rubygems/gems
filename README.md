@@ -54,6 +54,10 @@ Gems.attestations 'nokogiri', '1.15.0', platform: 'java'
 # Return an array of active gems that match the query.
 Gems.search 'cucumber'
 
+# Walk every page of results, a page at a time, without tracking page numbers.
+Gems.search_each('cucumber').first(100)
+Gems.search_each('cucumber') { |gem| puts gem.name }
+
 # Return the names of gems that match the query, for a search box.
 Gems.autocomplete 'nokogiri'
 
@@ -133,9 +137,14 @@ Gems.latest
 # Returns the 50 most recently updated gems
 Gems.just_updated
 
+# Each of these has an _each counterpart that walks the pages for you.
+Gems.latest_each.lazy.reject(&:yanked?).first(10)
+Gems.just_updated_each { |gem| puts gem.name }
+
 # Returns the gem versions created in a timeframe of up to seven days, 30 at a time.
 Gems.timeframe_versions from: Time.now - 86_400
 Gems.timeframe_versions from: '2019-01-18T21:24:29Z', to: '2019-01-19T21:24:29Z', page: 2
+Gems.timeframe_versions_each(from: Time.now - 86_400).count
 
 # Create an API key using HTTP basic authentication.
 # The key is only returned once, so store it somewhere safe.
@@ -204,6 +213,23 @@ gem['dependencies'] # => {"development" => [...], "runtime" => [...]}
 gem.to_h            # => the parsed JSON response
 ```
 
+Two endpoints return their JSON as it is, by design, rather than wrapping it: `contents` answers with a plain map of
+path to checksum, and `attestations` answers with sigstore bundles, whose shape is defined by sigstore rather than by
+RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem names for the same reason.
+
+## Pagination
+
+The endpoints that return one page at a time — `search`, `latest`, `just_updated`, and `timeframe_versions` — each
+have an `_each` counterpart that walks the pages. It returns an `Enumerator`, requests a page only once the results
+of the page before it have been enumerated, and stops at the first empty page:
+
+```ruby
+Gems.search_each('cucumber').first(100)          # requests only the pages it needs
+Gems.latest_each.lazy.reject(&:yanked?).first(5)
+Gems.just_updated_each { |gem| puts gem.name }   # a block enumerates every page
+Gems.timeframe_versions_each from: Time.now - 86_400
+```
+
 ## Configuration
 
 Clients default to the global configuration, which can be set with `Gems.configure` or overridden per client:
@@ -224,6 +250,8 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `debug_output` | An IO that receives HTTP debug output, with credentials redacted | `nil`                          |
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
+| `max_retries` | The number of times a rate-limited request is sent again | `0`                                  |
+| `max_retry_delay` | The longest a request waits before it is sent again, in seconds | `60`               |
 
 Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
 `Gems::TrustedPublisherAuthenticator`, and `Gems::OTPAuthenticator` (which wraps one of the others).
@@ -256,6 +284,23 @@ Debug output is redacted before it reaches the IO `debug_output` is set to, so t
 `update_api_key` sends, and the API key an API key or token exchange response returns are written as `[REDACTED]`.
 Everything else Net::HTTP writes, including the rest of the headers, is left as it is.
 
+## Retries
+
+RubyGems.org answers a request it turned away with 429 Too Many Requests, or 503 Service Unavailable, and a
+`Retry-After` header saying how long to wait. Setting `max_retries` waits and sends the request again:
+
+```ruby
+Gems.max_retries = 3
+Gems.rubygem 'rails'
+```
+
+Retrying is off by default, so a rate-limited request raises rather than pausing the thread unless you asked for it.
+Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
+idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
+`Retry-After` asks for, and doubles from one second when the response does not carry the header. A response asking to
+wait longer than `max_retry_delay` raises instead, so that a server cannot pause your program for as long as it likes.
+`HTTPError#retry_after` reads the header yourself when you would rather handle it in your own code.
+
 ## Errors
 
 All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
@@ -263,7 +308,9 @@ integer status `code`, with specific classes such as `Gems::NotFound`, `Gems::Un
 `Gems::ClientError` or `Gems::ServerError` for any other 4xx or 5xx status. The message of an error is the response
 body, or the status message when the body is empty or an HTML page, such as the error page of a CDN. When a 429 or
 503 response carries a `Retry-After` header, `retry_after` reads it as the seconds to wait.
-Network failures raise `Gems::NetworkError`, redirect loops raise `Gems::TooManyRedirects`, and a successful response
+Network failures raise `Gems::NetworkError`, whose `cause` is the `Errno`, `Net`, `Socket`, `Timeout`, `OpenSSL`, or
+`Zlib` error underneath, so a timeout worth retrying can be told from a refused connection that is not. Redirect loops
+raise `Gems::TooManyRedirects`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
 portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the
 latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`,
