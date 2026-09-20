@@ -1,4 +1,4 @@
-require "uri"
+require "cgi/escape"
 
 module Gems
   # Escapes the values interpolated into request paths, mixed into the API endpoints
@@ -13,17 +13,16 @@ module Gems
   module PathEscaping
     private
 
-    # The characters that may appear in a path segment unescaped: the unreserved characters of RFC 3986
-    UNRESERVED = /[^A-Za-z0-9\-._~]/
-    private_constant :UNRESERVED
-
     # Escape a value interpolated into a request path
+    #
+    # CGI.escapeURIComponent percent-encodes everything but the unreserved characters of RFC 3986, which are the
+    # characters a path segment may hold as they are.
     #
     # @api private
     # @param value [Object] the value, which is read as a String
     # @return [String] the value, with everything but the unreserved characters percent-encoded
     def escape(value)
-      URI::DEFAULT_PARSER.escape(value.to_s, UNRESERVED) #: String
+      CGI.escapeURIComponent(value.to_s)
     end
   end
 end

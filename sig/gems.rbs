@@ -588,8 +588,6 @@ module Gems
   end
 
   module PathEscaping
-    UNRESERVED: Regexp
-
     private
 
     def escape: (untyped value) -> String

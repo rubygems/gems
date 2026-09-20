@@ -1,6 +1,7 @@
 target :lib do
   signature "sig"
   check "lib"
+  library "cgi"
   library "forwardable"
   library "json"
   library "net-http"
