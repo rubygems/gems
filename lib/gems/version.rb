@@ -1,3 +1,4 @@
+require_relative "errors/invalid_response"
 require_relative "resource"
 
 module Gems
@@ -137,12 +138,14 @@ module Gems
     #
     # @api public
     # @return [String, nil] the SHA-256 checksum of the gem file, in hex
+    # @raise [InvalidResponse] if the base64-encoded checksum cannot be decoded
     # @example
     #   version.sha
     def sha
       return self["sha"] if attributes.key?("sha")
 
-      self["sha256"]&.unpack1("m0")&.unpack1("H*")
+      value = self["sha256"]
+      value && decode_sha(value)
     end
     record_attribute(:sha)
 
@@ -169,5 +172,19 @@ module Gems
     #   @example
     #     version.number
     attribute :number
+
+    private
+
+    # Decode a base64-encoded checksum to hex
+    #
+    # @api private
+    # @param value [Object] the attribute value
+    # @return [String] the checksum in hex
+    # @raise [InvalidResponse] if the value is not a base64-encoded checksum
+    def decode_sha(value)
+      value.unpack1("m0").unpack1("H*") #: String
+    rescue ArgumentError, NoMethodError
+      raise InvalidResponse.new(body: value.to_s, message: "#{value.inspect} is not a base64-encoded checksum")
+    end
   end
 end

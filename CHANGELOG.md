@@ -58,6 +58,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Exchange a trusted publishing ID token once when requests are made concurrently, since RubyGems.org issues the API key only once per token
 * Build the client the module delegates to again only when the configured credentials change, and apply the rest of the configuration — the user agent, the timeouts, the debug output, the proxy, and the maximum redirects — to the client it has, so that changing one of them no longer throws away the API key an ID token was exchanged for; `Gems.reset` forgets the client, and a mutex guards it, so that threads calling it at once build one client
 * Inherit the readers a resource declares in its subclasses, so that a subclass of `Gem`, `Version`, or another resource keeps matching patterns, inspecting, and comparing by them
+* Raise `InvalidResponse` from `Version#sha`, rather than `ArgumentError` or `NoMethodError`, when the base64 `sha256` of a response cannot be decoded
 * Raise `ArgumentError` for a `host` that is not an HTTP or HTTPS URL, when a client is built and when `host` is assigned, rather than letting `URI::BadURIError` or `URI::InvalidURIError` escape when a request is made; an invalid host leaves the host as it was, as an invalid `proxy_url` does
 * Raise `ArgumentError` for an API key scope the RubyGems API does not define, rather than sending a misspelled scope for the server to ignore and leaving the key scoped differently than it was meant to be
 

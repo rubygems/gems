@@ -278,6 +278,10 @@ module Gems
     def sha: () -> String?
     def spdx_identifier: () -> String?
     def metadata: () -> Hash[String, String]?
+
+    private
+
+    def decode_sha: (untyped value) -> String
   end
 
   class Owner < Resource

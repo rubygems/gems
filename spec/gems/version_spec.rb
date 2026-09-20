@@ -108,6 +108,28 @@ RSpec.describe Gems::Version do
     it "is an attribute for pattern matching" do
       expect(version.deconstruct_keys([:sha])).to eq(sha: "5dfbd481a23556ad425fc8541399a129a08ed550f877294b44d0170ca5b9f421")
     end
+
+    it "raises an InvalidResponse for a sha256 that is not base64" do
+      expect { described_class.new("sha256" => "not base64!").sha }
+        .to raise_error(Gems::InvalidResponse, '"not base64!" is not a base64-encoded checksum')
+    end
+
+    it "raises an InvalidResponse for a sha256 that is not a String" do
+      expect { described_class.new("sha256" => 12_345).sha }
+        .to raise_error(Gems::InvalidResponse, "12345 is not a base64-encoded checksum")
+    end
+
+    it "reports the value that could not be decoded" do
+      described_class.new("sha256" => "not base64!").sha
+    rescue Gems::InvalidResponse => e
+      expect(e.body).to eq("not base64!")
+    end
+
+    it "reports a value that is not a String as a String" do
+      described_class.new("sha256" => 12_345).sha
+    rescue Gems::InvalidResponse => e
+      expect(e.body).to eq("12345")
+    end
   end
 
   describe "#number" do
