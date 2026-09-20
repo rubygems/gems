@@ -149,12 +149,17 @@ module Gems
     # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The credentials file is only read when
     # this method is called.
     #
+    # When the credentials file does not have the permissions RubyGems requires, RubyGems reports the problem on
+    # standard error and would exit the process; this method returns nil instead.
+    #
     # @api public
-    # @return [String, nil] the API key, or nil when none is stored
+    # @return [String, nil] the API key, or nil when none is stored or the credentials file cannot be read
     # @example Get the default API key
     #   Gems.default_key
     def default_key
       ENV.fetch("GEM_HOST_API_KEY") { ::Gem.configuration.api_keys.fetch(host) { ::Gem.configuration.rubygems_api_key } }
+    rescue ::Gem::SystemExitException
+      nil
     end
 
     # Convenience method to allow configuration options to be set in a block

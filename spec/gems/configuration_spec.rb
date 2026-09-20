@@ -45,6 +45,14 @@ RSpec.describe Gems::Configuration do
 
       expect(Gems.default_key).to be_nil
     end
+
+    it "returns nil when RubyGems refuses to read the credentials file" do
+      configuration = instance_double(Gem::ConfigFile)
+      allow(configuration).to receive(:api_keys).and_raise(Gem::SystemExitException.new(1))
+      allow(Gem).to receive(:configuration).and_return(configuration)
+
+      expect(Gems.default_key).to be_nil
+    end
   end
 
   describe "#key" do

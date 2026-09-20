@@ -1,5 +1,8 @@
-# Declare the RubyGems methods used by Gems::Configuration and Gems::Identifiers
+# Declare the RubyGems methods and errors used by Gems::Configuration and Gems::Identifiers
 module Gem
+  class SystemExitException < SystemExit
+  end
+
   class ConfigFile
     def rubygems_api_key: () -> String?
     def api_keys: () -> Hash[untyped, String]
