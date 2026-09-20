@@ -154,7 +154,8 @@ Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: t
 Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 
 # The following methods require authentication.
-# By default, we load your API key from ~/.gem/credentials
+# By default, we load your API key as `gem push` does: from GEM_HOST_API_KEY, or from
+# ~/.gem/credentials, where `gem signin` stores it (`gem signin --host` for another host).
 # You can override this default by specifying a custom API key.
 Gems.configure do |config|
   config.key = '701243f217cdf23b1370c7b66b65ca97'
@@ -201,7 +202,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | Option        | Description                                              | Default                                |
 | ------------- | -------------------------------------------------------- | -------------------------------------- |
 | `host`        | The RubyGems-compatible host, including scheme           | `RUBYGEMS_HOST` or `https://rubygems.org` |
-| `key`         | The API key sent in the `Authorization` header           | `~/.gem/credentials`                   |
+| `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or `~/.gem/credentials` |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |

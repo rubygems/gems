@@ -44,6 +44,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Delegate only the API methods from the `Gems` module instead of every client method
 * Push to the client's configured host by default
 * Read the default API key from `~/.gem/credentials` lazily instead of when the library is required; assigning `nil` to `key` now disables that fallback without disabling configured basic authentication or trusted publishing
+* Resolve the default API key as `gem push` does: the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the configured host, else the RubyGems.org key
 * Rename `GemError` to `Error` and build HTTP errors from a response rather than a message
 * Rename `info` to `rubygem` and `gems` to `owned_gems`
 * Return the version string from `latest_version`

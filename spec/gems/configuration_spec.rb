@@ -6,15 +6,49 @@ RSpec.describe Gems::Configuration do
   end
 
   describe "#default_key" do
-    it "reads the API key from the RubyGems configuration" do
-      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY"))
+    let(:api_keys) { {:rubygems_api_key => "FILE_KEY", "https://gems.example.com" => "HOST_KEY"} }
+
+    before { allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY", api_keys:)) }
+
+    it "reads the RubyGems.org API key from the RubyGems configuration" do
+      expect(Gems.default_key).to eq("FILE_KEY")
+    end
+
+    it "reads the API key stored for the configured host" do
+      Gems.host = "https://gems.example.com"
+
+      expect(Gems.default_key).to eq("HOST_KEY")
+    end
+
+    it "falls back to the RubyGems.org API key for a host without one" do
+      Gems.host = "https://other.example.com"
 
       expect(Gems.default_key).to eq("FILE_KEY")
+    end
+
+    it "prefers the GEM_HOST_API_KEY environment variable" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_API_KEY" => "ENV_KEY"))
+      Gems.host = "https://gems.example.com"
+
+      expect(Gems.default_key).to eq("ENV_KEY")
+    end
+
+    it "does not read the RubyGems configuration when GEM_HOST_API_KEY is set" do
+      stub_const("ENV", ENV.to_h.merge("GEM_HOST_API_KEY" => "ENV_KEY"))
+      Gems.default_key
+
+      expect(Gem).not_to have_received(:configuration)
+    end
+
+    it "returns nil without a stored key" do
+      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: nil, api_keys: {}))
+
+      expect(Gems.default_key).to be_nil
     end
   end
 
   describe "#key" do
-    before { allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY")) }
+    before { allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY", api_keys: {})) }
 
     it "returns the configured key" do
       Gems.key = TEST_KEY
@@ -118,7 +152,7 @@ RSpec.describe Gems::Configuration do
     end
 
     it "restores the default key" do
-      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY"))
+      allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key: "FILE_KEY", api_keys: {}))
       Gems.key = TEST_KEY
       Gems.reset
 

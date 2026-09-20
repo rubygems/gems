@@ -38,7 +38,9 @@ Gems.new.get "/api/v1/gems/rails.json"
 ```
 
 The API key in `~/.gem/credentials` is read when it is first needed rather than when the library is required, and
-assigning `nil` to `key` turns that fallback off, where 2.x fell back to it anyway:
+assigning `nil` to `key` turns that fallback off, where 2.x fell back to it anyway. The default key is resolved as
+`gem push` resolves it: the `GEM_HOST_API_KEY` environment variable comes first, then the key `gem signin --host`
+stored for the configured `host`, then the RubyGems.org key, where 2.x read only the RubyGems.org key:
 
 ```ruby
 # 3.0

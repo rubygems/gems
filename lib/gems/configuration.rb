@@ -143,16 +143,18 @@ module Gems
       end
     end
 
-    # The API key stored in ~/.gem/credentials by `gem signin`
+    # The API key `gem push` would use for the configured host
     #
-    # The credentials file is only read when this method is called.
+    # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for {#host} in
+    # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The credentials file is only read when
+    # this method is called.
     #
     # @api public
-    # @return [String, nil] the stored API key
-    # @example Get the stored API key
+    # @return [String, nil] the API key, or nil when none is stored
+    # @example Get the default API key
     #   Gems.default_key
     def default_key
-      ::Gem.configuration.rubygems_api_key
+      ENV.fetch("GEM_HOST_API_KEY") { ::Gem.configuration.api_keys.fetch(host) { ::Gem.configuration.rubygems_api_key } }
     end
 
     # Convenience method to allow configuration options to be set in a block
