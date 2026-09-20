@@ -50,6 +50,20 @@ RSpec.describe Gems::API::DownloadEndpoints do
       expect(a_get("/api/v1/downloads/nokogiri-1.15.0-java.json")).to have_been_made
     end
 
+    it "accepts a platform" do
+      stub_get("/api/v1/downloads/nokogiri-1.15.0-java.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      client.downloads("nokogiri", "1.15.0", platform: "java")
+
+      expect(a_get("/api/v1/downloads/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "prefers a platform to the platform of a version" do
+      stub_get("/api/v1/downloads/nokogiri-1.15.0-java.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      client.downloads("nokogiri", Gems::Version.new("number" => "1.15.0", "platform" => "x86_64-linux"), platform: "java")
+
+      expect(a_get("/api/v1/downloads/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
     it "escapes the gem name" do
       stub_get("/api/v1/downloads/..%2Frails-0.0.0.json").to_return(body: fixture("rails_admin-0.0.0.json"))
       client.downloads("../rails", "0.0.0")

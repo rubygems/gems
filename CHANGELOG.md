@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `TrustedPublisherAuthenticator`, an `id_token` option, and `exchange_trusted_publisher_token` for trusted publishing
 * Add `create_api_key` and `update_api_key` for the current API key endpoints
 * Add `autocomplete` for gem name suggestions
-* Add a `platform` option to `version`
+* Add a `platform` option to `version` and to `downloads`
 * Add `contents` for the file checksums of a version
 * Add `attestations` for the sigstore attestations of a version
 * Add `timeframe_versions` for the versions created in a timeframe

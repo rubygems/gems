@@ -94,6 +94,9 @@ Gems.total_downloads
 # (Defaults to the latest version if no version is specified.)
 Gems.downloads('rails_admin', '0.0.1').version_downloads
 
+# Return the downloads of a version for a specific platform.
+Gems.downloads('nokogiri', '1.15.0', platform: 'java').version_downloads
+
 # Returns an array containing the top 50 downloaded gem versions of all time.
 Gems.most_downloaded.first.full_name
 

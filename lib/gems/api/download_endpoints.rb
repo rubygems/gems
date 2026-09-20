@@ -32,15 +32,19 @@ module Gems
       #   version argument too, so that the downloads of a version are those of that version.
       # @param version [String, Version, nil] The version of the gem (defaults to the version given as the gem, or to
       #   the latest version).
+      # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
+      #   platform of a version object, or "ruby".
       # @return [Downloads]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
       # @example
       #   Gems.downloads(Gems.version("rails_admin", "0.0.1")).version_downloads
-      def downloads(gem_name, version = nil)
+      # @example
+      #   Gems.downloads("nokogiri", "1.15.0", platform: "java").version_downloads
+      def downloads(gem_name, version = nil, platform: nil)
         version = version_of(gem_name, version) || latest_version(gem_name)
-        Downloads.new(parse_json(get("/api/v1/downloads/#{escape(full_name_of(gem_name, version))}.json")))
+        Downloads.new(parse_json(get("/api/v1/downloads/#{escape(full_name_of(gem_name, version, platform))}.json")))
       end
 
       # Returns the top 50 downloaded gem versions of all time
