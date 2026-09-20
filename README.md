@@ -310,6 +310,32 @@ after a network failure too, since a request that never arrived has no response 
 asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your program for as long
 as it likes. `HTTPError#retry_after` reads the header yourself when you would rather handle it in your own code.
 
+## Thread safety
+
+`Gems.client` is built under a lock, so the methods of the `Gems` module can be called from many threads at once and
+share one client between them. That client's connections are pooled per host, and a connection is used by one
+request at a time, so concurrent requests neither wait for one another nor share a socket. A trusted publishing ID
+token is exchanged for an API key once, however many threads ask for it at the same time.
+
+What is not synchronized is changing things while requests are in flight. The global configuration is meant to be
+set up once, before the threads that use it start:
+
+```ruby
+Gems.configure do |config|       # at boot
+  config.key = ENV.fetch('GEM_HOST_API_KEY')
+  config.max_retries = 3
+end
+
+threads = 10.times.map { |i| Thread.new { Gems.search('cucumber', page: i + 1) } }
+threads.each(&:join)
+```
+
+Assigning to `Gems.key`, `Gems.host`, or another credential afterwards builds the shared client again, and a request
+another thread is making at that moment carries the credentials it started with. A `Gems::Client` of your own is the
+same: it is safe to make requests with from several threads, and its `key=`, `host=`, and `otp=` writers are meant
+for the thread that owns it rather than for one racing a request. Give each thread a client of its own when they
+need different credentials.
+
 ## Errors
 
 All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
