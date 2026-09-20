@@ -219,9 +219,10 @@ Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environmen
 All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
 integer status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`, and
 `Gems::ClientError` or `Gems::ServerError` for any other 4xx or 5xx status.
-Network failures raise `Gems::NetworkError` and redirect loops raise `Gems::TooManyRedirects`. Asking for the latest
-version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`, raises
-`Gems::NoLatestVersion`.
+Network failures raise `Gems::NetworkError`, redirect loops raise `Gems::TooManyRedirects`, and a successful response
+whose body is not JSON, such as the page of a proxy or captive portal, raises `Gems::InvalidResponse`. Asking for the
+latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`,
+raises `Gems::NoLatestVersion`.
 
 ## Development
 

@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../gem"
 
 module Gems
@@ -8,6 +8,7 @@ module Gems
     # @api public
     module ActivityEndpoints
       include Identifiers
+      include JSONParsing
 
       # Returns the 50 gems most recently added to RubyGems.org (for the first time)
       #
@@ -18,7 +19,7 @@ module Gems
       # @example
       #   Gems.latest
       def latest(page: nil)
-        Gem.list(JSON.parse(get("/api/v1/activity/latest.json", {page:}.compact)))
+        Gem.list(parse_json(get("/api/v1/activity/latest.json", {page:}.compact)))
       end
 
       # Returns the 50 most recently updated gems
@@ -30,7 +31,7 @@ module Gems
       # @example
       #   Gems.just_updated
       def just_updated(page: nil)
-        Gem.list(JSON.parse(get("/api/v1/activity/just_updated.json", {page:}.compact)))
+        Gem.list(parse_json(get("/api/v1/activity/just_updated.json", {page:}.compact)))
       end
     end
   end

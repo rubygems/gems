@@ -111,8 +111,8 @@ RSpec.describe Gems::API::VersionEndpoints do
     context "when the response is not JSON" do
       before { stub_get("/api/v2/rubygems/rails/versions/7.0.99.json").to_return(body: "This version could not be found.") }
 
-      it "raises a parser error" do
-        expect { client.version("rails", "7.0.99") }.to raise_error(JSON::ParserError)
+      it "raises InvalidResponse" do
+        expect { client.version("rails", "7.0.99") }.to raise_error(Gems::InvalidResponse)
       end
     end
   end

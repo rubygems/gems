@@ -28,8 +28,8 @@ RSpec.describe Gems::API::GemEndpoints do
     context "when the response is not JSON" do
       before { stub_get("/api/v1/gems/nonexistentgem.json").to_return(body: "This rubygem could not be found.") }
 
-      it "raises a parser error" do
-        expect { client.rubygem("nonexistentgem") }.to raise_error(JSON::ParserError)
+      it "raises InvalidResponse" do
+        expect { client.rubygem("nonexistentgem") }.to raise_error(Gems::InvalidResponse)
       end
     end
   end

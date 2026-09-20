@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../downloads"
 require_relative "../version"
 
@@ -9,6 +9,7 @@ module Gems
     # @api public
     module DownloadEndpoints
       include Identifiers
+      include JSONParsing
 
       # Returns the total number of downloads of all gems
       #
@@ -18,7 +19,7 @@ module Gems
       # @example
       #   Gems.total_downloads
       def total_downloads
-        JSON.parse(get("/api/v1/downloads.json")).fetch("total")
+        parse_json(get("/api/v1/downloads.json")).fetch("total")
       end
 
       # Returns the number of downloads of a gem and of one of its versions
@@ -33,7 +34,7 @@ module Gems
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
       def downloads(gem_name, version = nil)
         full_name = full_name_of(gem_name, version || latest_version(gem_name))
-        Downloads.new(JSON.parse(get("/api/v1/downloads/#{full_name}.json")))
+        Downloads.new(parse_json(get("/api/v1/downloads/#{full_name}.json")))
       end
 
       # Returns the top 50 downloaded gem versions of all time
@@ -46,7 +47,7 @@ module Gems
       # @example
       #   Gems.most_downloaded.first.full_name
       def most_downloaded
-        JSON.parse(get("/api/v1/downloads/all.json")).fetch("gems").map do |version, downloads|
+        parse_json(get("/api/v1/downloads/all.json")).fetch("gems").map do |version, downloads|
           Version.new(version.merge("name" => gem_name_from(version), "downloads_count" => downloads))
         end
       end

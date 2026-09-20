@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../gem"
 require_relative "../request_builder"
 
@@ -9,6 +9,7 @@ module Gems
     # @api public
     module GemEndpoints
       include Identifiers
+      include JSONParsing
 
       # Returns some basic information about the given gem
       #
@@ -19,7 +20,7 @@ module Gems
       # @example
       #   Gems.rubygem "rails"
       def rubygem(gem_name)
-        Gem.new(JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}.json")))
+        Gem.new(parse_json(get("/api/v1/gems/#{name_of(gem_name)}.json")))
       end
 
       # Returns an array of active gems that match the query
@@ -32,7 +33,7 @@ module Gems
       # @example
       #   Gems.search "cucumber", page: 2
       def search(query, page: nil)
-        Gem.list(JSON.parse(get("/api/v1/search.json", {query:, page:}.compact)))
+        Gem.list(parse_json(get("/api/v1/search.json", {query:, page:}.compact)))
       end
 
       # Returns the names of gems matching the query, for populating a search box
@@ -44,7 +45,7 @@ module Gems
       # @example
       #   Gems.autocomplete "nokogiri"
       def autocomplete(query)
-        JSON.parse(get("/api/v1/search/autocomplete", {query:}))
+        parse_json(get("/api/v1/search/autocomplete", {query:}))
       end
 
       # List all gems that you own, or that the given user owns
@@ -61,7 +62,7 @@ module Gems
         else
           "/api/v1/gems.json"
         end
-        Gem.list(JSON.parse(get(path)))
+        Gem.list(parse_json(get(path)))
       end
 
       # Submit a gem to RubyGems.org or another host
@@ -126,7 +127,7 @@ module Gems
       # @example
       #   Gems.reverse_dependencies "money", only: "runtime"
       def reverse_dependencies(gem_name, only: nil)
-        JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}/reverse_dependencies.json", {only:}.compact))
+        parse_json(get("/api/v1/gems/#{name_of(gem_name)}/reverse_dependencies.json", {only:}.compact))
       end
 
       private

@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../owner"
 
 module Gems
@@ -8,6 +8,7 @@ module Gems
     # @api public
     module OwnerEndpoints
       include Identifiers
+      include JSONParsing
 
       # View all owners of a gem that you own
       #
@@ -18,7 +19,7 @@ module Gems
       # @example
       #   Gems.owners "gemcutter"
       def owners(gem_name)
-        Owner.list(JSON.parse(get("/api/v1/gems/#{name_of(gem_name)}/owners.json")))
+        Owner.list(parse_json(get("/api/v1/gems/#{name_of(gem_name)}/owners.json")))
       end
 
       # Add an owner to a RubyGem you own, giving that user permission to manage it

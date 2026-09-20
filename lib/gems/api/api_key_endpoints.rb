@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../api_key"
 require_relative "../trusted_publisher_authenticator"
 
@@ -9,6 +9,7 @@ module Gems
     # @api public
     module ApiKeyEndpoints
       include Identifiers
+      include JSONParsing
 
       # Create an API key using HTTP basic auth
       #
@@ -33,7 +34,7 @@ module Gems
       #   Gems.create_api_key("ci-push", push_rubygem: true, rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
       def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
         settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
-        ApiKey.new(JSON.parse(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
+        ApiKey.new(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
       end
 
       # Update the scopes of an API key using HTTP basic auth

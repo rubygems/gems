@@ -116,6 +116,8 @@ module Gems
   end
 
   class TrustedPublisherAuthenticator < Authenticator
+    include JSONParsing
+
     EXCHANGE_TOKEN_PATH: String
     JSON_CONTENT_TYPE: String
 
@@ -321,6 +323,7 @@ module Gems
 
   module API::ActivityEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     def latest: (?page: Integer?) -> Array[Gem]
     def just_updated: (?page: Integer?) -> Array[Gem]
@@ -328,6 +331,7 @@ module Gems
 
   module API::ApiKeyEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
     def update_api_key: (api_key_identifier key, **bool scopes) -> String
@@ -336,6 +340,7 @@ module Gems
 
   module API::DownloadEndpoints : Object, _Requests, API::VersionEndpoints
     include Identifiers
+    include JSONParsing
 
     def total_downloads: () -> Integer
     def downloads: (gem_identifier gem_name, ?version_identifier? version) -> Downloads
@@ -348,6 +353,7 @@ module Gems
 
   module API::GemEndpoints : Object, _Requests, API::VersionEndpoints
     include Identifiers
+    include JSONParsing
 
     def rubygem: (gem_identifier gem_name) -> Gem
     def search: (String query, ?page: Integer?) -> Array[Gem]
@@ -365,6 +371,7 @@ module Gems
 
   module API::OwnerEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     def owners: (gem_identifier gem_name) -> Array[Owner]
     def add_owner: (gem_identifier gem_name, owner_identifier owner, ?role: String?) -> String
@@ -374,6 +381,7 @@ module Gems
 
   module API::ProfileEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     def profile: (user_identifier user) -> Profile
     def me: () -> Profile
@@ -381,6 +389,7 @@ module Gems
 
   module API::VersionEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     def versions: (gem_identifier gem_name) -> Array[Version]
     def latest_version: (gem_identifier gem_name) -> String
@@ -392,6 +401,7 @@ module Gems
 
   module API::WebHookEndpoints : Object, _Requests
     include Identifiers
+    include JSONParsing
 
     WEB_HOOK_GEM_NAMES: Hash[String, String]
 
@@ -508,6 +518,18 @@ module Gems
   end
 
   class NoLatestVersion < Error
+  end
+
+  class InvalidResponse < Error
+    attr_reader body: String
+
+    def initialize: (body: String) -> void
+  end
+
+  module JSONParsing
+    private
+
+    def parse_json: (String body) -> untyped
   end
 
   class Connection

@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../web_hook"
 
 module Gems
@@ -8,6 +8,7 @@ module Gems
     # @api public
     module WebHookEndpoints
       include Identifiers
+      include JSONParsing
 
       # Mapping of the gem name groupings returned by the web hooks endpoint to the names used to register hooks
       WEB_HOOK_GEM_NAMES = {"all gems" => "*"}.freeze
@@ -22,7 +23,7 @@ module Gems
       # @example
       #   Gems.web_hooks.map(&:url)
       def web_hooks
-        JSON.parse(get("/api/v1/web_hooks.json")).flat_map do |gem_name, hooks|
+        parse_json(get("/api/v1/web_hooks.json")).flat_map do |gem_name, hooks|
           WebHook.list(hooks.map { |hook| hook.merge("gem_name" => WEB_HOOK_GEM_NAMES.fetch(gem_name, gem_name)) })
         end
       end

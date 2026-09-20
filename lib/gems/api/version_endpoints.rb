@@ -1,6 +1,6 @@
-require "json"
 require_relative "../errors/no_latest_version"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../gem"
 require_relative "../version"
 
@@ -10,6 +10,7 @@ module Gems
     # @api public
     module VersionEndpoints
       include Identifiers
+      include JSONParsing
 
       # Returns an array of gem version details
       #
@@ -21,7 +22,7 @@ module Gems
       #   Gems.versions "coulda"
       def versions(gem_name)
         name = name_of(gem_name)
-        Version.list(JSON.parse(get("/api/v1/versions/#{name}.json")).map { |version| version.merge("name" => name) })
+        Version.list(parse_json(get("/api/v1/versions/#{name}.json")).map { |version| version.merge("name" => name) })
       end
 
       # Returns the latest version number of a gem
@@ -35,7 +36,7 @@ module Gems
       #   Gems.latest_version "coulda"
       def latest_version(gem_name)
         response = get("/api/v1/versions/#{name_of(gem_name)}/latest.json")
-        version = JSON.parse(response).fetch("version")
+        version = parse_json(response).fetch("version")
         # The endpoint answers 200 with "unknown" rather than 404 for a gem with no published version
         raise NoLatestVersion, "#{name_of(gem_name)} has no latest version" if version.eql?("unknown")
 
@@ -57,7 +58,7 @@ module Gems
       #   Gems.version "nokogiri", "1.15.0", platform: "java"
       def version(gem_name, version, platform: nil)
         path = "/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}.json"
-        Version.new(JSON.parse(get(path, {platform: platform || platform_of(version)}.compact)))
+        Version.new(parse_json(get(path, {platform: platform || platform_of(version)}.compact)))
       end
 
       # Returns the SHA-256 checksum of every file packaged in a specific gem version
@@ -75,7 +76,7 @@ module Gems
       #   Gems.contents("rails", "8.1.3.1")["README.md"]["sha256"]
       def contents(gem_name, version, platform: nil)
         path = "/api/v2/rubygems/#{name_of(gem_name)}/versions/#{number_of(version)}/contents.json"
-        JSON.parse(get(path, {platform: platform || platform_of(version)}.compact))
+        parse_json(get(path, {platform: platform || platform_of(version)}.compact))
       end
 
       # Returns the sigstore attestations published with a gem version
@@ -92,7 +93,7 @@ module Gems
       # @example
       #   Gems.attestations "nokogiri", "1.15.0", platform: "java"
       def attestations(gem_name, version, platform: nil)
-        JSON.parse(get("/api/v1/attestations/#{full_name_of(gem_name, version, platform)}.json"))
+        parse_json(get("/api/v1/attestations/#{full_name_of(gem_name, version, platform)}.json"))
       end
 
       # Returns the gem versions created within a timeframe of up to seven days
@@ -109,7 +110,7 @@ module Gems
       #   Gems.timeframe_versions from: Time.now - 86_400
       def timeframe_versions(from:, to: nil, page: nil)
         params = {from: timestamp_of(from), to: timestamp_of(to), page:}.compact
-        Gem.list(JSON.parse(get("/api/v1/timeframe_versions.json", params)))
+        Gem.list(parse_json(get("/api/v1/timeframe_versions.json", params)))
       end
     end
   end

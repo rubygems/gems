@@ -107,6 +107,12 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
 
       expect { authenticator.exchange_token! }.to raise_error(Gems::Unauthorized, "Invalid token")
     end
+
+    it "raises InvalidResponse when the exchange answers with a body that is not JSON" do
+      stub_request(:post, exchange_url).to_return(body: "<html>")
+
+      expect { authenticator.exchange_token! }.to raise_error(Gems::InvalidResponse)
+    end
   end
 
   describe "#header" do

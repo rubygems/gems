@@ -4,6 +4,7 @@ require_relative "api_key"
 require_relative "authenticator"
 require_relative "configuration"
 require_relative "connection"
+require_relative "json_parsing"
 require_relative "request_builder"
 require_relative "response_parser"
 
@@ -15,6 +16,8 @@ module Gems
   #
   # @api public
   class TrustedPublisherAuthenticator < Authenticator
+    include JSONParsing
+
     # The path of the token exchange endpoint
     EXCHANGE_TOKEN_PATH = "/api/v1/oidc/trusted_publisher/exchange_token".freeze
     # The content type of the token exchange request and response
@@ -81,6 +84,7 @@ module Gems
     # @param _request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the authentication headers with the exchanged API key
     # @raise [HTTPError] if the token exchange fails
+    # @raise [InvalidResponse] if the response is not JSON
     # @example Generate an authentication header
     #   authenticator.header(request)
     def header(_request)
@@ -109,7 +113,7 @@ module Gems
       request = request_builder.build(http_method: :post, uri:,
         body: JSON.generate({jwt: id_token}), content_type: JSON_CONTENT_TYPE, headers: {"Accept" => JSON_CONTENT_TYPE})
       response = connection.perform(request:)
-      api_key = ApiKey.new(JSON.parse(ResponseParser.new.parse(response:)))
+      api_key = ApiKey.new(parse_json(ResponseParser.new.parse(response:)))
       @api_key = api_key.key
       api_key
     end

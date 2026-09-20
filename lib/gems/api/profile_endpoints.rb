@@ -1,5 +1,5 @@
-require "json"
 require_relative "../identifiers"
+require_relative "../json_parsing"
 require_relative "../profile"
 
 module Gems
@@ -8,6 +8,7 @@ module Gems
     # @api public
     module ProfileEndpoints
       include Identifiers
+      include JSONParsing
 
       # Returns basic information about a user
       #
@@ -18,7 +19,7 @@ module Gems
       # @example
       #   Gems.profile "qrush"
       def profile(user)
-        Profile.new(JSON.parse(get("/api/v1/profiles/#{slug_of(user)}.json")))
+        Profile.new(parse_json(get("/api/v1/profiles/#{slug_of(user)}.json")))
       end
 
       # Returns basic information about your account
@@ -35,7 +36,7 @@ module Gems
       #   end
       #   Gems.me.mfa
       def me
-        Profile.new(JSON.parse(get("/api/v1/profile/me.json")))
+        Profile.new(parse_json(get("/api/v1/profile/me.json")))
       end
     end
   end
