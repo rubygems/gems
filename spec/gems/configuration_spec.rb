@@ -143,8 +143,8 @@ RSpec.describe Gems::Configuration do
   end
 
   describe "::DEFAULT_USER_AGENT" do
-    it "includes the version" do
-      expect(described_class::DEFAULT_USER_AGENT).to eq("Gems #{Gems::VERSION}")
+    it "is the user agent a request builder sends" do
+      expect(described_class::DEFAULT_USER_AGENT).to equal(Gems::RequestBuilder::DEFAULT_USER_AGENT)
     end
   end
 

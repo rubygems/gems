@@ -1,12 +1,14 @@
 require "net/http"
 require "uri"
 require_relative "authenticator"
-require_relative "configuration"
+require_relative "version"
 
 module Gems
   # Builds HTTP requests for the RubyGems API
   # @api private
   class RequestBuilder
+    # The default 'User-Agent' HTTP header
+    DEFAULT_USER_AGENT = "Gems #{VERSION}".freeze
     # Content type for form-encoded request bodies
     FORM_URLENCODED = "application/x-www-form-urlencoded".freeze
     # Content type for multipart request bodies
@@ -37,7 +39,7 @@ module Gems
     # @return [RequestBuilder] a new instance
     # @example Create a request builder
     #   builder = Gems::RequestBuilder.new(user_agent: "Custom User Agent")
-    def initialize(user_agent: Configuration::DEFAULT_USER_AGENT)
+    def initialize(user_agent: DEFAULT_USER_AGENT)
       @user_agent = user_agent
     end
 

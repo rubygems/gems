@@ -678,6 +678,7 @@ module Gems
   end
 
   class RequestBuilder
+    DEFAULT_USER_AGENT: String
     FORM_URLENCODED: String
     MULTIPART_FORM_DATA: String
     OCTET_STREAM: String

@@ -2,7 +2,7 @@ require "rubygems"
 require_relative "connection"
 require_relative "identifiers"
 require_relative "redirect_handler"
-require_relative "version"
+require_relative "request_builder"
 
 module Gems
   # Global configuration for {Gems::Client} instances
@@ -14,7 +14,7 @@ module Gems
     DEFAULT_HOST = "https://rubygems.org".freeze
 
     # The default 'User-Agent' HTTP header
-    DEFAULT_USER_AGENT = "Gems #{VERSION}".freeze
+    DEFAULT_USER_AGENT = RequestBuilder::DEFAULT_USER_AGENT
 
     # The host used for API requests
     # @api public

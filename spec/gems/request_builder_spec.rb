@@ -3,9 +3,15 @@ RSpec.describe Gems::RequestBuilder do
 
   let(:uri) { URI("https://rubygems.org/api/v1/gems/rails.json") }
 
+  describe "::DEFAULT_USER_AGENT" do
+    it "includes the version" do
+      expect(described_class::DEFAULT_USER_AGENT).to eq("Gems #{Gems::VERSION}")
+    end
+  end
+
   describe "#initialize" do
     it "defaults the user agent" do
-      expect(builder.user_agent).to eq(Gems::Configuration::DEFAULT_USER_AGENT)
+      expect(builder.user_agent).to eq(described_class::DEFAULT_USER_AGENT)
     end
 
     it "sets a custom user agent" do
@@ -29,7 +35,7 @@ RSpec.describe Gems::RequestBuilder do
     end
 
     it "sets the default User-Agent header" do
-      expect(builder.build(http_method: :get, uri:)["User-Agent"]).to eq(Gems::Configuration::DEFAULT_USER_AGENT)
+      expect(builder.build(http_method: :get, uri:)["User-Agent"]).to eq(described_class::DEFAULT_USER_AGENT)
     end
 
     it "uses the configured user agent" do
