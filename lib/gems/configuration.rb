@@ -92,6 +92,16 @@ module Gems
     #   Gems.write_timeout = 30
     attr_accessor :write_timeout
 
+    # The seconds an idle connection is kept open for another request
+    #
+    # Zero closes every connection when its request is done.
+    #
+    # @api public
+    # @return [Integer] the seconds an idle connection is kept open
+    # @example Get or set the keep-alive timeout
+    #   Gems.keep_alive_timeout = 0
+    attr_accessor :keep_alive_timeout
+
     # The IO object for debug output
     # @api public
     # @return [IO, nil] the IO object for debug output
@@ -236,6 +246,7 @@ module Gems
       self.open_timeout = Connection::DEFAULT_OPEN_TIMEOUT
       self.read_timeout = Connection::DEFAULT_READ_TIMEOUT
       self.write_timeout = Connection::DEFAULT_WRITE_TIMEOUT
+      self.keep_alive_timeout = Connection::DEFAULT_KEEP_ALIVE_TIMEOUT
       self.debug_output = nil
       self.proxy_url = nil
       self.max_redirects = RedirectHandler::DEFAULT_MAX_REDIRECTS

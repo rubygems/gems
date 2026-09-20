@@ -13,6 +13,12 @@ module Gems
   CLIENT_MUTEX = Mutex.new
   private_constant :CLIENT_MUTEX
 
+  # The settings of the global configuration that are applied to the client the module has, rather than building
+  # another one from them
+  CONNECTION_SETTINGS = %i[user_agent open_timeout read_timeout write_timeout keep_alive_timeout debug_output
+    proxy_url max_redirects].freeze
+  private_constant :CONNECTION_SETTINGS
+
   # @!method self.new(**options)
   #   Alias for Gems::Client.new
   #   @api public
@@ -89,7 +95,7 @@ module Gems
   # @api private
   # @return [Array<Object>] the values
   def self.connection_values
-    [user_agent, open_timeout, read_timeout, write_timeout, debug_output, proxy_url, max_redirects]
+    CONNECTION_SETTINGS.map { |setting| public_send(setting) }
   end
   private_class_method :connection_values
 
@@ -98,13 +104,7 @@ module Gems
   # @api private
   # @return [Array<Object>] the configuration applied to the client
   def self.apply_connection_values
-    @client.user_agent = user_agent
-    @client.open_timeout = open_timeout
-    @client.read_timeout = read_timeout
-    @client.write_timeout = write_timeout
-    @client.debug_output = debug_output
-    @client.proxy_url = proxy_url
-    @client.max_redirects = max_redirects
+    CONNECTION_SETTINGS.each { |setting| @client.public_send(:"#{setting}=", public_send(setting)) }
     @connection_values = connection_values
   end
   private_class_method :apply_connection_values

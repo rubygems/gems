@@ -2,6 +2,7 @@ require "net/http"
 require "openssl"
 require "uri"
 require "zlib"
+require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
 
@@ -15,18 +16,8 @@ module Gems
     DEFAULT_READ_TIMEOUT = 60 # seconds
     # Default timeout for writing requests in seconds
     DEFAULT_WRITE_TIMEOUT = 60 # seconds
-    # Network errors that should be wrapped in NetworkError
-    NETWORK_ERRORS = [
-      IOError,
-      Net::HTTPBadResponse,
-      Net::ProtocolError,
-      OpenSSL::SSL::SSLError,
-      SocketError,
-      SystemCallError,
-      Timeout::Error,
-      Zlib::Error
-    ].freeze
-    private_constant :NETWORK_ERRORS
+    # Default seconds an idle connection is kept open for another request
+    DEFAULT_KEEP_ALIVE_TIMEOUT = 2 # seconds
 
     # The timeout for opening connections in seconds
     # @api public
@@ -48,6 +39,17 @@ module Gems
     # @example Get or set the write timeout
     #   connection.write_timeout = 30
     attr_accessor :write_timeout
+
+    # The seconds an idle connection is kept open for another request
+    #
+    # A request is sent on the connection kept open for its host when one was used within this many seconds, so that
+    # a series of requests does not open a connection each. Zero closes every connection when its request is done.
+    #
+    # @api public
+    # @return [Integer] the seconds an idle connection is kept open
+    # @example Get or set the keep-alive timeout
+    #   connection.keep_alive_timeout = 0
+    attr_accessor :keep_alive_timeout
 
     # The IO object for debug output
     #
@@ -114,10 +116,10 @@ module Gems
     # @api public
     # @return [String] the summary, which includes the proxy URL without its user and password
     # @example Inspect a connection
-    #   connection.inspect # => #<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60>
+    #   connection.inspect # => #<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60 keep_alive_timeout=2>
     def inspect
       "#<#{self.class} proxy_url=#{redact(proxy_url).inspect} open_timeout=#{open_timeout} " \
-        "read_timeout=#{read_timeout} write_timeout=#{write_timeout}>"
+        "read_timeout=#{read_timeout} write_timeout=#{write_timeout} keep_alive_timeout=#{keep_alive_timeout}>"
     end
 
     # Initialize a new connection
@@ -128,21 +130,28 @@ module Gems
     # @param write_timeout [Integer] the timeout for writing requests in seconds
     # @param debug_output [IO, nil] the IO object for debug output
     # @param proxy_url [String, nil] the proxy URL for requests
+    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open for another request
     # @return [Connection] a new connection instance
     # @example Create a connection with default settings
     #   connection = Gems::Connection.new
     # @example Create a connection with custom timeouts
     #   connection = Gems::Connection.new(open_timeout: 30, read_timeout: 30)
     def initialize(open_timeout: DEFAULT_OPEN_TIMEOUT, read_timeout: DEFAULT_READ_TIMEOUT,
-      write_timeout: DEFAULT_WRITE_TIMEOUT, debug_output: nil, proxy_url: nil)
+      write_timeout: DEFAULT_WRITE_TIMEOUT, debug_output: nil, proxy_url: nil,
+      keep_alive_timeout: DEFAULT_KEEP_ALIVE_TIMEOUT)
       @open_timeout = open_timeout
       @read_timeout = read_timeout
       @write_timeout = write_timeout
       @debug_output = debug_output
+      @keep_alive_timeout = keep_alive_timeout
+      @pool = ConnectionPool.new
       self.proxy_url = proxy_url
     end
 
     # Perform an HTTP request
+    #
+    # The request is sent on the connection kept open for its host, when there is one it can be sent on, and that
+    # connection is kept open for the next request (see {#keep_alive_timeout}).
     #
     # @api public
     # @param request [Net::HTTPRequest] the HTTP request to perform
@@ -151,10 +160,27 @@ module Gems
     # @example Perform a request
     #   response = connection.perform(request: request)
     def perform(request:)
-      http_client = build_http_client(request.uri)
-      http_client.request(request)
-    rescue *NETWORK_ERRORS => e
+      http_client = pool.checkout(request:, settings:, keep_alive_timeout:) { build_http_client(request.uri) }
+      response = http_client.request(request)
+      pool.checkin(request:, http_client:, settings:, keep_alive_timeout:)
+      response
+    rescue *NetworkError::WRAPPED => e
+      pool.discard(http_client)
       raise NetworkError, "Network error: #{e}"
+    end
+
+    # Close the connections kept open for the next request
+    #
+    # The connections are opened again as they are needed, so a connection that is closed while it is being used is
+    # not interrupted, and requests can still be made afterwards.
+    #
+    # @api public
+    # @return [Connection] the connection
+    # @example Close the connections a client keeps open
+    #   connection.close
+    def close
+      pool.close
+      self
     end
 
     # Set the proxy URL for requests
@@ -174,6 +200,21 @@ module Gems
     end
 
     private
+
+    # The connections kept open for the next request
+    # @api private
+    # @return [ConnectionPool] the pool
+    attr_reader :pool
+
+    # The settings a connection is opened with
+    #
+    # A connection kept open must still have them to be reused.
+    #
+    # @api private
+    # @return [Array<Object>] the settings
+    def settings
+      [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url]
+    end
 
     # Parse and validate a proxy URL
     # @api private
@@ -250,6 +291,7 @@ module Gems
         c.open_timeout = open_timeout
         c.read_timeout = read_timeout
         c.write_timeout = write_timeout
+        c.keep_alive_timeout = keep_alive_timeout
         c.set_debug_output(debug_output && RedactedOutput.new(debug_output))
       end
     end

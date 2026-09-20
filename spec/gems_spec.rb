@@ -62,6 +62,7 @@ RSpec.describe Gems do
       open_timeout: 1,
       read_timeout: 1,
       write_timeout: 1,
+      keep_alive_timeout: 1,
       debug_output: $stderr,
       proxy_url: "http://proxy.example.com:8080",
       max_redirects: 1

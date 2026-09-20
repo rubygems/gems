@@ -167,7 +167,7 @@ RSpec.describe Gems::Configuration do
     end
 
     options = %i[host id_token key otp password user_agent username]
-    options += %i[open_timeout read_timeout write_timeout debug_output proxy_url max_redirects]
+    options += %i[open_timeout read_timeout write_timeout keep_alive_timeout debug_output proxy_url max_redirects]
     options.each do |key|
       it "sets the #{key}" do
         Gems.configure { |config| config.public_send(:"#{key}=", key.to_s) }
@@ -190,6 +190,7 @@ RSpec.describe Gems::Configuration do
         config.open_timeout = 10
         config.read_timeout = 20
         config.write_timeout = 30
+        config.keep_alive_timeout = 40
         config.debug_output = $stderr
         config.proxy_url = "http://proxy.example.com:8080"
         config.max_redirects = 3
@@ -206,6 +207,7 @@ RSpec.describe Gems::Configuration do
       open_timeout: Gems::Connection::DEFAULT_OPEN_TIMEOUT,
       read_timeout: Gems::Connection::DEFAULT_READ_TIMEOUT,
       write_timeout: Gems::Connection::DEFAULT_WRITE_TIMEOUT,
+      keep_alive_timeout: Gems::Connection::DEFAULT_KEEP_ALIVE_TIMEOUT,
       debug_output: nil,
       proxy_url: nil,
       max_redirects: Gems::RedirectHandler::DEFAULT_MAX_REDIRECTS

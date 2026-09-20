@@ -220,6 +220,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `open_timeout` | The timeout for opening connections, in seconds         | `60`                                   |
 | `read_timeout` | The timeout for reading responses, in seconds           | `60`                                   |
 | `write_timeout` | The timeout for writing requests, in seconds           | `60`                                   |
+| `keep_alive_timeout` | The seconds an idle connection is kept open for the next request | `2`                   |
 | `debug_output` | An IO that receives HTTP debug output, with credentials redacted | `nil`                          |
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
@@ -239,6 +240,16 @@ Gems.push 'gemcutter-0.2.1.gem', host: 'https://gems.example.com'
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
 An `https://` proxy is connected to over TLS.
+
+A request is sent on the connection the last request to the same host left open, so that a series of requests does not
+open a connection each. `keep_alive_timeout` sets how long an idle connection is kept open, and `0` closes every
+connection once its request is done. A request that is not idempotent, such as `push`, is sent on a connection of its
+own, since a connection the server closed while it was idle cannot be retried for it. `close` closes the connections a
+client keeps open; they are opened again as they are needed, so requests can still be made afterwards.
+
+```ruby
+Gems.client.close
+```
 
 Debug output is redacted before it reaches the IO `debug_output` is set to, so that it can be kept in a log: the
 `Authorization` and `OTP` headers of every request, the ID token of a trusted publishing token exchange, the API key

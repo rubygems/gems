@@ -82,8 +82,8 @@ RSpec.describe Gems::Client do
       expect(described_class.new.user_agent).to eq("Custom User Agent")
     end
 
-    {open_timeout: 10, read_timeout: 20, write_timeout: 30, debug_output: $stderr, proxy_url: "http://proxy.example.com:8080",
-     max_redirects: 3}.each do |option, value|
+    {open_timeout: 10, read_timeout: 20, write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
+     proxy_url: "http://proxy.example.com:8080", max_redirects: 3}.each do |option, value|
       it "defaults the #{option} to the global configuration" do
         Gems.public_send(:"#{option}=", value)
 
@@ -101,6 +101,10 @@ RSpec.describe Gems::Client do
 
     it "defaults the write timeout" do
       expect(client.write_timeout).to eq(Gems::Connection::DEFAULT_WRITE_TIMEOUT)
+    end
+
+    it "defaults the keep-alive timeout" do
+      expect(client.keep_alive_timeout).to eq(Gems::Connection::DEFAULT_KEEP_ALIVE_TIMEOUT)
     end
 
     it "defaults the debug output to nil" do
@@ -125,7 +129,8 @@ RSpec.describe Gems::Client do
       subject(:client) do
         described_class.new(host: "http://example.com", key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD,
           otp: "123456", id_token: "ID_TOKEN", user_agent: "Custom User Agent", open_timeout: 10, read_timeout: 20,
-          write_timeout: 30, debug_output: $stderr, proxy_url: "http://proxy.example.com:8080", max_redirects: 3)
+          write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
+          proxy_url: "http://proxy.example.com:8080", max_redirects: 3)
       end
 
       it "sets the host" do
@@ -151,6 +156,10 @@ RSpec.describe Gems::Client do
 
       it "sets the write timeout" do
         expect(client.write_timeout).to eq(30)
+      end
+
+      it "sets the keep-alive timeout" do
+        expect(client.keep_alive_timeout).to eq(40)
       end
 
       it "sets the debug output" do
@@ -202,6 +211,20 @@ RSpec.describe Gems::Client do
       client = described_class.new(host: "http://example.com", key: TEST_KEY, username: nil, password: nil)
 
       expect(client.inspect).to eq('#<Gems::Client host="http://example.com" authenticator=#<Gems::APIKeyAuthenticator>>')
+    end
+  end
+
+  describe "#close" do
+    it "returns the client" do
+      expect(client.close).to equal(client)
+    end
+
+    it "closes the connections the client keeps open" do
+      connection = client.instance_variable_get(:@connection)
+      allow(connection).to receive(:close)
+      client.close
+
+      expect(connection).to have_received(:close)
     end
   end
 

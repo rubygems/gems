@@ -25,6 +25,7 @@ module Gems
 
     def_delegators :@connection, :open_timeout, :read_timeout, :write_timeout, :proxy_url, :debug_output
     def_delegators :@connection, :open_timeout=, :read_timeout=, :write_timeout=, :proxy_url=, :debug_output=
+    def_delegators :@connection, :keep_alive_timeout, :keep_alive_timeout=
     def_delegators :@redirect_handler, :max_redirects
     def_delegators :@redirect_handler, :max_redirects=
     def_delegators :@request_builder, :user_agent
@@ -47,6 +48,7 @@ module Gems
     # @param write_timeout [Integer] the timeout for writing requests in seconds
     # @param debug_output [IO, nil] the IO object for debug output
     # @param proxy_url [String, nil] the proxy URL for requests
+    # @param keep_alive_timeout [Integer] the seconds an idle connection is kept open for another request
     # @param max_redirects [Integer] the maximum number of redirects to follow
     # @return [Client] a new client instance
     # @example Create a client with an API key
@@ -66,9 +68,11 @@ module Gems
       write_timeout: Gems.write_timeout,
       debug_output: Gems.debug_output,
       proxy_url: Gems.proxy_url,
+      keep_alive_timeout: Gems.keep_alive_timeout,
       max_redirects: Gems.max_redirects)
       @host = validate_host(host)
-      @connection = Connection.new(open_timeout:, read_timeout:, write_timeout:, debug_output:, proxy_url:)
+      @connection = Connection.new(open_timeout:, read_timeout:, write_timeout:, debug_output:, proxy_url:,
+        keep_alive_timeout:)
       @request_builder = RequestBuilder.new(user_agent:)
       initialize_credentials(key:, username:, password:, otp:, id_token:)
       initialize_authenticator
@@ -103,6 +107,19 @@ module Gems
     #   client.inspect # => #<Gems::Client host="https://rubygems.org" authenticator=#<Gems::APIKeyAuthenticator>>
     def inspect
       "#<#{self.class} host=#{host.inspect} authenticator=#{authenticator.inspect}>"
+    end
+
+    # Close the connections the client keeps open for the next request
+    #
+    # The connections are opened again as they are needed, so requests can still be made afterwards.
+    #
+    # @api public
+    # @return [Client] the client
+    # @example Close the connections a client keeps open
+    #   client.close
+    def close
+      @connection.close
+      self
     end
 
     # Perform a GET request to the RubyGems API

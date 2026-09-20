@@ -30,6 +30,18 @@ RSpec.describe Gems::Connection do
       expect(connection.write_timeout).to eq(described_class::DEFAULT_WRITE_TIMEOUT)
     end
 
+    it "defaults the keep-alive timeout" do
+      expect(connection.keep_alive_timeout).to eq(described_class::DEFAULT_KEEP_ALIVE_TIMEOUT)
+    end
+
+    it "builds a pool for the connections it keeps open" do
+      expect(connection.send(:pool)).to be_an_instance_of(Gems::ConnectionPool)
+    end
+
+    it "sets the keep-alive timeout" do
+      expect(described_class.new(keep_alive_timeout: 5).keep_alive_timeout).to eq(5)
+    end
+
     it "defaults the debug output to nil" do
       expect(connection.debug_output).to be_nil
     end
@@ -173,7 +185,7 @@ RSpec.describe Gems::Connection do
       connection.proxy_url = "http://user:secret@proxy.example.com:8080"
 
       expect(connection.inspect).to eq('#<Gems::Connection proxy_url="http://proxy.example.com:8080" open_timeout=60 ' \
-        "read_timeout=60 write_timeout=60>")
+        "read_timeout=60 write_timeout=60 keep_alive_timeout=2>")
     end
 
     it "shows a proxy URL with an empty user and password without the separator" do
@@ -183,13 +195,45 @@ RSpec.describe Gems::Connection do
     end
 
     it "shows a nil proxy URL" do
-      expect(connection.inspect).to eq("#<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60>")
+      expect(connection.inspect)
+        .to eq("#<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60 keep_alive_timeout=2>")
     end
 
     it "shows the timeouts" do
-      connection = described_class.new(open_timeout: 1, read_timeout: 2, write_timeout: 3)
+      connection = described_class.new(open_timeout: 1, read_timeout: 2, write_timeout: 3, keep_alive_timeout: 4)
 
-      expect(connection.inspect).to eq("#<Gems::Connection proxy_url=nil open_timeout=1 read_timeout=2 write_timeout=3>")
+      expect(connection.inspect)
+        .to eq("#<Gems::Connection proxy_url=nil open_timeout=1 read_timeout=2 write_timeout=3 keep_alive_timeout=4>")
+    end
+  end
+
+  describe "#close" do
+    let(:built) { [] }
+
+    before do
+      stub_request(:get, https_uri.to_s)
+      allow(Net::HTTP).to receive(:new).and_wrap_original do |original, *arguments|
+        original.call(*arguments).tap { |http_client| built << http_client }
+      end
+    end
+
+    it "returns the connection" do
+      expect(connection.close).to equal(connection)
+    end
+
+    it "closes the connection it keeps open" do
+      connection.perform(request: Net::HTTP::Get.new(https_uri))
+      connection.close
+
+      expect(built.first).not_to be_started
+    end
+
+    it "opens a connection again for the next request" do
+      connection.perform(request: Net::HTTP::Get.new(https_uri))
+      connection.close
+      connection.perform(request: Net::HTTP::Get.new(https_uri))
+
+      expect(built.size).to eq(2)
     end
   end
 
@@ -257,6 +301,101 @@ RSpec.describe Gems::Connection do
 
       expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }.to raise_error(ArgumentError)
     end
+
+    context "when it keeps connections open" do
+      let(:built) { [] }
+
+      before do
+        stub_request(:get, https_uri.to_s)
+        stub_request(:post, https_uri.to_s)
+        stub_request(:get, http_uri.to_s)
+        allow(Net::HTTP).to receive(:new).and_wrap_original do |original, *arguments|
+          original.call(*arguments).tap { |http_client| built << http_client }
+        end
+      end
+
+      def get(uri = https_uri)
+        connection.perform(request: Net::HTTP::Get.new(uri))
+      end
+
+      def get_ignoring_errors(uri = https_uri)
+        get(uri)
+      rescue Gems::NetworkError
+        nil
+      end
+
+      it "sends a second request on the connection the first left open" do
+        2.times { get }
+
+        expect(built.size).to eq(1)
+      end
+
+      it "opens a connection for each host" do
+        get
+        get(http_uri)
+
+        expect(built.size).to eq(2)
+      end
+
+      it "leaves the connection open" do
+        get
+
+        expect(built.first).to be_started
+      end
+
+      it "opens a connection of its own for a request that is not idempotent" do
+        get
+        connection.perform(request: Net::HTTP::Post.new(https_uri))
+
+        expect(built.size).to eq(2)
+      end
+
+      it "closes the connection of a request that is not idempotent" do
+        connection.perform(request: Net::HTTP::Post.new(https_uri))
+
+        expect(built.first).not_to be_started
+      end
+
+      it "opens a connection for each request when the keep-alive timeout is zero" do
+        connection.keep_alive_timeout = 0
+        2.times { get }
+
+        expect(built.size).to eq(2)
+      end
+
+      {open_timeout: 1, read_timeout: 1, write_timeout: 1, keep_alive_timeout: 1, debug_output: StringIO.new,
+       proxy_url: "http://proxy.example.com:8080"}.each do |setting, value|
+        it "opens a connection again when the #{setting} has changed" do
+          get
+          connection.public_send(:"#{setting}=", value)
+          get
+
+          expect(built.size).to eq(2)
+        end
+      end
+
+      it "closes the connection it kept open when a setting has changed" do
+        get
+        connection.read_timeout = 1
+        get
+
+        expect(built.first).not_to be_started
+      end
+
+      it "closes the connection of a request that failed" do
+        stub_request(:get, http_uri.to_s).to_raise(Errno::ECONNRESET)
+        get_ignoring_errors(http_uri)
+
+        expect(built.first).not_to be_started
+      end
+
+      it "does not keep the connection of a request that failed" do
+        stub_request(:get, https_uri.to_s).to_raise(Errno::ECONNRESET).then.to_return(status: 200)
+        2.times { get_ignoring_errors }
+
+        expect(built.size).to eq(2)
+      end
+    end
   end
 
   describe "#build_http_client" do
@@ -296,6 +435,12 @@ RSpec.describe Gems::Connection do
       connection = described_class.new(open_timeout: 10)
 
       expect(build_http_client(https_uri, connection:).open_timeout).to eq(10)
+    end
+
+    it "applies the keep-alive timeout" do
+      connection = described_class.new(keep_alive_timeout: 10)
+
+      expect(build_http_client(https_uri, connection:).keep_alive_timeout).to eq(10)
     end
 
     it "applies the read timeout" do
