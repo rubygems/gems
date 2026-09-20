@@ -42,7 +42,7 @@ require "yard"
 
 YARD::Rake::YardocTask.new(:yard) do |t|
   t.files = ["lib/**/*.rb"]
-  t.options = ["--no-private"]
+  t.options = ["--no-private", "--hide-api", "private"]
 end
 
 require "yardstick/rake/measurement"

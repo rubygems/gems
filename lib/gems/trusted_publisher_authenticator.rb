@@ -28,28 +28,28 @@ module Gems
     # @api public
     # @return [String] the OIDC ID token
     # @example Get the ID token
-    #   authenticator.id_token = ENV.fetch("ID_TOKEN")
+    #   authenticator.id_token
     attr_reader :id_token
 
     # The host to exchange the token with
     # @api public
     # @return [String] the host, including scheme
     # @example Get the host
-    #   authenticator.host = "https://rubygems.org"
+    #   authenticator.host
     attr_reader :host
 
     # The connection used for the token exchange
     # @api public
     # @return [Connection] the connection
     # @example Get the connection
-    #   authenticator.connection = Gems::Connection.new(proxy_url: "http://proxy.example.com:8080")
+    #   authenticator.connection
     attr_reader :connection
 
     # The request builder used for the token exchange
     # @api public
     # @return [RequestBuilder] the request builder
     # @example Get the request builder
-    #   authenticator.request_builder = Gems::RequestBuilder.new(user_agent: "Custom User Agent")
+    #   authenticator.request_builder
     attr_reader :request_builder
 
     # The API key obtained from the token exchange

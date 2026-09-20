@@ -6,8 +6,8 @@ require_relative "otp_authenticator"
 require_relative "trusted_publisher_authenticator"
 
 module Gems
-  # Mixin for client authentication credentials
-  # @api private
+  # Mixin for client authentication credentials, included in {Client}
+  # @api public
   module ClientCredentials
     include Identifiers
 

@@ -15,14 +15,14 @@ module Gems
     # @api public
     # @return [Authenticator] the wrapped authenticator
     # @example Get the wrapped authenticator
-    #   authenticator.authenticator = Gems::APIKeyAuthenticator.new(key: "key")
+    #   authenticator.authenticator
     attr_reader :authenticator
 
     # The one-time passcode
     # @api public
     # @return [String] the one-time passcode
     # @example Get the one-time passcode
-    #   authenticator.otp = "123456"
+    #   authenticator.otp
     attr_reader :otp
 
     # Initialize a new OTPAuthenticator

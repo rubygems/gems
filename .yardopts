@@ -1,4 +1,5 @@
 --no-private
+--hide-api private
 --markup markdown
 --tag authenticated:"Requires Authentication"
 lib/**/*.rb

@@ -35,7 +35,7 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to add the hook to all gems.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to add the hook to all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
       # @return [String]
       # @example
@@ -48,7 +48,7 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to remove the hook from all gems.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to remove the hook from all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
       # @return [String]
       # @example
@@ -61,7 +61,7 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem_name [String, Gem] The name of a gem, or a gem. Specify "*" to fire the hook for all gems.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to fire the hook for all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
       # @return [String]
       # @example

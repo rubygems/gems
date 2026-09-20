@@ -11,7 +11,7 @@ module Gems
   # The RubyGems API endpoints, mixed into {Client}
   #
   # The endpoints are grouped into one mixin per topic, following the sections of the RubyGems.org API guide.
-  # Every public method of those mixins is also available on the {Gems} module, which delegates to a new client.
+  # Every public method of those mixins is also available on the {Gems} module, which delegates to {Gems.client}.
   #
   # @api public
   module API

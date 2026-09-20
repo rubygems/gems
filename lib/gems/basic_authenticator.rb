@@ -8,14 +8,14 @@ module Gems
     # @api public
     # @return [String] the username
     # @example Get the username
-    #   authenticator.username = "nick@gemcutter.org"
+    #   authenticator.username
     attr_reader :username
 
     # The password
     # @api public
     # @return [String] the password
     # @example Get the password
-    #   authenticator.password = "schwwwwing"
+    #   authenticator.password
     attr_reader :password
 
     # Initialize a new BasicAuthenticator
