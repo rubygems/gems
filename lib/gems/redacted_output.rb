@@ -1,23 +1,28 @@
 module Gems
   # Wraps the IO that receives HTTP debug output, redacting the credentials it would otherwise write in the clear
   #
-  # Net::HTTP writes every request it sends to the debug output, headers and body alike, which carry the API key,
-  # the basic authentication credentials, the one-time passcode, and the OIDC ID token of a token exchange. Those
-  # values are replaced before they reach the IO, so that debug output can be kept where the credentials should not
-  # be.
+  # Net::HTTP writes every request it sends and every response it reads to the debug output, headers and body alike,
+  # which carry the API key, the basic authentication credentials, the one-time passcode, the OIDC ID token of a
+  # token exchange, and the API key an API key or token exchange response returns. Those values are replaced before
+  # they reach the IO, so that debug output can be kept where the credentials should not be.
   #
   # @api private
   class RedactedOutput
     # The value written in place of a credential
     REDACTION = "[REDACTED]".freeze
-    # The patterns of the credentials the library sends, each capturing what introduces the value it redacts
+    # The patterns of the credentials the library sends and receives, each capturing what introduces the value it
+    # redacts
     #
     # Net::HTTP dumps a request as one escaped string, in which a header is preceded by an escaped newline and its
-    # value runs to the next one, and it capitalizes the header names it writes, so OTP is written as Otp. The token
-    # exchange sends the ID token as the jwt field of a JSON body, whose quotes the same dump escapes.
+    # value runs to the next one, and it capitalizes the header names it writes, so OTP is written as Otp. It dumps
+    # bodies the same way, so the patterns also cover the credentials a body carries: the ID token the token exchange
+    # sends as the jwt field of a JSON body, the API key `update_api_key` sends as a form field, and the API key a
+    # response to the API key and token exchange endpoints carries.
     CREDENTIALS = [
       /(\\n(?:Authorization|OTP): )[^\\]*/i,
-      /(\\"jwt\\":\\")[^\\]*/
+      /(\\"jwt\\":\\")[^\\]*/,
+      /(api_key=)[^&\\"]*/,
+      /(\\"rubygems_api_key\\":\\")[^\\]*/
     ].freeze
     private_constant :CREDENTIALS
 

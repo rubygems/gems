@@ -51,7 +51,7 @@ module Gems
 
     # The IO object for debug output
     #
-    # The `Authorization` and `OTP` headers of requests are redacted from what is written to it.
+    # The credentials requests and responses carry are redacted from what is written to it (see {RedactedOutput}).
     #
     # @api public
     # @return [IO, nil] the IO object for debug output

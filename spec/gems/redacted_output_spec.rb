@@ -61,6 +61,24 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq(%(<- "{\\"jwt\\":\\"[REDACTED]\\"}"))
     end
 
+    it "redacts the API key a form body carries" do
+      redacted_output << %(<- "api_key=rubygems_701243f217cdf23b1370c7b66b65ca97")
+
+      expect(io.string).to eq(%(<- "api_key=[REDACTED]"))
+    end
+
+    it "keeps the form fields that carry no credential" do
+      redacted_output << %(<- "yank_rubygem=true&api_key=rubygems_701243f217cdf23b1370c7b66b65ca97&name=ci-push")
+
+      expect(io.string).to eq(%(<- "yank_rubygem=true&api_key=[REDACTED]&name=ci-push"))
+    end
+
+    it "redacts the API key a response body carries" do
+      redacted_output << %(-> "{\\"name\\":\\"ci-push\\",\\"rubygems_api_key\\":\\"rubygems_701243f2\\"}")
+
+      expect(io.string).to eq(%(-> "{\\"name\\":\\"ci-push\\",\\"rubygems_api_key\\":\\"[REDACTED]\\"}"))
+    end
+
     it "does not redact a header that only looks like one, without the escaped newline" do
       redacted_output << '-> "X-Note: Authorization: not a header\\r\\n"'
 
