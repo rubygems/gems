@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   }
 
   spec.files = Dir[
-    "bin/*",
+    ".yardopts",
     "lib/**/*.rb",
     "sig/*.rbs",
     "*.md",
