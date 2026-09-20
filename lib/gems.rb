@@ -55,6 +55,10 @@ module Gems
   # that have been reset, such as the API key an ID token was exchanged for, is not kept. Its connections are closed,
   # since no request of the module will be sent on them again.
   #
+  # The configuration is reset while the client is forgotten rather than afterwards, so that a thread asking for the
+  # client is given one built from the configuration as it was or as it has been reset, rather than one built from a
+  # configuration that is half of each.
+  #
   # @api public
   # @return [self]
   # @example Reset the configuration
@@ -63,8 +67,8 @@ module Gems
     CLIENT_MUTEX.synchronize do
       @client&.close
       @credential_values = nil
+      super
     end
-    super
   end
 
   # Build the client again from the global configuration

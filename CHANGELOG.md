@@ -47,6 +47,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 
 * Follow 301, 302, and 303 redirects with GET, keeping the method and body only for 307 and 308, and follow a redirect to another scheme, host, or port without the API key, basic authentication, one-time passcode, or caller's headers of the request, so that a redirect cannot send them to a host they were not meant for
 * Name the Ruby the library runs on in the default `User-Agent`, which is now `gems/<version> (<engine> <version>; <platform>)` rather than `Gems <version>`, so that the RubyGems.org operators can tell which client and which Ruby a request came from
+* Reset the global configuration while the client built from it is forgotten, rather than afterwards, so that a thread asking for `Gems.client` during a `Gems.reset` is given a client built from the configuration as it was or as it has been reset, rather than one built from a configuration that is half of each
 * Take keyword arguments in `Gems::Client.new` and `Gems.new`; unknown options raise `ArgumentError`
 * Take keyword arguments in the client's `get`, `post`, `put`, `patch`, and `delete` methods
 * Collapse `Gems::V1` and `Gems::V2` into a single `Gems::Client`; `Gems::V2.info` is now `Gems.version`
