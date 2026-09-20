@@ -162,13 +162,17 @@ module Gems
       end
 
       # Read a file given as a path or an open file
+      #
+      # An open file is read in binary mode, as a path is, so that a gem opened in text mode is sent as the bytes it
+      # holds rather than with its line endings translated.
+      #
       # @api private
       # @param file [String, Pathname, File] the path, or the open file
       # @return [String] the contents of the file
       def read_file(file)
         case file
         when String, Pathname then File.binread(file)
-        else file.read #: String
+        else file.binmode.read #: String
         end
       end
 

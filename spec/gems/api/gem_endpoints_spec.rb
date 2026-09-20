@@ -368,6 +368,22 @@ RSpec.describe Gems::API::GemEndpoints do
     end
   end
 
+  describe "#read_file" do
+    let(:path) { File.join(fixture_path, "gems-0.0.8.gem") }
+
+    it "reads a gem given as a path" do
+      expect(client.send(:read_file, path)).to eq(File.binread(path))
+    end
+
+    it "reads a gem given as a Pathname" do
+      expect(client.send(:read_file, Pathname(path))).to eq(File.binread(path))
+    end
+
+    it "reads a gem opened in text mode as the bytes it holds" do
+      expect(client.send(:read_file, File.new(path))).to eq(File.binread(path))
+    end
+  end
+
   describe "#multipart_push_body" do
     let(:gem) { fixture("gems-0.0.8.gem") }
     let(:gem_data) { File.binread(File.join(fixture_path, "gems-0.0.8.gem")) }
