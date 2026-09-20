@@ -305,10 +305,11 @@ raised as it was.
 Retrying is off by default, so a rate-limited request raises rather than pausing the thread unless you asked for it.
 Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
 idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
-`Retry-After` asks for, and doubles from one second when the response does not carry the header, which is the wait
-after a network failure too, since a request that never arrived has no response to read a wait from. A response
-asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your program for as long
-as it likes. `HTTPError#retry_after` reads the header yourself when you would rather handle it in your own code.
+`Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the
+header, which is the wait after a network failure too, since a request that never arrived has no response to read a
+wait from. A response asking to wait longer than `max_retry_delay` raises instead, so that a server cannot pause your
+program for as long as it likes. `HTTPError#retry_after` reads the header yourself when you would rather handle it in
+your own code.
 
 ## Thread safety
 

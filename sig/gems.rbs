@@ -802,12 +802,12 @@ module Gems
     private
 
     def attempt: (request: Net::HTTPRequest, retries: Integer) { () -> Net::HTTPResponse } -> Net::HTTPResponse?
-    def wait: (Integer delay) -> nil
-    def retry_delay: (response: Net::HTTPResponse, request: Net::HTTPRequest, retries: Integer) -> Integer?
-    def network_retry_delay: (request: Net::HTTPRequest, retries: Integer) -> Integer?
+    def wait: (Numeric delay) -> nil
+    def retry_delay: (response: Net::HTTPResponse, request: Net::HTTPRequest, retries: Integer) -> Numeric?
+    def network_retry_delay: (request: Net::HTTPRequest, retries: Integer) -> Numeric?
     def retryable?: (Net::HTTPRequest request, Integer retries) -> bool
     def capped: (Integer delay) -> Integer?
     def retry?: (Net::HTTPResponse response) -> bool
-    def backoff: (Integer retries) -> Integer
+    def backoff: (Integer retries) -> Numeric
   end
 end

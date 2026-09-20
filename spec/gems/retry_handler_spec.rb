@@ -142,7 +142,7 @@ RSpec.describe Gems::RetryHandler do
       expect([response.code, waited]).to eq(["429", []])
     end
 
-    it "does not wait longer than the maximum retry delay" do
+    it "does not wait longer than the maximum retry delay the response asks for" do
       response, waited = handle(handler, [rate_limited(retry_after: "61"), success])
 
       expect([response.code, waited]).to eq(["429", []])
@@ -152,6 +152,20 @@ RSpec.describe Gems::RetryHandler do
       _, waited = handle(handler, [rate_limited(retry_after: "60"), success])
 
       expect(waited).to eq([60])
+    end
+
+    it "shortens a doubling wait to the maximum retry delay" do
+      handler = described_class.new(max_retries: 3, max_retry_delay: 3)
+      _, waited = handle(handler, [rate_limited, rate_limited, rate_limited, success])
+
+      expect(waited).to eq([1, 2, 3])
+    end
+
+    it "sends the request again as many times as asked once the wait reaches the maximum retry delay" do
+      handler = described_class.new(max_retries: 5, max_retry_delay: 2)
+      response, waited = handle(handler, [*Array.new(5) { rate_limited }, success])
+
+      expect([response, waited]).to eq([success, [1, 2, 2, 2, 2]])
     end
 
     context "when the request is lost to the network" do
@@ -182,10 +196,11 @@ RSpec.describe Gems::RetryHandler do
         expect { handle(handler, [network_error, success], request: post_request) }.to raise_error(Gems::NetworkError)
       end
 
-      it "raises the error rather than waiting longer than the maximum retry delay" do
-        handler = described_class.new(max_retries: 2, max_retry_delay: 0)
+      it "shortens the wait to the maximum retry delay" do
+        handler = described_class.new(max_retries: 3, max_retry_delay: 3)
+        _, waited = handle(handler, [network_error, network_error, network_error, success])
 
-        expect { handle(handler, [network_error, success]) }.to raise_error(Gems::NetworkError)
+        expect(waited).to eq([1, 2, 3])
       end
 
       it "waits a delay equal to the maximum retry delay" do
