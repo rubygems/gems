@@ -116,11 +116,11 @@ module Gems
 
     # Resolve an API key from a key or an API key object
     # @api private
-    # @param api_key [String, ApiKey, nil] a key or API key
+    # @param api_key [String, APIKey, nil] a key or API key
     # @return [String, nil] the key
     def key_of(api_key)
       case api_key
-      when ApiKey then api_key.key
+      when APIKey then api_key.key
       else api_key
       end
     end

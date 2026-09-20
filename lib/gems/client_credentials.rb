@@ -56,7 +56,7 @@ module Gems
     # Set the API key
     #
     # @api public
-    # @param key [String, ApiKey, nil] the API key, or an API key object
+    # @param key [String, APIKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
     #   client.key = "701243f217cdf23b1370c7b66b65ca97"
@@ -119,7 +119,7 @@ module Gems
 
     # Initialize credential instance variables
     # @api private
-    # @param key [String, ApiKey, nil] the API key, or an API key object
+    # @param key [String, APIKey, nil] the API key, or an API key object
     # @param username [String, nil] the username
     # @param password [String, nil] the password
     # @param otp [String, nil] the one-time passcode
@@ -152,7 +152,7 @@ module Gems
     def otp_authenticator(authenticator)
       return authenticator unless otp
 
-      OtpAuthenticator.new(authenticator:, otp:)
+      OTPAuthenticator.new(authenticator:, otp:)
     end
 
     # Build a trusted publisher authenticator if an ID token is available
@@ -175,11 +175,11 @@ module Gems
 
     # Build an API key authenticator if a key is available
     # @api private
-    # @return [ApiKeyAuthenticator, nil] the API key authenticator or nil
+    # @return [APIKeyAuthenticator, nil] the API key authenticator or nil
     def api_key_authenticator
       return unless key
 
-      ApiKeyAuthenticator.new(key:)
+      APIKeyAuthenticator.new(key:)
     end
   end
 end

@@ -88,7 +88,7 @@ way.
 ### Return values
 
 The methods that returned parsed JSON return objects: `Gems::Gem`, `Gems::Version`, `Gems::Dependency`,
-`Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`. Each reads its fields with
+`Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::APIKey`. Each reads its fields with
 methods, parses timestamps into `Time` objects, and offers `[]` and `to_h` for the raw response, so code that read
 the Hash can keep doing so:
 

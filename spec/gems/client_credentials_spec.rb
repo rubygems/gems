@@ -11,7 +11,7 @@ RSpec.describe Gems::ClientCredentials do
     end
 
     it "resolves the key of an API key object" do
-      client = Gems::Client.new(key: Gems::ApiKey.new("rubygems_api_key" => TEST_KEY))
+      client = Gems::Client.new(key: Gems::APIKey.new("rubygems_api_key" => TEST_KEY))
 
       expect(client.key).to eq(TEST_KEY)
     end
@@ -41,7 +41,7 @@ RSpec.describe Gems::ClientCredentials do
     it "uses API key authentication with a key" do
       client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil)
 
-      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     it "uses basic authentication with a username and password" do
@@ -77,7 +77,7 @@ RSpec.describe Gems::ClientCredentials do
     it "wraps the authenticator with a one-time passcode" do
       client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
 
-      expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::OTPAuthenticator)
     end
 
     it "returns the authenticator" do
@@ -109,7 +109,7 @@ RSpec.describe Gems::ClientCredentials do
     it "returns the authenticator unchanged without a one-time passcode" do
       client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: nil)
 
-      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     it "wraps the authenticator with the one-time passcode" do
@@ -121,7 +121,7 @@ RSpec.describe Gems::ClientCredentials do
     it "wraps the credential authenticator" do
       client = Gems::Client.new(key: TEST_KEY, username: nil, password: nil, otp: "123456")
 
-      expect(client.authenticator.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+      expect(client.authenticator.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     it "sends the one-time passcode with requests" do
@@ -179,7 +179,7 @@ RSpec.describe Gems::ClientCredentials do
     end
 
     it "resolves the key of an API key object" do
-      client.key = Gems::ApiKey.new("rubygems_api_key" => TEST_KEY)
+      client.key = Gems::APIKey.new("rubygems_api_key" => TEST_KEY)
 
       expect(client.key).to eq(TEST_KEY)
     end
@@ -187,7 +187,7 @@ RSpec.describe Gems::ClientCredentials do
     it "reinitializes the authenticator" do
       client.key = TEST_KEY
 
-      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     it "removes authentication when cleared" do
@@ -208,7 +208,7 @@ RSpec.describe Gems::ClientCredentials do
     it "reinitializes the authenticator" do
       client.otp = "123456"
 
-      expect(client.authenticator).to be_an_instance_of(Gems::OtpAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::OTPAuthenticator)
     end
   end
 

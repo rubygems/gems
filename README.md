@@ -185,7 +185,7 @@ client.rubygem 'rails'
 ## Response objects
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
-`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::ApiKey`.
+`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, and `Gems::APIKey`.
 Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
 accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and
 `Gems.key = api_key` all work.
@@ -220,8 +220,8 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
 
-Each authentication method has its own authenticator class: `Gems::ApiKeyAuthenticator`, `Gems::BasicAuthenticator`,
-`Gems::TrustedPublisherAuthenticator`, and `Gems::OtpAuthenticator` (which wraps one of the others).
+Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
+`Gems::TrustedPublisherAuthenticator`, and `Gems::OTPAuthenticator` (which wraps one of the others).
 HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.

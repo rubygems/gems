@@ -1,4 +1,4 @@
-RSpec.describe Gems::API::ApiKeyEndpoints do
+RSpec.describe Gems::API::APIKeyEndpoints do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
   describe "#create_api_key" do
@@ -47,7 +47,7 @@ RSpec.describe Gems::API::ApiKeyEndpoints do
     it "returns the new API key" do
       api_key = client.create_api_key("ci-push", push_rubygem: true)
 
-      expect([api_key.class, api_key.key]).to eq([Gems::ApiKey, "rubygems_701243f217cdf23b1370c7b66b65ca97"])
+      expect([api_key.class, api_key.key]).to eq([Gems::APIKey, "rubygems_701243f217cdf23b1370c7b66b65ca97"])
     end
   end
 
@@ -58,7 +58,7 @@ RSpec.describe Gems::API::ApiKeyEndpoints do
 
     it "accepts an API key" do
       stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated")
-      client.update_api_key(Gems::ApiKey.new("rubygems_api_key" => "rubygems_701243f217cdf23b1370c7b66b65ca97"), yank_rubygem: true)
+      client.update_api_key(Gems::APIKey.new("rubygems_api_key" => "rubygems_701243f217cdf23b1370c7b66b65ca97"), yank_rubygem: true)
 
       expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
         .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
@@ -96,7 +96,7 @@ RSpec.describe Gems::API::ApiKeyEndpoints do
     end
 
     it "returns the exchanged API key" do
-      expect(client.exchange_trusted_publisher_token("ID_TOKEN")).to eq(Gems::ApiKey.new(JSON.parse(fixture("exchange_token.json").read)))
+      expect(client.exchange_trusted_publisher_token("ID_TOKEN")).to eq(Gems::APIKey.new(JSON.parse(fixture("exchange_token.json").read)))
     end
 
     it "exchanges the token with the client's host" do

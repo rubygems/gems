@@ -33,7 +33,7 @@ module Gems
     # Set the API key used for authentication
     #
     # @api public
-    # @param key [String, ApiKey, nil] the API key, or an API key object
+    # @param key [String, APIKey, nil] the API key, or an API key object
     # @return [void]
     # @example Set the API key
     #   Gems.key = "701243f217cdf23b1370c7b66b65ca97"

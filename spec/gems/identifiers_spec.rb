@@ -159,7 +159,7 @@ RSpec.describe Gems::Identifiers do
     end
 
     it "returns the key of an API key" do
-      expect(client.send(:key_of, Gems::ApiKey.new("rubygems_api_key" => TEST_KEY))).to eq(TEST_KEY)
+      expect(client.send(:key_of, Gems::APIKey.new("rubygems_api_key" => TEST_KEY))).to eq(TEST_KEY)
     end
 
     it "returns nil for nil" do

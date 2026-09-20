@@ -5,7 +5,7 @@ require_relative "resource"
 module Gems
   # An API key, as returned by the API key and trusted publishing endpoints
   # @api public
-  class ApiKey < Resource
+  class APIKey < Resource
     inspect_with :name, :scopes
 
     # @!method name

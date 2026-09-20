@@ -61,7 +61,7 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
     end
 
     it "returns the exchanged API key" do
-      expect(authenticator.exchange_token!).to eq(Gems::ApiKey.new(JSON.parse(fixture("exchange_token.json").read)))
+      expect(authenticator.exchange_token!).to eq(Gems::APIKey.new(JSON.parse(fixture("exchange_token.json").read)))
     end
 
     it "stores the API key" do

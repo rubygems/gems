@@ -105,7 +105,7 @@ module Gems
     # Exchange the OIDC ID token for a RubyGems API key
     #
     # @api public
-    # @return [ApiKey] the exchanged API key, including its name, scopes, and expiry
+    # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     # @example Exchange the ID token
     #   authenticator.exchange_token!.expires_at
@@ -114,7 +114,7 @@ module Gems
       request = request_builder.build(http_method: :post, uri:,
         body: JSON.generate({jwt: id_token}), content_type: JSON_CONTENT_TYPE, headers: {"Accept" => JSON_CONTENT_TYPE})
       response = connection.perform(request:)
-      api_key = ApiKey.new(parse_json(ResponseParser.new.parse(response:)))
+      api_key = APIKey.new(parse_json(ResponseParser.new.parse(response:)))
       @api_key = api_key.key
       api_key
     end

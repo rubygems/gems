@@ -1,4 +1,4 @@
-RSpec.describe Gems::ApiKey do
+RSpec.describe Gems::APIKey do
   subject(:api_key) { described_class.new(JSON.parse(fixture("exchange_token.json").read)) }
 
   it "is a Resource" do
@@ -8,7 +8,7 @@ RSpec.describe Gems::ApiKey do
   it "inspects as the name and scopes without the key" do
     api_key = described_class.new("rubygems_api_key" => "secret", "name" => "ci-push", "scopes" => ["push_rubygem"])
 
-    expect(api_key.inspect).to eq('#<Gems::ApiKey name="ci-push" scopes=["push_rubygem"]>')
+    expect(api_key.inspect).to eq('#<Gems::APIKey name="ci-push" scopes=["push_rubygem"]>')
   end
 
   it "exposes the key" do

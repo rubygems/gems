@@ -1,4 +1,4 @@
-RSpec.describe Gems::ApiKeyAuthenticator do
+RSpec.describe Gems::APIKeyAuthenticator do
   subject(:authenticator) { described_class.new(key: TEST_KEY) }
 
   it "is an Authenticator" do
@@ -19,7 +19,7 @@ RSpec.describe Gems::ApiKeyAuthenticator do
 
   describe "#inspect" do
     it "shows the class without the key" do
-      expect(authenticator.inspect).to eq("#<Gems::ApiKeyAuthenticator>")
+      expect(authenticator.inspect).to eq("#<Gems::APIKeyAuthenticator>")
     end
   end
 end

@@ -80,7 +80,7 @@ RSpec.describe Gems::Client do
     it "initializes the authenticator from the credentials" do
       client = described_class.new(key: TEST_KEY)
 
-      expect(client.authenticator).to be_an_instance_of(Gems::ApiKeyAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     context "with custom options" do
@@ -163,7 +163,7 @@ RSpec.describe Gems::Client do
     it "shows the host and authenticator without credentials" do
       client = described_class.new(host: "http://example.com", key: TEST_KEY, username: nil, password: nil)
 
-      expect(client.inspect).to eq('#<Gems::Client host="http://example.com" authenticator=#<Gems::ApiKeyAuthenticator>>')
+      expect(client.inspect).to eq('#<Gems::Client host="http://example.com" authenticator=#<Gems::APIKeyAuthenticator>>')
     end
   end
 

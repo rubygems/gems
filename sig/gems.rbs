@@ -7,7 +7,7 @@ module Gems
   type owner_identifier = String | Owner | Profile
   type user_identifier = String | Integer | Owner | Profile
   type web_hook_identifier = String | WebHook
-  type api_key_identifier = String | ApiKey
+  type api_key_identifier = String | APIKey
   type push_file = String | Pathname | File
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String
 
@@ -49,9 +49,9 @@ module Gems
   def self.profile: (user_identifier user) -> Profile
   def self.me: () -> Profile
   def self.just_updated: (?page: Integer?) -> Array[Gem]
-  def self.create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
+  def self.create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> APIKey
   def self.update_api_key: (api_key_identifier key, **bool scopes) -> String
-  def self.exchange_trusted_publisher_token: (String id_token) -> ApiKey
+  def self.exchange_trusted_publisher_token: (String id_token) -> APIKey
   def self.reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
 
   module Configuration
@@ -95,7 +95,7 @@ module Gems
     def inspect: () -> String
   end
 
-  class ApiKeyAuthenticator < Authenticator
+  class APIKeyAuthenticator < Authenticator
     attr_reader key: String
 
     def initialize: (key: String) -> void
@@ -111,7 +111,7 @@ module Gems
     def inspect: () -> String
   end
 
-  class OtpAuthenticator < Authenticator
+  class OTPAuthenticator < Authenticator
     OTP_HEADER: String
 
     attr_reader authenticator: Authenticator
@@ -137,7 +137,7 @@ module Gems
     def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
     def inspect: () -> String
-    def exchange_token!: () -> ApiKey
+    def exchange_token!: () -> APIKey
   end
 
   module ClientCredentials
@@ -167,7 +167,7 @@ module Gems
     def otp_authenticator: (Authenticator authenticator) -> Authenticator
     def basic_authenticator: () -> BasicAuthenticator?
     def trusted_publisher_authenticator: () -> TrustedPublisherAuthenticator?
-    def api_key_authenticator: () -> ApiKeyAuthenticator?
+    def api_key_authenticator: () -> APIKeyAuthenticator?
   end
 
   class Resource
@@ -290,7 +290,7 @@ module Gems
     def version_downloads: () -> Integer?
   end
 
-  class ApiKey < Resource
+  class APIKey < Resource
     def key: () -> String
     def name: () -> String?
     def scopes: () -> Array[String]?
@@ -323,7 +323,7 @@ module Gems
 
   module API : Object, _Requests
     include ActivityEndpoints
-    include ApiKeyEndpoints
+    include APIKeyEndpoints
     include DownloadEndpoints
     include GemEndpoints
     include OwnerEndpoints
@@ -340,13 +340,13 @@ module Gems
     def just_updated: (?page: Integer?) -> Array[Gem]
   end
 
-  module API::ApiKeyEndpoints : Object, _Requests
+  module API::APIKeyEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
 
-    def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> ApiKey
+    def create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> APIKey
     def update_api_key: (api_key_identifier key, **bool scopes) -> String
-    def exchange_trusted_publisher_token: (String id_token) -> ApiKey
+    def exchange_trusted_publisher_token: (String id_token) -> APIKey
 
     private
 

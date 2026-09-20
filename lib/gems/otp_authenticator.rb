@@ -6,7 +6,7 @@ module Gems
   # Wraps another authenticator and adds the OTP header to its headers.
   #
   # @api public
-  class OtpAuthenticator < Authenticator
+  class OTPAuthenticator < Authenticator
     # The HTTP header name for the one-time passcode
     OTP_HEADER = "OTP".freeze
     private_constant :OTP_HEADER
@@ -15,7 +15,7 @@ module Gems
     # @api public
     # @return [Authenticator] the wrapped authenticator
     # @example Get the wrapped authenticator
-    #   authenticator.authenticator = Gems::ApiKeyAuthenticator.new(key: "key")
+    #   authenticator.authenticator = Gems::APIKeyAuthenticator.new(key: "key")
     attr_reader :authenticator
 
     # The one-time passcode
@@ -25,14 +25,14 @@ module Gems
     #   authenticator.otp = "123456"
     attr_reader :otp
 
-    # Initialize a new OtpAuthenticator
+    # Initialize a new OTPAuthenticator
     #
     # @api public
     # @param authenticator [Authenticator] the authenticator providing the underlying credentials
     # @param otp [String] the one-time passcode
-    # @return [OtpAuthenticator] a new instance
+    # @return [OTPAuthenticator] a new instance
     # @example Create an OTP authenticator around an API key authenticator
-    #   authenticator = Gems::OtpAuthenticator.new(authenticator: Gems::ApiKeyAuthenticator.new(key: "key"), otp: "123456")
+    #   authenticator = Gems::OTPAuthenticator.new(authenticator: Gems::APIKeyAuthenticator.new(key: "key"), otp: "123456")
     def initialize(authenticator:, otp:)
       @authenticator = authenticator
       @otp = otp
@@ -54,7 +54,7 @@ module Gems
     # @api public
     # @return [String] the summary, which includes the wrapped authenticator but not the passcode
     # @example Inspect an OTP authenticator
-    #   authenticator.inspect # => #<Gems::OtpAuthenticator authenticator=#<Gems::ApiKeyAuthenticator>>
+    #   authenticator.inspect # => #<Gems::OTPAuthenticator authenticator=#<Gems::APIKeyAuthenticator>>
     def inspect
       "#<#{self.class} authenticator=#{authenticator.inspect}>"
     end

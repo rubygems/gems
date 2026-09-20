@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 * Add `Connection`, `RequestBuilder`, `RedirectHandler`, and `ResponseParser`, with one authenticator class per authentication method, behind the existing client interface; `RequestBuilder`, `RedirectHandler`, and `ResponseParser` are private API, which can change within 3.x, the authenticators are read-only, and the constants that map statuses, methods, and headers are private
-* Add `OtpAuthenticator` and an `otp` option for multi-factor authentication
+* Add `OTPAuthenticator` and an `otp` option for multi-factor authentication
 * Add `TrustedPublisherAuthenticator`, an `id_token` option, and `exchange_trusted_publisher_token` for trusted publishing
 * Add `create_api_key` and `update_api_key` for the current API key endpoints
 * Add `autocomplete` for gem name suggestions
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `NoLatestVersion`, raised by `latest_version`, and by `yank`, `unyank`, and `downloads` without a version, when a gem has no published version
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, timeouts, malformed responses, and bad compressed bodies instead of the underlying `Errno`, `Net`, `Socket`, `EOF`, `Timeout`, `OpenSSL`, and `Zlib` errors
-* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `ApiKey` objects; `Version#sha` is hex from every endpoint, decoded from the base64 `sha256` of the most downloaded versions
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `APIKey` objects; `Version#sha` is hex from every endpoint, decoded from the base64 `sha256` of the most downloaded versions
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option; a version given as the gem to `yank`, `unyank`, or `downloads` stands in for the version too
 * Accept a path as well as an open file in `push`, for the gem and for its attestations
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts

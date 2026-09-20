@@ -70,7 +70,7 @@ RSpec.describe Gems::Configuration do
 
   describe "#key=" do
     it "resolves the key of an API key object" do
-      Gems.key = Gems::ApiKey.new("rubygems_api_key" => TEST_KEY)
+      Gems.key = Gems::APIKey.new("rubygems_api_key" => TEST_KEY)
 
       expect(Gems.key).to eq(TEST_KEY)
     end

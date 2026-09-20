@@ -7,7 +7,7 @@ module Gems
   module API
     # The API key endpoints, including trusted publishing
     # @api public
-    module ApiKeyEndpoints
+    module APIKeyEndpoints
       include Identifiers
       include JSONParsing
 
@@ -23,7 +23,7 @@ module Gems
       # @param mfa [Boolean, nil] Whether to require a one-time passcode when the key is used.
       # @param scopes [Hash{Symbol => Boolean}] The scopes to enable: push_rubygem, yank_rubygem, index_rubygems,
       #   add_owner, remove_owner, access_webhooks, update_owner, configure_trusted_publishers, and show_dashboard.
-      # @return [ApiKey] the new API key
+      # @return [APIKey] the new API key
       # @example
       #   Gems.configure do |config|
       #     config.username = "nick@gemcutter.org"
@@ -34,14 +34,14 @@ module Gems
       #   Gems.create_api_key("ci-push", push_rubygem: true, rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
       def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
         settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
-        ApiKey.new(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
+        APIKey.new(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
       end
 
       # Update the scopes of an API key using HTTP basic auth
       #
       # @api public
       # @authenticated true
-      # @param key [String, ApiKey] The API key to update.
+      # @param key [String, APIKey] The API key to update.
       # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem.
       # @return [String]
       # @example
@@ -55,7 +55,7 @@ module Gems
       # @api public
       # @authenticated false
       # @param id_token [String] The OIDC ID token.
-      # @return [ApiKey] the exchanged API key, including its name, scopes, and expiry
+      # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
       # @example
       #   Gems.exchange_trusted_publisher_token(ENV.fetch("ID_TOKEN")).key
       def exchange_trusted_publisher_token(id_token)

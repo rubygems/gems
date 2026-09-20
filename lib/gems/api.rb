@@ -16,7 +16,7 @@ module Gems
   # @api public
   module API
     include ActivityEndpoints
-    include ApiKeyEndpoints
+    include APIKeyEndpoints
     include DownloadEndpoints
     include GemEndpoints
     include OwnerEndpoints

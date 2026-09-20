@@ -3,7 +3,7 @@ require_relative "authenticator"
 module Gems
   # Authenticator for RubyGems API key authentication
   # @api public
-  class ApiKeyAuthenticator < Authenticator
+  class APIKeyAuthenticator < Authenticator
     # The API key
     # @api public
     # @return [String] the API key
@@ -11,13 +11,13 @@ module Gems
     #   authenticator.key = "701243f217cdf23b1370c7b66b65ca97"
     attr_reader :key
 
-    # Initialize a new ApiKeyAuthenticator
+    # Initialize a new APIKeyAuthenticator
     #
     # @api public
     # @param key [String] the API key
-    # @return [ApiKeyAuthenticator] a new instance
+    # @return [APIKeyAuthenticator] a new instance
     # @example Create an API key authenticator
-    #   authenticator = Gems::ApiKeyAuthenticator.new(key: "701243f217cdf23b1370c7b66b65ca97")
+    #   authenticator = Gems::APIKeyAuthenticator.new(key: "701243f217cdf23b1370c7b66b65ca97")
     def initialize(key:)
       @key = key
     end

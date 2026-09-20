@@ -55,7 +55,7 @@ RSpec.describe Gems::RequestBuilder do
     end
 
     it "adds the authenticator's headers" do
-      authenticator = Gems::ApiKeyAuthenticator.new(key: TEST_KEY)
+      authenticator = Gems::APIKeyAuthenticator.new(key: TEST_KEY)
 
       expect(builder.build(http_method: :get, uri:, authenticator:)["Authorization"]).to eq(TEST_KEY)
     end

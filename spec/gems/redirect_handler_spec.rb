@@ -99,7 +99,7 @@ RSpec.describe Gems::RedirectHandler do
     end
 
     it "preserves authentication across redirects" do
-      authenticator = Gems::ApiKeyAuthenticator.new(key: TEST_KEY)
+      authenticator = Gems::APIKeyAuthenticator.new(key: TEST_KEY)
       stub_request(:get, "https://rubygems.org/second").to_return(status: 302, headers: {"Location" => "/third"})
       stub_request(:get, "https://rubygems.org/third")
       handler.handle(response: redirect(302, "/second"), request:, authenticator:)
@@ -108,7 +108,7 @@ RSpec.describe Gems::RedirectHandler do
     end
 
     context "when a redirect leaves the origin" do
-      let(:authenticator) { Gems::OtpAuthenticator.new(authenticator: Gems::ApiKeyAuthenticator.new(key: TEST_KEY), otp: "123456") }
+      let(:authenticator) { Gems::OTPAuthenticator.new(authenticator: Gems::APIKeyAuthenticator.new(key: TEST_KEY), otp: "123456") }
 
       def headers_sent_to(location, uri = location)
         stub_request(:get, uri)
@@ -280,7 +280,7 @@ RSpec.describe Gems::RedirectHandler do
       end
 
       it "preserves authentication on a #{code}" do
-        authenticator = Gems::ApiKeyAuthenticator.new(key: TEST_KEY)
+        authenticator = Gems::APIKeyAuthenticator.new(key: TEST_KEY)
         request = Net::HTTP::Post.new(URI("https://rubygems.org/old"))
         stub_request(:post, "https://rubygems.org/new")
         handler.handle(response: redirect(code, "/new", klass:), request:, authenticator:)

@@ -1,7 +1,7 @@
-RSpec.describe Gems::OtpAuthenticator do
+RSpec.describe Gems::OTPAuthenticator do
   subject(:authenticator) { described_class.new(authenticator: api_key_authenticator, otp: "123456") }
 
-  let(:api_key_authenticator) { Gems::ApiKeyAuthenticator.new(key: TEST_KEY) }
+  let(:api_key_authenticator) { Gems::APIKeyAuthenticator.new(key: TEST_KEY) }
   let(:request) { Net::HTTP::Get.new("/") }
 
   it "is an Authenticator" do
@@ -40,7 +40,7 @@ RSpec.describe Gems::OtpAuthenticator do
 
   describe "#inspect" do
     it "shows the wrapped authenticator without the passcode" do
-      expect(authenticator.inspect).to eq("#<Gems::OtpAuthenticator authenticator=#<Gems::ApiKeyAuthenticator>>")
+      expect(authenticator.inspect).to eq("#<Gems::OTPAuthenticator authenticator=#<Gems::APIKeyAuthenticator>>")
     end
   end
 end
