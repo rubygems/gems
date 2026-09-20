@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-* Add `Connection`, `RequestBuilder`, `RedirectHandler`, and `ResponseParser`, with one authenticator class per authentication method, behind the existing client interface; `RequestBuilder`, `RedirectHandler`, and `ResponseParser` are private API, which can change within 3.x, the authenticators are read-only, and the constants that map statuses, methods, and headers are private
+* Add `Connection`, `RequestBuilder`, `RedirectHandler`, and `ResponseParser`, with one authenticator class per authentication method, behind the existing client interface; everything documented as `@api private`, such as `RequestBuilder`, `RedirectHandler`, `ResponseParser`, `RetryHandler`, `ConnectionPool`, and the mixins beneath them, can change within 3.x, the authenticators are read-only, and the constants that map statuses, methods, and headers are private
 * Add `OTPAuthenticator` and an `otp` option for multi-factor authentication
 * Add `TrustedPublisherAuthenticator`, an `id_token` option, and `exchange_trusted_publisher_token` for trusted publishing
 * Add `create_api_key` and `update_api_key` for the current API key endpoints

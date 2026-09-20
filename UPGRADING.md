@@ -263,7 +263,10 @@ Gems.host                         # => the same, until another host is configure
 
 ### Internals
 
-`Gems::RequestBuilder`, `Gems::RedirectHandler`, and `Gems::ResponseParser` are private API, which can change within
-3.x; configure them through the options of `Gems::Client`, such as `user_agent` and `max_redirects`. The
-authenticators are read-only; change a credential with the setters of `Gems::Client` or the `Gems` module, which
-build the authenticator again.
+Everything documented as `@api private` can change within 3.x, and is hidden from the generated documentation:
+`Gems::RequestBuilder`, `Gems::RedirectHandler`, `Gems::ResponseParser`, `Gems::RetryHandler`,
+`Gems::ConnectionPool`, and the mixins beneath them, such as `Gems::Idempotence`, `Gems::Identifiers`,
+`Gems::JSONParsing`, `Gems::Pagination`, `Gems::PathEscaping`, `Gems::RedactedOutput`, `Gems::RetryAfter`, and
+`Gems::URLValidation`. Configure them through the options of `Gems::Client`, such as `user_agent`, `max_redirects`,
+and `max_retries`. The authenticators are read-only; change a credential with the setters of `Gems::Client` or the
+`Gems` module, which build the authenticator again.
