@@ -136,16 +136,16 @@ module Gems
     # @example Get the API key
     #   Gems.key
     def key
-      if instance_variable_defined?(:@key)
+      if key_configured?
         @key
       else
         default_key
       end
     end
 
-    # The API key `gem push` would use for the configured host
+    # The API key `gem push` would use for a host
     #
-    # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for {#host} in
+    # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the host in
     # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The credentials file is only read when
     # this method is called.
     #
@@ -153,13 +153,26 @@ module Gems
     # standard error and would exit the process; this method returns nil instead.
     #
     # @api public
+    # @param gem_host [String] the host to resolve the key for, which defaults to {#host}
     # @return [String, nil] the API key, or nil when none is stored or the credentials file cannot be read
     # @example Get the default API key
     #   Gems.default_key
-    def default_key
-      ENV.fetch("GEM_HOST_API_KEY") { ::Gem.configuration.api_keys.fetch(host) { ::Gem.configuration.rubygems_api_key } }
+    # @example Get the default API key for another host
+    #   Gems.default_key("https://gems.example.com")
+    def default_key(gem_host = host)
+      ENV.fetch("GEM_HOST_API_KEY") { ::Gem.configuration.api_keys.fetch(gem_host) { ::Gem.configuration.rubygems_api_key } }
     rescue ::Gem::SystemExitException
       nil
+    end
+
+    # Whether an API key has been assigned, rather than falling back to {#default_key}
+    #
+    # @api private
+    # @return [Boolean] whether an API key has been assigned
+    # @example
+    #   Gems.key_configured?
+    def key_configured?
+      instance_variable_defined?(:@key)
     end
 
     # Convenience method to allow configuration options to be set in a block
@@ -197,7 +210,7 @@ module Gems
     # @return [void]
     def reset_credentials
       self.id_token = nil
-      remove_instance_variable(:@key) if instance_variable_defined?(:@key)
+      remove_instance_variable(:@key) if key_configured?
       self.otp = nil
       self.password = nil
       self.username = nil

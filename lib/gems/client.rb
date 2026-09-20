@@ -36,7 +36,7 @@ module Gems
     #
     # @api public
     # @param host [String] the host for API requests, including scheme
-    # @param key [String, APIKey, nil] the API key, or an API key object
+    # @param key [String, APIKey, nil] the API key, an API key object, or nil to send requests without one
     # @param username [String, nil] the username for HTTP basic authentication
     # @param password [String, nil] the password for HTTP basic authentication
     # @param otp [String, nil] the one-time passcode for multi-factor authentication
@@ -58,7 +58,7 @@ module Gems
     # @example Create a client for trusted publishing
     #   client = Gems::Client.new(id_token: ENV.fetch("ID_TOKEN"))
     # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
-    def initialize(host: Gems.host, key: Gems.key, username: Gems.username, password: Gems.password,
+    def initialize(host: Gems.host, key: UNSET, username: Gems.username, password: Gems.password,
       otp: Gems.otp, id_token: Gems.id_token,
       user_agent: Gems.user_agent,
       open_timeout: Gems.open_timeout,
@@ -194,12 +194,48 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     def execute_request(http_method, path, host:, params: {}, body: nil, content_type: nil)
-      host = validate_host(host) unless host.nil?
-      uri = build_uri(host || @host, path)
+      host = host.nil? ? @host : validate_host(host)
+      uri = build_uri(host, path)
+      authenticator = authenticator_for(host)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
       response = @connection.perform(request:)
       response = @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:)
       @response_parser.parse(response:)
+    end
+
+    # The authenticator for a request to a host
+    #
+    # A request to a host other than the client's is authenticated with the API key stored for that host, resolved
+    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. Credentials
+    # configured for the client are sent wherever the client sends a request, as the configured credentials of
+    # `gem push --key` are.
+    #
+    # @api private
+    # @param host [String] the host of the request
+    # @return [Authenticator] the authenticator for the request
+    def authenticator_for(host)
+      return authenticator if credentials_configured? || same_origin?(host, @host)
+
+      key = Gems.default_key(host)
+      otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
+    end
+
+    # Whether two hosts share a scheme, host, and port
+    # @api private
+    # @param host [String] one host
+    # @param other [String] the other host
+    # @return [Boolean] whether the hosts share an origin
+    def same_origin?(host, other)
+      origin(host).eql?(origin(other))
+    end
+
+    # The origin of a host, with the scheme and host in lowercase
+    # @api private
+    # @param host [String] the host
+    # @return [Array] the scheme, host, and port
+    def origin(host)
+      uri = URI(host).normalize
+      [uri.scheme, uri.host, uri.port]
     end
 
     # Check that a host is a URL requests can be sent to

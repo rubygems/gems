@@ -208,7 +208,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | Option        | Description                                              | Default                                |
 | ------------- | -------------------------------------------------------- | -------------------------------------- |
 | `host`        | The RubyGems-compatible host, including scheme           | `RUBYGEMS_HOST` or `https://rubygems.org` |
-| `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or `~/.gem/credentials` |
+| `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or the key stored for the host in `~/.gem/credentials` |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `nil`                                  |
@@ -224,6 +224,15 @@ Clients default to the global configuration, which can be set with `Gems.configu
 Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
 `Gems::TrustedPublisherAuthenticator`, and `Gems::OTPAuthenticator` (which wraps one of the others).
 HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
+
+When no key is configured, the API key is resolved for the host it is sent to, as `gem push --host` resolves it: a
+client built for another host, and a request made to one with `host:`, use the key `gem signin --host` stored for that
+host. A key you configure yourself is sent wherever the client sends a request, as `gem push --key` is.
+
+```ruby
+# Uses the key stored for gems.example.com, not the RubyGems.org key.
+Gems.push 'gemcutter-0.2.1.gem', host: 'https://gems.example.com'
+```
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
 An `https://` proxy is connected to over TLS.

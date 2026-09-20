@@ -31,6 +31,113 @@ RSpec.describe Gems::ClientCredentials do
     it "sets the ID token" do
       expect(client.id_token).to eq("ID_TOKEN")
     end
+
+    it "records a key given to the client as configured" do
+      expect(Gems::Client.new(key: TEST_KEY).send(:credentials_configured?)).to be(true)
+    end
+
+    it "records a configured key as configured" do
+      Gems.key = TEST_KEY
+
+      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+    end
+
+    it "records no key as not configured" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new.send(:credentials_configured?)).to be(false)
+    end
+
+    it "falls back to the key stored for the host without a key" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(host: "https://gems.example.com").key).to eq("HOST_KEY")
+    end
+  end
+
+  describe "#configured_key" do
+    it "reads the configured key" do
+      Gems.key = TEST_KEY
+
+      expect(Gems::Client.new.send(:configured_key)).to eq(TEST_KEY)
+    end
+
+    it "prefers the configured key to the key stored for the host of the client" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      Gems.key = TEST_KEY
+
+      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to eq(TEST_KEY)
+    end
+
+    it "reads the key stored for the host of the client without a configured key" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to eq("HOST_KEY")
+    end
+
+    it "falls back to the RubyGems.org key for a host without a stored key" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to eq("FILE_KEY")
+    end
+
+    it "returns nil without a stored key" do
+      stub_rubygems_configuration(rubygems_api_key: nil)
+
+      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to be_nil
+    end
+  end
+
+  describe "#credentials_configured?" do
+    it "is false when the client falls back to the key stored for its host" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new.send(:credentials_configured?)).to be(false)
+    end
+
+    it "is true with a key given to the client" do
+      expect(Gems::Client.new(key: TEST_KEY).send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with a key of nil given to the client" do
+      expect(Gems::Client.new(key: nil).send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with a configured key" do
+      Gems.key = TEST_KEY
+
+      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with a configured key of nil" do
+      Gems.key = nil
+
+      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with a username" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(username: TEST_USERNAME).send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with a password" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(password: TEST_PASSWORD).send(:credentials_configured?)).to be(true)
+    end
+
+    it "is true with an ID token" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:credentials_configured?)).to be(true)
+    end
+
+    it "is false with only a one-time passcode" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(otp: "123456").send(:credentials_configured?)).to be(false)
+    end
   end
 
   describe "#initialize_authenticator" do
@@ -195,6 +302,14 @@ RSpec.describe Gems::ClientCredentials do
       client.key = nil
 
       expect(client.authenticator).to be_an_instance_of(Gems::Authenticator)
+    end
+
+    it "records the key as configured, so that it is sent to every host" do
+      stub_rubygems_configuration
+      client = Gems::Client.new
+      client.key = TEST_KEY
+
+      expect(client.send(:credentials_configured?)).to be(true)
     end
   end
 

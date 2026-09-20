@@ -5,6 +5,31 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  describe "#key_configured?" do
+    it "is false until a key is assigned" do
+      expect(Gems.key_configured?).to be(false)
+    end
+
+    it "is true once a key is assigned" do
+      Gems.key = TEST_KEY
+
+      expect(Gems.key_configured?).to be(true)
+    end
+
+    it "is true once a key is assigned nil" do
+      Gems.key = nil
+
+      expect(Gems.key_configured?).to be(true)
+    end
+
+    it "is false again after a reset" do
+      Gems.key = TEST_KEY
+      Gems.reset
+
+      expect(Gems.key_configured?).to be(false)
+    end
+  end
+
   describe "#default_key" do
     let(:api_keys) { {:rubygems_api_key => "FILE_KEY", "https://gems.example.com" => "HOST_KEY"} }
 
@@ -24,6 +49,14 @@ RSpec.describe Gems::Configuration do
       Gems.host = "https://other.example.com"
 
       expect(Gems.default_key).to eq("FILE_KEY")
+    end
+
+    it "reads the API key stored for a given host" do
+      expect(Gems.default_key("https://gems.example.com")).to eq("HOST_KEY")
+    end
+
+    it "falls back to the RubyGems.org API key for a given host without one" do
+      expect(Gems.default_key("https://other.example.com")).to eq("FILE_KEY")
     end
 
     it "prefers the GEM_HOST_API_KEY environment variable" do

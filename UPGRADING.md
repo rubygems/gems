@@ -50,6 +50,16 @@ Gems.key = nil                  # send requests without an API key
 Gems.configure { |config| config.key = nil }
 ```
 
+The default key is resolved for the host a request is sent to, so a client built for another host, and a request made
+to one with `host:`, send the key `gem signin --host` stored for that host rather than the RubyGems.org key, where 2.x
+sent the RubyGems.org key wherever `push` was pointed. A key you configure yourself is sent wherever the client sends a
+request, as `gem push --key` is:
+
+```ruby
+# 3.0
+Gems.push "gems-0.0.8.gem", host: "https://gems.example.com"   # uses the key stored for gems.example.com
+```
+
 A `host` that is not an HTTP or HTTPS URL raises `ArgumentError` when a client is built and when `host` is assigned,
 where 2.x let `URI::BadURIError` or `URI::InvalidURIError` escape when a request was made.
 

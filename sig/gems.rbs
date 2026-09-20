@@ -78,7 +78,8 @@ module Gems
 
     def self.extended: (Configuration base) -> void
     def key: () -> String?
-    def default_key: () -> String?
+    def default_key: (?String host) -> String?
+    def key_configured?: () -> bool
     def configure: () { (self) -> void } -> self
     def reset: () -> self
 
@@ -148,6 +149,9 @@ module Gems
     @host: String
     @connection: Connection
     @request_builder: RequestBuilder
+    @key_configured: bool
+
+    UNSET: untyped
 
     attr_reader key: String?
     attr_reader username: String?
@@ -165,6 +169,8 @@ module Gems
     private
 
     def initialize_credentials: (key: api_key_identifier?, username: String?, password: String?, otp: String?, id_token: String?) -> void
+    def configured_key: () -> String?
+    def credentials_configured?: () -> bool
     def initialize_authenticator: () -> Authenticator
     def otp_authenticator: (Authenticator authenticator) -> Authenticator
     def basic_authenticator: () -> BasicAuthenticator?
@@ -474,6 +480,9 @@ module Gems
 
     def execute_request: (Symbol http_method, String path, host: String?, ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
 
+    def authenticator_for: (String host) -> Authenticator
+    def same_origin?: (String host, String other) -> bool
+    def origin: (String host) -> [String?, String?, Integer?]
     def validate_host: (String host) -> String
     def http_url?: (untyped host) -> bool
 

@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
 * Match resources against `case`/`in` patterns by their readers, such as `in {name:, version:}`, with `Resource#deconstruct_keys` and `Resource.attribute_names`
+* Add `key_configured?`, and a host argument to `default_key`, for the API key stored for a host other than the configured one
 * Add RBS signatures, with a manifest naming the standard libraries they refer to
 
 ### Changed
@@ -53,6 +54,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a flat list of `WebHook` objects from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
 * Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
+* Resolve the default API key for the host a request is sent to, as `gem push --host` resolves it, so that a client built for another host, and a request made to one with `host:`, send the key `gem signin --host` stored for it rather than the RubyGems.org key; a configured key, basic authentication, and a trusted publishing ID token are sent wherever the client sends a request, as `gem push --key` is
 * Exchange a trusted publishing ID token once when requests are made concurrently, since RubyGems.org issues the API key only once per token
 * Raise `ArgumentError` for a `host` that is not an HTTP or HTTPS URL, when a client is built and when `host` is assigned, rather than letting `URI::BadURIError` or `URI::InvalidURIError` escape when a request is made; an invalid host leaves the host as it was, as an invalid `proxy_url` does
 

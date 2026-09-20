@@ -33,6 +33,19 @@ RSpec.describe Gems::Client do
       expect { described_class.new(host: nil) }.to raise_error(ArgumentError, "Invalid host: ")
     end
 
+    it "reads the API key stored for its host when no key is configured" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(described_class.new(host: "https://gems.example.com").key).to eq("HOST_KEY")
+    end
+
+    it "prefers a configured key to the key stored for its host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      Gems.key = TEST_KEY
+
+      expect(described_class.new(host: "https://gems.example.com").key).to eq(TEST_KEY)
+    end
+
     it "defaults the key to the global configuration" do
       Gems.key = TEST_KEY
 
@@ -290,6 +303,59 @@ RSpec.describe Gems::Client do
     it "raises an ArgumentError for an invalid per-request host" do
       expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
+
+    it "authenticates a request to another host with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new.post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+    end
+
+    it "sends the one-time passcode with the key stored for another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(otp: "123456").post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => "HOST_KEY", "OTP" => "123456"})).to have_been_made
+    end
+
+    it "sends no credentials to another host without a stored key" do
+      stub_rubygems_configuration(rubygems_api_key: nil)
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new.post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
+    it "sends a configured key to another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(key: TEST_KEY).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "sends configured basic authentication to another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(username: TEST_USERNAME, password: TEST_PASSWORD).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(basic_auth: [TEST_USERNAME, TEST_PASSWORD])).to have_been_made
+    end
+
+    it "keeps the key of the client for its own host written another way" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+      stub_post("/path")
+      described_class.new.post("/path", host: "https://RubyGems.org:443")
+
+      expect(a_post("/path").with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+    end
   end
 
   describe "#delete" do
@@ -377,6 +443,64 @@ RSpec.describe Gems::Client do
     requests
   end
 
+  describe "#authenticator_for" do
+    it "authenticates another host with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(described_class.new.send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "does not authenticate another host without a stored key" do
+      stub_rubygems_configuration(rubygems_api_key: nil)
+
+      expect(described_class.new.send(:authenticator_for, "https://gems.example.com"))
+        .to be_an_instance_of(Gems::Authenticator)
+    end
+
+    it "wraps the key stored for another host with the one-time passcode" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(described_class.new(otp: "123456").send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::OTPAuthenticator, otp: "123456")
+    end
+
+    it "keeps the authenticator of the client for its own host written another way" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+
+      expect(described_class.new.send(:authenticator_for, "https://RubyGems.org:443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "keeps the authenticator of the client for its own host with a path prefix" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+
+      expect(described_class.new.send(:authenticator_for, "#{TEST_HOST}/gems"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "authenticates a host that differs only in port with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://rubygems.org:8443" => "OTHER_KEY", TEST_HOST => "HOST_KEY"})
+
+      expect(described_class.new.send(:authenticator_for, "https://rubygems.org:8443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "OTHER_KEY")
+    end
+
+    it "authenticates a host that differs only in scheme with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"http://rubygems.org:443" => "OTHER_KEY", TEST_HOST => "HOST_KEY"})
+
+      expect(described_class.new.send(:authenticator_for, "http://rubygems.org:443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "OTHER_KEY")
+    end
+
+    it "keeps a configured key for another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(described_class.new(key: TEST_KEY).send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: TEST_KEY)
+    end
+  end
+
   describe "#execute_request" do
     it "joins the path with the host" do
       client.host = "http://example.com/"
@@ -431,6 +555,59 @@ RSpec.describe Gems::Client do
 
     it "raises an ArgumentError for an invalid per-request host" do
       expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
+    end
+
+    it "authenticates a request to another host with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new.post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+    end
+
+    it "sends the one-time passcode with the key stored for another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(otp: "123456").post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => "HOST_KEY", "OTP" => "123456"})).to have_been_made
+    end
+
+    it "sends no credentials to another host without a stored key" do
+      stub_rubygems_configuration(rubygems_api_key: nil)
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new.post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
+    it "sends a configured key to another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(key: TEST_KEY).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "sends configured basic authentication to another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(username: TEST_USERNAME, password: TEST_PASSWORD).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with(basic_auth: [TEST_USERNAME, TEST_PASSWORD])).to have_been_made
+    end
+
+    it "keeps the key of the client for its own host written another way" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+      stub_post("/path")
+      described_class.new.post("/path", host: "https://RubyGems.org:443")
+
+      expect(a_post("/path").with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
     end
 
     it "authenticates requests" do

@@ -73,6 +73,10 @@ def rubygems_url(url)
   TEST_HOST + url
 end
 
+def stub_rubygems_configuration(api_keys: {}, rubygems_api_key: "FILE_KEY")
+  allow(Gem).to receive(:configuration).and_return(instance_double(Gem::ConfigFile, rubygems_api_key:, api_keys:))
+end
+
 def build_response(response_class, code, message, body)
   response = response_class.new("1.1", code, message)
   response.instance_variable_set(:@read, true)

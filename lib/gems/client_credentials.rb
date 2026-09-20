@@ -11,6 +11,11 @@ module Gems
   module ClientCredentials
     include Identifiers
 
+    # Sentinel for a key that was not given, so that a key given as nil, which sends requests without one, is told
+    # apart from no key at all, which falls back to the configured key or the key stored for the host
+    UNSET = Object.new.freeze
+    private_constant :UNSET
+
     # The API key
     # @api public
     # @return [String, nil] the API key
@@ -64,6 +69,7 @@ module Gems
     #   client.key = client.create_api_key("ci-push", push_rubygem: true)
     def key=(key)
       @key = key_of(key)
+      @key_configured = true
       initialize_authenticator
     end
 
@@ -126,11 +132,33 @@ module Gems
     # @param id_token [String, nil] the OIDC ID token
     # @return [void]
     def initialize_credentials(key:, username:, password:, otp:, id_token:)
-      @key = key_of(key)
+      @key_configured = key.equal?(UNSET) ? Gems.key_configured? : true
+      @key = key_of(key.equal?(UNSET) ? configured_key : key)
       @username = username
       @password = password
       @otp = otp
       @id_token = id_token
+    end
+
+    # The API key to use when none was given to the client
+    #
+    # The configured key, else the key stored for the client's host, so that a client for another host uses the
+    # key kept for it rather than the RubyGems.org key.
+    #
+    # @api private
+    # @return [String, nil] the API key
+    def configured_key
+      Gems.key_configured? ? Gems.key : Gems.default_key(@host)
+    end
+
+    # Whether credentials were configured for the client
+    #
+    # When none were, the client falls back to the API key stored for the host a request is sent to.
+    #
+    # @api private
+    # @return [Boolean] whether credentials were configured
+    def credentials_configured?
+      @key_configured || [username, password, id_token].any?
     end
 
     # Initialize the appropriate authenticator based on available credentials
