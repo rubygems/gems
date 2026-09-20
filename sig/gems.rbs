@@ -177,7 +177,7 @@ module Gems
 
     attr_reader attributes: Hash[String, untyped]
 
-    def self.list: (Array[Hash[String, untyped]] list) -> Array[instance]
+    def self.list: (Array[Hash[String | Symbol, untyped]] list) -> Array[instance]
     def self.inspect_with: (*Symbol readers) -> Array[Symbol]
     def self.inspect_readers: () -> Array[Symbol]
     def self.identified_by: (*Symbol readers) -> Array[Symbol]
@@ -188,7 +188,7 @@ module Gems
     def self.attribute_names: () -> Array[Symbol]
     def self.record_attribute: (Symbol name) -> Symbol
     def self.keys_for: (Symbol name, Array[String | Symbol] keys) -> Array[String]
-    def initialize: (Hash[String, untyped] attributes) -> void
+    def initialize: (Hash[String | Symbol, untyped] attributes) -> void
     def []: (String | Symbol key) -> untyped
     def deconstruct_keys: (Array[Symbol]? keys) -> Hash[Symbol, untyped]
     def to_h: () -> Hash[String, untyped]

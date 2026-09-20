@@ -15,7 +15,7 @@ module Gems
     # Build a list of resources from a list of attribute hashes
     #
     # @api public
-    # @param list [Array<Hash>] the attribute hashes
+    # @param list [Array<Hash{String, Symbol => Object}>] the attribute hashes
     # @return [Array<Resource>] the resources
     # @example Build a list of gems
     #   Gems::Gem.list(JSON.parse(body))
@@ -148,10 +148,10 @@ module Gems
     # Initialize a new resource
     #
     # The attributes are deeply copied and frozen, so resources are immutable values and the hash passed in
-    # stays mutable.
+    # stays mutable. Symbol keys are converted to strings, at every level.
     #
     # @api public
-    # @param attributes [Hash{String => Object}] the raw attributes from the API response
+    # @param attributes [Hash{String, Symbol => Object}] the raw attributes from the API response
     # @return [Resource] a new instance
     # @example Wrap a parsed response
     #   Gems::Gem.new(JSON.parse(body))
@@ -280,14 +280,14 @@ module Gems
 
     # Copy a value, freezing the copy and everything nested inside it
     #
-    # Everything a parsed JSON response holds other than hashes, arrays, and strings is already immutable.
+    # The keys of hashes are converted to strings. Everything a parsed JSON response holds other than hashes, arrays, and strings is already immutable.
     #
     # @api private
     # @param value [Object] the value to copy
     # @return [Object] the frozen copy
     def deep_freeze(value)
       case value
-      when Hash then value.to_h { |key, nested| [key, deep_freeze(nested)] }.freeze
+      when Hash then value.to_h { |key, nested| [key.to_s, deep_freeze(nested)] }.freeze
       when Array then value.map { |nested| deep_freeze(nested) }.freeze
       when String then value.dup.freeze
       else value

@@ -201,6 +201,16 @@ RSpec.describe Gems::Resource do
     it "freezes strings" do
       expect(resource_class.new("name" => +"rails").name).to be_frozen
     end
+
+    it "converts symbol keys to strings" do
+      expect(resource_class.new(name: "rails").name).to eq("rails")
+    end
+
+    it "converts the symbol keys of nested hashes to strings" do
+      resource = resource_class.new(metadata: {changelog_uri: "https://example.com"})
+
+      expect(resource[:metadata]).to eq("changelog_uri" => "https://example.com")
+    end
   end
 
   describe ".attribute_names" do

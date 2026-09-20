@@ -191,8 +191,9 @@ accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.r
 `Gems.key = api_key` all work.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
-`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Every object also exposes
-the raw response through `[]` and `to_h`, so fields without a reader remain accessible:
+`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Objects are immutable, with
+their attributes frozen at every level. Every object also exposes the raw response through `[]` and `to_h`, so fields
+without a reader remain accessible:
 
 ```ruby
 gem = Gems.rubygem 'rails'
