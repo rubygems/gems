@@ -234,7 +234,6 @@ skipped on JRuby. You can also run `bin/console` for an interactive prompt that 
 This library aims to support and is [tested against][gh-actions] the following Ruby
 implementations:
 
-* Ruby 3.3
 * Ruby 3.4
 * Ruby 4.0
 * [JRuby][]
