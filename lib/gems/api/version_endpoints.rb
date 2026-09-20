@@ -1,4 +1,5 @@
 require "json"
+require_relative "../errors/no_latest_version"
 require_relative "../identifiers"
 require_relative "../gem"
 require_relative "../version"
@@ -29,14 +30,14 @@ module Gems
       # @authenticated false
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @return [String] the latest version number
-      # @raise [KeyError] if the gem has no published version
+      # @raise [NoLatestVersion] if the gem has no published version
       # @example
       #   Gems.latest_version "coulda"
       def latest_version(gem_name)
         response = get("/api/v1/versions/#{name_of(gem_name)}/latest.json")
         version = JSON.parse(response).fetch("version")
         # The endpoint answers 200 with "unknown" rather than 404 for a gem with no published version
-        raise KeyError, "#{name_of(gem_name)} has no latest version" if version.eql?("unknown")
+        raise NoLatestVersion, "#{name_of(gem_name)} has no latest version" if version.eql?("unknown")
 
         version
       end

@@ -224,10 +224,10 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
     end
 
-    it "raises KeyError when the gem has no published version" do
+    it "raises NoLatestVersion when the gem has no published version" do
       stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"unknown"}')
 
-      expect { client.yank("gems") }.to raise_error(KeyError)
+      expect { client.yank("gems") }.to raise_error(Gems::NoLatestVersion)
     end
   end
 
@@ -270,10 +270,10 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "3.0.9"})).to have_been_made
     end
 
-    it "raises KeyError when the gem has no published version" do
+    it "raises NoLatestVersion when the gem has no published version" do
       stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"unknown"}')
 
-      expect { client.unyank("gems") }.to raise_error(KeyError)
+      expect { client.unyank("gems") }.to raise_error(Gems::NoLatestVersion)
     end
   end
 

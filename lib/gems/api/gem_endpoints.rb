@@ -90,6 +90,7 @@ module Gems
       # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
       def yank(gem_name, version = nil, platform: nil)
@@ -106,6 +107,7 @@ module Gems
       # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
       def unyank(gem_name, version = nil, platform: nil)

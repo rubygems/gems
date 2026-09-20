@@ -507,6 +507,9 @@ module Gems
   class TooManyRedirects < Error
   end
 
+  class NoLatestVersion < Error
+  end
+
   class Connection
     extend Forwardable
 

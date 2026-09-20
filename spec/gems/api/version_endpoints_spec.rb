@@ -48,11 +48,11 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(client.latest_version("script_helpers")).to eq("0.3.0")
     end
 
-    it "raises KeyError when the gem has no published version" do
+    it "raises NoLatestVersion when the gem has no published version" do
       stub_get("/api/v1/versions/script_helpers/latest.json").to_return(body: '{"version":"unknown"}')
 
       expect { client.latest_version("script_helpers") }
-        .to raise_error(KeyError, "script_helpers has no latest version")
+        .to raise_error(Gems::NoLatestVersion, "script_helpers has no latest version")
     end
 
     it "names the resource in the error when it has no published version" do
@@ -60,7 +60,7 @@ RSpec.describe Gems::API::VersionEndpoints do
       version = Gems::Version.new("name" => "script_helpers")
 
       expect { client.latest_version(version) }
-        .to raise_error(KeyError, "script_helpers has no latest version")
+        .to raise_error(Gems::NoLatestVersion, "script_helpers has no latest version")
     end
 
     it "raises KeyError when the response has no version" do

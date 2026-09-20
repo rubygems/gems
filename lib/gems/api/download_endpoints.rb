@@ -28,6 +28,7 @@ module Gems
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param version [String, Version, nil] The version of the gem (defaults to the latest version).
       # @return [Downloads]
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
       def downloads(gem_name, version = nil)

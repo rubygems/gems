@@ -218,7 +218,9 @@ Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environmen
 
 All errors inherit from `Gems::Error`. HTTP errors are `Gems::HTTPError` subclasses that expose the `response` and
 integer status `code`, with specific classes such as `Gems::NotFound`, `Gems::Unauthorized`, and `Gems::Forbidden`.
-Network failures raise `Gems::NetworkError` and redirect loops raise `Gems::TooManyRedirects`.
+Network failures raise `Gems::NetworkError` and redirect loops raise `Gems::TooManyRedirects`. Asking for the latest
+version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`, raises
+`Gems::NoLatestVersion`.
 
 ## Development
 
