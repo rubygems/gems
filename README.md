@@ -21,6 +21,8 @@ Or, if Bundler is not being used to manage dependencies:
 ## Documentation
 [https://www.rubydoc.info/gems/gems](https://www.rubydoc.info/gems/gems)
 
+Upgrading from 2.x? See [UPGRADING.md](UPGRADING.md) for what changed.
+
 # Usage Examples
 
 ```ruby
