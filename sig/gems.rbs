@@ -28,7 +28,7 @@ module Gems
   def self.connection_values: () -> Array[untyped]
   def self.apply_connection_values: () -> void
 
-  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Integer, ?max_redirects: Integer) -> Client
+  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Integer, ?read_timeout: Integer, ?write_timeout: Integer, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Integer, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Integer) -> Client
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
