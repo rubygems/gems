@@ -603,14 +603,14 @@ module Gems
     attr_reader request_builder: RequestBuilder
 
     def initialize: (?connection: Connection, ?request_builder: RequestBuilder, ?max_redirects: Integer) -> void
-    def handle: (response: Net::HTTPResponse, request: Net::HTTPRequest, ?authenticator: Authenticator, ?redirect_count: Integer) -> Net::HTTPResponse
+    def handle: (response: Net::HTTPResponse, request: Net::HTTPRequest, ?authenticator: Authenticator, ?body: request_body?, ?content_type: String?, ?redirect_count: Integer) -> Net::HTTPResponse
 
     private
 
     def same_origin?: (URI::Generic uri, URI::Generic other) -> bool
     def origin: (URI::Generic uri) -> [String?, String?, Integer?]
     def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::HTTP?
-    def build_request: (Net::HTTPRequest request, URI::Generic uri, Integer response_code, Authenticator authenticator) -> Net::HTTPRequest
+    def build_request: (request: Net::HTTPRequest, uri: URI::Generic, response_code: Integer, authenticator: Authenticator, body: request_body?, content_type: String?) -> Net::HTTPRequest
   end
 
   class ResponseParser

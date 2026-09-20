@@ -195,7 +195,7 @@ module Gems
       uri = build_uri(host || @host, path)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, authenticator:)
       response = @connection.perform(request:)
-      response = @redirect_handler.handle(response:, request:, authenticator:)
+      response = @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:)
       @response_parser.parse(response:)
     end
 

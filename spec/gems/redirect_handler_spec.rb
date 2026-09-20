@@ -4,12 +4,30 @@ RSpec.describe Gems::RedirectHandler do
   let(:connection) { Gems::Connection.new }
   let(:request_builder) { Gems::RequestBuilder.new }
   let(:request) { Net::HTTP::Get.new(URI("https://rubygems.org/old")) }
-  let(:form_request) { Net::HTTP::Post.new(URI("https://rubygems.org/old")).tap { |post| post.form_data = {key: "value"} } }
+  let(:form_request) { request_builder.build(http_method: :post, uri: URI("https://rubygems.org/old"), body: form_body) }
 
   def redirect(code, location, klass: Net::HTTPFound)
     response = klass.new("1.1", code.to_s, "Redirect")
     response["Location"] = location
     response
+  end
+
+  def form_body
+    {key: "value"}
+  end
+
+  def multipart_body
+    @multipart_body ||= [["gem", "GEM DATA", {filename: "gems-0.0.8.gem", content_type: "application/octet-stream"}]]
+  end
+
+  # The requests the connection performs, which show the multipart fields that WebMock cannot read from a request
+  def performed_requests
+    requests = []
+    allow(connection).to receive(:perform).and_wrap_original do |perform, request:|
+      requests << request
+      perform.call(request:)
+    end
+    requests
   end
 
   describe "#initialize" do
@@ -206,7 +224,7 @@ RSpec.describe Gems::RedirectHandler do
 
     it "drops the body on a 302" do
       stub_request(:get, "https://rubygems.org/new")
-      handler.handle(response: redirect(302, "/new"), request: form_request)
+      handler.handle(response: redirect(302, "/new"), request: form_request, body: form_body)
 
       expect(a_request(:get, "https://rubygems.org/new").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
     end
@@ -222,9 +240,43 @@ RSpec.describe Gems::RedirectHandler do
 
       it "preserves the body on a #{code}" do
         stub_request(:post, "https://rubygems.org/new")
-        handler.handle(response: redirect(code, "/new", klass:), request: form_request)
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request, body: form_body)
 
         expect(a_request(:post, "https://rubygems.org/new").with(body: "key=value")).to have_been_made
+      end
+
+      it "preserves a multipart body on a #{code}" do
+        request = request_builder.build(http_method: :post, uri: URI("https://rubygems.org/old"), body: multipart_body)
+        stub_request(:post, "https://rubygems.org/new")
+        requests = performed_requests
+        handler.handle(response: redirect(code, "/new", klass:), request:, body: multipart_body)
+
+        expect(requests.last.instance_variable_get(:@body_data)).to equal(multipart_body)
+      end
+
+      it "preserves a raw body and its content type on a #{code}" do
+        request = request_builder.build(http_method: :put, uri: URI("https://rubygems.org/old"), body: "raw", content_type: "text/plain")
+        stub_request(:put, "https://rubygems.org/new")
+        handler.handle(response: redirect(code, "/new", klass:), request:, body: "raw", content_type: "text/plain")
+
+        expect(a_request(:put, "https://rubygems.org/new").with(body: "raw", headers: {"Content-Type" => "text/plain"})).to have_been_made
+      end
+
+      it "preserves the body across a second #{code}" do
+        stub_request(:post, "https://rubygems.org/second").to_return(status: code, headers: {"Location" => "/third"})
+        stub_request(:post, "https://rubygems.org/third")
+        handler.handle(response: redirect(code, "/second", klass:), request: form_request, body: form_body)
+
+        expect(a_request(:post, "https://rubygems.org/third").with(body: "key=value")).to have_been_made
+      end
+
+      it "preserves the content type across a second #{code}" do
+        request = request_builder.build(http_method: :put, uri: URI("https://rubygems.org/old"), body: "raw", content_type: "text/plain")
+        stub_request(:put, "https://rubygems.org/second").to_return(status: code, headers: {"Location" => "/third"})
+        stub_request(:put, "https://rubygems.org/third")
+        handler.handle(response: redirect(code, "/second", klass:), request:, body: "raw", content_type: "text/plain")
+
+        expect(a_request(:put, "https://rubygems.org/third").with(body: "raw", headers: {"Content-Type" => "text/plain"})).to have_been_made
       end
 
       it "preserves authentication on a #{code}" do
@@ -238,7 +290,7 @@ RSpec.describe Gems::RedirectHandler do
 
       it "preserves the content type on a #{code}" do
         stub_request(:post, "https://rubygems.org/new")
-        handler.handle(response: redirect(code, "/new", klass:), request: form_request)
+        handler.handle(response: redirect(code, "/new", klass:), request: form_request, body: form_body)
 
         expect(a_request(:post, "https://rubygems.org/new")
           .with(headers: {"Content-Type" => "application/x-www-form-urlencoded"})).to have_been_made

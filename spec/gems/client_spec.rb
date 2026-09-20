@@ -323,6 +323,21 @@ RSpec.describe Gems::Client do
     end
   end
 
+  def multipart_body
+    @multipart_body ||= [["gem", "GEM DATA", {filename: "gems-0.0.8.gem", content_type: "application/octet-stream"}]]
+  end
+
+  # The requests the connection performs, which show the multipart fields that WebMock cannot read from a request
+  def performed_requests
+    connection = client.instance_variable_get(:@connection)
+    requests = []
+    allow(connection).to receive(:perform).and_wrap_original do |perform, request:|
+      requests << request
+      perform.call(request:)
+    end
+    requests
+  end
+
   describe "#execute_request" do
     it "joins the path with the host" do
       client.host = "http://example.com/"
@@ -410,6 +425,23 @@ RSpec.describe Gems::Client do
       stub_get("/loop").to_return(status: 302, headers: {"Location" => "/loop"})
 
       expect { client.get("/loop") }.to raise_error(Gems::TooManyRedirects)
+    end
+
+    it "preserves a multipart body across a 307 redirect" do
+      stub_post("/old").to_return(status: 307, headers: {"Location" => "/new"})
+      stub_post("/new")
+      requests = performed_requests
+      client.post("/old", multipart_body)
+
+      expect(requests.last.instance_variable_get(:@body_data)).to equal(multipart_body)
+    end
+
+    it "preserves a raw body and its content type across a 307 redirect" do
+      stub_put("/old").to_return(status: 307, headers: {"Location" => "/new"})
+      stub_put("/new")
+      client.put("/old", "raw", content_type: "text/plain")
+
+      expect(a_put("/new").with(body: "raw", headers: {"Content-Type" => "text/plain"})).to have_been_made
     end
 
     it "raises NotFound for 404 responses" do

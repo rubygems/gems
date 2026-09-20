@@ -62,16 +62,21 @@ module Gems
     # valid URL, or is not an HTTP or HTTPS URL, is returned as it is, so that the caller raises the HTTPError of its
     # status.
     #
+    # A 307 or 308 redirect is followed with the method of the request and the body it was built from, which is
+    # given as it was given to {RequestBuilder#build}, since a multipart body cannot be read back from the request.
+    #
     # @api private
     # @param response [Net::HTTPResponse] the HTTP response to handle
     # @param request [Net::HTTPRequest] the original HTTP request
     # @param authenticator [Authenticator] the authenticator for requests
+    # @param body [Hash, Array, String, nil] the body the request was built from
+    # @param content_type [String, nil] the content type the request was built with, for a String body
     # @param redirect_count [Integer] the current redirect count
     # @return [Net::HTTPResponse] the final HTTP response after following redirects
     # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
     # @example Handle a response
     #   response = handler.handle(response: resp, request: req)
-    def handle(response:, request:, authenticator: Authenticator.new, redirect_count: 0)
+    def handle(response:, request:, authenticator: Authenticator.new, body: nil, content_type: nil, redirect_count: 0)
       return response unless response.is_a?(Net::HTTPRedirection)
 
       raise TooManyRedirects, "Too many redirects" if redirect_count >= max_redirects
@@ -80,10 +85,12 @@ module Gems
       return response if new_uri.nil?
 
       authenticator = Authenticator.new unless same_origin?(request.uri, new_uri)
-      new_request = build_request(request, new_uri, Integer(response.code), authenticator)
+      new_request = build_request(request:, uri: new_uri, response_code: Integer(response.code), authenticator:, body:,
+        content_type:)
       new_response = connection.perform(request: new_request)
 
-      handle(response: new_response, request: new_request, authenticator:, redirect_count: redirect_count + 1)
+      handle(response: new_response, request: new_request, authenticator:, body:, content_type:,
+        redirect_count: redirect_count + 1)
     end
 
     private
@@ -129,11 +136,13 @@ module Gems
     # @param uri [URI::Generic] the new URI
     # @param response_code [Integer] the HTTP response code
     # @param authenticator [Authenticator] the authenticator
-    # @return [Net::HTTPRequest] the new request
-    def build_request(request, uri, response_code, authenticator)
+    # @param body [Hash, Array, String, nil] the body the original request was built from
+    # @param content_type [String, nil] the content type the original request was built with
+    # @return [Net::HTTPRequest] the new request, with the method and body of the original for a 307 or 308, or a
+    #   GET without a body otherwise
+    def build_request(request:, uri:, response_code:, authenticator:, body:, content_type:)
       if METHOD_PRESERVING_CODES.include?(response_code)
-        request_builder.build(http_method: request.method.downcase.to_sym, uri:, body: request.body,
-          content_type: request.content_type, authenticator:)
+        request_builder.build(http_method: request.method.downcase.to_sym, uri:, body:, content_type:, authenticator:)
       else
         request_builder.build(http_method: :get, uri:, authenticator:)
       end
