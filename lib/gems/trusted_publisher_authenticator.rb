@@ -75,11 +75,13 @@ module Gems
       @host = host
       @connection = connection
       @request_builder = request_builder
+      @mutex = Mutex.new
     end
 
     # Generate the authentication headers for a request
     #
-    # Exchanges the ID token for an API key on first use.
+    # Exchanges the ID token for an API key on first use, once even when requests are made concurrently, since
+    # RubyGems.org issues the key only once per token.
     #
     # @api public
     # @param _request [Net::HTTPRequest] the HTTP request
@@ -89,7 +91,7 @@ module Gems
     # @example Generate an authentication header
     #   authenticator.header(request)
     def header(_request)
-      {AUTHENTICATION_HEADER => api_key || exchange_token!.key}
+      {AUTHENTICATION_HEADER => @mutex.synchronize { api_key || exchange_token!.key }}
     end
 
     # Summarize the authenticator for the console

@@ -134,6 +134,8 @@ module Gems
     attr_reader request_builder: RequestBuilder
     attr_reader api_key: String?
 
+    @mutex: Thread::Mutex
+
     def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
     def inspect: () -> String

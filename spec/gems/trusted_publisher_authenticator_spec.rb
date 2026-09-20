@@ -8,6 +8,14 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
     stub_request(:post, url).to_return(body: fixture("exchange_token.json"), headers: {"Content-Type" => "application/json"})
   end
 
+  # An exchange slow enough that concurrent requests reach it together
+  def stub_slow_exchange
+    stub_request(:post, exchange_url).to_return do
+      sleep 0.01
+      {body: fixture("exchange_token.json").read, headers: {"Content-Type" => "application/json"}}
+    end
+  end
+
   it "is an Authenticator" do
     expect(authenticator).to be_a(Gems::Authenticator)
   end
@@ -43,6 +51,10 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       request_builder = Gems::RequestBuilder.new
 
       expect(described_class.new(id_token: "ID_TOKEN", request_builder:).request_builder).to equal(request_builder)
+    end
+
+    it "builds a mutex, so that concurrent requests exchange the token once" do
+      expect(authenticator.instance_variable_get(:@mutex)).to be_an_instance_of(Thread::Mutex)
     end
 
     it "has no API key before the token is exchanged" do
@@ -138,6 +150,13 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
     it "reuses a previously exchanged API key" do
       authenticator.exchange_token!
       authenticator.header(request)
+
+      expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
+
+    it "exchanges the token only once for concurrent requests" do
+      stub_slow_exchange
+      Array.new(4) { Thread.new { authenticator.header(request) } }.each(&:join)
 
       expect(a_request(:post, exchange_url)).to have_been_made.once
     end
