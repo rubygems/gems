@@ -26,15 +26,19 @@ module Gems
       #
       # @api public
       # @authenticated false
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version, nil] The version of the gem (defaults to the latest version).
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A version stands in for the
+      #   version argument too, so that the downloads of a version are those of that version.
+      # @param version [String, Version, nil] The version of the gem (defaults to the version given as the gem, or to
+      #   the latest version).
       # @return [Downloads]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
+      # @example
+      #   Gems.downloads(Gems.version("rails_admin", "0.0.1")).version_downloads
       def downloads(gem_name, version = nil)
-        full_name = full_name_of(gem_name, version || latest_version(gem_name))
-        Downloads.new(parse_json(get("/api/v1/downloads/#{full_name}.json")))
+        version = version_of(gem_name, version) || latest_version(gem_name)
+        Downloads.new(parse_json(get("/api/v1/downloads/#{full_name_of(gem_name, version)}.json")))
       end
 
       # Returns the top 50 downloaded gem versions of all time

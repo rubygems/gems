@@ -87,14 +87,19 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A version stands in for the
+      #   version argument too, so that yanking a version yanks that version.
+      # @param version [String, Version, nil] The version of a gem (defaults to the version given as the gem, or to
+      #   the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+      # @example
+      #   Gems.yank Gems.version("gemcutter", "0.2.1")
       def yank(gem_name, version = nil, platform: nil)
+        version = version_of(gem_name, version)
         platform ||= platform_of(version)
         version = number_of(version) || latest_version(gem_name)
         delete("/api/v1/gems/yank", {gem_name: name_of(gem_name), version:, platform:}.compact)
@@ -104,14 +109,19 @@ module Gems
       #
       # @api public
       # @authenticated true
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version, nil] The version of a gem (defaults to the latest version).
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A version stands in for the
+      #   version argument too, so that unyanking a version unyanks that version.
+      # @param version [String, Version, nil] The version of a gem (defaults to the version given as the gem, or to
+      #   the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
       # @return [String]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"
+      # @example
+      #   Gems.unyank Gems.version("gemcutter", "0.2.1")
       def unyank(gem_name, version = nil, platform: nil)
+        version = version_of(gem_name, version)
         platform ||= platform_of(version)
         version = number_of(version) || latest_version(gem_name)
         put("/api/v1/gems/unyank", {gem_name: name_of(gem_name), version:, platform:}.compact)

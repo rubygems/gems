@@ -77,6 +77,9 @@ Gems.yank 'bills', '0.0.1'
 # Defaults to the latest version if no version is specified.
 Gems.unyank 'bills', '0.0.1'
 
+# A version object stands in for both the gem and the version.
+Gems.yank Gems.version('bills', '0.0.1')
+
 # Return an array of versions of coulda.
 Gems.versions('coulda').map(&:number)
 

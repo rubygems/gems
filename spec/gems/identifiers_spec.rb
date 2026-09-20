@@ -33,6 +33,30 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#version_of" do
+    let(:version) { Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java") }
+
+    it "returns a version unchanged" do
+      expect(client.send(:version_of, "nokogiri", "1.15.0")).to eq("1.15.0")
+    end
+
+    it "returns the version given as the gem when no version is given" do
+      expect(client.send(:version_of, version, nil)).to equal(version)
+    end
+
+    it "prefers the version to the version given as the gem" do
+      expect(client.send(:version_of, version, "1.16.0")).to eq("1.16.0")
+    end
+
+    it "returns nil for a gem name without a version" do
+      expect(client.send(:version_of, "nokogiri", nil)).to be_nil
+    end
+
+    it "returns nil for a gem without a version" do
+      expect(client.send(:version_of, Gems::Gem.new("name" => "nokogiri", "version" => "1.15.0"), nil)).to be_nil
+    end
+  end
+
   describe "#platform_of" do
     it "returns nil for a version number" do
       expect(client.send(:platform_of, "7.0.6")).to be_nil

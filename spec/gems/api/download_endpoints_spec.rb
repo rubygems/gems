@@ -51,6 +51,19 @@ RSpec.describe Gems::API::DownloadEndpoints do
 
       expect(a_get("/api/v1/downloads/rails_admin-3.0.9.json")).to have_been_made
     end
+
+    it "gets the downloads of the version given as the gem" do
+      stub_get("/api/v1/downloads/nokogiri-1.15.0-java.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      client.downloads(Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java"))
+
+      expect(a_get("/api/v1/downloads/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "prefers an explicit version to the version given as the gem" do
+      client.downloads(Gems::Version.new("name" => "rails_admin", "number" => "0.0.1"), "0.0.0")
+
+      expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
+    end
   end
 
   describe "#most_downloaded" do

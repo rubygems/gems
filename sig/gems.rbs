@@ -303,6 +303,7 @@ module Gems
 
     def name_of: (gem_identifier? gem) -> String?
     def number_of: (version_identifier? version) -> String?
+    def version_of: (gem_identifier? gem, version_identifier? version) -> version_identifier?
     def platform_of: (version_identifier? version) -> String?
     def full_name_of: (gem_identifier gem, version_identifier version, ?String? platform) -> String
     def handle_of: (user_identifier owner) -> (String | Integer)?

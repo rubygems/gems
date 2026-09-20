@@ -34,6 +34,19 @@ module Gems
       end
     end
 
+    # Resolve the version to act on from a gem argument and a version argument
+    #
+    # A version given as the gem stands in for a missing version, so that acting on a version acts on that version
+    # rather than on the latest version of its gem.
+    #
+    # @api private
+    # @param gem [String, Gem, Version, nil] a gem name, gem, or version
+    # @param version [String, Version, nil] a version number or version, or nil to use the gem when it is a version
+    # @return [String, Version, nil] the version to act on
+    def version_of(gem, version)
+      version || (gem if gem.instance_of?(Version))
+    end
+
     # Resolve a platform from a version
     # @api private
     # @param version [String, Version, nil] a version number or version
