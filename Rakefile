@@ -31,6 +31,23 @@ rescue LoadError
   end
 end
 
+# Validate the signatures themselves, which the type checker does not: steep loads them without checking that they
+# are valid, so a signature that redeclares a method of a standard library class leaves every call on that class
+# unchecked rather than failing. They are validated against the standard libraries sig/manifest.yaml names, which
+# are the ones rbs collection loads for code that depends on this gem, so a signature referring to a library the
+# manifest leaves out is reported here rather than by whoever depends on it.
+desc "Validate the RBS signatures (skipped on Rubies without RBS)"
+task :rbs do
+  if Gem.loaded_specs.key?("rbs")
+    require "yaml"
+
+    libraries = YAML.load_file("sig/manifest.yaml").fetch("dependencies").map { |dependency| dependency.fetch("name") }
+    sh "bundle exec rbs -I sig #{libraries.map { |library| "-r #{library}" }.join(" ")} validate"
+  else
+    warn "RBS is not available on #{RUBY_ENGINE}"
+  end
+end
+
 desc "Run mutation tests (skipped on Rubies without Mutant)"
 task :mutant do
   if Gem.loaded_specs.key?("mutant-rspec")
@@ -61,4 +78,4 @@ end
 desc "Run linters"
 task lint: %i[rubocop standard]
 
-task default: %i[spec lint mutant steep yardstick]
+task default: %i[spec lint mutant rbs steep yardstick]
