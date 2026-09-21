@@ -226,8 +226,8 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
-    # @example Unyank a gem
-    #   client.put("/api/v1/gems/unyank", {gem_name: "gems", version: "0.0.8"})
+    # @example Update the role of an owner
+    #   client.put("/api/v1/gems/gems/owners", {email: "josh@technicalpickles.com", role: "maintainer"})
     def put(path, body = {}, content_type: nil, headers: {}, host: nil)
       execute_request(:put, path, body:, content_type:, headers:, host:)
     end

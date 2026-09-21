@@ -339,64 +339,6 @@ RSpec.describe Gems::API::GemEndpoints do
     end
   end
 
-  describe "#unyank" do
-    before { stub_put("/api/v1/gems/unyank").to_return(body: fixture("unyank")) }
-
-    it "accepts a gem and a version" do
-      stub_put("/api/v1/gems/unyank").to_return(body: fixture("unyank"))
-      client.unyank(Gems::Gem.new("name" => "gems"), Gems::Version.new("number" => "0.0.8"))
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8"})).to have_been_made
-    end
-
-    it "puts the correct resource" do
-      client.unyank("gems", "0.0.8")
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8"})).to have_been_made
-    end
-
-    it "returns the response body" do
-      expect(client.unyank("gems", "0.0.8")).to eq("Successfully unyanked gem: gems (0.0.8)")
-    end
-
-    it "passes options in the body" do
-      client.unyank("gems", "0.0.8", platform: "java")
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
-    end
-
-    it "defaults to the platform of a version" do
-      client.unyank("gems", Gems::Version.new("number" => "0.0.8", "platform" => "java"))
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
-    end
-
-    it "defaults to the latest version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
-      client.unyank("gems")
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "3.0.9"})).to have_been_made
-    end
-
-    it "unyanks the version given as the gem" do
-      client.unyank(Gems::Version.new("name" => "gems", "number" => "0.0.8", "platform" => "java"))
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8", platform: "java"})).to have_been_made
-    end
-
-    it "prefers an explicit version to the version given as the gem" do
-      client.unyank(Gems::Version.new("name" => "gems", "number" => "0.0.7"), "0.0.8")
-
-      expect(a_put("/api/v1/gems/unyank").with(body: {gem_name: "gems", version: "0.0.8"})).to have_been_made
-    end
-
-    it "raises NoLatestVersion when the gem has no published version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"unknown"}')
-
-      expect { client.unyank("gems") }.to raise_error(Gems::NoLatestVersion)
-    end
-  end
-
   describe "#reverse_dependencies" do
     before { stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json")) }
 

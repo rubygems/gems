@@ -79,10 +79,6 @@ Gems.push File.new 'gemcutter-0.2.1.gem'
 # Defaults to the latest version if no version is specified.
 Gems.yank 'bills', '0.0.1'
 
-# Update a previously yanked gem back into RubyGems.org's index.
-# Defaults to the latest version if no version is specified.
-Gems.unyank 'bills', '0.0.1'
-
 # A version object stands in for both the gem and the version.
 Gems.yank Gems.version('bills', '0.0.1')
 
@@ -389,8 +385,8 @@ Network failures raise `Gems::NetworkError`, whose `cause` is the `Errno`, `Net`
 raise `Gems::TooManyRedirects`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
 portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the
-latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`, or `downloads`,
-raises `Gems::NoLatestVersion`.
+latest version of a gem that has none, directly or by omitting the version from `yank` or `downloads`, raises
+`Gems::NoLatestVersion`.
 
 Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or `proxy_url` that is not an HTTP or
 HTTPS URL, and an API key scope the RubyGems API does not define, which would otherwise be ignored by the server and

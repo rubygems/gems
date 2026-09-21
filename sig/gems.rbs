@@ -47,7 +47,6 @@ module Gems
   def self.owned_gems: (?user_identifier? user_handle) -> Array[Gem]
   def self.push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
   def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
-  def self.unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
   def self.versions: (gem_identifier gem_name) -> Array[Version]
   def self.latest_version: (gem_identifier gem_name) -> String
   def self.total_downloads: () -> Integer
@@ -462,7 +461,6 @@ module Gems
     def owned_gems: (?user_identifier? user_handle) -> Array[Gem]
     def push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
     def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
-    def unyank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
     def reverse_dependencies: (gem_identifier gem_name, ?only: String?) -> Array[String]
 
     private

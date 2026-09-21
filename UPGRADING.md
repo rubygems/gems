@@ -111,7 +111,7 @@ Gems.push File.new("gems-0.0.8.gem"), host: "https://gems.example.com"
 Gems.yank "gems", "0.0.8", platform: "java"
 ```
 
-`unyank`, `reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same way. `latest` and
+`reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same way. `latest` and
 `just_updated` now take no arguments at all: their endpoints answer with the 50 gems they name whatever page is
 asked for, so the `page` 2.x took was never more than the first page under another name.
 
@@ -228,8 +228,8 @@ Failures that 2.x let through as other exceptions are `Gems::Error` subclasses n
   `rubygem` and `version` raise it rather than return `{}`. A response whose JSON lacks a field the library reads,
   such as the `version` of `latest_version` or the key of an API key, raises it rather than `KeyError`, and a
   timestamp that cannot be parsed raises it rather than `ArgumentError`.
-* Asking for the latest version of a gem that has none, directly or by omitting the version from `yank`, `unyank`,
-  or `downloads`, raises `Gems::NoLatestVersion` rather than sending `"unknown"` as the version.
+* Asking for the latest version of a gem that has none, directly or by omitting the version from `yank` or
+  `downloads`, raises `Gems::NoLatestVersion` rather than sending `"unknown"` as the version.
 * A redirect loop raises `Gems::TooManyRedirects` after `max_redirects` hops rather than recursing forever.
 
 SSL certificates are verified, where 2.x disabled verification. A host with a certificate that Ruby's OpenSSL does
@@ -239,8 +239,9 @@ request, where 2.x sent the API key wherever the redirect led.
 
 ### Removed methods and constants
 
-`dependencies` and `api_key` are gone, since RubyGems.org retired their endpoints. `create_api_key` replaces
-`api_key`:
+`dependencies`, `api_key`, and `unyank` are gone, since RubyGems.org retired their endpoints. `PUT
+/api/v1/gems/unyank` has answered 403 "This version of the Gemcutter plugin has been deprecated." for years, so
+2.x's `Gems.unyank` could not have worked against RubyGems.org. `create_api_key` replaces `api_key`:
 
 ```ruby
 # 2.x

@@ -33,11 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add specific `HTTPError` subclasses such as `NotFound`, `Unauthorized`, and `Forbidden`, exposing the `response` and the status `code` as an Integer; any other 4xx or 5xx status raises `ClientError` or `ServerError`; the message of an error is the response body, or the status message when the body is empty or an HTML page, such as the error page of a CDN; `retry_after` reads the `Retry-After` header of a 429 or 503 response as the seconds to wait, never negative
 * Add `TooManyRedirects`, raised instead of looping forever on redirects; a redirect that cannot be followed, such as 304 Not Modified or one whose `Location` is missing, is not a valid URL, or is not an HTTP or HTTPS URL, raises the `HTTPError` of its status
 * Add `InvalidResponse`, raised with the `body` when a successful response is not JSON, such as the page of a proxy or captive portal, instead of `JSON::ParserError`; it is also raised, instead of `KeyError` or `ArgumentError`, when the JSON lacks a field the library reads, such as the `version` of `latest_version` or the key of an API key, or holds a timestamp that cannot be parsed
-* Add `NoLatestVersion`, raised by `latest_version`, and by `yank`, `unyank`, and `downloads` without a version, when a gem has no published version
+* Add `NoLatestVersion`, raised by `latest_version`, and by `yank` and `downloads` without a version, when a gem has no published version
 * Add credential-free `inspect` output for clients and authenticators
 * Add `NetworkError`, raised for connection failures, DNS errors, timeouts, malformed responses, and bad compressed bodies instead of the underlying `Errno`, `Net`, `Socket`, `EOF`, `Timeout`, `OpenSSL`, and `Zlib` errors
 * Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, and `APIKey` objects; `Version#sha` is hex from every endpoint, decoded from the base64 `sha256` of the most downloaded versions; the objects are immutable, with their attributes frozen at every level, and their constructors take string or symbol keys; `to_h` answers with a copy of the attributes that the caller owns and can change, and `attributes` with the frozen Hash the object holds
-* Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option; a version given as the gem to `yank`, `unyank`, or `downloads` stands in for the version too
+* Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option; a version given as the gem to `yank` or `downloads` stands in for the version too
 * Accept a path as well as an open file in `push`, for the gem and for its attestations
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts; an API key is compared by its name, rather than by the key it carries
 * Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`, which `to_s` answers with too, so that a resource written into a message reads as the one the console shows rather than as the address the object sits at
@@ -69,7 +69,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Return the version string from `latest_version`
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a flat list of `WebHook` objects from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
-* Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
+* Take keyword arguments instead of option hashes in `search`, `yank`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 * Resolve the default API key for the host a request is sent to, as `gem push --host` resolves it, so that a client built for another host, and a request made to one with `host:`, send the key `gem signin --host` stored for it rather than the RubyGems.org key; a configured key, basic authentication, and a trusted publishing ID token are sent wherever the client sends a request, as `gem push --key` is
 * Exchange a trusted publishing ID token once when requests are made concurrently, since RubyGems.org issues the API key only once per token
 * Follow the redirects of a trusted publishing token exchange, with the `max_redirects` of the client it is made for, rather than raising the `HTTPError` of the redirect; a redirect to another scheme, host, or port is followed without the headers of the exchange, as it is for every other request
@@ -89,7 +89,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Remove the `page` option of `latest` and `just_updated`, which take no arguments now: their endpoints answer with the 50 gems they name whatever page is asked for, so a page other than the first was the first under another name
 * Require Ruby 3.4 or later: Ruby 3.1 and 3.2 have reached end of life, Ruby 3.3 reaches it in March 2027, within the life of 3.x, and Ruby 3.4 bundles the net-http that connects to an HTTPS proxy over TLS
 * Remove `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE`; `Gems::Version` is now a response object and `Gems::VERSION` remains the library version string
-* Remove `dependencies` and `api_key`, whose endpoints have been retired by RubyGems.org; use `create_api_key` instead
+* Remove `dependencies`, `api_key`, and `unyank`, whose endpoints have been retired by RubyGems.org; `PUT /api/v1/gems/unyank` answers 403 "This version of the Gemcutter plugin has been deprecated.", so `unyank` could not have worked against RubyGems.org, and `create_api_key` replaces `api_key`
 * Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`
 
 ### Deprecated
