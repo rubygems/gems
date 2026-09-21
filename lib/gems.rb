@@ -7,7 +7,17 @@ require_relative "gems/library_version"
 require_relative "gems/version"
 
 # A Ruby wrapper for the RubyGems.org API
+#
+# Every public method of {API} is a method of this module too, delegated to {.client}: {API::GemEndpoints#rubygem}
+# is `Gems.rubygem`, {API::VersionEndpoints#versions} is `Gems.versions`, and so on for every endpoint. They are
+# delegated as the module is loaded rather than written out, so they are not listed among the methods below; {API}
+# groups them into one mixin per topic, and each is documented there.
+#
+# The raw request methods, {Client#get} and the rest, are on the client rather than on this module, since a request
+# of your own is made with {.client}.
+#
 # @api public
+# @see API The endpoints, grouped into one mixin per topic
 module Gems
   extend Configuration
   extend SingleForwardable
@@ -34,6 +44,9 @@ module Gems
   #     Gems.new { |client| client.versions("rails") }
   def_delegator "Gems::Client", :new
 
+  # The endpoints of {API}, each delegated to the client the module has. They are read from the module as it is
+  # loaded rather than written out one by one, so YARD has none of them to document here; {API} documents each of
+  # them in the mixin it belongs to.
   def_delegators :client, *API.public_instance_methods
 
   # The client the API methods of the module delegate to

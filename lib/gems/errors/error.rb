@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Ruby wrapper for the RubyGems.org API
 module Gems
   # Base error class for all Gems errors
   class Error < StandardError; end
