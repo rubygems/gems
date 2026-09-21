@@ -102,7 +102,7 @@ module Gems
     # @example Generate an authentication header
     #   authenticator.header(request)
     def header(_request)
-      {AUTHENTICATION_HEADER => @mutex.synchronize { api_key || exchange_token!.key }}
+      {AUTHENTICATION_HEADER => @mutex.synchronize { api_key || exchange!.key }}
     end
 
     # Summarize the authenticator for the console
@@ -122,18 +122,30 @@ module Gems
     # another scheme, host, or port is followed without the `Accept` header of the exchange, as it is for a request
     # of the client, and with the body only when the redirect preserves the method.
     #
+    # The exchange is made under the lock that {#header} takes, so that a caller exchanging the token itself while
+    # a request is being authenticated exchanges it once rather than twice, which RubyGems.org would refuse.
+    #
     # @api public
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     # @example Exchange the ID token
     #   authenticator.exchange_token!.expires_at
     def exchange_token!
+      @mutex.synchronize { exchange! }
+    end
+
+    private
+
+    # Exchange the ID token, under the lock its callers hold
+    #
+    # @api private
+    # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
+    # @raise [HTTPError] if the token exchange fails
+    def exchange!
       api_key = APIKey.new(parse_json(ResponseParser.new.parse(response: exchange_response)))
       @api_key = api_key.key
       api_key
     end
-
-    private
 
     # Send the token exchange request and follow the redirects of its response
     #

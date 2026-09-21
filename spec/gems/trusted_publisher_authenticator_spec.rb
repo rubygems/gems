@@ -186,6 +186,14 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
 
       expect { authenticator.exchange_token! }.to raise_error(Gems::InvalidResponse)
     end
+
+    it "exchanges the token once when a request is being authenticated at the same time" do
+      stub_slow_exchange
+      exchanges = [Thread.new { authenticator.exchange_token! }, Thread.new { authenticator.header(request) }]
+      exchanges.each(&:join)
+
+      expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
   end
 
   describe "#header" do

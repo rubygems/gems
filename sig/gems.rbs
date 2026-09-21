@@ -175,6 +175,7 @@ module Gems
 
     private
 
+    def exchange!: () -> APIKey
     def exchange_response: () -> Net::HTTPResponse
   end
 
