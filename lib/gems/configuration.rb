@@ -167,7 +167,8 @@ module Gems
 
     # The number of times a rate-limited request is sent again
     #
-    # Zero, the default, raises {TooManyRequests} or {ServiceUnavailable} rather than waiting.
+    # Two by default. Zero raises {TooManyRequests} or {ServiceUnavailable} rather than waiting. Only an idempotent
+    # request is sent again, so a `push` is never retried.
     #
     # @api public
     # @return [Integer] the number of times a rate-limited request is sent again

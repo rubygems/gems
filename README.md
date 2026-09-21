@@ -281,7 +281,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `debug_output` | An IO that receives HTTP debug output, with credentials redacted | `nil`                          |
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
-| `max_retries` | The number of times a rate-limited request is sent again | `0`                                  |
+| `max_retries` | The number of times a rate-limited request is sent again | `2`                                  |
 | `max_retry_delay` | The longest a request waits before it is sent again, in seconds | `60`               |
 
 Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
@@ -318,10 +318,12 @@ Everything else Net::HTTP writes, including the rest of the headers, is left as 
 ## Retries
 
 RubyGems.org answers a request it turned away with 429 Too Many Requests, or 503 Service Unavailable, and a
-`Retry-After` header saying how long to wait. Setting `max_retries` waits and sends the request again:
+`Retry-After` header saying how long to wait. A request is waited for and sent again twice by default, and
+`max_retries` sets how many times:
 
 ```ruby
-Gems.max_retries = 3
+Gems.max_retries = 3  # send a request again up to three times
+Gems.max_retries = 0  # raise instead of waiting
 Gems.rubygem 'rails'
 ```
 
@@ -330,7 +332,6 @@ refused, reset, or timed out never reached the endpoint, so sending the request 
 429. When the retries run out, the response raises the `Gems::HTTPError` of its status and a network failure is
 raised as it was.
 
-Retrying is off by default, so a rate-limited request raises rather than pausing the thread unless you asked for it.
 Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
 idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
 `Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the

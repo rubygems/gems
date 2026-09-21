@@ -78,6 +78,9 @@ environment variable `gem push` falls back to, and an empty one counts as no pas
 
 The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`,
 `max_redirects`, `max_retries`, and `max_retry_delay` are new, and every option can be set globally or per client.
+A request the server turns away with 429, 502, 503, or 504, or that the network loses, is now sent again twice
+before it raises, where 2.x raised straight away; `max_retries` of zero restores that. Only an idempotent request
+is sent again, so `push` never is.
 
 ### Renamed methods
 

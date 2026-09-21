@@ -13,9 +13,11 @@ module Gems
   # idempotent request is retried, since a request such as pushing a gem cannot be sent a second time to find out
   # whether the server received the first one.
   #
-  # Retrying is off until {#max_retries} is set, so a request that was turned away raises {TooManyRequests},
-  # {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or {NetworkError} rather than pausing the caller's thread
-  # unless the caller asked for it.
+  # A request is sent again twice by default, which is enough for the moment of rate limiting or the lost
+  # connection that a retry is for, and {#max_retries} of zero turns retrying off, so that a request that was
+  # turned away raises {TooManyRequests}, {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or {NetworkError}
+  # rather than pausing the caller's thread. A response asking to wait longer than {#max_retry_delay} raises
+  # whatever {#max_retries} is, so the wait a caller can be held for is theirs to cap.
   #
   # @api private
   class RetryHandler
@@ -23,7 +25,7 @@ module Gems
     include RetryAfter
 
     # Default number of times a request is sent again
-    DEFAULT_MAX_RETRIES = 0
+    DEFAULT_MAX_RETRIES = 2
     # Default longest a request waits before it is sent again, in seconds
     DEFAULT_MAX_RETRY_DELAY = 60 # seconds
     # The statuses a request is sent again for

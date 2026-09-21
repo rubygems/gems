@@ -48,8 +48,8 @@ RSpec.describe Gems::RetryHandler do
   end
 
   describe "::DEFAULT_MAX_RETRIES" do
-    it "does not retry" do
-      expect(described_class::DEFAULT_MAX_RETRIES).to eq(0)
+    it "sends a request again twice" do
+      expect(described_class::DEFAULT_MAX_RETRIES).to eq(2)
     end
   end
 
@@ -172,7 +172,7 @@ RSpec.describe Gems::RetryHandler do
     end
 
     it "does not retry when the maximum is zero" do
-      response, waited = handle(described_class.new, [rate_limited, success])
+      response, waited = handle(described_class.new(max_retries: 0), [rate_limited, success])
 
       expect([response.code, waited]).to eq(["429", []])
     end
@@ -229,7 +229,7 @@ RSpec.describe Gems::RetryHandler do
       end
 
       it "raises the error when the maximum is zero" do
-        expect { handle(described_class.new, [network_error, success]) }
+        expect { handle(described_class.new(max_retries: 0), [network_error, success]) }
           .to raise_error(Gems::NetworkError, "Network error: connection reset")
       end
 
