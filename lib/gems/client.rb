@@ -6,6 +6,7 @@ require_relative "api"
 require_relative "client_credentials"
 require_relative "configuration"
 require_relative "connection"
+require_relative "idempotence"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "response_parser"
@@ -19,6 +20,7 @@ module Gems
     extend Forwardable
     include API
     include ClientCredentials
+    include Idempotence
     include URLValidation
 
     # The host for API requests
@@ -272,6 +274,12 @@ module Gems
     attr_reader :retry_handler
 
     # Execute an HTTP request to the RubyGems API
+    #
+    # Each attempt builds a request of its own (see {#perform}), so the retry handler is told whether the request
+    # is safe to send again rather than given one to read the method of. A request whose method is idempotent is
+    # safe to send again whatever turned it away; one whose method is not cannot be sent a second time to find out
+    # whether the server received the first.
+    #
     # @api private
     # @param http_method [Symbol] the HTTP method
     # @param path [String] the request path
@@ -285,24 +293,33 @@ module Gems
       host = host.nil? ? @host : validate_host(host)
       uri = build_uri(host, path)
       authenticator = authenticator_for(host)
-      request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
-      response = @retry_handler.handle(request:) { perform(request:, authenticator:, body:, content_type:, headers:) }
+      retryable = idempotent?(http_method)
+      response = @retry_handler.handle(retry_refused: retryable, retry_lost: retryable) do
+        perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
+      end
       @response_parser.parse(response:)
     end
 
-    # Send a request and follow the redirects of its response
+    # Build a request, send it, and follow the redirects of its response
     #
     # This is what a retry sends again, so that a request that was redirected is followed again from the start
     # rather than sent straight to where the redirect led the first time.
     #
+    # The request is built here rather than once for every attempt, so that a body read as a stream is sent from
+    # the start each time: an open file, or a multipart field holding one, is left at its end by the attempt
+    # before, and {RequestBuilder#build} rewinds the body it builds a request from.
+    #
     # @api private
-    # @param request [Net::HTTPRequest] the request to send
-    # @param authenticator [Authenticator] the authenticator the request was built with
-    # @param body [Hash, Array, String, nil] the body the request was built from
-    # @param content_type [String, nil] the content type the request was built with, for a String body
-    # @param headers [Hash{String => String}] the headers the request was built with
+    # @param http_method [Symbol] the HTTP method
+    # @param uri [URI::Generic] the request URI
+    # @param params [Hash] the query parameters
+    # @param body [Hash, Array, String, nil] the request body
+    # @param content_type [String, nil] the content type for a String body
+    # @param headers [Hash{String => String}] the headers to send with the request
+    # @param authenticator [Authenticator] the authenticator for the request
     # @return [Net::HTTPResponse] the response
-    def perform(request:, authenticator:, body:, content_type:, headers:)
+    def perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
+      request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
       response = @connection.perform(request:)
       @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:, headers:)
     end

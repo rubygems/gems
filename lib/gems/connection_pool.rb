@@ -147,7 +147,7 @@ module Gems
     # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open
     # @return [Boolean] whether the connection is kept open
     def keep_alive?(request, keep_alive_timeout)
-      keep_alive_timeout.positive? && idempotent?(request)
+      keep_alive_timeout.positive? && idempotent?(request.method)
     end
 
     # The key a connection is kept under, which is the host it is open to

@@ -539,6 +539,7 @@ module Gems
     include API
     extend Forwardable
     include ClientCredentials
+    include Idempotence
     include URLValidation
 
     @connection: Connection
@@ -588,7 +589,7 @@ module Gems
     attr_reader request_builder: RequestBuilder
 
     def execute_request: (Symbol http_method, String path, host: String?, headers: Hash[String, String], ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
-    def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPResponse
+    def perform: (http_method: Symbol, uri: URI::Generic, params: Hash[Symbol | String, untyped], body: request_body?, content_type: String?, headers: Hash[String, String], authenticator: Authenticator) -> Net::HTTPResponse
 
 
     def build_uri: (String host, String path) -> URI::Generic
@@ -836,7 +837,7 @@ module Gems
 
     private
 
-    def idempotent?: (Net::HTTPRequest request) -> bool
+    def idempotent?: (String | Symbol http_method) -> bool
   end
 
   module Pagination
@@ -852,7 +853,6 @@ module Gems
   end
 
   class RetryHandler
-    include Idempotence
     include RetryAfter
 
     DEFAULT_MAX_RETRIES: Integer
@@ -864,7 +864,7 @@ module Gems
     attr_reader random: _Random
 
     def initialize: (?max_retries: Integer, ?max_retry_delay: Numeric, ?random: _Random) -> void
-    def handle: (request: Net::HTTPRequest, ?retry_refused: bool, ?retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse
+    def handle: (retry_refused: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse
 
     private
 

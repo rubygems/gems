@@ -2,17 +2,17 @@
 
 require "net/http"
 require_relative "errors/network_error"
-require_relative "idempotence"
 require_relative "retry_after"
 
 module Gems
   # Sends a request again when the server, or the network, turns it away
   #
   # A 429 Too Many Requests, 502 Bad Gateway, 503 Service Unavailable, and 504 Gateway Timeout response all mean the
-  # request was turned away rather than acted on, as does a {NetworkError}, so sending it again is safe. Only an
-  # idempotent request is retried by default, since a request such as pushing a gem cannot be sent a second time to
-  # find out whether the server received the first one; a caller that knows better, such as the trusted publishing
-  # token exchange, says so with the `retry_refused` and `retry_lost` arguments of {#handle}.
+  # request was turned away rather than acted on, as does a {NetworkError}, so sending it again is safe. Whether a
+  # request is one of those is the caller's to say, with the `retry_refused` and `retry_lost` arguments of
+  # {#handle}: {Client} says whether the method of the request is idempotent, since a request such as pushing a gem
+  # cannot be sent a second time to find out whether the server received the first one, and a caller that knows
+  # better, such as the trusted publishing token exchange, says what it knows instead.
   #
   # A request is sent again twice by default, which is enough for the moment of rate limiting or the lost
   # connection that a retry is for, and {#max_retries} of zero turns retrying off, so that a request that was
@@ -22,7 +22,6 @@ module Gems
   #
   # @api private
   class RetryHandler
-    include Idempotence
     include RetryAfter
 
     # Default number of times a request is sent again
@@ -82,22 +81,24 @@ module Gems
     #
     # A request that is turned away and one that is lost to the network are told apart, since they are not equally
     # safe to send again: a 429, 502, 503, or 504 says the server refused the request rather than acting on it,
-    # where a request lost to the network may have arrived and been acted on before the answer went missing. Both
-    # default to whether the request is idempotent, and the caller of a request that is not, such as the trusted
-    # publishing token exchange, can say that the refusal is safe to retry while the loss is not.
+    # where a request lost to the network may have arrived and been acted on before the answer went missing. The
+    # caller says which of the two its request is safe for, so that the trusted publishing token exchange can be
+    # sent again when the server turns it away although it is a POST, and not when it is lost.
+    #
+    # The request is not named, since the block builds one of its own each time it is called, so that a body read
+    # as a stream is sent from the start (see {Client#perform}).
     #
     # @api private
-    # @param request [Net::HTTPRequest] the request being sent
     # @param retry_refused [Boolean] whether a request the server turned away is sent again
     # @param retry_lost [Boolean] whether a request lost to the network is sent again
     # @yield the response, each time the request is sent
     # @return [Net::HTTPResponse] the last response
     # @raise [NetworkError] if the request is lost to the network and is not sent again
-    # @example Send a request, retrying it when the server asks
-    #   handler.handle(request:) { connection.perform(request:) }
+    # @example Send an idempotent request, which is safe to send again whatever happened to it
+    #   handler.handle(retry_refused: true, retry_lost: true) { connection.perform(request:) }
     # @example Send a request that is safe to send again only when the server turns it away
-    #   handler.handle(request:, retry_refused: true, retry_lost: false) { connection.perform(request:) }
-    def handle(request:, retry_refused: idempotent?(request), retry_lost: idempotent?(request))
+    #   handler.handle(retry_refused: true, retry_lost: false) { connection.perform(request:) }
+    def handle(retry_refused:, retry_lost:)
       retries = 0
       loop do
         response = attempt(retries:, retry_refused:, retry_lost:) { yield }

@@ -13,12 +13,16 @@ module Gems
 
     private
 
-    # Whether a request can be sent again
+    # Whether a request made with an HTTP method can be sent again
+    #
+    # The method is named rather than the request, so that a caller deciding whether to send a request again does
+    # not have to have built one (see {Client#execute_request}).
+    #
     # @api private
-    # @param request [Net::HTTPRequest] the request
-    # @return [Boolean] whether the request is idempotent
-    def idempotent?(request)
-      IDEMPOTENT_METHODS.include?(request.method)
+    # @param http_method [String, Symbol] the HTTP method, in either case
+    # @return [Boolean] whether a request made with the method is idempotent
+    def idempotent?(http_method)
+      IDEMPOTENT_METHODS.include?(http_method.to_s.upcase)
     end
   end
 end

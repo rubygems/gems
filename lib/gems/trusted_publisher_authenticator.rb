@@ -163,9 +163,8 @@ module Gems
     # The exchange is sent again when the server turns it away, although it is a POST, so that a moment of rate
     # limiting does not fail a publish; the `max_retries` of the client it was built for is what it is sent again.
     # A 429, 502, 503, or 504 says the endpoint refused the exchange rather than issuing a key for the token, which
-    # is why sending it again is safe. An exchange lost to the network is left as it is, which is what a POST does
-    # without being asked, since the answer that went missing may have carried the only key RubyGems.org issues for
-    # that token.
+    # is why sending it again is safe. An exchange lost to the network is left as it is, as a POST would be, since
+    # the answer that went missing may have carried the only key RubyGems.org issues for that token.
     #
     # @api private
     # @return [Net::HTTPResponse] the response the exchange ended at
@@ -175,7 +174,7 @@ module Gems
       headers = {"Accept" => RequestBuilder::APPLICATION_JSON}
       request = request_builder.build(http_method: :post, uri:, body:,
         content_type: RequestBuilder::APPLICATION_JSON, headers:)
-      retry_handler.handle(request:, retry_refused: true) do
+      retry_handler.handle(retry_refused: true, retry_lost: false) do
         redirect_handler.handle(response: connection.perform(request:), request:, body:,
           content_type: RequestBuilder::APPLICATION_JSON, headers:)
       end

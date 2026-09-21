@@ -9,8 +9,6 @@ RSpec.describe Gems::RetryHandler do
   # A source of randomness that jitters as far as the backoff allows, which is half of the wait
   let(:jittery) { instance_double(Random, rand: 1.0) }
 
-  let(:request) { Net::HTTP::Get.new(URI("#{TEST_HOST}/api/v1/gems/rails.json")) }
-  let(:post_request) { Net::HTTP::Post.new(URI("#{TEST_HOST}/api/v1/gems")) }
   let(:success) { build_response(Net::HTTPOK, "200", "OK", "body") }
 
   def rate_limited(retry_after: nil)
@@ -36,11 +34,11 @@ RSpec.describe Gems::RetryHandler do
   end
 
   # Send the given responses in turn, raising the ones that are errors, and recording the seconds waited between them
-  def handle(handler, responses, request: self.request, **options)
+  def handle(handler, responses, retry_refused: true, retry_lost: true, **options)
     waited = []
     allow(handler).to receive(:sleep) { |seconds| waited << seconds }
     remaining = responses.dup
-    response = handler.handle(request:, **options) do
+    response = handler.handle(retry_refused:, retry_lost:, **options) do
       answer = remaining.shift
       answer.is_a?(Exception) ? raise(answer) : answer
     end
@@ -177,8 +175,8 @@ RSpec.describe Gems::RetryHandler do
       expect([response.code, waited]).to eq(["429", []])
     end
 
-    it "does not retry a request that is not idempotent" do
-      response, waited = handle(handler, [rate_limited, success], request: post_request)
+    it "does not send a request again when the caller allows neither" do
+      response, waited = handle(handler, [rate_limited, success], retry_refused: false, retry_lost: false)
 
       expect([response.code, waited]).to eq(["429", []])
     end
@@ -233,8 +231,8 @@ RSpec.describe Gems::RetryHandler do
           .to raise_error(Gems::NetworkError, "Network error: connection reset")
       end
 
-      it "raises the error for a request that is not idempotent" do
-        expect { handle(handler, [network_error, success], request: post_request) }.to raise_error(Gems::NetworkError)
+      it "raises the error when the caller allows neither" do
+        expect { handle(handler, [network_error, success], retry_refused: false, retry_lost: false) }.to raise_error(Gems::NetworkError)
       end
 
       it "shortens the wait to the maximum retry delay" do
@@ -253,30 +251,30 @@ RSpec.describe Gems::RetryHandler do
     end
 
     context "when the caller says what the request is safe to be sent again for" do
-      it "sends a request that is not idempotent again when the server turns it away" do
-        response, waited = handle(handler, [rate_limited, success], request: post_request, retry_refused: true)
+      it "sends a request again when only a refusal is allowed and the server turns it away" do
+        response, waited = handle(handler, [rate_limited, success], retry_refused: true, retry_lost: false)
 
         expect([response, waited]).to eq([success, [1]])
       end
 
-      it "raises for a request that is not idempotent lost to the network" do
-        expect { handle(handler, [network_error, success], request: post_request, retry_refused: true) }
+      it "raises when only a refusal is allowed and the request is lost to the network" do
+        expect { handle(handler, [network_error, success], retry_refused: true, retry_lost: false) }
           .to raise_error(Gems::NetworkError)
       end
 
-      it "sends a request that is not idempotent again when it is lost to the network" do
-        response, = handle(handler, [network_error, success], request: post_request, retry_lost: true)
+      it "sends a request again when only a loss is allowed and it is lost to the network" do
+        response, = handle(handler, [network_error, success], retry_refused: false, retry_lost: true)
 
         expect(response).to equal(success)
       end
 
-      it "leaves an idempotent request the server turned away as it is" do
+      it "leaves a request the server turned away as it is when a refusal is not allowed" do
         response, waited = handle(handler, [rate_limited, success], retry_refused: false)
 
         expect([response.code, waited]).to eq(["429", []])
       end
 
-      it "raises for an idempotent request lost to the network" do
+      it "raises for a request lost to the network when a loss is not allowed" do
         expect { handle(handler, [network_error, success], retry_lost: false) }.to raise_error(Gems::NetworkError)
       end
     end

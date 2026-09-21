@@ -607,6 +607,18 @@ RSpec.describe Gems::Client do
   end
 
   describe "#execute_request" do
+    # Answers the first request sent on the client's connection with 429 and the rest with 200, collecting the body
+    # each one carried, so that an example can ask what every attempt sent.
+    def bodies_of_requests_sent
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      sent = []
+      allow(client.instance_variable_get(:@connection)).to receive(:perform) do |request:|
+        sent << request.body_stream.read
+        sent.one? ? build_response(Net::HTTPTooManyRequests, "429", "Too Many Requests", "throttled") : build_response(Net::HTTPOK, "200", "OK", "body")
+      end
+      sent
+    end
+
     it "joins the path with the host" do
       client.host = "http://example.com/"
       stub_request(:get, "http://example.com/path")
@@ -790,10 +802,25 @@ RSpec.describe Gems::Client do
       expect { client.get("/path") }.to raise_error(Gems::TooManyRequests)
     end
 
+    it "does not send a request that is not idempotent again" do
+      client.max_retries = 1
+      stub_post("/path").to_return({status: 429, body: "throttled"}, {body: "body"})
+
+      expect { client.post("/path") }.to raise_error(Gems::TooManyRequests)
+    end
+
     it "sends a rate-limited request again once retries are allowed" do
       client.max_retries = 1
       allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
       stub_get("/path").to_return({status: 429, headers: {"Retry-After" => "1"}}, {body: "body"})
+
+      expect(client.get("/path")).to eq("body")
+    end
+
+    it "sends an idempotent request lost to the network again" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_get("/path").to_raise(Errno::ECONNREFUSED).then.to_return(body: "body")
 
       expect(client.get("/path")).to eq("body")
     end
@@ -805,6 +832,16 @@ RSpec.describe Gems::Client do
       stub_get("/new").to_return(body: "redirected")
 
       expect(client.get("/old")).to eq("redirected")
+    end
+
+    it "sends the whole of a body read as a stream again, rather than the bytes the attempt before it left" do
+      client.max_retries = 1
+      gem_bytes = File.binread(File.join(fixture_path, "gems-0.0.8.gem"))
+      sent = bodies_of_requests_sent
+
+      client.put("/path", fixture("gems-0.0.8.gem"))
+
+      expect(sent).to eq([gem_bytes, gem_bytes])
     end
 
     it "raises NotFound for 404 responses" do
