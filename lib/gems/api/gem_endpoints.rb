@@ -103,7 +103,7 @@ module Gems
       # @param host [String, nil] A RubyGems compatible host to use (defaults to the client's host).
       # @param attestations [Array<String, Pathname, File>, nil] The paths of the attestations to push, or the open
       #   files, or `nil`.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.push "pkg/gemcutter-0.2.1.gem"
       # @example
@@ -124,7 +124,7 @@ module Gems
       # @param version [String, Version, nil] The version of a gem (defaults to the version given as the gem, or to
       #   the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
@@ -146,7 +146,7 @@ module Gems
       # @param version [String, Version, nil] The version of a gem (defaults to the version given as the gem, or to
       #   the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.unyank "gemcutter", "0.2.1", platform: "x86-darwin-10"

@@ -47,12 +47,16 @@ module Gems
 
       # Update the scopes of an API key using HTTP basic auth
       #
+      # The endpoint answers with a message rather than with the key it updated, as the endpoints of {#push},
+      # {API::OwnerEndpoints#add_owner}, and the rest of the endpoints that act on something do, so that message is
+      # what is returned; {#create_api_key} answers with an {APIKey} because its endpoint answers with the key.
+      #
       # @api public
       # @authenticated true
       # @param key [String, APIKey] The API key to update.
       # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem;
       #   {APIKey::SCOPES} names them all.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
       def update_api_key(key, **scopes)

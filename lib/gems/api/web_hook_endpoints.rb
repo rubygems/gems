@@ -40,7 +40,7 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to add the hook to all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.add_web_hook "rails", "http://example.com"
       def add_web_hook(gem_name, url)
@@ -53,7 +53,7 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to remove the hook from all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.remove_web_hook "rails", "http://example.com"
       def remove_web_hook(gem_name, url)
@@ -66,7 +66,7 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. Specify "*" to fire the hook for all gems.
       # @param url [String, WebHook] The URL of the web hook, or a web hook.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.fire_web_hook "rails", "http://example.com"
       def fire_web_hook(gem_name, url)

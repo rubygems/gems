@@ -36,7 +36,7 @@ module Gems
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param owner [String, Owner] The email address or handle of the user you want to add, or an owner.
       # @param role [String, nil] The role to grant, "owner" or "maintainer"; defaults to "owner".
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.add_owner "gemcutter", "josh@technicalpickles.com"
       # @example
@@ -52,7 +52,7 @@ module Gems
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param owner [String, Owner] The email address or handle of the owner, or an owner.
       # @param role [String] The new role, "owner" or "maintainer".
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.update_owner "gemcutter", "josh@technicalpickles.com", role: "maintainer"
       def update_owner(gem_name, owner, role:)
@@ -65,7 +65,7 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param owner [String, Owner] The email address or handle of the user you want to remove, or an owner.
-      # @return [String]
+      # @return [String] the message the endpoint answers with
       # @example
       #   Gems.remove_owner "gemcutter", "josh@technicalpickles.com"
       def remove_owner(gem_name, owner)
