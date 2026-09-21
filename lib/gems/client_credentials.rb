@@ -6,12 +6,14 @@ require_relative "basic_authenticator"
 require_relative "identifiers"
 require_relative "otp_authenticator"
 require_relative "trusted_publisher_authenticator"
+require_relative "url_validation"
 
 module Gems
   # Mixin for client authentication credentials, included in {Client}
   # @api public
   module ClientCredentials
     include Identifiers
+    include URLValidation
 
     # Sentinel for a key that was not given, so that a key given as nil, which sends requests without one, is told
     # apart from no key at all, which falls back to the configured key or the key stored for the host
@@ -162,6 +164,23 @@ module Gems
     # @return [String, nil] the API key
     def configured_key
       Gems.key_configured? ? Gems.key : Gems.default_key(@host)
+    end
+
+    # The authenticator for a request to a host
+    #
+    # A request to a host other than the client's is authenticated with the API key stored for that host, resolved
+    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. Credentials
+    # configured for the client are sent wherever the client sends a request, as the configured credentials of
+    # `gem push --key` are.
+    #
+    # @api private
+    # @param host [String] the host of the request
+    # @return [Authenticator] the authenticator for the request
+    def authenticator_for(host)
+      return authenticator if credentials_configured? || same_origin?(host, @host)
+
+      key = Gems.default_key(host)
+      otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
     end
 
     # Whether credentials were configured for the client

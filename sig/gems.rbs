@@ -181,6 +181,7 @@ module Gems
 
   module ClientCredentials
     include Identifiers
+    include URLValidation
 
     @host: String
     @connection: Connection
@@ -210,6 +211,7 @@ module Gems
     def initialize_credentials: (key: api_key_identifier?, username: String?, password: String?, otp: String?, id_token: String?) -> void
     def resolve_key_for_host: () -> void
     def configured_key: () -> String?
+    def authenticator_for: (String host) -> Authenticator
     def credentials_configured?: () -> bool
     def initialize_authenticator: () -> Authenticator
     def otp_authenticator: (Authenticator authenticator) -> Authenticator
@@ -588,7 +590,6 @@ module Gems
     def execute_request: (Symbol http_method, String path, host: String?, headers: Hash[String, String], ?params: Hash[Symbol | String, untyped], ?body: request_body?, ?content_type: String?) -> String
     def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPResponse
 
-    def authenticator_for: (String host) -> Authenticator
 
     def build_uri: (String host, String path) -> URI::Generic
   end

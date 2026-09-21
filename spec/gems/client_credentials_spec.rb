@@ -90,6 +90,64 @@ RSpec.describe Gems::ClientCredentials do
     end
   end
 
+  describe "#authenticator_for" do
+    it "authenticates another host with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new.send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "does not authenticate another host without a stored key" do
+      stub_rubygems_configuration(rubygems_api_key: nil)
+
+      expect(Gems::Client.new.send(:authenticator_for, "https://gems.example.com"))
+        .to be_an_instance_of(Gems::Authenticator)
+    end
+
+    it "wraps the key stored for another host with the one-time passcode" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(otp: "123456").send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::OTPAuthenticator, otp: "123456")
+    end
+
+    it "keeps the authenticator of the client for its own host written another way" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+
+      expect(Gems::Client.new.send(:authenticator_for, "https://RubyGems.org:443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "keeps the authenticator of the client for its own host with a path prefix" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+
+      expect(Gems::Client.new.send(:authenticator_for, "#{TEST_HOST}/gems"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "authenticates a host that differs only in port with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"https://rubygems.org:8443" => "OTHER_KEY", TEST_HOST => "HOST_KEY"})
+
+      expect(Gems::Client.new.send(:authenticator_for, "https://rubygems.org:8443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "OTHER_KEY")
+    end
+
+    it "authenticates a host that differs only in scheme with the key stored for it" do
+      stub_rubygems_configuration(api_keys: {"http://rubygems.org:443" => "OTHER_KEY", TEST_HOST => "HOST_KEY"})
+
+      expect(Gems::Client.new.send(:authenticator_for, "http://rubygems.org:443"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "OTHER_KEY")
+    end
+
+    it "keeps a configured key for another host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(key: TEST_KEY).send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: TEST_KEY)
+    end
+  end
+
   describe "#credentials_configured?" do
     it "is false when the client falls back to the key stored for its host" do
       stub_rubygems_configuration

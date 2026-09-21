@@ -307,23 +307,6 @@ module Gems
       @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:, headers:)
     end
 
-    # The authenticator for a request to a host
-    #
-    # A request to a host other than the client's is authenticated with the API key stored for that host, resolved
-    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. Credentials
-    # configured for the client are sent wherever the client sends a request, as the configured credentials of
-    # `gem push --key` are.
-    #
-    # @api private
-    # @param host [String] the host of the request
-    # @return [Authenticator] the authenticator for the request
-    def authenticator_for(host)
-      return authenticator if credentials_configured? || same_origin?(host, @host)
-
-      key = Gems.default_key(host)
-      otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
-    end
-
     # Join a host and a request path, keeping any path prefix on the host
     #
     # @api private
