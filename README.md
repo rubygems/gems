@@ -242,6 +242,7 @@ gem = Gems.rubygem 'rails'
 gem['dependencies'] # => {"development" => [...], "runtime" => [...]}
 gem.to_h            # => the parsed JSON response, as a Hash you can change
 gem.attributes      # => the same fields, frozen
+gem.to_s            # => '#<Gems::Gem name="rails" version="8.1.2">', the summary it inspects as
 ```
 
 Two endpoints return their JSON as it is, by design, rather than wrapping it: `contents` answers with a plain map of

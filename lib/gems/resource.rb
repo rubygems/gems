@@ -109,8 +109,7 @@ module Gems
     # @param keys [Array<String, Symbol>] the declared keys
     # @return [Array<String>] the keys, most preferred first
     def self.keys_for(name, keys)
-      keys = [name] if keys.empty?
-      keys.map(&:to_s)
+      (keys.empty? ? [name] : keys).map(&:to_s)
     end
 
     # Declare which readers appear in the inspect output
@@ -255,6 +254,17 @@ module Gems
       fields = self.class.inspect_readers.map { |reader| " #{reader}=#{public_send(reader).inspect}" }
       "#<#{self.class}#{fields.join}>"
     end
+
+    # Summarize the resource as a String
+    #
+    # The summary {#inspect} answers with, so that a resource written into a message or a log reads as the one the
+    # console shows rather than as the address the object sits at.
+    #
+    # @api public
+    # @return [String] the summary
+    # @example Write a gem into a message
+    #   "fetched #{gem}" # => 'fetched #<Gems::Gem name="rails" version="8.1.2">'
+    def to_s = inspect
 
     # Generate a hash code for the resource
     #

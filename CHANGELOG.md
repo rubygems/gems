@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Accept those objects wherever a gem name, version number, owner, web hook URL, or API key is expected, including the `key` option; a version given as the gem to `yank`, `unyank`, or `downloads` stands in for the version too
 * Accept a path as well as an open file in `push`, for the gem and for its attestations
 * Compare resources by identity, so `Gems.gem("rails") == Gems.gem("rails")` regardless of download counts; an API key is compared by its name, rather than by the key it carries
-* Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`
+* Add `Resource#inspect` summaries such as `#<Gems::Gem name="rails" version="8.1.2">`, which `to_s` answers with too, so that a resource written into a message reads as the one the console shows rather than as the address the object sits at
 * Match resources against `case`/`in` patterns by their readers, such as `in {name:, version:}`, with `Resource#deconstruct_keys` and `Resource.attribute_names`
 * Add `key_configured?` and `otp_configured?`, which tell a configured credential from the fallback the library resolves, and a host argument to `default_key`, for the API key stored for a host other than the configured one
 * Add `default_host`, the host `gem push` would use, which reads the `RUBYGEMS_HOST` environment variable when it is called rather than when the library is required

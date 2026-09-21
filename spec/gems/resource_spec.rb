@@ -357,6 +357,20 @@ RSpec.describe Gems::Resource do
     end
   end
 
+  describe "#to_s" do
+    it "is the summary the resource inspects as" do
+      stub_const("Gems::TestResource", resource_class)
+
+      expect(resource.to_s).to eq('#<Gems::TestResource name="rails" yanked?=true>')
+    end
+
+    it "is what a resource written into a String reads as" do
+      stub_const("Gems::TestResource", resource_class)
+
+      expect("fetched #{resource}").to eq('fetched #<Gems::TestResource name="rails" yanked?=true>')
+    end
+  end
+
   describe ".identified_by" do
     let(:identified_class) { Class.new(resource_class) { identified_by :name } }
 

@@ -242,6 +242,7 @@ module Gems
     def deconstruct_keys: (Array[Symbol]? keys) -> Hash[Symbol, untyped]
     def to_h: () -> Hash[String, untyped]
     def inspect: () -> String
+    def to_s: () -> String
     def identity: () -> (Array[untyped] | Hash[String, untyped])
     def ==: (untyped other) -> bool
     def eql?: (untyped other) -> bool
