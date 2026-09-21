@@ -39,6 +39,16 @@ Gems.get "/api/v1/gems/rails.json"
 Gems.client.get "/api/v1/gems/rails.json"
 ```
 
+Those methods take a path on the client's host, and a path that is a URL of another scheme, host, or port raises
+`ArgumentError` rather than sending the request there with the credentials the client resolved for its own host.
+Send a request to another host with the `host` argument, which resolves the key stored for the host it names:
+
+```ruby
+# 3.0
+Gems.client.get "https://gems.example.com/api/v1/gems/rails.json"   # ArgumentError
+Gems.client.get "/api/v1/gems/rails.json", host: "https://gems.example.com"
+```
+
 The API key in `~/.gem/credentials` is read when it is first needed rather than when the library is required, and
 assigning `nil` to `key` turns that fallback off, where 2.x fell back to it anyway. The default key is resolved as
 `gem push` resolves it: the `GEM_HOST_API_KEY` environment variable comes first, then the key `gem signin --host`

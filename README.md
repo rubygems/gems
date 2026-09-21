@@ -210,6 +210,11 @@ Gems.client.get '/api/v1/gems/rails.json'
 # Raw requests take headers of your own, alongside the User-Agent and the credentials of the client.
 Gems.client.get '/api/v1/gems/rails.json', headers: {'X-Trace-Id' => 'abc123'}
 
+# A raw request takes a path on the client's host. Send one to another host with host:, which uses the key
+# stored for it; a path that is a URL of another host raises ArgumentError rather than taking the
+# credentials of this one there.
+Gems.client.get '/api/v1/gems/rails.json', host: 'https://gems.example.com'
+
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: 'rubygems_701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.rubygem 'rails'
@@ -389,8 +394,9 @@ latest version of a gem that has none, directly or by omitting the version from 
 `Gems::NoLatestVersion`.
 
 Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or `proxy_url` that is not an HTTP or
-HTTPS URL, and an API key scope the RubyGems API does not define, which would otherwise be ignored by the server and
-leave the key scoped differently than it was meant to be.
+HTTPS URL, a raw request path that is a URL of another scheme, host, or port, which would otherwise carry the
+credentials resolved for the client's host to the host it names, and an API key scope the RubyGems API does not
+define, which would otherwise be ignored by the server and leave the key scoped differently than it was meant to be.
 
 ## Development
 

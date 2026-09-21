@@ -176,6 +176,7 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     # @example Get information about a gem
     #   client.get("/api/v1/gems/rails.json")
     # @example Send a header of your own
@@ -194,6 +195,7 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     # @example Remove an owner from a gem
     #   client.delete("/api/v1/gems/gems/owners", {email: "josh@technicalpickles.com"})
     def delete(path, params = {}, headers: {}, host: nil)
@@ -211,6 +213,7 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     # @example Add an owner to a gem
     #   client.post("/api/v1/gems/gems/owners", {email: "josh@technicalpickles.com"})
     def post(path, body = {}, content_type: nil, headers: {}, host: nil)
@@ -228,6 +231,7 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     # @example Update the role of an owner
     #   client.put("/api/v1/gems/gems/owners", {email: "josh@technicalpickles.com", role: "maintainer"})
     def put(path, body = {}, content_type: nil, headers: {}, host: nil)
@@ -245,6 +249,7 @@ module Gems
     # @param host [String, nil] the host for the request (defaults to the client's host)
     # @return [String] the response body
     # @raise [HTTPError] if the response is not successful
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     # @example Update the scopes of an API key
     #   client.patch("/api/v1/api_key", {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true})
     def patch(path, body = {}, content_type: nil, headers: {}, host: nil)
@@ -326,12 +331,21 @@ module Gems
 
     # Join a host and a request path, keeping any path prefix on the host
     #
+    # A path that is a URL of its own is refused rather than followed to the host it names, since the credentials of
+    # a request are the ones resolved for the host it was meant for: a path that moved the request to another host
+    # would take them with it, where the `host` argument of a request resolves the key stored for the host it names,
+    # and a redirect to another host is followed without them.
+    #
     # @api private
     # @param host [String] the host, optionally carrying a path prefix
     # @param path [String] the request path
     # @return [URI] the request URI
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host
     def build_uri(host, path)
-      URI.join("#{host.chomp("/")}/", path.delete_prefix("/"))
+      uri = URI.join("#{host.chomp("/")}/", path.delete_prefix("/"))
+      raise ArgumentError, "Path is not on #{host}: #{path}" unless same_origin?(uri, host)
+
+      uri
     end
   end
 end

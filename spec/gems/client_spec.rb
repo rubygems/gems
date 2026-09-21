@@ -642,6 +642,35 @@ RSpec.describe Gems::Client do
       expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
     end
 
+    it "refuses a path that is a URL of another host" do
+      expect { client.get("https://gems.example.com/path") }
+        .to raise_error(ArgumentError, "Path is not on https://rubygems.org: https://gems.example.com/path")
+    end
+
+    it "refuses a path that is a URL of another host than the one the request is for" do
+      expect { client.get("https://gems.example.com/other", host: "http://example.com") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com: https://gems.example.com/other")
+    end
+
+    it "refuses a path that is a URL of another port on the host" do
+      expect { client.get("https://rubygems.org:8080/path") }
+        .to raise_error(ArgumentError, "Path is not on https://rubygems.org: https://rubygems.org:8080/path")
+    end
+
+    it "sends a path that is a URL of the host itself" do
+      stub_get("/path")
+      client.get("https://rubygems.org/path")
+
+      expect(a_get("/path")).to have_been_made
+    end
+
+    it "keeps a path that begins with two slashes on the host" do
+      stub_get("/gems.example.com/path")
+      client.get("//gems.example.com/path")
+
+      expect(a_get("/gems.example.com/path")).to have_been_made
+    end
+
     it "sends request bodies" do
       stub_post("/path")
       client.post("/path", {gem_name: "gems"})
