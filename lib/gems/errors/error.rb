@@ -2,6 +2,7 @@
 
 module Gems
   # Base error class for all Gems errors
+  # @api public
   class Error < StandardError; end
 
   # @deprecated Use {Error} instead.
