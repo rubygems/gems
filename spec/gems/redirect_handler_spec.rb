@@ -161,6 +161,13 @@ RSpec.describe Gems::RedirectHandler do
         expect(a_request(:get, "https://example.com/new").with { |req| !req.headers.key?("X-Trace-Id") }).to have_been_made
       end
 
+      it "follows a redirect that does not keep the body to another host" do
+        stub_request(:get, "https://example.com/new")
+        handler.handle(response: redirect(302, "https://example.com/new"), request: form_request, body: form_body)
+
+        expect(a_request(:get, "https://example.com/new").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
+      end
+
       it "does not restore the credentials on a redirect back" do
         stub_request(:get, "https://example.com/away").to_return(status: 302, headers: {"Location" => "https://rubygems.org/back"})
         stub_request(:get, "https://rubygems.org/back")
@@ -322,6 +329,29 @@ RSpec.describe Gems::RedirectHandler do
 
         expect(a_request(:post, "https://rubygems.org/new")
           .with(headers: {"Content-Type" => "application/x-www-form-urlencoded"})).to have_been_made
+      end
+
+      context "when a #{code} leaves the origin" do
+        it "returns a redirect that would send the body again" do
+          response = redirect(code, "https://example.com/new", klass:)
+
+          expect(handler.handle(response:, request: form_request, body: form_body)).to equal(response)
+        end
+
+        it "does not send the body to the host the redirect names" do
+          stub_request(:post, "https://example.com/new")
+          handler.handle(response: redirect(code, "https://example.com/new", klass:), request: form_request,
+            body: form_body)
+
+          expect(a_request(:post, "https://example.com/new")).not_to have_been_made
+        end
+
+        it "follows a redirect for a request that has no body" do
+          stub_request(:get, "https://example.com/new")
+          handler.handle(response: redirect(code, "https://example.com/new", klass:), request:)
+
+          expect(a_request(:get, "https://example.com/new")).to have_been_made
+        end
       end
     end
   end

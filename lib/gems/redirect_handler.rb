@@ -70,6 +70,11 @@ module Gems
     #
     # A 307 or 308 redirect is followed with the method of the request and the body it was built from, which is
     # given as it was given to {RequestBuilder#build}, since a multipart body cannot be read back from the request.
+    # One to another scheme, host, or port is not followed at all when the request has a body, and is returned as a
+    # redirect that cannot be followed is: the credentials of a request are not all carried by the headers a
+    # cross-origin redirect drops, since {API::APIKeyEndpoints#update_api_key} sends an API key as a form field and
+    # the trusted publishing token exchange sends an ID token as a JSON field, and a body replayed to the host the
+    # redirect names would take them there.
     #
     # @api private
     # @param response [Net::HTTPResponse] the HTTP response to handle
@@ -99,6 +104,9 @@ module Gems
 
     # Send the request again to where a redirect leads
     #
+    # A redirect to another origin that would replay the body is not followed, and its response is returned for the
+    # caller to raise the HTTPError of (see {#handle}).
+    #
     # @api private
     # @param response [Net::HTTPResponse] the redirect response
     # @param request [Net::HTTPRequest] the request that was redirected
@@ -111,15 +119,37 @@ module Gems
     # @return [Net::HTTPResponse] the final HTTP response after following redirects
     # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
     def follow(response:, request:, uri:, authenticator:, body:, content_type:, headers:, redirect_count:)
+      response_code = Integer(response.code)
       unless same_origin?(request.uri, uri)
+        return response if replays_body?(response_code, body)
+
         authenticator = Authenticator.new
         headers = {} #: Hash[String, String]
       end
-      new_request = build_request(request:, uri:, response_code: Integer(response.code), authenticator:, body:,
-        content_type:, headers:)
+      new_request = build_request(request:, uri:, response_code:, authenticator:, body:, content_type:, headers:)
       new_response = connection.perform(request: new_request)
       handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:,
         redirect_count: redirect_count + 1)
+    end
+
+    # Whether following a redirect would send the body of the request again
+    #
+    # Only a redirect that keeps the method carries the body; the rest are followed with a GET that has none.
+    #
+    # @api private
+    # @param response_code [Integer] the HTTP response code
+    # @param body [Hash, Array, String, nil] the body the request was built from
+    # @return [Boolean] whether the body would be sent again
+    def replays_body?(response_code, body)
+      method_preserving?(response_code) && !body.nil?
+    end
+
+    # Whether a redirect keeps the method and body, rather than becoming a GET
+    # @api private
+    # @param response_code [Integer] the HTTP response code
+    # @return [Boolean] whether the method and body are kept
+    def method_preserving?(response_code)
+      METHOD_PRESERVING_CODES.include?(response_code)
     end
 
     # Build a new URI from the redirect response
@@ -151,7 +181,7 @@ module Gems
     # @return [Net::HTTPRequest] the new request, with the method and body of the original for a 307 or 308, or a
     #   GET without a body otherwise
     def build_request(request:, uri:, response_code:, authenticator:, body:, content_type:, headers:)
-      if METHOD_PRESERVING_CODES.include?(response_code)
+      if method_preserving?(response_code)
         request_builder.build(http_method: request.method.downcase.to_sym, uri:, body:, content_type:, authenticator:,
           headers:)
       else

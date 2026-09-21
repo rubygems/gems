@@ -834,6 +834,8 @@ module Gems
     private
 
     def follow: (response: Net::HTTPResponse, request: Net::HTTPRequest, uri: URI::HTTP, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String], redirect_count: Integer) -> Net::HTTPResponse
+    def replays_body?: (Integer response_code, request_body? body) -> bool
+    def method_preserving?: (Integer response_code) -> bool
     def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::HTTP?
     def build_request: (request: Net::HTTPRequest, uri: URI::Generic, response_code: Integer, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPRequest
   end

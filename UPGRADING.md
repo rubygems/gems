@@ -250,7 +250,8 @@ Failures that 2.x let through as other exceptions are `Gems::Error` subclasses n
 SSL certificates are verified, where 2.x disabled verification. A host with a certificate that Ruby's OpenSSL does
 not trust, such as a private gem server with a self-signed certificate, raises `Gems::NetworkError` until the
 certificate is trusted. A redirect to another scheme, host, or port is followed without the credentials of the
-request, where 2.x sent the API key wherever the redirect led.
+request, and one that would send the body of the request again is not followed at all, where 2.x sent the API key
+wherever the redirect led.
 
 ### Removed methods and constants
 
