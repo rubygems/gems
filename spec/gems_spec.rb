@@ -25,6 +25,15 @@ RSpec.describe Gems do
 
       expect([client.key, client.host, client.max_redirects]).to eq([TEST_KEY, "http://example.com", 3])
     end
+
+    it "passes a block to the client, which closes it once the block is done with it" do
+      closed = described_class.new(key: TEST_KEY) do |client|
+        allow(client).to receive(:close)
+        client
+      end
+
+      expect(closed).to have_received(:close)
+    end
   end
 
   describe ".client" do

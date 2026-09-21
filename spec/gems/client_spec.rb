@@ -3,6 +3,50 @@
 RSpec.describe Gems::Client do
   subject(:client) { described_class.new(key: nil, username: nil, password: nil) }
 
+  describe ".new" do
+    # Builds a client with a block that stubs its close, so that an example can ask whether it was closed, and runs
+    # the action the example gives it, such as raising.
+    def client_given_to_block(&action)
+      client = nil
+      described_class.new(key: nil) do |built|
+        client = built
+        allow(built).to receive(:close)
+        action&.call
+      end
+      client
+    rescue RuntimeError
+      client
+    end
+
+    it "returns the client without a block" do
+      expect(described_class.new(key: nil)).to be_a(described_class)
+    end
+
+    it "gives the client to a block" do
+      expect { |block| described_class.new(key: nil, &block) }.to yield_with_args(described_class)
+    end
+
+    it "builds the client from the options it is given" do
+      expect(described_class.new(key: nil, host: "https://gems.example.com", &:host)).to eq("https://gems.example.com")
+    end
+
+    it "returns what the block returns" do
+      expect(described_class.new(key: nil) { "returned" }).to eq("returned")
+    end
+
+    it "closes the connections of the client once the block is done with it" do
+      expect(client_given_to_block).to have_received(:close)
+    end
+
+    it "closes the connections of the client when the block raises" do
+      expect(client_given_to_block { raise "boom" }).to have_received(:close)
+    end
+
+    it "raises what the block raised" do
+      expect { described_class.new(key: nil) { raise "boom" } }.to raise_error("boom")
+    end
+  end
+
   describe "#initialize" do
     it "defaults the host to the global configuration" do
       Gems.host = "http://example.com"

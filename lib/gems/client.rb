@@ -38,6 +38,36 @@ module Gems
     def_delegators :@request_builder, :user_agent
     def_delegators :@request_builder, :user_agent=
 
+    # Build a client, and close it once a block is done with it
+    #
+    # Without a block the client is returned, as it is from any other constructor. With one, the client is given to
+    # the block and its connections are closed once the block returns or raises, as `Net::HTTP.start` closes the
+    # connection it opened, and what the block returns is returned. The client can still be used afterwards, since
+    # a closed client opens its connections again as it needs them.
+    #
+    # The options are handed to {#initialize}, which is what declares them, so they are collected here and named
+    # there.
+    #
+    # @api public
+    # @param options [Hash] the options of {#initialize}
+    # @yield [client] the client, which is closed once the block is done with it
+    # @return [Client, Object] the client, or what the block returned
+    # @example Close the connections of a client once a series of requests is done
+    #   versions = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97") do |client|
+    #     client.versions("rails")
+    #   end
+    def self.new(**options) # steep:ignore DifferentMethodParameterKind
+      client = super
+
+      return client unless block_given?
+
+      begin
+        yield client
+      ensure
+        client.close
+      end
+    end
+
     # Initialize a new RubyGems API client
     #
     # Every option defaults to the global configuration (see {Gems.configure}).

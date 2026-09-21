@@ -34,6 +34,7 @@ module Gems
   def self.apply_connection_values: () -> void
 
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> Client
+              | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) { (Client client) -> T } -> T
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
@@ -569,6 +570,8 @@ module Gems
     def user_agent: () -> String
     def user_agent=: (String user_agent) -> void
 
+    def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> Client
+                | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) { (Client client) -> T } -> T
     def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> void
     def close: () -> self
     def get: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String

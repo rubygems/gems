@@ -26,9 +26,12 @@ module Gems
   #   Alias for Gems::Client.new
   #   @api public
   #   @param options [Hash] options passed to {Gems::Client#initialize}
-  #   @return [Gems::Client] a new client
+  #   @yield [client] the client, which is closed once the block is done with it (see {Gems::Client.new})
+  #   @return [Gems::Client, Object] a new client, or what the block returned
   #   @example Create a client
   #     Gems.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
+  #   @example Close the connections of a client once a block is done with it
+  #     Gems.new { |client| client.versions("rails") }
   def_delegator "Gems::Client", :new
 
   def_delegators :client, *API.public_instance_methods

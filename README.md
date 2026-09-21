@@ -220,6 +220,9 @@ Gems.client.get '/api/v1/gems/rails.json', headers: {'X-Trace-Id' => 'abc123'}
 # Alternatively, create a client with its own credentials and settings.
 client = Gems::Client.new(key: 'rubygems_701243f217cdf23b1370c7b66b65ca97', host: 'https://gems.example.com')
 client.rubygem 'rails'
+
+# Given a block, the client is closed once the block is done with it, and the block's value is returned.
+versions = Gems::Client.new(host: 'https://gems.example.com') { |client| client.versions 'rails' }
 ```
 
 ## Response objects
@@ -304,10 +307,13 @@ A request is sent on the connection the last request to the same host left open,
 open a connection each. `keep_alive_timeout` sets how long an idle connection is kept open, and `0` closes every
 connection once its request is done. A request that is not idempotent, such as `push`, is sent on a connection of its
 own, since a connection the server closed while it was idle cannot be retried for it. `close` closes the connections a
-client keeps open; they are opened again as they are needed, so requests can still be made afterwards.
+client keeps open; they are opened again as they are needed, so requests can still be made afterwards. A client
+built with a block is closed once the block returns or raises, as `Net::HTTP.start` closes the connection it opened:
 
 ```ruby
 Gems.client.close
+
+Gems::Client.new { |client| client.versions 'rails' }  # closed once the block is done with it
 ```
 
 Debug output is redacted before it reaches the IO `debug_output` is set to, so that it can be kept in a log: the
