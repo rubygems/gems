@@ -8,7 +8,7 @@ RSpec.describe Gems::WebHook do
   end
 
   it "is identified by its gem name and URL" do
-    expect(web_hook.identity).to eq(["rails", "http://example.com"])
+    expect(web_hook.send(:identity)).to eq(["rails", "http://example.com"])
   end
 
   it "inspects as the gem name and URL" do

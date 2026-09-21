@@ -8,7 +8,7 @@ RSpec.describe Gems::Version do
   end
 
   it "is identified by its name, number, and platform" do
-    expect(version.identity).to eq(["rails", "7.0.6", "ruby"])
+    expect(version.send(:identity)).to eq(["rails", "7.0.6", "ruby"])
   end
 
   it "inspects as the name and number" do

@@ -8,7 +8,7 @@ RSpec.describe Gems::Dependency do
   end
 
   it "is identified by its name and requirements" do
-    expect(dependency.identity).to eq(["thor", ">= 0.14.6"])
+    expect(dependency.send(:identity)).to eq(["thor", ">= 0.14.6"])
   end
 
   it "inspects as the name and requirements" do

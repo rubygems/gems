@@ -214,17 +214,6 @@ module Gems
       names.to_h { |name| [name, public_send(name)] }
     end
 
-    # The values that identify the resource
-    #
-    # @api public
-    # @return [Array<Object>, Hash{String => Object}] the identifying values, or all attributes when no identity is declared
-    # @example Get a gem's identity
-    #   gem.identity # => ["rails"]
-    def identity
-      readers = self.class.identity_readers
-      readers.empty? ? attributes : readers.map { |reader| public_send(reader) }
-    end
-
     # Compare with another resource
     #
     # @api public
@@ -281,6 +270,24 @@ module Gems
     #   {gem => true}
     def hash
       [self.class, identity].hash
+    end
+
+    protected
+
+    # The values that identify the resource
+    #
+    # A resource answers with these to the resource it is compared with, rather than to a caller, which reads the
+    # readers {.identified_by} names or the attributes themselves: the values are what the comparison is made of,
+    # and are an Array of readers for one resource and the whole of the attributes for another.
+    #
+    # @api private
+    # @return [Array<Object>, Hash{String => Object}] the identifying values, or all attributes when no identity is
+    #   declared
+    # @example Compare two gems by the name, version, and platform that identify them
+    #   Gems.rubygem("rails") == Gems.rubygem("rails") # => true
+    def identity
+      readers = self.class.identity_readers
+      readers.empty? ? attributes : readers.map { |reader| public_send(reader) }
     end
 
     private

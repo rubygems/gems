@@ -401,13 +401,17 @@ RSpec.describe Gems::Resource do
 
   describe "#identity" do
     it "is the attributes without declared readers" do
-      expect(resource.identity).to eq(attributes)
+      expect(resource.send(:identity)).to eq(attributes)
     end
 
     it "is the values of the declared readers" do
       identified_class = Class.new(resource_class) { identified_by :name, :yanked? }
 
-      expect(identified_class.new(attributes).identity).to eq(["rails", true])
+      expect(identified_class.new(attributes).send(:identity)).to eq(["rails", true])
+    end
+
+    it "is protected, so that it answers to the resource it is compared with rather than to a caller" do
+      expect { resource.identity }.to raise_error(NoMethodError, /protected method/)
     end
   end
 

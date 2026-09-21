@@ -8,7 +8,7 @@ RSpec.describe Gems::Gem do
   end
 
   it "is identified by its name, version, and platform" do
-    expect(gem.identity).to eq(["rails", "7.0.6", "ruby"])
+    expect(gem.send(:identity)).to eq(["rails", "7.0.6", "ruby"])
   end
 
   it "ignores other attributes when comparing" do

@@ -8,7 +8,7 @@ RSpec.describe Gems::TrustedPublisher do
   end
 
   it "is identified by its id" do
-    expect(trusted_publisher.identity).to eq([1])
+    expect(trusted_publisher.send(:identity)).to eq([1])
   end
 
   it "inspects as the id and name" do

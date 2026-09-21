@@ -8,7 +8,7 @@ RSpec.describe Gems::Owner do
   end
 
   it "is identified by its id, handle, and email" do
-    expect(owner.identity).to eq([1, "sferik", "sferik@gmail.com"])
+    expect(owner.send(:identity)).to eq([1, "sferik", "sferik@gmail.com"])
   end
 
   it "inspects as the handle" do

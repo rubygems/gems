@@ -8,7 +8,7 @@ RSpec.describe Gems::Profile do
   end
 
   it "is identified by its id and handle" do
-    expect(profile.identity).to eq([1, "qrush"])
+    expect(profile.send(:identity)).to eq([1, "qrush"])
   end
 
   it "inspects as the handle" do
