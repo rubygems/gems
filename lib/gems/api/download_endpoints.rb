@@ -59,11 +59,12 @@ module Gems
       # @example
       #   Gems.most_downloaded.first.full_name
       def most_downloaded
-        parse_json(get("/api/v1/downloads/all.json")) do |json|
+        versions = parse_json(get("/api/v1/downloads/all.json")) do |json|
           json.fetch("gems").map do |version, downloads|
-            Version.new(version.merge("name" => gem_name_from(version), "downloads_count" => downloads))
+            version.merge("name" => gem_name_from(version), "downloads_count" => downloads)
           end
         end
+        Version.list(versions)
       end
 
       private
