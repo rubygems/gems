@@ -97,6 +97,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 
 ### Security
 * Verify SSL certificates instead of disabling verification
+* Send the name of the gem file, rather than the path it was opened with, as the filename of the multipart body `push` builds for a gem pushed with attestations, so that a push does not tell the host where the gem sits on the machine it was pushed from
 * Redact credentials from `debug_output`, which Net::HTTP would otherwise write in the clear: the `Authorization` and `OTP` headers of every request, the ID token a trusted publishing token exchange sends, the API key `update_api_key` sends as a form field, and the API key an API key or token exchange response returns are written as `[REDACTED]`
 * Escape the gem names, user handles, version numbers, and platforms interpolated into request paths, so that a value holding a slash cannot walk out of the endpoint it was meant for and take the credentials of the request with it, and one holding a question mark or a number sign cannot add a query string or truncate the path; a value holding a space or a character outside ASCII is escaped rather than raising `URI::InvalidURIError`
 * Resolve the API key stored for the host again when `Client#host=` is assigned, so that a client pointed at another host stops sending the key stored for the host it was built for; a configured key, basic authentication, and a trusted publishing ID token are still sent wherever the client sends a request, as `gem push --key` is

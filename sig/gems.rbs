@@ -448,6 +448,8 @@ module Gems
     include Pagination
     include PathEscaping
 
+    UNNAMED_GEM_FILENAME: String
+
     def rubygem: (gem_identifier gem_name) -> Gem
     def search: (String query, ?page: Integer?) -> Array[Gem]
     def search_each: (String query) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
@@ -461,6 +463,7 @@ module Gems
     private
 
     def multipart_push_body: (File file, Array[push_file] attestations) -> Array[multipart_field]
+    def filename_of: (File file) -> String
     def open_file: [T] (push_file file) { (File file) -> T } -> T
     def read_file: (push_file file) -> String
   end

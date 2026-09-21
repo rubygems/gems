@@ -267,6 +267,13 @@ RSpec.describe Gems::API::GemEndpoints do
 
         expect(a_post("/api/v1/gems").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
       end
+
+      it "builds the multipart body from the open gem file" do
+        allow(client).to receive(:multipart_push_body).and_call_original
+        client.push(gem, attestations:)
+
+        expect(client).to have_received(:multipart_push_body).with(gem, attestations)
+      end
     end
   end
 
@@ -485,7 +492,17 @@ RSpec.describe Gems::API::GemEndpoints do
     let(:body) { client.send(:multipart_push_body, gem, attestations) }
 
     it "includes the gem with its filename and content type" do
-      expect(body.first).to eq(["gem", gem, {filename: gem.path, content_type: "application/octet-stream"}])
+      expect(body.first).to eq(["gem", gem, {filename: "gems-0.0.8.gem", content_type: "application/octet-stream"}])
+    end
+
+    it "sends the name of the gem file rather than the path it was opened with" do
+      expect(body.first.last[:filename]).not_to include(File::SEPARATOR)
+    end
+
+    it "sends a gem with no path of its own under a name of its own" do
+      body = client.send(:multipart_push_body, StringIO.new("gem"), attestations)
+
+      expect(body.first.last[:filename]).to eq("gem")
     end
 
     it "includes the attestations as a JSON array" do

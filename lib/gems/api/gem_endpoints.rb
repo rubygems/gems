@@ -18,6 +18,10 @@ module Gems
       include Pagination
       include PathEscaping
 
+      # The name a gem given as an IO with no path of its own is pushed under
+      UNNAMED_GEM_FILENAME = "gem"
+      private_constant :UNNAMED_GEM_FILENAME
+
       # Returns some basic information about the given gem
       #
       # @api public
@@ -176,15 +180,28 @@ module Gems
       # with attestations is no more held in memory than one pushed without them.
       #
       # @api private
-      # @param file [File] The open gem file, whose path names the field.
+      # @param file [File, IO] The open gem file, whose name names the field.
       # @param attestations [Array<String, Pathname, File>] The paths of the attestations, or the open files.
       # @return [Array] the multipart form fields
       def multipart_push_body(file, attestations)
         [
-          ["gem", file, {filename: file.to_path, content_type: RequestBuilder::OCTET_STREAM}],
+          ["gem", file, {filename: filename_of(file), content_type: RequestBuilder::OCTET_STREAM}],
           ["attestations", "[#{attestations.map { |attestation| read_file(attestation) }.join(",")}]",
             {content_type: "application/json"}]
         ]
+      end
+
+      # The name a gem is sent under in a multipart body
+      #
+      # The name of the file is sent rather than the path it was opened with, so that pushing a gem does not tell
+      # the host where the gem sits on the machine it was pushed from. An IO with no path of its own, such as a gem
+      # held in memory, is sent under the name of its field rather than raising.
+      #
+      # @api private
+      # @param file [File, IO] the open gem file
+      # @return [String] the name of the file, or {UNNAMED_GEM_FILENAME} for an IO with no path
+      def filename_of(file)
+        file.respond_to?(:to_path) ? File.basename(file) : UNNAMED_GEM_FILENAME
       end
 
       # Open a file given as a path, or take one that is already open
