@@ -15,6 +15,14 @@ RSpec.describe Gems::Downloads do
       expect(described_class.new("total_downloads" => 3142).total).to eq(3142)
     end
 
+    it "returns the total downloads of every gem" do
+      expect(described_class.new("total" => 3142).total).to eq(3142)
+    end
+
+    it "prefers the total of a gem to the total of every gem" do
+      expect(described_class.new("total_downloads" => 3142, "total" => 42).total).to eq(3142)
+    end
+
     it "returns nil without total downloads" do
       expect(described_class.new({}).total).to be_nil
     end

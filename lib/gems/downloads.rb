@@ -18,10 +18,14 @@ module Gems
 
     # @!method total
     #   The total downloads of the gem
+    #
+    #   The downloads endpoint of a gem answers with the total under total_downloads, and the one for every gem
+    #   answers with it under total, so the reader reads whichever the response it was built from carries.
+    #
     #   @api public
     #   @return [Integer, nil] the total downloads of the gem
     #   @example
     #     downloads.total
-    attribute :total, "total_downloads"
+    attribute :total, "total_downloads", "total"
   end
 end
