@@ -16,7 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `Gems::TrustedPublisher`, which wraps a trusted publisher and reads the fields of the publisher nested in it, such as `repository_owner` and `workflow_filename`, and `Gems::TrustedPublisher::GITHUB_ACTION`, the type `add_trusted_publisher` sends unless it is given another
 * Add `autocomplete` for gem name suggestions
 * Build a client with a block, `Gems::Client.new { |client| ... }` and `Gems.new { |client| ... }`, which gives the client to the block, closes its connections once the block returns or raises, as `Net::HTTP.start` closes the connection it opened, and returns what the block returned; a closed client opens its connections again as it needs them
-* Add `Downloads#total_downloads`, the total downloads of a gem under the name the endpoint gives the field, alongside `Downloads#total`
 * Add a `platform` option to `version` and to `downloads`
 * Add `contents` for the file checksums of a version
 * Add `attestations` for the sigstore attestations of a version

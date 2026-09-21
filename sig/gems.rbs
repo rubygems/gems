@@ -357,7 +357,6 @@ module Gems
 
   class Downloads < Resource
     def total: () -> Integer?
-    def total_downloads: () -> Integer?
     def version_downloads: () -> Integer?
   end
 
