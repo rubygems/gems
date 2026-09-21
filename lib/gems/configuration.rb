@@ -245,8 +245,10 @@ module Gems
     # The API key `gem push` would use for a host
     #
     # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the host in
-    # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The credentials file is only read when
-    # this method is called.
+    # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The environment is read each time
+    # this method is called, rather than when the library is required, and the credentials file is read the first
+    # time it is needed: RubyGems keeps what it read in `Gem.configuration`, which it shares with everything else
+    # running in the process, so a key `gem signin` stores afterwards is picked up only by a new process.
     #
     # An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, since a continuous integration
     # service sets a variable to the empty string when the secret it was given is not set, and an empty
