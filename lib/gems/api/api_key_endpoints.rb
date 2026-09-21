@@ -70,7 +70,7 @@ module Gems
       #   Gems.exchange_trusted_publisher_token(ENV.fetch("ID_TOKEN")).key
       def exchange_trusted_publisher_token(id_token)
         TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:,
-          redirect_handler:).exchange_token!
+          redirect_handler:, retry_handler:).exchange_token!
       end
 
       private

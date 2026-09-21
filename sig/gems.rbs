@@ -164,11 +164,12 @@ module Gems
     attr_reader connection: Connection
     attr_reader request_builder: RequestBuilder
     attr_reader redirect_handler: RedirectHandler
+    attr_reader retry_handler: RetryHandler
     attr_reader api_key: String?
 
     @mutex: Thread::Mutex
 
-    def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder, ?redirect_handler: RedirectHandler) -> void
+    def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder, ?redirect_handler: RedirectHandler, ?retry_handler: RetryHandler) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
     def inspect: () -> String
     def exchange_token!: () -> APIKey
@@ -186,6 +187,7 @@ module Gems
     @connection: Connection
     @request_builder: RequestBuilder
     @redirect_handler: RedirectHandler
+    @retry_handler: RetryHandler
     @key_configured: bool
     @trusted_publisher_authenticator: TrustedPublisherAuthenticator?
 
@@ -426,6 +428,7 @@ module Gems
     def connection: () -> Connection
     def request_builder: () -> RequestBuilder
     def redirect_handler: () -> RedirectHandler
+    def retry_handler: () -> RetryHandler
     def validate_scopes: (Hash[Symbol, bool] scopes) -> void
   end
 
@@ -862,15 +865,15 @@ module Gems
     attr_reader random: _Random
 
     def initialize: (?max_retries: Integer, ?max_retry_delay: Numeric, ?random: _Random) -> void
-    def handle: (request: Net::HTTPRequest) { () -> Net::HTTPResponse } -> Net::HTTPResponse
+    def handle: (request: Net::HTTPRequest, ?retry_refused: bool, ?retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse
 
     private
 
-    def attempt: (request: Net::HTTPRequest, retries: Integer) { () -> Net::HTTPResponse } -> Net::HTTPResponse?
+    def attempt: (retries: Integer, retry_refused: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse?
     def wait: (Numeric delay) -> nil
-    def retry_delay: (response: Net::HTTPResponse, request: Net::HTTPRequest, retries: Integer) -> Numeric?
-    def network_retry_delay: (request: Net::HTTPRequest, retries: Integer) -> Numeric?
-    def retryable?: (Net::HTTPRequest request, Integer retries) -> bool
+    def retry_delay: (response: Net::HTTPResponse, retries: Integer, allowed: bool) -> Numeric?
+    def network_retry_delay: (retries: Integer, allowed: bool) -> Numeric?
+    def retryable?: (bool allowed, Integer retries) -> bool
     def capped: (Integer delay) -> Integer?
     def retry?: (Net::HTTPResponse response) -> bool
     def backoff: (Integer retries) -> Numeric

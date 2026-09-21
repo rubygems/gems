@@ -84,6 +84,16 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect(described_class.new(id_token: "ID_TOKEN", redirect_handler:).redirect_handler).to equal(redirect_handler)
     end
 
+    it "defaults the retry handler" do
+      expect(authenticator.retry_handler).to be_an_instance_of(Gems::RetryHandler)
+    end
+
+    it "sets a custom retry handler" do
+      retry_handler = Gems::RetryHandler.new
+
+      expect(described_class.new(id_token: "ID_TOKEN", retry_handler:).retry_handler).to equal(retry_handler)
+    end
+
     it "builds a mutex, so that concurrent requests exchange the token once" do
       expect(authenticator.instance_variable_get(:@mutex)).to be_an_instance_of(Thread::Mutex)
     end
@@ -193,6 +203,45 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       exchanges.each(&:join)
 
       expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
+
+    context "when the server turns the exchange away" do
+      subject(:authenticator) { described_class.new(id_token: "ID_TOKEN", retry_handler:) }
+
+      let(:retry_handler) { Gems::RetryHandler.new(max_retries: 2, max_retry_delay: 0.01) }
+
+      it "sends the exchange again" do
+        stub_request(:post, exchange_url)
+          .to_return({status: 429, headers: {"Retry-After" => "0"}}, {body: fixture("exchange_token.json").read})
+
+        expect(authenticator.exchange_token!.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+      end
+
+      it "raises once the retries the handler allows are spent" do
+        stub_request(:post, exchange_url).to_return(status: 503, headers: {"Retry-After" => "0"})
+
+        expect { authenticator.exchange_token! }.to raise_error(Gems::ServiceUnavailable)
+      end
+
+      it "sends the exchange again as many times as the retry handler allows" do
+        stub_request(:post, exchange_url).to_return(status: 503, headers: {"Retry-After" => "0"})
+        authenticator.exchange_token!
+      rescue Gems::ServiceUnavailable
+        expect(a_request(:post, exchange_url)).to have_been_made.times(3)
+      end
+
+      it "raises the network error of an exchange that was lost" do
+        stub_request(:post, exchange_url).to_raise(Errno::ECONNRESET)
+
+        expect { authenticator.exchange_token! }.to raise_error(Gems::NetworkError)
+      end
+
+      it "does not send an exchange lost to the network again, since it may have issued the only key" do
+        stub_request(:post, exchange_url).to_raise(Errno::ECONNRESET)
+        authenticator.exchange_token!
+      rescue Gems::NetworkError
+        expect(a_request(:post, exchange_url)).to have_been_made.once
+      end
     end
   end
 

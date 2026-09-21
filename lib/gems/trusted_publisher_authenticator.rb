@@ -10,6 +10,7 @@ require_relative "json_parsing"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "response_parser"
+require_relative "retry_handler"
 
 module Gems
   # Authenticator for trusted publishing
@@ -60,6 +61,13 @@ module Gems
     #   authenticator.redirect_handler
     attr_reader :redirect_handler
 
+    # The retry handler the token exchange is sent again with
+    # @api public
+    # @return [RetryHandler] the retry handler
+    # @example Get the retry handler
+    #   authenticator.retry_handler
+    attr_reader :retry_handler
+
     # The API key obtained from the token exchange
     # @api public
     # @return [String, nil] the API key, or nil before the token has been exchanged
@@ -75,17 +83,20 @@ module Gems
     # @param connection [Connection] the connection used for the token exchange
     # @param request_builder [RequestBuilder] the request builder used for the token exchange
     # @param redirect_handler [RedirectHandler] the redirect handler the token exchange is followed with
+    # @param retry_handler [RetryHandler] the retry handler the token exchange is sent again with
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
     def initialize(id_token:, host: Gems.default_host, connection: Connection.new,
       request_builder: RequestBuilder.new,
-      redirect_handler: RedirectHandler.new(connection:, request_builder:))
+      redirect_handler: RedirectHandler.new(connection:, request_builder:),
+      retry_handler: RetryHandler.new)
       @id_token = id_token
       @host = host
       @connection = connection
       @request_builder = request_builder
       @redirect_handler = redirect_handler
+      @retry_handler = retry_handler
       @mutex = Mutex.new
     end
 
@@ -149,6 +160,13 @@ module Gems
 
     # Send the token exchange request and follow the redirects of its response
     #
+    # The exchange is sent again when the server turns it away, although it is a POST, so that a moment of rate
+    # limiting does not fail a publish; the `max_retries` of the client it was built for is what it is sent again.
+    # A 429, 502, 503, or 504 says the endpoint refused the exchange rather than issuing a key for the token, which
+    # is why sending it again is safe. An exchange lost to the network is left as it is, which is what a POST does
+    # without being asked, since the answer that went missing may have carried the only key RubyGems.org issues for
+    # that token.
+    #
     # @api private
     # @return [Net::HTTPResponse] the response the exchange ended at
     def exchange_response
@@ -157,8 +175,10 @@ module Gems
       headers = {"Accept" => RequestBuilder::APPLICATION_JSON}
       request = request_builder.build(http_method: :post, uri:, body:,
         content_type: RequestBuilder::APPLICATION_JSON, headers:)
-      redirect_handler.handle(response: connection.perform(request:), request:, body:,
-        content_type: RequestBuilder::APPLICATION_JSON, headers:)
+      retry_handler.handle(request:, retry_refused: true) do
+        redirect_handler.handle(response: connection.perform(request:), request:, body:,
+          content_type: RequestBuilder::APPLICATION_JSON, headers:)
+      end
     end
   end
 end

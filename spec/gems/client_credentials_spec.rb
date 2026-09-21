@@ -271,6 +271,16 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.authenticator.redirect_handler).to equal(client.send(:redirect_handler))
     end
 
+    it "builds an authenticator with the client's retry handler, so the exchange retries what the client does" do
+      expect(client.authenticator.retry_handler).to equal(client.send(:retry_handler))
+    end
+
+    it "sends the exchange again as many times as the client's max_retries, which can be changed afterwards" do
+      client.max_retries = 5
+
+      expect(client.authenticator.retry_handler.max_retries).to eq(5)
+    end
+
     it "keeps the authenticator when another credential changes, so the exchanged key is not thrown away" do
       authenticator = client.authenticator
       client.otp = "123456"

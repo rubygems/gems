@@ -157,5 +157,13 @@ RSpec.describe Gems::API::APIKeyEndpoints do
 
       expect(connection).to have_received(:perform).with(request: an_instance_of(Net::HTTP::Post))
     end
+
+    it "sends the exchange again as many times as the client does" do
+      client.max_retries = 0
+      stub_request(:post, exchange_url).to_return(status: 429, headers: {"Retry-After" => "0"})
+      client.exchange_trusted_publisher_token("ID_TOKEN")
+    rescue Gems::TooManyRequests
+      expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
   end
 end

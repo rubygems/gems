@@ -338,7 +338,10 @@ refused, reset, or timed out never reached the endpoint, so sending the request 
 raised as it was.
 
 Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
-idempotent cannot be sent a second time to find out whether the server received the first one. The wait is the one
+idempotent cannot be sent a second time to find out whether the server received the first one. The trusted
+publishing token exchange is the exception: a 429, 502, 503, or 504 says the endpoint turned the exchange away
+rather than issuing a key for the token, so it is sent again, where an exchange lost to the network is not, since
+the answer that went missing may have carried the only key RubyGems.org issues for that token. The wait is the one
 `Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the
 header, which is the wait after a network failure too, since a request that never arrived has no response to read a
 wait from. A wait the library chose for itself is jittered down by up to half, so that the clients a server turned

@@ -212,7 +212,8 @@ module Gems
       return kept if kept && kept.id_token.eql?(id_token) && kept.host.eql?(@host)
 
       @trusted_publisher_authenticator = TrustedPublisherAuthenticator.new(id_token:, host: @host,
-        connection: @connection, request_builder: @request_builder, redirect_handler: @redirect_handler)
+        connection: @connection, request_builder: @request_builder, redirect_handler: @redirect_handler,
+        retry_handler: @retry_handler)
     end
 
     # Build a basic authenticator if a username and password are available

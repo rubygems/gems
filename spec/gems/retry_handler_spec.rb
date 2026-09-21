@@ -36,11 +36,11 @@ RSpec.describe Gems::RetryHandler do
   end
 
   # Send the given responses in turn, raising the ones that are errors, and recording the seconds waited between them
-  def handle(handler, responses, request: self.request)
+  def handle(handler, responses, request: self.request, **options)
     waited = []
     allow(handler).to receive(:sleep) { |seconds| waited << seconds }
     remaining = responses.dup
-    response = handler.handle(request:) do
+    response = handler.handle(request:, **options) do
       answer = remaining.shift
       answer.is_a?(Exception) ? raise(answer) : answer
     end
@@ -249,6 +249,35 @@ RSpec.describe Gems::RetryHandler do
         _, waited = handle(handler, [network_error, success])
 
         expect(waited).to eq([1])
+      end
+    end
+
+    context "when the caller says what the request is safe to be sent again for" do
+      it "sends a request that is not idempotent again when the server turns it away" do
+        response, waited = handle(handler, [rate_limited, success], request: post_request, retry_refused: true)
+
+        expect([response, waited]).to eq([success, [1]])
+      end
+
+      it "raises for a request that is not idempotent lost to the network" do
+        expect { handle(handler, [network_error, success], request: post_request, retry_refused: true) }
+          .to raise_error(Gems::NetworkError)
+      end
+
+      it "sends a request that is not idempotent again when it is lost to the network" do
+        response, = handle(handler, [network_error, success], request: post_request, retry_lost: true)
+
+        expect(response).to equal(success)
+      end
+
+      it "leaves an idempotent request the server turned away as it is" do
+        response, waited = handle(handler, [rate_limited, success], retry_refused: false)
+
+        expect([response.code, waited]).to eq(["429", []])
+      end
+
+      it "raises for an idempotent request lost to the network" do
+        expect { handle(handler, [network_error, success], retry_lost: false) }.to raise_error(Gems::NetworkError)
       end
     end
   end

@@ -116,9 +116,9 @@ module Gems
         keep_alive_timeout:)
       @request_builder = RequestBuilder.new(user_agent:)
       @redirect_handler = RedirectHandler.new(connection: @connection, request_builder: @request_builder, max_redirects:)
+      @retry_handler = RetryHandler.new(max_retries:, max_retry_delay:)
       initialize_credentials(key:, username:, password:, otp:, id_token:)
       initialize_authenticator
-      @retry_handler = RetryHandler.new(max_retries:, max_retry_delay:)
       @response_parser = ResponseParser.new
     end
 
@@ -265,6 +265,11 @@ module Gems
     # @api private
     # @return [RedirectHandler] the redirect handler
     attr_reader :redirect_handler
+
+    # The retry handler the requests the server turns away are sent again with
+    # @api private
+    # @return [RetryHandler] the retry handler
+    attr_reader :retry_handler
 
     # Execute an HTTP request to the RubyGems API
     # @api private
