@@ -3,7 +3,7 @@ module Gems
 
   type multipart_field = [Symbol | String, untyped, Hash[Symbol, String]]
   type gem_identifier = String | Gem | Version
-  type version_identifier = String | Version
+  type version_identifier = String | Version | Gem
   type owner_identifier = String | Owner | Profile
   type user_identifier = String | Integer | Owner | Profile
   type web_hook_identifier = String | WebHook
@@ -38,9 +38,9 @@ module Gems
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
-  def self.version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
-  def self.contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
-  def self.attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
+  def self.version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Version
+  def self.contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Hash[String, Hash[String, String]]
+  def self.attestations: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Array[Hash[String, untyped]]
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
   def self.search_each: (String query) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
   def self.autocomplete: (String query) -> Array[String]
@@ -527,9 +527,9 @@ module Gems
 
     def versions: (gem_identifier gem_name) -> Array[Version]
     def latest_version: (gem_identifier gem_name) -> String
-    def version: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Version
-    def contents: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Hash[String, Hash[String, String]]
-    def attestations: (gem_identifier gem_name, version_identifier version, ?platform: String?) -> Array[Hash[String, untyped]]
+    def version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Version
+    def contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Hash[String, Hash[String, String]]
+    def attestations: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Array[Hash[String, untyped]]
     def timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
     def timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
   end

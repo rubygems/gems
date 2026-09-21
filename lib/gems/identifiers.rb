@@ -26,37 +26,48 @@ module Gems
       end
     end
 
-    # Resolve a version number from a number or a version
+    # Resolve a version number from a number, a version, or a gem
+    #
+    # A gem carries the number of the version the endpoint it came from answered with, which is the latest version
+    # for the endpoints that answer with a gem.
+    #
     # @api private
-    # @param version [String, Version, nil] a version number or version
+    # @param version [String, Version, Gem, nil] a version number, version, or gem
     # @return [String, nil] the version number
     def number_of(version)
       case version
       when Version then version.number
+      when Gem then version.version
       else version
       end
     end
 
     # Resolve the version to act on from a gem argument and a version argument
     #
-    # A version given as the gem stands in for a missing version, so that acting on a version acts on that version
-    # rather than on the latest version of its gem.
+    # A gem or a version given as the gem stands in for a missing version when it carries a number of its own, so
+    # that acting on one acts on the version it names rather than on the latest version of its gem. A gem name, and
+    # a resource that carries no number, leave the version to the caller, which falls back to the latest version.
     #
     # @api private
     # @param gem [String, Gem, Version, nil] a gem name, gem, or version
-    # @param version [String, Version, nil] a version number or version, or nil to use the gem when it is a version
-    # @return [String, Version, nil] the version to act on
+    # @param version [String, Version, Gem, nil] a version number, version, or gem, or nil to use the gem when it
+    #   carries a number
+    # @return [String, Version, Gem, nil] the version to act on
     def version_of(gem, version)
-      version || (gem if gem.instance_of?(Version))
+      return version if version
+
+      case gem
+      when Gem, Version then gem unless number_of(gem).nil?
+      end
     end
 
-    # Resolve a platform from a version
+    # Resolve a platform from a version or a gem
     # @api private
-    # @param version [String, Version, nil] a version number or version
-    # @return [String, nil] the platform of a version, or nil for a version number
+    # @param version [String, Version, Gem, nil] a version number, version, or gem
+    # @return [String, nil] the platform of a version or gem, or nil for a version number
     def platform_of(version)
       case version
-      when Version then version.platform
+      when Version, Gem then version.platform
       end
     end
 

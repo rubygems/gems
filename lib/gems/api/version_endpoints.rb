@@ -53,17 +53,24 @@ module Gems
       #
       # @api public
       # @authenticated false
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version] The requested version of the gem.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A gem or version stands in
+      #   for the version argument too, so that reading a version reads that version.
+      # @param version [String, Version, Gem, nil] The requested version of the gem (defaults to the version given
+      #   as the gem, or to the latest version).
       # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
-      #   platform of a version object, or "ruby".
+      #   platform of a gem or version object, or "ruby".
       # @return [Version]
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.version "rails", "7.0.6"
       # @example
       #   Gems.version "nokogiri", "1.15.0", platform: "java"
-      def version(gem_name, version, platform: nil)
-        path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number_of(version))}.json"
+      # @example
+      #   Gems.version Gems.rubygem("rails")
+      def version(gem_name, version = nil, platform: nil)
+        version = version_of(gem_name, version)
+        number = number_of(version) || latest_version(gem_name)
+        path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number)}.json"
         Version.new(parse_json(get(path, {platform: platform || platform_of(version)}.compact)))
       end
 
@@ -73,15 +80,22 @@ module Gems
       #
       # @api public
       # @authenticated false
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version] The requested version of the gem.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A gem or version stands in
+      #   for the version argument too, so that reading the contents of a version reads that version.
+      # @param version [String, Version, Gem, nil] The requested version of the gem (defaults to the version given
+      #   as the gem, or to the latest version).
       # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
-      #   platform of a version object, or "ruby".
+      #   platform of a gem or version object, or "ruby".
       # @return [Hash{String => Hash{String => String}}] the checksums of each file, keyed by path
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.contents("rails", "8.1.3.1")["README.md"]["sha256"]
-      def contents(gem_name, version, platform: nil)
-        path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number_of(version))}/contents.json"
+      # @example
+      #   Gems.contents Gems.rubygem("rails")
+      def contents(gem_name, version = nil, platform: nil)
+        version = version_of(gem_name, version)
+        number = number_of(version) || latest_version(gem_name)
+        path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number)}/contents.json"
         parse_json(get(path, {platform: platform || platform_of(version)}.compact))
       end
 
@@ -89,16 +103,22 @@ module Gems
       #
       # @api public
       # @authenticated false
-      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
-      # @param version [String, Version] The requested version of the gem.
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A gem or version stands in
+      #   for the version argument too, so that reading the attestations of a version reads that version.
+      # @param version [String, Version, Gem, nil] The requested version of the gem (defaults to the version given
+      #   as the gem, or to the latest version).
       # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
-      #   platform of a version object, or "ruby".
+      #   platform of a gem or version object, or "ruby".
       # @return [Array<Hash>] the sigstore bundles, empty for versions pushed without attestations
+      # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.attestations("rails", "8.1.3.1").first["mediaType"]
       # @example
       #   Gems.attestations "nokogiri", "1.15.0", platform: "java"
-      def attestations(gem_name, version, platform: nil)
+      # @example
+      #   Gems.attestations Gems.rubygem("rails")
+      def attestations(gem_name, version = nil, platform: nil)
+        version = version_of(gem_name, version) || latest_version(gem_name)
         parse_json(get("/api/v1/attestations/#{escape(full_name_of(gem_name, version, platform))}.json"))
       end
 

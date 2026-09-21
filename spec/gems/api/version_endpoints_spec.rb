@@ -122,6 +122,34 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
     end
 
+    it "reads the version given as the gem" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version(Gems::Version.new("name" => "rails", "number" => "7.0.6", "platform" => "java"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
+    end
+
+    it "reads the version a gem carries" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version(Gems::Gem.new("name" => "rails", "version" => "7.0.6", "platform" => "java"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/versions/rails/latest.json").to_return(body: '{"version":"7.0.6"}')
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("rails")
+
+      expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json")).to have_been_made
+    end
+
+    it "raises NoLatestVersion for a gem with no published version" do
+      stub_get("/api/v1/versions/rails/latest.json").to_return(body: '{"version":"unknown"}')
+
+      expect { client.version("rails") }.to raise_error(Gems::NoLatestVersion)
+    end
+
     context "when the gem version exists" do
       before { stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: fixture("v2/rails-7.0.6.json")) }
 
@@ -190,6 +218,25 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json?platform=java")).to have_been_made
     end
 
+    it "reads the version given as the gem" do
+      client.contents(Gems::Version.new("name" => "rails", "number" => "8.1.3.1"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json")).to have_been_made
+    end
+
+    it "reads the version a gem carries" do
+      client.contents(Gems::Gem.new("name" => "rails", "version" => "8.1.3.1"))
+
+      expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json")).to have_been_made
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/versions/rails/latest.json").to_return(body: '{"version":"8.1.3.1"}')
+      client.contents("rails")
+
+      expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json")).to have_been_made
+    end
+
     it "returns the checksum of each file" do
       contents = client.contents("rails", "8.1.3.1")
 
@@ -231,6 +278,27 @@ RSpec.describe Gems::API::VersionEndpoints do
       client.attestations("nokogiri", Gems::Version.new("number" => "1.15.0", "platform" => "java"))
 
       expect(a_get("/api/v1/attestations/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "reads the version given as the gem" do
+      stub_get("/api/v1/attestations/nokogiri-1.15.0-java.json").to_return(body: "[]")
+      client.attestations(Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "java"))
+
+      expect(a_get("/api/v1/attestations/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "reads the version a gem carries" do
+      stub_get("/api/v1/attestations/nokogiri-1.15.0-java.json").to_return(body: "[]")
+      client.attestations(Gems::Gem.new("name" => "nokogiri", "version" => "1.15.0", "platform" => "java"))
+
+      expect(a_get("/api/v1/attestations/nokogiri-1.15.0-java.json")).to have_been_made
+    end
+
+    it "defaults to the latest version" do
+      stub_get("/api/v1/versions/rails/latest.json").to_return(body: '{"version":"8.1.3.1"}')
+      client.attestations("rails")
+
+      expect(a_get("/api/v1/attestations/rails-8.1.3.1.json")).to have_been_made
     end
 
     it "returns the sigstore bundles" do

@@ -326,6 +326,21 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
 
+    it "yanks the version a gem carries" do
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
+      client.yank(Gems::Gem.new("name" => "gems", "version" => "0.0.8", "platform" => "java"))
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
+    end
+
+    it "yanks the latest version of a gem that carries none" do
+      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
+      stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
+      client.yank(Gems::Gem.new("name" => "gems"))
+
+      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
+    end
+
     it "prefers an explicit version to the version given as the gem" do
       client.yank(Gems::Version.new("name" => "gems", "number" => "0.0.7"), "0.0.8")
 

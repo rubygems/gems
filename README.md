@@ -45,6 +45,9 @@ version.spec_sha     # => "9d5f4a10...", the checksum of the gemspec it was push
 # Return information about a version for a specific platform.
 Gems.version 'nokogiri', '1.15.0', platform: 'java'
 
+# Defaults to the latest version if no version is specified.
+Gems.version 'rails'
+
 # Return the SHA-256 checksum of every file in a version.
 Gems.contents('rails', '8.1.3.1')['README.md']['sha256']
 
@@ -80,8 +83,9 @@ Gems.push File.new 'gemcutter-0.2.1.gem'
 # Defaults to the latest version if no version is specified.
 Gems.yank 'bills', '0.0.1'
 
-# A version object stands in for both the gem and the version.
+# A gem or version object stands in for both the gem and the version.
 Gems.yank Gems.version('bills', '0.0.1')
+Gems.contents Gems.rubygem('rails')
 
 # Return an array of versions of coulda, and the newest of them.
 Gems.versions('coulda').map(&:number)
@@ -232,7 +236,11 @@ Responses are wrapped in objects with readers for each documented field: `Gems::
 `Gems::TrustedPublisher`.
 Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
 accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`,
-`Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work.
+`Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work. A gem or version given
+where a gem is expected stands in for the version too, when it carries a version number, so `Gems.version(gem)`,
+`Gems.contents(gem)`, `Gems.attestations(gem)`, `Gems.downloads(gem)`, and `Gems.yank(gem)` act on the version it
+names, at the platform it names, rather than on the latest version. Those five methods take no version at all when
+you mean the latest one.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Versions also

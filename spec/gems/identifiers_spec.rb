@@ -33,6 +33,10 @@ RSpec.describe Gems::Identifiers do
     it "returns the number of a version" do
       expect(client.send(:number_of, Gems::Version.new("number" => "7.0.6"))).to eq("7.0.6")
     end
+
+    it "returns the version of a gem" do
+      expect(client.send(:number_of, Gems::Gem.new("name" => "rails", "version" => "7.0.6"))).to eq("7.0.6")
+    end
   end
 
   describe "#version_of" do
@@ -54,8 +58,18 @@ RSpec.describe Gems::Identifiers do
       expect(client.send(:version_of, "nokogiri", nil)).to be_nil
     end
 
-    it "returns nil for a gem without a version" do
-      expect(client.send(:version_of, Gems::Gem.new("name" => "nokogiri", "version" => "1.15.0"), nil)).to be_nil
+    it "returns the gem given as the gem when it carries a version" do
+      gem = Gems::Gem.new("name" => "nokogiri", "version" => "1.15.0")
+
+      expect(client.send(:version_of, gem, nil)).to equal(gem)
+    end
+
+    it "returns nil for a gem that carries no version" do
+      expect(client.send(:version_of, Gems::Gem.new("name" => "nokogiri"), nil)).to be_nil
+    end
+
+    it "returns nil for a version that carries no number" do
+      expect(client.send(:version_of, Gems::Version.new("name" => "nokogiri"), nil)).to be_nil
     end
   end
 
@@ -66,6 +80,10 @@ RSpec.describe Gems::Identifiers do
 
     it "returns the platform of a version" do
       expect(client.send(:platform_of, Gems::Version.new("number" => "1.15.0", "platform" => "java"))).to eq("java")
+    end
+
+    it "returns the platform of a gem" do
+      expect(client.send(:platform_of, Gems::Gem.new("version" => "1.15.0", "platform" => "java"))).to eq("java")
     end
   end
 

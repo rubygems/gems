@@ -214,7 +214,10 @@ Gems.web_hooks                              # => [#<Gems::WebHook gem_name="*" u
 
 A web hook on all gems has a `gem_name` of `"*"`. Objects are accepted wherever their identifier is expected, so
 `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`, and `Gems.key = api_key` work, and they compare by identity,
-so `Gems.rubygem("rails") == Gems.rubygem("rails")` even when the download counts have changed in between.
+so `Gems.rubygem("rails") == Gems.rubygem("rails")` even when the download counts have changed in between. A gem or
+version given where a gem is expected stands in for the version it carries, so `Gems.version(gem)`,
+`Gems.contents(gem)`, `Gems.attestations(gem)`, `Gems.downloads(gem)`, and `Gems.yank(gem)` act on that version;
+without one they act on the latest version of the gem.
 
 ### Errors
 
