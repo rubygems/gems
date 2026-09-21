@@ -53,6 +53,9 @@ module Gems
       #
       # Each version's download count is available as {Version#downloads_count}.
       #
+      # There is no counterpart for the versions downloaded most today: RubyGems.org retired that endpoint, and
+      # `GET /api/v1/downloads/top.json` answers 410 Gone.
+      #
       # @api public
       # @authenticated false
       # @return [Array<Version>]
