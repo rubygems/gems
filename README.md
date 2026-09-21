@@ -319,6 +319,11 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
 | `max_retries` | The number of times a request that was turned away is sent again | `2`                           |
 | `max_retry_delay` | The longest a request waits before it is sent again, in seconds | `60`               |
+| `ca_file`     | The path of a file of certificates TLS is verified with  | OpenSSL's own certificates             |
+| `ca_path`     | The path of a directory of certificates TLS is verified with | OpenSSL's own certificates         |
+| `cert_store`  | An `OpenSSL::X509::Store` TLS is verified with           | OpenSSL's own certificates             |
+| `client_cert` | The certificate presented to a host that asks for one    | `nil`                                  |
+| `client_key`  | The private key of `client_cert`                         | `nil`                                  |
 
 Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
 `Gems::TrustedPublisherAuthenticator`, and `Gems::OTPAuthenticator` (which wraps one of the others).
@@ -335,6 +340,25 @@ Gems.push 'gemcutter-0.2.1.gem', host: 'https://gems.example.com'
 
 Proxies are read from the `http_proxy`, `https_proxy`, and `no_proxy` environment variables unless `proxy_url` is set.
 An `https://` proxy is connected to over TLS.
+
+TLS certificates are verified, and there is no option to turn that off. A host whose certificate Ruby's OpenSSL does
+not already trust, such as a private gem server with one of its own, is reached by naming that certificate rather than
+by skipping the check. `ca_file` and `ca_path` add to the certificates OpenSSL trusts; a `cert_store` of your own
+replaces them. A host that asks the client for a certificate is given `client_cert` and `client_key`:
+
+```ruby
+# Trust the certificate of a private gem server.
+Gems::Client.new(host: 'https://gems.example.com', ca_file: '/etc/ssl/certs/internal.pem')
+
+# Present a client certificate to a host behind mutual TLS.
+Gems.configure do |config|
+  config.client_cert = OpenSSL::X509::Certificate.new(File.read('client.pem'))
+  config.client_key = OpenSSL::PKey::RSA.new(File.read('client.key'))
+end
+```
+
+A `ca_file` or `ca_path` that names nothing raises `ArgumentError` where it is assigned, as an invalid `host` does,
+rather than failing as a TLS error on the next request.
 
 A request is sent on the connection the last request to the same host left open, so that a series of requests does not
 open a connection each. `keep_alive_timeout` sets how long an idle connection is kept open, and `0` closes every

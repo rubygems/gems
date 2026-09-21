@@ -128,7 +128,12 @@ RSpec.describe Gems do
       keep_alive_timeout: 1,
       debug_output: $stderr,
       proxy_url: "http://proxy.example.com:8080",
-      max_redirects: 1
+      max_redirects: 1,
+      ca_file: certificate_path("ca.pem"),
+      ca_path: certificate_path,
+      cert_store: OpenSSL::X509::Store.new,
+      client_cert: test_client_cert,
+      client_key: test_client_key
     }.each do |option, value|
       it "keeps the client it has when #{option} changes" do
         client = described_class.client

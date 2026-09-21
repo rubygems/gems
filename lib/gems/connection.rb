@@ -2,6 +2,7 @@
 
 require "net/http"
 require "uri"
+require_relative "certificate_options"
 require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
@@ -16,6 +17,7 @@ module Gems
   #
   # @api private
   class Connection
+    include CertificateOptions
     include URLValidation
 
     # Default timeout for opening connections in seconds
@@ -139,14 +141,23 @@ module Gems
     # @param debug_output [IO, nil] the IO object for debug output
     # @param proxy_url [String, nil] the proxy URL for requests
     # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open for another request
+    # @param ca_file [String, nil] the path of a file of certificates TLS is verified with
+    # @param ca_path [String, nil] the path of a directory of certificates TLS is verified with
+    # @param cert_store [OpenSSL::X509::Store, nil] the store of certificates TLS is verified with
+    # @param client_cert [OpenSSL::X509::Certificate, nil] the certificate presented to a host that asks for one
+    # @param client_key [OpenSSL::PKey::PKey, nil] the private key of the client certificate
     # @return [Connection] a new connection instance
+    # @raise [ArgumentError] if the proxy URL is invalid, or a certificate path names nothing
     # @example Create a connection with default settings
     #   connection = Gems::Connection.new
     # @example Create a connection with custom timeouts
     #   connection = Gems::Connection.new(open_timeout: 30, read_timeout: 30)
+    # @example Create a connection that trusts a certificate of its own
+    #   connection = Gems::Connection.new(ca_file: "/etc/ssl/certs/internal.pem")
     def initialize(open_timeout: DEFAULT_OPEN_TIMEOUT, read_timeout: DEFAULT_READ_TIMEOUT,
       write_timeout: DEFAULT_WRITE_TIMEOUT, debug_output: nil, proxy_url: nil,
-      keep_alive_timeout: DEFAULT_KEEP_ALIVE_TIMEOUT)
+      keep_alive_timeout: DEFAULT_KEEP_ALIVE_TIMEOUT, ca_file: nil, ca_path: nil, cert_store: nil,
+      client_cert: nil, client_key: nil)
       @open_timeout = open_timeout
       @read_timeout = read_timeout
       @write_timeout = write_timeout
@@ -154,6 +165,7 @@ module Gems
       @keep_alive_timeout = keep_alive_timeout
       @pool = ConnectionPool.new
       self.proxy_url = proxy_url
+      initialize_certificates(ca_file:, ca_path:, cert_store:, client_cert:, client_key:)
     end
 
     # Perform an HTTP request
@@ -221,7 +233,7 @@ module Gems
     # @api private
     # @return [Array<Object>] the settings
     def settings
-      [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url]
+      [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url, certificate_settings]
     end
 
     # Decode a percent-encoded component of a URL
@@ -278,6 +290,7 @@ module Gems
         c.write_timeout = write_timeout
         c.keep_alive_timeout = keep_alive_timeout
         c.set_debug_output(debug_output && RedactedOutput.new(debug_output))
+        configure_certificates(c)
       end
     end
   end

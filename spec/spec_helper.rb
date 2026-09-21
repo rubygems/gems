@@ -15,8 +15,31 @@ end
 %w[GEM_HOST_API_KEY GEM_HOST_OTP_CODE RUBYGEMS_HOST].each { |name| ENV.delete(name) }
 
 require "gems"
+require "openssl"
 require "rspec"
+require "tmpdir"
 require "webmock/rspec"
+
+# A certificate authority for the examples that name one, generated rather than committed so that the repository
+# carries no PEM private key for a secret scanner to flag, and written into a directory of its own so that a path
+# to a file of certificates and a path to a directory of them are both at hand
+def build_test_certificate(key)
+  name = OpenSSL::X509::Name.parse("/CN=Gems Test CA")
+  fields = {version: 2, serial: 1, subject: name, issuer: name, public_key: key,
+            not_before: Time.now - 60, not_after: Time.now + 3600}
+  OpenSSL::X509::Certificate.new.tap do |certificate|
+    fields.each { |field, value| certificate.public_send(:"#{field}=", value) }
+    certificate.sign(key, OpenSSL::Digest.new("SHA256"))
+  end
+end
+
+TEST_CERTIFICATE_DIRECTORY = Dir.mktmpdir("gems-certificates")
+# Only the process that made the directory removes it: mutant forks a process per mutation, and a fork removing it
+# on the way out would take it from the mutations that run after
+TEST_CERTIFICATE_PID = Process.pid
+at_exit { FileUtils.remove_entry(TEST_CERTIFICATE_DIRECTORY, true) if Process.pid.eql?(TEST_CERTIFICATE_PID) }
+File.write(File.join(TEST_CERTIFICATE_DIRECTORY, "ca.pem"),
+  build_test_certificate(OpenSSL::PKey::EC.generate("prime256v1")).to_pem)
 
 WebMock.disable_net_connect!
 
@@ -48,6 +71,18 @@ end
 
 def fixture(file)
   File.new(File.join(fixture_path, file), "rb")
+end
+
+def certificate_path(file = nil)
+  File.join(TEST_CERTIFICATE_DIRECTORY, *file)
+end
+
+def test_client_cert
+  OpenSSL::X509::Certificate.new(File.read(certificate_path("ca.pem")))
+end
+
+def test_client_key
+  OpenSSL::PKey::EC.generate("prime256v1")
 end
 
 def stub_get(url)

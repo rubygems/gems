@@ -39,4 +39,5 @@ around one of them is a vulnerability rather than a feature request:
 * `inspect` output for clients and authenticators never includes credentials.
 * The values interpolated into request paths are escaped, so one holding a slash cannot walk out of the endpoint it
   was meant for and take the credentials of the request with it.
-* TLS certificates are verified.
+* TLS certificates are verified, and no option turns that off: a host whose certificate OpenSSL does not already
+  trust is reached by naming that certificate with `ca_file`, `ca_path`, or `cert_store`.

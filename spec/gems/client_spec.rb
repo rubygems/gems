@@ -130,7 +130,9 @@ RSpec.describe Gems::Client do
 
     {open_timeout: 10, read_timeout: 20, write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
      proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3,
-     max_retry_delay: 30}.each do |option, value|
+     max_retry_delay: 30, ca_file: certificate_path("ca.pem"), ca_path: certificate_path,
+     cert_store: OpenSSL::X509::Store.new, client_cert: test_client_cert,
+     client_key: test_client_key}.each do |option, value|
       it "defaults the #{option} to the global configuration" do
         Gems.public_send(:"#{option}=", value)
 
@@ -160,6 +162,11 @@ RSpec.describe Gems::Client do
 
     it "defaults the proxy URL to nil" do
       expect(client.proxy_url).to be_nil
+    end
+
+    it "defaults the certificates to nil" do
+      expect([client.ca_file, client.ca_path, client.cert_store, client.client_cert, client.client_key])
+        .to all(be_nil)
     end
 
     it "defaults the maximum redirects" do

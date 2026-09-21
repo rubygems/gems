@@ -29,7 +29,7 @@ module Gems
   # The settings of the global configuration that are applied to the client the module has, rather than building
   # another one from them
   CONNECTION_SETTINGS = %i[user_agent open_timeout read_timeout write_timeout keep_alive_timeout debug_output
-    proxy_url max_redirects max_retries max_retry_delay].freeze
+    proxy_url max_redirects max_retries max_retry_delay ca_file ca_path cert_store client_cert client_key].freeze
   private_constant :CONNECTION_SETTINGS
 
   # @!method self.new(**options)

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems"
+require_relative "certificate_options"
 require_relative "connection"
 require_relative "identifiers"
 require_relative "redirect_handler"
@@ -12,6 +13,7 @@ module Gems
   # Global configuration for {Gems::Client} instances
   # @api public
   module Configuration
+    include CertificateOptions
     include Identifiers
     include URLValidation
 
@@ -352,6 +354,7 @@ module Gems
       self.user_agent = DEFAULT_USER_AGENT
       reset_credentials
       reset_connection
+      reset_certificates
       self
     end
 

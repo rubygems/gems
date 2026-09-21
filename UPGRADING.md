@@ -87,7 +87,8 @@ environment variable `gem push` falls back to, and an empty one counts as no pas
 `key`, disables that fallback.
 
 The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, `debug_output`, `proxy_url`,
-`max_redirects`, `max_retries`, and `max_retry_delay` are new, and every option can be set globally or per client.
+`max_redirects`, `max_retries`, `max_retry_delay`, `ca_file`, `ca_path`, `cert_store`, `client_cert`, and
+`client_key` are new, and every option can be set globally or per client.
 A request the server turns away with 429, 502, 503, or 504, or that the network loses, is now sent again twice
 before it raises, where 2.x raised straight away; `max_retries` of zero restores that. Only an idempotent request
 is sent again, so `push` never is.
@@ -249,7 +250,8 @@ Failures that 2.x let through as other exceptions are `Gems::Error` subclasses n
 
 SSL certificates are verified, where 2.x disabled verification. A host with a certificate that Ruby's OpenSSL does
 not trust, such as a private gem server with a self-signed certificate, raises `Gems::NetworkError` until the
-certificate is trusted. A redirect to another scheme, host, or port is followed without the credentials of the
+certificate is trusted, which the `ca_file`, `ca_path`, and `cert_store` options are for; `client_cert` and
+`client_key` present a certificate to a host that asks for one. There is no option to turn verification off. A redirect to another scheme, host, or port is followed without the credentials of the
 request, and one that would send the body of the request again is not followed at all, where 2.x sent the API key
 wherever the redirect led.
 

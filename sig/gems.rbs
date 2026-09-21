@@ -33,8 +33,8 @@ module Gems
   def self.connection_values: () -> Array[untyped]
   def self.apply_connection_values: () -> void
 
-  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> Client
-              | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) { (Client client) -> T } -> T
+  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
+              | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
@@ -74,6 +74,7 @@ module Gems
   def self.remove_trusted_publisher: (gem_identifier gem_name, trusted_publisher_identifier trusted_publisher) -> String
 
   module Configuration
+    include CertificateOptions
     include Identifiers
     include URLValidation
 
@@ -101,7 +102,6 @@ module Gems
     attr_accessor max_redirects: Integer
     attr_accessor max_retries: Integer
     attr_accessor max_retry_delay: Numeric
-
     def self.extended: (Configuration base) -> void
     def key: () -> String?
     def otp: () -> String?
@@ -607,10 +607,20 @@ module Gems
     def max_retry_delay=: (Numeric max_retry_delay) -> void
     def user_agent: () -> String
     def user_agent=: (String user_agent) -> void
+    def ca_file: () -> String?
+    def ca_file=: (String? ca_file) -> void
+    def ca_path: () -> String?
+    def ca_path=: (String? ca_path) -> void
+    def cert_store: () -> OpenSSL::X509::Store?
+    def cert_store=: (OpenSSL::X509::Store? cert_store) -> void
+    def client_cert: () -> OpenSSL::X509::Certificate?
+    def client_cert=: (OpenSSL::X509::Certificate? client_cert) -> void
+    def client_key: () -> OpenSSL::PKey::PKey?
+    def client_key=: (OpenSSL::PKey::PKey? client_key) -> void
 
-    def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> Client
-                | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) { (Client client) -> T } -> T
-    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric) -> void
+    def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
+                | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
+    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> void
     def close: () -> self
     def get: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
     def delete: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
@@ -753,6 +763,7 @@ module Gems
   end
 
   class Connection
+    include CertificateOptions
     include URLValidation
 
     @pool: ConnectionPool
@@ -775,7 +786,7 @@ module Gems
     def proxy_user: () -> String?
     def proxy_pass: () -> String?
 
-    def initialize: (?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric) -> void
+    def initialize: (?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> void
     def inspect: () -> String
     def perform: (request: Net::HTTPRequest) -> Net::HTTPResponse
     def close: () -> self
@@ -850,6 +861,28 @@ module Gems
 
     def error: (Net::HTTPResponse response) -> HTTPError
     def error_class: (Net::HTTPResponse response) -> singleton(HTTPError)
+  end
+
+  module CertificateOptions
+    SETTINGS: Array[Symbol]
+
+    attr_reader ca_file: String?
+    attr_reader ca_path: String?
+    attr_accessor cert_store: OpenSSL::X509::Store?
+    attr_accessor client_cert: OpenSSL::X509::Certificate?
+    attr_accessor client_key: OpenSSL::PKey::PKey?
+
+    def ca_file=: (String? ca_file) -> void
+    def ca_path=: (String? ca_path) -> void
+
+    private
+
+    def initialize_certificates: (**untyped settings) -> void
+    def reset_certificates: () -> void
+    def certificate_settings: () -> Array[untyped]
+    def configure_certificates: (Net::HTTP http_client) -> void
+    def validate_ca_file: (String ca_file) -> String
+    def validate_ca_path: (String ca_path) -> String
   end
 
   module URLValidation

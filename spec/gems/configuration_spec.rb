@@ -347,6 +347,11 @@ RSpec.describe Gems::Configuration do
         config.max_redirects = 3
         config.max_retries = 3
         config.max_retry_delay = 30
+        config.ca_file = certificate_path("ca.pem")
+        config.ca_path = certificate_path
+        config.cert_store = OpenSSL::X509::Store.new
+        config.client_cert = test_client_cert
+        config.client_key = test_client_key
       end
     end
 
@@ -365,7 +370,12 @@ RSpec.describe Gems::Configuration do
       proxy_url: nil,
       max_redirects: Gems::RedirectHandler::DEFAULT_MAX_REDIRECTS,
       max_retries: Gems::RetryHandler::DEFAULT_MAX_RETRIES,
-      max_retry_delay: Gems::RetryHandler::DEFAULT_MAX_RETRY_DELAY
+      max_retry_delay: Gems::RetryHandler::DEFAULT_MAX_RETRY_DELAY,
+      ca_file: nil,
+      ca_path: nil,
+      cert_store: nil,
+      client_cert: nil,
+      client_key: nil
     }.each do |option, default|
       it "resets the #{option} to its default" do
         Gems.reset

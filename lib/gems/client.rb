@@ -3,6 +3,7 @@
 require "forwardable"
 require "uri"
 require_relative "api"
+require_relative "certificate_options"
 require_relative "client_credentials"
 require_relative "configuration"
 require_relative "connection"
@@ -30,9 +31,9 @@ module Gems
     #   client.host
     attr_reader :host
 
-    def_delegators :@connection, :open_timeout, :read_timeout, :write_timeout, :proxy_url, :debug_output
-    def_delegators :@connection, :open_timeout=, :read_timeout=, :write_timeout=, :proxy_url=, :debug_output=
-    def_delegators :@connection, :keep_alive_timeout, :keep_alive_timeout=
+    def_delegators :@connection, :open_timeout, :read_timeout, :write_timeout, :keep_alive_timeout, :proxy_url, :debug_output
+    def_delegators :@connection, :open_timeout=, :read_timeout=, :write_timeout=, :keep_alive_timeout=, :proxy_url=, :debug_output=
+    def_delegators :@connection, *CertificateOptions::SETTINGS, *CertificateOptions::SETTINGS.map { |s| :"#{s}=" }
     def_delegators :@redirect_handler, :max_redirects
     def_delegators :@redirect_handler, :max_redirects=
     def_delegators :@retry_handler, :max_retries, :max_retry_delay
@@ -91,6 +92,11 @@ module Gems
     # @param max_redirects [Integer] the maximum number of redirects to follow
     # @param max_retries [Integer] the number of times a request that was turned away is sent again
     # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
+    # @param ca_file [String, nil] the path of a file of certificates TLS is verified with
+    # @param ca_path [String, nil] the path of a directory of certificates TLS is verified with
+    # @param cert_store [OpenSSL::X509::Store, nil] the store of certificates TLS is verified with
+    # @param client_cert [OpenSSL::X509::Certificate, nil] the certificate presented to a host that asks for one
+    # @param client_key [OpenSSL::PKey::PKey, nil] the private key of the client certificate
     # @return [Client] a new client instance
     # @example Create a client with an API key
     #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97")
@@ -100,7 +106,9 @@ module Gems
     #   client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97", otp: "123456")
     # @example Create a client for trusted publishing
     #   client = Gems::Client.new(id_token: ENV.fetch("ID_TOKEN"))
-    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
+    # @example Create a client for a host with a certificate of its own
+    #   client = Gems::Client.new(host: "https://gems.example.com", ca_file: "/etc/ssl/certs/internal.pem")
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL, or a certificate path names nothing
     def initialize(host: Gems.host, key: UNSET, username: Gems.username, password: Gems.password,
       otp: Gems.otp, id_token: Gems.id_token,
       user_agent: Gems.user_agent,
@@ -112,10 +120,12 @@ module Gems
       keep_alive_timeout: Gems.keep_alive_timeout,
       max_redirects: Gems.max_redirects,
       max_retries: Gems.max_retries,
-      max_retry_delay: Gems.max_retry_delay)
+      max_retry_delay: Gems.max_retry_delay,
+      ca_file: Gems.ca_file, ca_path: Gems.ca_path, cert_store: Gems.cert_store,
+      client_cert: Gems.client_cert, client_key: Gems.client_key)
       @host = validate_host(host)
       @connection = Connection.new(open_timeout:, read_timeout:, write_timeout:, debug_output:, proxy_url:,
-        keep_alive_timeout:)
+        keep_alive_timeout:, ca_file:, ca_path:, cert_store:, client_cert:, client_key:)
       @request_builder = RequestBuilder.new(user_agent:)
       @redirect_handler = RedirectHandler.new(connection: @connection, request_builder: @request_builder, max_redirects:)
       @retry_handler = RetryHandler.new(max_retries:, max_retry_delay:)

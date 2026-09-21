@@ -56,10 +56,25 @@ RSpec.describe Gems::Connection do
       expect(connection.proxy_uri).to be_nil
     end
 
+    it "defaults the certificates to nil" do
+      expect([connection.ca_file, connection.ca_path, connection.cert_store, connection.client_cert,
+        connection.client_key]).to all(be_nil)
+    end
+
     context "with custom options" do
       subject(:connection) do
         described_class.new(open_timeout: 10, read_timeout: 20, write_timeout: 30, debug_output: $stderr,
-          proxy_url: "http://user:pass@proxy.example.com:8080")
+          proxy_url: "http://user:pass@proxy.example.com:8080", ca_file: certificate_path("ca.pem"),
+          ca_path: certificate_path, cert_store: store, client_cert:, client_key:)
+      end
+
+      let(:store) { OpenSSL::X509::Store.new }
+      let(:client_cert) { test_client_cert }
+      let(:client_key) { test_client_key }
+
+      it "sets the certificates" do
+        expect([connection.ca_file, connection.ca_path, connection.cert_store, connection.client_cert,
+          connection.client_key]).to eq([certificate_path("ca.pem"), certificate_path, store, client_cert, client_key])
       end
 
       it "sets the open timeout" do
@@ -366,7 +381,9 @@ RSpec.describe Gems::Connection do
       end
 
       {open_timeout: 1, read_timeout: 1, write_timeout: 1, keep_alive_timeout: 1, debug_output: StringIO.new,
-       proxy_url: "http://proxy.example.com:8080"}.each do |setting, value|
+       proxy_url: "http://proxy.example.com:8080", ca_file: certificate_path("ca.pem"),
+       ca_path: certificate_path, cert_store: OpenSSL::X509::Store.new, client_cert: test_client_cert,
+       client_key: test_client_key}.each do |setting, value|
         it "opens a connection again when the #{setting} has changed" do
           get
           connection.public_send(:"#{setting}=", value)
@@ -407,6 +424,18 @@ RSpec.describe Gems::Connection do
 
     it "returns a Net::HTTP client" do
       expect(build_http_client(https_uri)).to be_a(Net::HTTP)
+    end
+
+    it "hands the certificates to the client" do
+      connection = described_class.new(ca_file: certificate_path("ca.pem"), client_cert: test_client_cert)
+      http_client = build_http_client(https_uri, connection:)
+
+      expect([http_client.ca_file, http_client.cert])
+        .to eq([connection.ca_file, connection.client_cert])
+    end
+
+    it "hands no certificates to the client when none are configured" do
+      expect(build_http_client(https_uri).ca_file).to be_nil
     end
 
     it "uses the URI's host" do
