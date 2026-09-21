@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems"
+require_relative "dependencies"
 require_relative "errors/invalid_response"
 require_relative "resource"
 
@@ -8,6 +9,8 @@ module Gems
   # A version of a gem, as returned by the versions, downloads, and API v2 endpoints
   # @api public
   class Version < Resource
+    include Dependencies
+
     inspect_with :name, :number
     identified_by :name, :number, :platform
 

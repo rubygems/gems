@@ -41,6 +41,7 @@ version.number       # => "7.0.6"
 version.built_at     # => 2023-06-29 00:00:00 UTC
 version.sha          # => "5dfbd481...", the checksum of the gem file
 version.spec_sha     # => "9d5f4a10...", the checksum of the gemspec it was pushed with
+version.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", ...]
 
 # Return information about a version for a specific platform.
 Gems.version 'nokogiri', '1.15.0', platform: 'java'
@@ -234,7 +235,10 @@ versions = Gems::Client.new(host: 'https://gems.example.com') { |client| client.
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
 `Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, `Gems::APIKey`, and
 `Gems::TrustedPublisher`.
-Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. Objects are
+Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. A gem and a
+version read the dependencies the endpoint they came from answered with as `runtime_dependencies` and
+`development_dependencies`; the endpoints that answer without them, such as the versions of a gem, leave both
+empty. Objects are
 accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.remove_owner(gem, owner)`,
 `Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work. A gem or version given
 where a gem is expected stands in for the version too, when it carries a version number, so `Gems.version(gem)`,

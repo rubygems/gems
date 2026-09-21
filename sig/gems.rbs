@@ -269,7 +269,18 @@ module Gems
     def requirements: () -> String?
   end
 
+  module Dependencies : Resource
+    def runtime_dependencies: () -> Array[Dependency]
+    def development_dependencies: () -> Array[Dependency]
+
+    private
+
+    def dependencies_of: (String type) -> Array[Dependency]
+  end
+
   class Gem < Resource
+    include Dependencies
+
     def name: () -> String?
     def version: () -> String?
     def version_created_at: () -> Time?
@@ -293,15 +304,11 @@ module Gems
     def bug_tracker_uri: () -> String?
     def changelog_uri: () -> String?
     def funding_uri: () -> String?
-    def runtime_dependencies: () -> Array[Dependency]
-    def development_dependencies: () -> Array[Dependency]
-
-    private
-
-    def dependencies_of: (String type) -> Array[Dependency]
   end
 
   class Version < Resource
+    include Dependencies
+
     def self.checksum_attribute: (Symbol name, String hex_key, String base64_key) -> Symbol
     def name: () -> String?
     def full_name: () -> String?

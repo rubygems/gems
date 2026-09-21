@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "dependency"
+require_relative "dependencies"
 require_relative "resource"
 
 module Gems
   # A gem, as returned by the gem information, search, and activity endpoints
   # @api public
   class Gem < Resource
+    include Dependencies
+
     inspect_with :name, :version
     identified_by :name, :version, :platform
 
@@ -197,35 +199,5 @@ module Gems
     #   @example
     #     gem.funding_uri
     attribute :funding_uri
-
-    # The runtime dependencies of the gem
-    #
-    # @api public
-    # @return [Array<Dependency>] the runtime dependencies
-    # @example List the runtime dependencies
-    #   gem.runtime_dependencies.map(&:name)
-    def runtime_dependencies
-      dependencies_of("runtime")
-    end
-
-    # The development dependencies of the gem
-    #
-    # @api public
-    # @return [Array<Dependency>] the development dependencies
-    # @example List the development dependencies
-    #   gem.development_dependencies.map(&:name)
-    def development_dependencies
-      dependencies_of("development")
-    end
-
-    private
-
-    # The dependencies of the given type
-    # @api private
-    # @param type [String] the dependency type ("runtime" or "development")
-    # @return [Array<Dependency>] the dependencies
-    def dependencies_of(type)
-      Dependency.list(attributes.dig("dependencies", type) || [])
-    end
   end
 end

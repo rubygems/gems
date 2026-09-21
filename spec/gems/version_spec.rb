@@ -211,6 +211,36 @@ RSpec.describe Gems::Version do
     end
   end
 
+  describe "#runtime_dependencies" do
+    it "wraps the runtime dependencies" do
+      expect(version.runtime_dependencies.first).to eq(Gems::Dependency.new("name" => "actioncable", "requirements" => "= 7.0.6"))
+    end
+
+    it "returns dependencies" do
+      expect(version.runtime_dependencies).to all(be_an_instance_of(Gems::Dependency))
+    end
+
+    it "returns an empty array for a version from an endpoint that answers without dependencies" do
+      expect(described_class.new("number" => "7.0.6").runtime_dependencies).to eq([])
+    end
+
+    it "returns an empty array without runtime dependencies" do
+      expect(described_class.new("dependencies" => {}).runtime_dependencies).to eq([])
+    end
+  end
+
+  describe "#development_dependencies" do
+    it "wraps the development dependencies" do
+      version = described_class.new("dependencies" => {"development" => [{"name" => "rspec", "requirements" => ">= 3"}]})
+
+      expect(version.development_dependencies).to eq([Gems::Dependency.new("name" => "rspec", "requirements" => ">= 3")])
+    end
+
+    it "returns an empty array when there are none" do
+      expect(version.development_dependencies).to eq([])
+    end
+  end
+
   describe "#gem_version" do
     it "returns the number as a Gem::Version" do
       expect(version.gem_version).to eq(Gem::Version.new("7.0.6"))
