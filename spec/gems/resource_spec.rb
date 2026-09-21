@@ -401,6 +401,20 @@ RSpec.describe Gems::Resource do
     it "returns the attributes" do
       expect(resource.to_h).to eq(attributes)
     end
+
+    it "returns a hash the caller can change" do
+      expect { resource.to_h["fetched_at"] = "now" }.not_to raise_error
+    end
+
+    it "leaves the attributes of the resource as they were" do
+      resource.to_h["name"] = "thor"
+
+      expect(resource.name).to eq("rails")
+    end
+
+    it "returns the frozen values the resource holds" do
+      expect(resource.to_h["name"]).to be_frozen
+    end
   end
 
   describe "#==" do

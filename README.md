@@ -234,12 +234,14 @@ Objects match `case`/`in` patterns by their readers, so `case gem in {name:, ver
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Objects are immutable, with
 their attributes frozen at every level. Every object also exposes the raw response through `[]` and `to_h`, so fields
-without a reader remain accessible:
+without a reader remain accessible. `to_h` answers with a copy you own and can change; `attributes` answers with the
+frozen Hash the object holds:
 
 ```ruby
 gem = Gems.rubygem 'rails'
 gem['dependencies'] # => {"development" => [...], "runtime" => [...]}
-gem.to_h            # => the parsed JSON response
+gem.to_h            # => the parsed JSON response, as a Hash you can change
+gem.attributes      # => the same fields, frozen
 ```
 
 Two endpoints return their JSON as it is, by design, rather than wrapping it: `contents` answers with a plain map of

@@ -177,12 +177,17 @@ module Gems
 
     # Convert the resource to a hash
     #
+    # The hash is a copy the caller owns and may change, as the hash `to_h` answers with elsewhere in Ruby is; the
+    # values in it are the frozen ones the resource holds, and {#attributes} answers with the frozen hash itself.
+    #
     # @api public
-    # @return [Hash{String => Object}] the raw attributes
+    # @return [Hash{String => Object}] a copy of the raw attributes
     # @example Convert a gem to a hash
     #   gem.to_h
+    # @example Add a field of your own to the copy
+    #   gem.to_h.merge!("fetched_at" => Time.now)
     def to_h
-      attributes
+      attributes.dup
     end
 
     # The attributes a pattern asks for, read by the declared readers

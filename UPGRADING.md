@@ -153,8 +153,9 @@ Gems.owners("rails").map(&:handle)
 Gems.rubygem("rails")["version"] # still works
 ```
 
-The attributes are frozen, at every level, so an object is an immutable value and `to_h` returns a frozen Hash. Code
-that changed the Hash a 2.x method returned needs to copy it first:
+The attributes are frozen, at every level, so an object is an immutable value. `to_h` answers with a copy of them
+that the caller owns, so code that changed the Hash a 2.x method returned keeps working as long as it changes what
+`to_h` gave it rather than the object:
 
 ```ruby
 # 2.x
@@ -162,9 +163,11 @@ gem = Gems.info("rails")
 gem["downloads"] += 1
 
 # 3.0
-gem = Gems.rubygem("rails").to_h.dup
+gem = Gems.rubygem("rails").to_h
 gem["downloads"] += 1
 ```
+
+`attributes` answers with the frozen Hash itself, for reading it without the copy.
 
 Some return values changed shape:
 
