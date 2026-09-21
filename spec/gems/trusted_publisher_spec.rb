@@ -45,6 +45,10 @@ RSpec.describe Gems::TrustedPublisher do
 
       expect(reader).to eq(:repository)
     end
+
+    it "is private, since it declares the fields nested in a trusted publisher rather than those of a resource" do
+      expect { described_class.publisher_attribute(:repository) }.to raise_error(NoMethodError, /private method/)
+    end
   end
 
   it "exposes the id" do

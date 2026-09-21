@@ -347,6 +347,36 @@ RSpec.describe Gems::Resource do
     end
   end
 
+  describe ".keys_for" do
+    it "is private, since it supports the declarations rather than being one of them" do
+      expect { resource_class.keys_for(:name, []) }.to raise_error(NoMethodError, /private method/)
+    end
+
+    it "reads the key a declaration names" do
+      klass = Class.new(described_class) { attribute :sha, "sha256" }
+
+      expect(klass.new("sha256" => "abc").sha).to eq("abc")
+    end
+
+    it "reads the name of the reader when a declaration names no key" do
+      klass = Class.new(described_class) { attribute :name }
+
+      expect(klass.new("name" => "rails").name).to eq("rails")
+    end
+
+    it "reads a key a declaration names as a symbol" do
+      klass = Class.new(described_class) { attribute :sha, :sha256 }
+
+      expect(klass.new("sha256" => "abc").sha).to eq("abc")
+    end
+
+    it "reads the keys a declaration names in the order it names them" do
+      klass = Class.new(described_class) { attribute :sha, "sha", "sha256" }
+
+      expect(klass.new("sha" => "abc", "sha256" => "def").sha).to eq("abc")
+    end
+  end
+
   describe ".inspect_with" do
     it "declares the readers shown by inspect" do
       expect(resource_class.inspect_readers).to eq(%i[name yanked?])

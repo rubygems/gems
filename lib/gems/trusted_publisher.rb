@@ -34,6 +34,7 @@ module Gems
       end
       record_attribute(name)
     end
+    private_class_method :publisher_attribute
 
     # @!method id
     #   The ID of the trusted publisher

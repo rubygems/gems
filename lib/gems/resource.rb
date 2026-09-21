@@ -6,6 +6,13 @@ require_relative "errors/invalid_response"
 
 module Gems
   # Base class for objects that wrap RubyGems API responses
+  #
+  # A resource of your own is a subclass that declares its readers with {.attribute}, {.predicate}, and
+  # {.time_attribute}, and declares what it inspects with and what identifies it with {.inspect_with} and
+  # {.identified_by}. Those declarations are public, since subclassing a resource is what they are for, and a
+  # subclass inherits the ones its superclass made until it makes its own. What supports them is private, so a
+  # resource is declared the same way in 3.x however they come to be implemented.
+  #
   # @api public
   class Resource
     include DeepCopy
@@ -33,10 +40,14 @@ module Gems
     # Endpoints spell some fields differently, so a reader may declare several keys and reads the first
     # one the response contains.
     #
-    # @api private
+    # @api public
     # @param name [Symbol] the name of the reader
     # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
+    # @example Declare a reader for a field of a subclass of your own
+    #   class Release < Gems::Version
+    #     attribute :channel
+    #   end
     def self.attribute(name, *keys)
       keys = keys_for(name, keys)
       define_method(name) do
@@ -48,10 +59,14 @@ module Gems
 
     # Define a predicate for a boolean attribute
     #
-    # @api private
+    # @api public
     # @param name [Symbol] the name of the attribute (the reader is suffixed with a question mark)
     # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
+    # @example Declare a predicate for a boolean field
+    #   class Release < Gems::Version
+    #     predicate :supported
+    #   end
     def self.predicate(name, *keys)
       keys = keys_for(name, keys)
       define_method(:"#{name}?") do
@@ -65,10 +80,14 @@ module Gems
     #
     # The reader raises {InvalidResponse} when the attribute is not a timestamp.
     #
-    # @api private
+    # @api public
     # @param name [Symbol] the name of the reader
     # @param keys [Array<String, Symbol>] the attribute keys, most preferred first (defaults to the name)
     # @return [Symbol] the name of the reader
+    # @example Declare a reader that parses a timestamp field
+    #   class Release < Gems::Version
+    #     time_attribute :supported_until
+    #   end
     def self.time_attribute(name, *keys)
       keys = keys_for(name, keys)
       define_method(name) do
@@ -114,20 +133,27 @@ module Gems
     def self.keys_for(name, keys)
       (keys.empty? ? [name] : keys).map(&:to_s)
     end
+    private_class_method :keys_for
 
     # Declare which readers appear in the inspect output
     #
-    # @api private
+    # @api public
     # @param readers [Array<Symbol>] the readers to show
     # @return [Array<Symbol>] the readers to show
+    # @example Declare the readers a subclass of your own inspects with
+    #   class Release < Gems::Version
+    #     inspect_with :name, :number, :channel
+    #   end
     def self.inspect_with(*readers)
       @inspect_readers = readers
     end
 
     # The readers shown in the inspect output
     #
-    # @api private
+    # @api public
     # @return [Array<Symbol>] the readers to show, inherited from the superclass until the class declares its own
+    # @example
+    #   Gems::Gem.inspect_readers # => [:name, :version]
     def self.inspect_readers
       @inspect_readers || (superclass.inspect_readers if superclass.respond_to?(:inspect_readers)) || [] # steep:ignore NoMethod
     end
@@ -136,18 +162,24 @@ module Gems
     #
     # Resources with an identity compare equal when those readers match, even if other attributes differ.
     #
-    # @api private
+    # @api public
     # @param readers [Array<Symbol>] the identifying readers
     # @return [Array<Symbol>] the identifying readers
+    # @example Declare what identifies a subclass of your own
+    #   class Release < Gems::Version
+    #     identified_by :name, :number, :platform, :channel
+    #   end
     def self.identified_by(*readers)
       @identity_readers = readers
     end
 
     # The readers that identify the resource
     #
-    # @api private
+    # @api public
     # @return [Array<Symbol>] the identifying readers, inherited from the superclass until the class declares its
     #   own, and empty when the resource is identified by all of its attributes
+    # @example
+    #   Gems::Gem.identity_readers # => [:name, :version, :platform]
     def self.identity_readers
       @identity_readers || (superclass.identity_readers if superclass.respond_to?(:identity_readers)) || [] # steep:ignore NoMethod
     end

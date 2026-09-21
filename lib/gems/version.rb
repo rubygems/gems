@@ -32,6 +32,7 @@ module Gems
       end
       record_attribute(name)
     end
+    private_class_method :checksum_attribute
 
     # @!method name
     #   The name of the gem

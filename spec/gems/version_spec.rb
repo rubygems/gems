@@ -106,6 +106,11 @@ RSpec.describe Gems::Version do
 
       expect(reader).to eq(:cert_sha)
     end
+
+    it "is private, since it declares the checksums of a version rather than the attributes of a resource" do
+      expect { described_class.checksum_attribute(:cert_sha, "cert_sha", "cert_sha256") }
+        .to raise_error(NoMethodError, /private method/)
+    end
   end
 
   describe "#sha" do
