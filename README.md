@@ -247,17 +247,21 @@ names, at the platform it names, rather than on the latest version. Those five m
 you mean the latest one.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
-`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Versions also
-order by their number as RubyGems orders numbers, rather than as the strings they are written with, so
+`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Gems and
+versions also order by their number as RubyGems orders numbers, rather than as the strings they are written with, so
 `Gems.versions('rails').max` answers with `7.0.10` where `max_by(&:number)` would answer with `7.0.9`:
 
 ```ruby
 Gems.versions('rails').sort      # oldest first, prereleases before the versions they lead to
 Gems.versions('rails').max       # => #<Gems::Version name="rails" number="8.1.2">
 version.gem_version              # => the number as a Gem::Version, to compare with one of your own
+
+Gems.search('cucumber').sort     # the endpoints that answer with gems order the same way
+Gems.timeframe_versions(from: Time.now - 86_400).max
+gem.gem_version                  # => the version as a Gem::Version
 ```
 
-`Comparable` is deliberately left out, so `<` and `>` are not defined: a version is equal to another by its
+`Comparable` is deliberately left out, so `<` and `>` are not defined: an object is equal to another by its
 identity, whatever fields the endpoint it came from answered with, rather than by what it is ordered alongside.
 
 Objects are immutable, with their attributes frozen at every level. Every object also exposes the raw response

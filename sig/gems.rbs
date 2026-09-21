@@ -278,11 +278,28 @@ module Gems
     def dependencies_of: (String type) -> Array[Dependency]
   end
 
+  interface _Ordered
+    def name: () -> String?
+    def platform: () -> String?
+    def gem_version: () -> ::Gem::Version?
+  end
+
+  module Ordering : _Ordered
+    def <=>: (untyped other) -> Integer?
+    def ordering: () -> Array[untyped]?
+
+    private
+
+    def gem_version_of: (untyped number) -> ::Gem::Version?
+  end
+
   class Gem < Resource
     include Dependencies
+    include Ordering
 
     def name: () -> String?
     def version: () -> String?
+    def gem_version: () -> ::Gem::Version?
     def version_created_at: () -> Time?
     def downloads: () -> Integer?
     def version_downloads: () -> Integer?
@@ -308,6 +325,7 @@ module Gems
 
   class Version < Resource
     include Dependencies
+    include Ordering
 
     def self.checksum_attribute: (Symbol name, String hex_key, String base64_key) -> Symbol
     def name: () -> String?
@@ -330,7 +348,6 @@ module Gems
     def spec_sha: () -> String?
     def metadata: () -> Hash[String, String]?
     def gem_version: () -> ::Gem::Version?
-    def <=>: (untyped other) -> Integer?
 
     private
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "dependencies"
+require_relative "ordering"
 require_relative "resource"
 
 module Gems
@@ -8,6 +9,7 @@ module Gems
   # @api public
   class Gem < Resource
     include Dependencies
+    include Ordering
 
     inspect_with :name, :version
     identified_by :name, :version, :platform
@@ -199,5 +201,19 @@ module Gems
     #   @example
     #     gem.funding_uri
     attribute :funding_uri
+
+    # The version, as the `Gem::Version` RubyGems orders versions by
+    #
+    # This is what {Ordering#<=>} orders a gem by, read from the `version` the gem endpoints answer with, which is
+    # the version of the gem they answered about: the latest version, for the endpoints that answer with a gem.
+    #
+    # @api public
+    # @return [::Gem::Version, nil] the version, or nil when the gem carries no version, or one RubyGems cannot
+    #   read
+    # @example Read the version as a Gem::Version
+    #   gem.gem_version # => Gem::Version.new("8.1.2")
+    def gem_version
+      gem_version_of(version)
+    end
   end
 end

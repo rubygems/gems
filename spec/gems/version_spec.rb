@@ -326,6 +326,12 @@ RSpec.describe Gems::Version do
       expect(described_class.new({}) <=> build("7.0.6")).to be_nil
     end
 
+    it "answers with nil for two versions without a number, rather than ordering them the same" do
+      numberless = described_class.new({})
+
+      expect(numberless <=> described_class.new({})).to be_nil
+    end
+
     it "answers with nil for an object that is not a version" do
       expect(build("7.0.6") <=> Gems::Gem.new("name" => "rails", "version" => "7.0.6")).to be_nil
     end
