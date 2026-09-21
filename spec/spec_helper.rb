@@ -8,6 +8,12 @@ unless $PROGRAM_NAME.include?("mutant") || RUBY_ENGINE.eql?("jruby")
   SimpleCov.start "strict"
 end
 
+# The environment `gem push` reads, which the library falls back to until a host, key, or passcode is assigned. A
+# developer who has exported one for `gem push` would otherwise have it resolved by the examples that exercise those
+# fallbacks, which sends their own credential to the request stubs and leaves it in whatever those runs record. It is
+# cleared before the library is required, since the module reads the host as it is loaded.
+%w[GEM_HOST_API_KEY GEM_HOST_OTP_CODE RUBYGEMS_HOST].each { |name| ENV.delete(name) }
+
 require "gems"
 require "rspec"
 require "webmock/rspec"
@@ -22,6 +28,13 @@ TEST_PASSWORD = "TEST_PASSWORD"
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  # The credentials `gem signin` stores, which the library falls back to for a key it was not given, so that the key
+  # in the developer's own ~/.gem/credentials is never the one an example resolves. An example that wants a stored
+  # key stubs the configuration again with a key of its own.
+  config.before do
+    stub_rubygems_configuration(rubygems_api_key: nil)
   end
 
   config.after do
