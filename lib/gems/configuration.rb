@@ -165,13 +165,16 @@ module Gems
     #   Gems.max_redirects = 5
     attr_accessor :max_redirects
 
-    # The number of times a rate-limited request is sent again
+    # The number of times a request that was turned away is sent again
     #
-    # Two by default. Zero raises {TooManyRequests} or {ServiceUnavailable} rather than waiting. Only an idempotent
-    # request is sent again, so a `push` is never retried.
+    # Two by default. Zero raises {TooManyRequests}, {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or
+    # {NetworkError} rather than waiting. Only an idempotent request is sent again, so a `push` is never retried.
+    # The trusted publishing token exchange is the exception: it is sent again when the server turns it away,
+    # although it is a POST, since those statuses say the endpoint refused the exchange rather than issuing a key
+    # for the token, and is not sent again when it is lost to the network.
     #
     # @api public
-    # @return [Integer] the number of times a rate-limited request is sent again
+    # @return [Integer] the number of times a request that was turned away is sent again
     # @example Get or set the maximum retries
     #   Gems.max_retries = 3
     attr_accessor :max_retries

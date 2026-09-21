@@ -313,7 +313,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `debug_output` | An IO that receives HTTP debug output, with credentials redacted | `nil`                          |
 | `proxy_url`   | The proxy to use                                         | `http_proxy`/`https_proxy` environment |
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
-| `max_retries` | The number of times a rate-limited request is sent again | `2`                                  |
+| `max_retries` | The number of times a request that was turned away is sent again | `2`                           |
 | `max_retry_delay` | The longest a request waits before it is sent again, in seconds | `60`               |
 
 Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,

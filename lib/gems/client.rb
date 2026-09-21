@@ -89,7 +89,7 @@ module Gems
     # @param proxy_url [String, nil] the proxy URL for requests
     # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open for another request
     # @param max_redirects [Integer] the maximum number of redirects to follow
-    # @param max_retries [Integer] the number of times a rate-limited request is sent again
+    # @param max_retries [Integer] the number of times a request that was turned away is sent again
     # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
     # @return [Client] a new client instance
     # @example Create a client with an API key
