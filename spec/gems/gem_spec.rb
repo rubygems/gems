@@ -62,6 +62,10 @@ RSpec.describe Gems::Gem do
     expect(described_class.new("spdx_identifier" => "MIT").spdx_identifier).to eq("MIT")
   end
 
+  it "exposes spec_sha" do
+    expect(described_class.new("spec_sha" => "5b60af49").spec_sha).to eq("5b60af49")
+  end
+
   it "exposes version_created_at as a time" do
     expect(gem.version_created_at).to eq(Time.utc(2023, 6, 29, 20, 57, 24.359r))
   end

@@ -282,6 +282,7 @@ module Gems
     def metadata: () -> Hash[String, String]?
     def yanked?: () -> bool
     def sha: () -> String?
+    def spec_sha: () -> String?
     def spdx_identifier: () -> String?
     def project_uri: () -> String?
     def gem_uri: () -> String?
@@ -302,6 +303,7 @@ module Gems
   end
 
   class Version < Resource
+    def self.checksum_attribute: (Symbol name, String hex_key, String base64_key) -> Symbol
     def name: () -> String?
     def full_name: () -> String?
     def number: () -> String?
@@ -319,6 +321,7 @@ module Gems
     def ruby_version: () -> String?
     def rubygems_version: () -> String?
     def sha: () -> String?
+    def spec_sha: () -> String?
     def spdx_identifier: () -> String?
     def metadata: () -> Hash[String, String]?
 

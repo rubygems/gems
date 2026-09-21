@@ -106,6 +106,18 @@ module Gems
     #     gem.sha
     attribute :sha
 
+    # @!method spec_sha
+    #   The SHA-256 checksum of the gemspec
+    #
+    #   This is the checksum of the gemspec the gem was pushed with, which the index is built from, where {#sha} is
+    #   the checksum of the gem file itself.
+    #
+    #   @api public
+    #   @return [String, nil] the SHA-256 checksum of the gemspec
+    #   @example
+    #     gem.spec_sha
+    attribute :spec_sha
+
     # @!method spdx_identifier
     #   The SPDX license identifier
     #   @api public

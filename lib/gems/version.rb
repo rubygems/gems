@@ -10,6 +10,24 @@ module Gems
     inspect_with :name, :number
     identified_by :name, :number, :platform
 
+    # Define a reader for a checksum, in hex from one endpoint and base64 from another
+    #
+    # @api private
+    # @param name [Symbol] the name of the reader
+    # @param hex_key [String] the key the checksum is in hex under
+    # @param base64_key [String] the key the checksum is base64-encoded under
+    # @return [Symbol] the name of the reader
+    def self.checksum_attribute(name, hex_key, base64_key)
+      define_method(name) do
+        # @type self: Version
+        return self[hex_key] if attributes.key?(hex_key)
+
+        value = self[base64_key]
+        value && decode_sha(value)
+      end
+      record_attribute(name)
+    end
+
     # @!method name
     #   The name of the gem
     #   @api public
@@ -130,23 +148,31 @@ module Gems
     #     version.rubygems_version
     attribute :rubygems_version, "rubygems_version", "required_rubygems_version"
 
-    # The SHA-256 checksum of the gem file, in hex
+    # @!method sha
+    #   The SHA-256 checksum of the gem file, in hex
     #
-    # The downloads endpoint returns the checksum base64-encoded under sha256, where the other endpoints return it
-    # in hex under sha, so it is decoded, and the checksum reads the same from every endpoint.
+    #   The downloads endpoint returns the checksum base64-encoded under sha256, where the other endpoints return it
+    #   in hex under sha, so it is decoded, and the checksum reads the same from every endpoint.
     #
-    # @api public
-    # @return [String, nil] the SHA-256 checksum of the gem file, in hex
-    # @raise [InvalidResponse] if the base64-encoded checksum cannot be decoded
-    # @example
-    #   version.sha
-    def sha
-      return self["sha"] if attributes.key?("sha")
+    #   @api public
+    #   @return [String, nil] the SHA-256 checksum of the gem file, in hex
+    #   @raise [InvalidResponse] if the base64-encoded checksum cannot be decoded
+    #   @example
+    #     version.sha
+    checksum_attribute :sha, "sha", "sha256"
 
-      value = self["sha256"]
-      value && decode_sha(value)
-    end
-    record_attribute(:sha)
+    # @!method spec_sha
+    #   The SHA-256 checksum of the gemspec, in hex
+    #
+    #   This is the checksum of the gemspec the gem was pushed with, which the index is built from, where {#sha} is
+    #   the checksum of the gem file itself. It is decoded from spec_sha256 for the downloads endpoint, as {#sha} is.
+    #
+    #   @api public
+    #   @return [String, nil] the SHA-256 checksum of the gemspec, in hex
+    #   @raise [InvalidResponse] if the base64-encoded checksum cannot be decoded
+    #   @example
+    #     version.spec_sha
+    checksum_attribute :spec_sha, "spec_sha", "spec_sha256"
 
     # @!method spdx_identifier
     #   The SPDX license identifier

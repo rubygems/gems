@@ -81,6 +81,37 @@ RSpec.describe Gems::Version do
     end
   end
 
+  describe ".checksum_attribute" do
+    let(:subclass) { Class.new(described_class) { checksum_attribute :cert_sha, "cert_sha", "cert_sha256" } }
+
+    it "defines a reader for the checksum in hex" do
+      expect(subclass.new("cert_sha" => "abc").cert_sha).to eq("abc")
+    end
+
+    it "decodes the base64 checksum" do
+      expect(subclass.new("cert_sha256" => "q83v").cert_sha).to eq("abcdef")
+    end
+
+    it "prefers the hex key to the base64 one" do
+      expect(subclass.new("cert_sha" => "abc", "cert_sha256" => "q83v").cert_sha).to eq("abc")
+    end
+
+    it "returns nil when the response carries neither key" do
+      expect(subclass.new("sha" => "abc").cert_sha).to be_nil
+    end
+
+    it "records the reader in attribute_names" do
+      expect(subclass.attribute_names).to eq([*described_class.attribute_names, :cert_sha])
+    end
+
+    it "returns the name of the reader" do
+      reader = nil
+      Class.new(described_class) { reader = checksum_attribute :cert_sha, "cert_sha", "cert_sha256" }
+
+      expect(reader).to eq(:cert_sha)
+    end
+  end
+
   describe "#sha" do
     it "returns the hex sha" do
       expect(version.sha).to eq("5dfbd481a23556ad425fc8541399a129a08ed550f877294b44d0170ca5b9f421")
@@ -131,6 +162,46 @@ RSpec.describe Gems::Version do
       described_class.new("sha256" => 12_345).sha
     rescue Gems::InvalidResponse => e
       expect(e.body).to eq("12345")
+    end
+  end
+
+  describe "#spec_sha" do
+    it "returns the hex spec_sha" do
+      expect(described_class.new("spec_sha" => "5b60af49").spec_sha).to eq("5b60af49")
+    end
+
+    it "decodes the base64 spec_sha256 the downloads endpoint returns into hex" do
+      expect(described_class.new("spec_sha256" => "I413SlhyPWwJBJTIh5temRjBlIX36EDywcdTLPhOvLE=").spec_sha)
+        .to eq("238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1")
+    end
+
+    it "returns nil without a checksum" do
+      expect(described_class.new({}).spec_sha).to be_nil
+    end
+
+    it "returns nil for a nil spec_sha256" do
+      expect(described_class.new("spec_sha256" => nil).spec_sha).to be_nil
+    end
+
+    it "prefers spec_sha to spec_sha256" do
+      expect(described_class.new("spec_sha" => "abc", "spec_sha256" => "q83v").spec_sha).to eq("abc")
+    end
+
+    it "prefers a nil spec_sha to spec_sha256" do
+      expect(described_class.new("spec_sha" => nil, "spec_sha256" => "q83v").spec_sha).to be_nil
+    end
+
+    it "reads the checksum of the gemspec rather than the one of the gem file" do
+      expect(described_class.new("sha" => "abc", "spec_sha" => "def").spec_sha).to eq("def")
+    end
+
+    it "is an attribute for pattern matching" do
+      expect(described_class.new("spec_sha" => "5b60af49").deconstruct_keys([:spec_sha])).to eq(spec_sha: "5b60af49")
+    end
+
+    it "raises an InvalidResponse for a spec_sha256 that is not base64" do
+      expect { described_class.new("spec_sha256" => "not base64!").spec_sha }
+        .to raise_error(Gems::InvalidResponse, '"not base64!" is not a base64-encoded checksum')
     end
   end
 

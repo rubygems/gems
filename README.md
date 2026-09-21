@@ -39,7 +39,8 @@ gem.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", ...]
 version = Gems.version 'rails', '7.0.6'
 version.number       # => "7.0.6"
 version.built_at     # => 2023-06-29 00:00:00 UTC
-version.sha          # => "5dfbd481..."
+version.sha          # => "5dfbd481...", the checksum of the gem file
+version.spec_sha     # => "9d5f4a10...", the checksum of the gemspec it was pushed with
 
 # Return information about a version for a specific platform.
 Gems.version 'nokogiri', '1.15.0', platform: 'java'
