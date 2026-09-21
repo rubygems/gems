@@ -322,6 +322,8 @@ module Gems
     def sha: () -> String?
     def spec_sha: () -> String?
     def metadata: () -> Hash[String, String]?
+    def gem_version: () -> ::Gem::Version?
+    def <=>: (untyped other) -> Integer?
 
     private
 

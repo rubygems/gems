@@ -210,4 +210,102 @@ RSpec.describe Gems::Version do
       expect(described_class.new({}).number).to be_nil
     end
   end
+
+  describe "#gem_version" do
+    it "returns the number as a Gem::Version" do
+      expect(version.gem_version).to eq(Gem::Version.new("7.0.6"))
+    end
+
+    it "returns nil without a number" do
+      expect(described_class.new({}).gem_version).to be_nil
+    end
+
+    it "returns nil for a number that is not a String" do
+      expect(described_class.new("number" => 7).gem_version).to be_nil
+    end
+
+    it "reads a number of a class that inherits String, such as a safe buffer" do
+      number = Class.new(String).new("7.0.6")
+
+      expect(described_class.new("number" => number).gem_version).to eq(Gem::Version.new("7.0.6"))
+    end
+
+    it "returns nil for a number RubyGems cannot read" do
+      expect(described_class.new("number" => "not a version").gem_version).to be_nil
+    end
+  end
+
+  describe "#<=>" do
+    def build(number, name: "rails", platform: "ruby")
+      described_class.new("name" => name, "number" => number, "platform" => platform)
+    end
+
+    it "orders numbers as RubyGems orders them, rather than as strings" do
+      expect(build("7.0.10") <=> build("7.0.9")).to eq(1)
+    end
+
+    it "orders a prerelease before the version it leads to" do
+      expect(build("7.0.0.rc1") <=> build("7.0.0")).to eq(-1)
+    end
+
+    it "answers with zero for the same version" do
+      same = build("7.0.6")
+
+      expect(same <=> build("7.0.6")).to eq(0)
+    end
+
+    it "orders versions of different gems by the name of the gem" do
+      expect(build("1.0.0", name: "rails") <=> build("9.9.9", name: "puma")).to eq(1)
+    end
+
+    it "orders versions of the same number by platform" do
+      expect(build("7.0.6", platform: "java") <=> build("7.0.6", platform: "ruby")).to eq(-1)
+    end
+
+    it "orders a version without a name before one with a name" do
+      expect(described_class.new("number" => "7.0.6") <=> build("7.0.6")).to eq(-1)
+    end
+
+    it "orders a version without a platform before one with a platform" do
+      expect(described_class.new("name" => "rails", "number" => "7.0.6") <=> build("7.0.6")).to eq(-1)
+    end
+
+    it "orders a version with a name after one without a name" do
+      expect(build("7.0.6") <=> described_class.new("number" => "7.0.6", "platform" => "ruby")).to eq(1)
+    end
+
+    it "orders a version with a platform after one without a platform" do
+      expect(build("7.0.6") <=> described_class.new("name" => "rails", "number" => "7.0.6")).to eq(1)
+    end
+
+    it "sorts the versions of a gem" do
+      versions = [build("7.0.9"), build("7.0.10"), build("7.0.0.rc1")]
+
+      expect(versions.sort.map(&:number)).to eq(["7.0.0.rc1", "7.0.9", "7.0.10"])
+    end
+
+    it "answers with the latest version from max" do
+      expect([build("7.0.9"), build("7.0.10")].max.number).to eq("7.0.10")
+    end
+
+    it "answers with nil for a version without a number" do
+      expect(build("7.0.6") <=> described_class.new({})).to be_nil
+    end
+
+    it "answers with nil for a version of its own without a number" do
+      expect(described_class.new({}) <=> build("7.0.6")).to be_nil
+    end
+
+    it "answers with nil for an object that is not a version" do
+      expect(build("7.0.6") <=> Gems::Gem.new("name" => "rails", "version" => "7.0.6")).to be_nil
+    end
+
+    it "answers with nil for a subclass of version" do
+      expect(build("7.0.6") <=> Class.new(described_class).new("name" => "rails", "number" => "7.0.6")).to be_nil
+    end
+
+    it "does not make versions with the same order equal" do
+      expect(build("7.0.6")).not_to eq(build("7.0.6", name: "puma"))
+    end
+  end
 end

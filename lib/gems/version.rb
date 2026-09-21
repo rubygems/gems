@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "rubygems"
 require_relative "errors/invalid_response"
 require_relative "resource"
 
@@ -189,6 +190,46 @@ module Gems
     #   @example
     #     version.number
     attribute :number
+
+    # The number, as the `Gem::Version` RubyGems orders versions by
+    #
+    # @api public
+    # @return [::Gem::Version, nil] the number, or nil when the version carries no number, or one RubyGems cannot
+    #   read
+    # @example Read the number as a Gem::Version
+    #   version.gem_version # => Gem::Version.new("7.0.6")
+    def gem_version
+      value = number
+      ::Gem::Version.new(value) if value.is_a?(String) && ::Gem::Version.correct?(value)
+    end
+
+    # Compare with another version
+    #
+    # Versions are ordered by the name of their gem, then by their number as RubyGems orders numbers, and then by
+    # their platform, so that the versions of a gem sort as `gem list` orders them rather than as the strings they
+    # are written with, where "7.0.10" comes before "7.0.9".
+    #
+    # `Comparable` is deliberately not included: a version is equal to another by its identity, whatever fields the
+    # endpoint it came from answered with (see {Resource#==}), where `Comparable` would answer that it is equal to
+    # whatever it is ordered alongside, such as the same number of another gem.
+    #
+    # @api public
+    # @param other [Object] the object to compare with
+    # @return [Integer, nil] -1, 0, or 1, or nil when the other object is not a version, or either version carries
+    #   no number, or one RubyGems cannot read
+    # @example Read the latest version of a gem
+    #   Gems.versions("rails").max.number
+    # @example Order the versions of a gem, oldest first
+    #   Gems.versions("rails").sort
+    def <=>(other)
+      return unless other.instance_of?(self.class)
+
+      version = gem_version
+      other_version = other.gem_version
+      return if version.nil? || other_version.nil?
+
+      [name.to_s, version, platform.to_s] <=> [other.name.to_s, other_version, other.platform.to_s]
+    end
 
     private
 

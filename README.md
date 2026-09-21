@@ -83,8 +83,9 @@ Gems.yank 'bills', '0.0.1'
 # A version object stands in for both the gem and the version.
 Gems.yank Gems.version('bills', '0.0.1')
 
-# Return an array of versions of coulda.
+# Return an array of versions of coulda, and the newest of them.
 Gems.versions('coulda').map(&:number)
+Gems.versions('coulda').max.number
 
 # Return the latest version of coulda.
 Gems.latest_version 'coulda'
@@ -234,11 +235,23 @@ accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.r
 `Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
-`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Objects are immutable, with
-their attributes frozen at every level. Every object also exposes the raw response through `[]` and `to_h`, so fields
-without a reader remain accessible. `to_h` answers with a copy you own and can change, at every level, since the
-Hashes, Arrays, and Strings an object holds are frozen too; `attributes` answers with the frozen Hash the object
-holds:
+`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Versions also
+order by their number as RubyGems orders numbers, rather than as the strings they are written with, so
+`Gems.versions('rails').max` answers with `7.0.10` where `max_by(&:number)` would answer with `7.0.9`:
+
+```ruby
+Gems.versions('rails').sort      # oldest first, prereleases before the versions they lead to
+Gems.versions('rails').max       # => #<Gems::Version name="rails" number="8.1.2">
+version.gem_version              # => the number as a Gem::Version, to compare with one of your own
+```
+
+`Comparable` is deliberately left out, so `<` and `>` are not defined: a version is equal to another by its
+identity, whatever fields the endpoint it came from answered with, rather than by what it is ordered alongside.
+
+Objects are immutable, with their attributes frozen at every level. Every object also exposes the raw response
+through `[]` and `to_h`, so fields without a reader remain accessible. `to_h` answers with a copy you own and can
+change, at every level, since the Hashes, Arrays, and Strings an object holds are frozen too; `attributes` answers
+with the frozen Hash the object holds:
 
 ```ruby
 gem = Gems.rubygem 'rails'
