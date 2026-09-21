@@ -177,17 +177,19 @@ Gems.rubygem("rails")["version"] # still works
 ```
 
 The attributes are frozen, at every level, so an object is an immutable value. `to_h` answers with a copy of them
-that the caller owns, so code that changed the Hash a 2.x method returned keeps working as long as it changes what
-`to_h` gave it rather than the object:
+that the caller owns, copied at every level too, so code that changed the Hash a 2.x method returned keeps working
+as long as it changes what `to_h` gave it rather than the object:
 
 ```ruby
 # 2.x
 gem = Gems.info("rails")
 gem["downloads"] += 1
+gem["dependencies"]["runtime"] << dependency
 
 # 3.0
 gem = Gems.rubygem("rails").to_h
 gem["downloads"] += 1
+gem["dependencies"]["runtime"] << dependency
 ```
 
 `attributes` answers with the frozen Hash itself, for reading it without the copy.
@@ -292,7 +294,7 @@ Gems.host                         # => the same, until another host is configure
 
 Everything documented as `@api private` can change within 3.x, and is hidden from the generated documentation:
 `Gems::RequestBuilder`, `Gems::RedirectHandler`, `Gems::ResponseParser`, `Gems::RetryHandler`,
-`Gems::ConnectionPool`, and the mixins beneath them, such as `Gems::Idempotence`, `Gems::Identifiers`,
+`Gems::ConnectionPool`, and the mixins beneath them, such as `Gems::DeepCopy`, `Gems::Idempotence`, `Gems::Identifiers`,
 `Gems::JSONParsing`, `Gems::Pagination`, `Gems::PathEscaping`, `Gems::RedactedOutput`, `Gems::RetryAfter`, and
 `Gems::URLValidation`. Configure them through the options of `Gems::Client`, such as `user_agent`, `max_redirects`,
 and `max_retries`. The authenticators are read-only; change a credential with the setters of `Gems::Client` or the

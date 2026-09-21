@@ -426,8 +426,43 @@ RSpec.describe Gems::Resource do
       expect(resource.name).to eq("rails")
     end
 
-    it "returns the frozen values the resource holds" do
-      expect(resource.to_h["name"]).to be_frozen
+    it "returns values the caller can change" do
+      expect(resource.to_h["name"]).not_to be_frozen
+    end
+
+    it "copies the values nested in a hash" do
+      nested = resource_class.new("metadata" => {"homepage_uri" => "https://rubyonrails.org"}).to_h["metadata"]
+
+      expect(nested).not_to be_frozen
+    end
+
+    it "copies the values nested in a hash within a hash" do
+      nested = resource_class.new("metadata" => {"funding" => {"uri" => "https://rubyonrails.org"}}).to_h["metadata"]
+
+      expect(nested["funding"]).not_to be_frozen
+    end
+
+    it "copies the values nested in an array" do
+      nested = resource_class.new("licenses" => ["MIT"]).to_h["licenses"]
+
+      expect(nested).not_to be_frozen
+    end
+
+    it "copies the values nested within an array" do
+      nested = resource_class.new("licenses" => ["MIT"]).to_h["licenses"]
+
+      expect(nested.first).not_to be_frozen
+    end
+
+    it "leaves the attributes of the resource frozen" do
+      nested = resource_class.new("metadata" => {"a" => "b"})
+      nested.to_h["metadata"]["a"] = "c"
+
+      expect(nested.attributes["metadata"]).to eq({"a" => "b"}).and(be_frozen)
+    end
+
+    it "returns the values a copy cannot be made of as they are" do
+      expect(resource_class.new("downloads" => 1).to_h["downloads"]).to eq(1)
     end
   end
 

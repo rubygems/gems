@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 require "time"
+require_relative "deep_copy"
 require_relative "errors/invalid_response"
 
 module Gems
   # Base class for objects that wrap RubyGems API responses
   # @api public
   class Resource
+    include DeepCopy
+
     # The raw attributes from the API response
     # @api public
     # @return [Hash{String => Object}] the raw attributes
@@ -176,8 +179,10 @@ module Gems
 
     # Convert the resource to a hash
     #
-    # The hash is a copy the caller owns and may change, as the hash `to_h` answers with elsewhere in Ruby is; the
-    # values in it are the frozen ones the resource holds, and {#attributes} answers with the frozen hash itself.
+    # The hash is a copy the caller owns and may change, as the hash `to_h` answers with elsewhere in Ruby is, and
+    # so is everything nested in it: the hashes, arrays, and strings a resource holds are frozen, so they are copied
+    # rather than handed to the caller to raise `FrozenError` on. {#attributes} answers with the frozen hash itself,
+    # for reading it without the copy.
     #
     # @api public
     # @return [Hash{String => Object}] a copy of the raw attributes
@@ -185,8 +190,10 @@ module Gems
     #   gem.to_h
     # @example Add a field of your own to the copy
     #   gem.to_h.merge!("fetched_at" => Time.now)
+    # @example Change a field nested in the copy
+    #   gem.to_h["metadata"]["fetched_at"] = Time.now
     def to_h
-      attributes.dup
+      deep_dup(attributes) #: Hash[String, untyped]
     end
 
     # The attributes a pattern asks for, read by the declared readers
@@ -296,22 +303,6 @@ module Gems
       Time.parse(value)
     rescue ArgumentError, TypeError
       raise InvalidResponse.new(body: value.to_s, message: "#{value.inspect} is not a timestamp")
-    end
-
-    # Copy a value, freezing the copy and everything nested inside it
-    #
-    # The keys of hashes are converted to strings. Everything a parsed JSON response holds other than hashes, arrays, and strings is already immutable.
-    #
-    # @api private
-    # @param value [Object] the value to copy
-    # @return [Object] the frozen copy
-    def deep_freeze(value)
-      case value
-      when Hash then value.to_h { |key, nested| [key.to_s, deep_freeze(nested)] }.freeze
-      when Array then value.map { |nested| deep_freeze(nested) }.freeze
-      when String then value.dup.freeze
-      else value
-      end
     end
   end
 end

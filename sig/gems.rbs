@@ -221,6 +221,8 @@ module Gems
   end
 
   class Resource
+    include DeepCopy
+
     self.@inspect_readers: Array[Symbol]?
     self.@identity_readers: Array[Symbol]?
     self.@attribute_names: Array[Symbol]?
@@ -253,7 +255,13 @@ module Gems
 
     def value_of: (Array[String] keys) -> untyped
     def parse_time: (untyped value) -> Time
+  end
+
+  module DeepCopy
+    private
+
     def deep_freeze: (untyped value) -> untyped
+    def deep_dup: (untyped value) -> untyped
   end
 
   class Dependency < Resource
