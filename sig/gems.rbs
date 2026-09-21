@@ -61,12 +61,10 @@ module Gems
   def self.add_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   def self.remove_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
   def self.fire_web_hook: (gem_identifier gem_name, web_hook_identifier url) -> String
-  def self.latest: (?page: Integer?) -> Array[Gem]
-  def self.latest_each: () ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
+  def self.latest: () -> Array[Gem]
   def self.profile: (user_identifier user) -> Profile
   def self.me: () -> Profile
-  def self.just_updated: (?page: Integer?) -> Array[Gem]
-  def self.just_updated_each: () ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
+  def self.just_updated: () -> Array[Gem]
   def self.create_api_key: (String name, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?, **bool scopes) -> APIKey
   def self.update_api_key: (api_key_identifier key, **bool scopes) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> APIKey
@@ -409,12 +407,9 @@ module Gems
   module API::ActivityEndpoints : Object, _Requests
     include Identifiers
     include JSONParsing
-    include Pagination
 
-    def latest: (?page: Integer?) -> Array[Gem]
-    def latest_each: () ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
-    def just_updated: (?page: Integer?) -> Array[Gem]
-    def just_updated_each: () ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
+    def latest: () -> Array[Gem]
+    def just_updated: () -> Array[Gem]
   end
 
   module API::APIKeyEndpoints : Object, _Requests

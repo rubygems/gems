@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `default_host`, the host `gem push` would use, which reads the `RUBYGEMS_HOST` environment variable when it is called rather than when the library is required
 * Add `default_otp` and `otp_configured?`, and fall back to the one-time passcode `gem push` would use, the `GEM_HOST_OTP_CODE` environment variable, until a passcode is assigned, so that a continuous integration job that already exports it for `gem push` authenticates without code of its own; an empty `GEM_HOST_OTP_CODE` counts as no passcode, as an empty `GEM_HOST_API_KEY` counts as no key, and assigning nil disables the fallback
 * Reuse the connection a request left open for the next request to the same host, so that a series of requests does not open a connection each; a `keep_alive_timeout` option sets the seconds an idle connection is kept open, which zero turns off, and `Client#close` closes the connections a client keeps open, which are opened again as they are needed
-* Add `search_each`, `latest_each`, `just_updated_each`, and `timeframe_versions_each`, which walk the pages of the endpoints that answer one page at a time: each returns an `Enumerator`, requests a page only once the results of the page before it have been enumerated, and stops at the first empty page, so `Gems.search_each("cucumber").first(100)` requests only the pages it needs
+* Add `search_each` and `timeframe_versions_each`, which walk the pages of the endpoints that answer one page at a time: each returns an `Enumerator`, requests a page only once the results of the page before it have been enumerated, and stops at the first empty page, so `Gems.search_each("cucumber").first(100)` requests only the pages it needs; `latest` and `just_updated` have no counterpart, since their endpoints answer with the 50 gems they name whatever page is asked for
 * Add RBS signatures, with a manifest naming the standard libraries they refer to
 
 ### Changed
@@ -69,7 +69,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Return the version string from `latest_version`
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a flat list of `WebHook` objects from `web_hooks`, with each hook's `gem_name` set to `*` for hooks on all gems
-* Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `latest`, `just_updated`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
+* Take keyword arguments instead of option hashes in `search`, `yank`, `unyank`, `reverse_dependencies`, `push`, `create_api_key`, and `update_api_key`
 * Resolve the default API key for the host a request is sent to, as `gem push --host` resolves it, so that a client built for another host, and a request made to one with `host:`, send the key `gem signin --host` stored for it rather than the RubyGems.org key; a configured key, basic authentication, and a trusted publishing ID token are sent wherever the client sends a request, as `gem push --key` is
 * Exchange a trusted publishing ID token once when requests are made concurrently, since RubyGems.org issues the API key only once per token
 * Follow the redirects of a trusted publishing token exchange, with the `max_redirects` of the client it is made for, rather than raising the `HTTPError` of the redirect; a redirect to another scheme, host, or port is followed without the headers of the exchange, as it is for every other request
@@ -86,6 +86,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Define `Gems::VERSION` in `gems/library_version` rather than in `gems/version`, which defines the `Gems::Version` response object, so that evaluating the gemspec reads the version without loading `Gems::Resource` and the errors and standard libraries beneath it; `require "gems"` defines both, as it did
 
 ### Removed
+* Remove the `page` option of `latest` and `just_updated`, which take no arguments now: their endpoints answer with the 50 gems they name whatever page is asked for, so a page other than the first was the first under another name
 * Require Ruby 3.4 or later: Ruby 3.1 and 3.2 have reached end of life, Ruby 3.3 reaches it in March 2027, within the life of 3.x, and Ruby 3.4 bundles the net-http that connects to an HTTPS proxy over TLS
 * Remove `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE`; `Gems::Version` is now a response object and `Gems::VERSION` remains the library version string
 * Remove `dependencies` and `api_key`, whose endpoints have been retired by RubyGems.org; use `create_api_key` instead

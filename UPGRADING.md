@@ -111,8 +111,17 @@ Gems.push File.new("gems-0.0.8.gem"), host: "https://gems.example.com"
 Gems.yank "gems", "0.0.8", platform: "java"
 ```
 
-`latest`, `just_updated`, `unyank`, `reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same
-way.
+`unyank`, `reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same way. `latest` and
+`just_updated` now take no arguments at all: their endpoints answer with the 50 gems they name whatever page is
+asked for, so the `page` 2.x took was never more than the first page under another name.
+
+```ruby
+# 2.x
+Gems.latest :page => 2      # the same 50 gems as page one
+
+# 3.0
+Gems.latest
+```
 
 ### Pagination
 
@@ -134,7 +143,8 @@ end
 gems = Gems.search_each("cucumber").to_a
 ```
 
-`latest_each`, `just_updated_each`, and `timeframe_versions_each` do the same for their endpoints.
+`timeframe_versions_each` does the same for its endpoint. `latest` and `just_updated` have no counterpart, since
+their endpoints have no pages to walk.
 
 ### Return values
 

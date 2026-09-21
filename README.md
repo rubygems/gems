@@ -132,15 +132,12 @@ Gems.remove_web_hook 'rails', 'http://example.com'
 # Test fire a webhook.
 Gems.fire_web_hook 'rails', 'http://example.com'
 
-# Returns the 50 gems most recently added to RubyGems.org
+# Returns the 50 gems most recently added to RubyGems.org.
+# This endpoint and the one below have no further pages to ask for.
 Gems.latest
 
-# Returns the 50 most recently updated gems
+# Returns the 50 most recently updated gems.
 Gems.just_updated
-
-# Each of these has an _each counterpart that walks the pages for you.
-Gems.latest_each.lazy.reject(&:yanked?).first(10)
-Gems.just_updated_each { |gem| puts gem.name }
 
 # Returns the gem versions created in a timeframe of up to seven days, 30 at a time.
 Gems.timeframe_versions from: Time.now - 86_400
@@ -253,16 +250,18 @@ RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem nam
 
 ## Pagination
 
-The endpoints that return one page at a time — `search`, `latest`, `just_updated`, and `timeframe_versions` — each
-have an `_each` counterpart that walks the pages. It returns an `Enumerator`, requests a page only once the results
-of the page before it have been enumerated, and stops at the first empty page:
+The endpoints that return one page at a time — `search` and `timeframe_versions` — each have an `_each` counterpart
+that walks the pages. It returns an `Enumerator`, requests a page only once the results of the page before it have
+been enumerated, and stops at the first empty page:
 
 ```ruby
 Gems.search_each('cucumber').first(100)          # requests only the pages it needs
-Gems.latest_each.lazy.reject(&:yanked?).first(5)
-Gems.just_updated_each { |gem| puts gem.name }   # a block enumerates every page
+Gems.search_each('cucumber') { |gem| puts gem.name }
 Gems.timeframe_versions_each from: Time.now - 86_400
 ```
+
+`latest` and `just_updated` take no page: the endpoints answer with the 50 gems they name whatever page is asked
+for, so there is nothing further to walk.
 
 ## Configuration
 
