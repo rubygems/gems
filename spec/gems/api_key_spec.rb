@@ -28,6 +28,24 @@ RSpec.describe Gems::APIKey do
     expect(api_key.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
   end
 
+  it "matches a pattern by its key, as it does by the rest of its readers" do
+    matched = case api_key
+    in {name: String => name, key: String => key} then [name, key]
+    end
+
+    expect(matched).to eq([api_key.name, api_key.key])
+  end
+
+  it "is identified by its name, so that the key is not compared" do
+    other = described_class.new("rubygems_api_key" => "another", "name" => api_key.name)
+
+    expect(api_key).to eq(other)
+  end
+
+  it "is not equal to a key of another name" do
+    expect(api_key).not_to eq(described_class.new(api_key.to_h.merge("name" => "other")))
+  end
+
   it "raises InvalidResponse without a key" do
     expect { described_class.new({}).key }
       .to raise_error(Gems::InvalidResponse, "The API key response has no rubygems_api_key")

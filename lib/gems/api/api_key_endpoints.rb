@@ -17,6 +17,10 @@ module Gems
       #
       # The key is only returned once, so store it somewhere safe.
       #
+      # The endpoint answers with the key alone, so the name the key was asked for is kept in the result, as the
+      # name of a gem is kept in the versions of it that {API::VersionEndpoints#versions} returns. A name the
+      # endpoint answers with is left as it is.
+      #
       # @api public
       # @authenticated true
       # @param name [String] A name for the key.
@@ -38,7 +42,7 @@ module Gems
       def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
         validate_scopes(scopes)
         settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
-        APIKey.new(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:})))
+        APIKey.new({"name" => name}.merge(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:}))))
       end
 
       # Update the scopes of an API key using HTTP basic auth

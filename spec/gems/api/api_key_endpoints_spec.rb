@@ -64,6 +64,16 @@ RSpec.describe Gems::API::APIKeyEndpoints do
 
       expect([api_key.class, api_key.key]).to eq([Gems::APIKey, "rubygems_701243f217cdf23b1370c7b66b65ca97"])
     end
+
+    it "keeps the name the key was asked for, which the endpoint answers without" do
+      expect(client.create_api_key("ci-push", push_rubygem: true).name).to eq("ci-push")
+    end
+
+    it "keeps a name the endpoint answers with" do
+      stub_post("/api/v1/api_key.json").to_return(body: JSON.generate("rubygems_api_key" => "key", "name" => "named"))
+
+      expect(client.create_api_key("ci-push").name).to eq("named")
+    end
   end
 
   describe "#update_api_key" do

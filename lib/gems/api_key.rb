@@ -28,6 +28,7 @@ module Gems
     ].freeze
 
     inspect_with :name, :scopes
+    identified_by :name
 
     # @!method name
     #   The name of the API key
@@ -55,6 +56,10 @@ module Gems
 
     # The API key
     #
+    # The reader is declared, as the readers of the other attributes are, so that a pattern matches an API key by
+    # its key as it matches the rest, such as `in {name:, key:}`. The key is still left out of {#inspect}, so that
+    # printing an API key in a console does not print the key it carries.
+    #
     # @api public
     # @return [String] the API key
     # @raise [InvalidResponse] if the response has no key
@@ -65,5 +70,6 @@ module Gems
         raise InvalidResponse.new(body: JSON.generate(attributes), message: "The API key response has no rubygems_api_key")
       end
     end
+    record_attribute(:key)
   end
 end
