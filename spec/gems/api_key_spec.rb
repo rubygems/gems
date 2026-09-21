@@ -51,6 +51,20 @@ RSpec.describe Gems::APIKey do
       .to raise_error(Gems::InvalidResponse, "The API key response has no rubygems_api_key")
   end
 
+  it "matches a pattern for the rest of its readers without a key, rather than raising" do
+    matched = case described_class.new("name" => "ci-push")
+    in {name:, **rest} then [name, rest.key?(:key)]
+    end
+
+    expect(matched).to eq(["ci-push", false])
+  end
+
+  it "does not match a pattern that asks for the key without a key" do
+    matched = (described_class.new("name" => "ci-push") in {key: String})
+
+    expect(matched).to be(false)
+  end
+
   it "attaches the attributes as JSON to the error" do
     expect { described_class.new("name" => "ci-push").key }.to raise_error(having_attributes(body: '{"name":"ci-push"}'))
   end

@@ -60,6 +60,10 @@ module Gems
     # its key as it matches the rest, such as `in {name:, key:}`. The key is still left out of {#inspect}, so that
     # printing an API key in a console does not print the key it carries.
     #
+    # A response that carries no key raises here, rather than answering with nil, since a caller asking for the key
+    # is asking for the one thing the endpoint was called for. A pattern is answered without it instead of raising
+    # (see {Resource#deconstruct_keys}).
+    #
     # @api public
     # @return [String] the API key
     # @raise [InvalidResponse] if the response has no key

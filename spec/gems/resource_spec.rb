@@ -297,6 +297,40 @@ RSpec.describe Gems::Resource do
 
       expect(matched).to be(false)
     end
+
+    context "with an attribute its reader cannot read" do
+      let(:attributes) { {"name" => "rails", "created_at" => "not a timestamp"} }
+
+      it "leaves the attribute out rather than raising" do
+        expect(resource.deconstruct_keys(nil)).not_to include(:created_at)
+      end
+
+      it "reads the attributes it can read" do
+        expect(resource.deconstruct_keys(nil)).to include(name: "rails")
+      end
+
+      it "leaves out an attribute a pattern asks for by name" do
+        expect(resource.deconstruct_keys([:created_at])).to eq({})
+      end
+
+      it "does not match a pattern that asks for the attribute" do
+        matched = (resource in {created_at: Time})
+
+        expect(matched).to be(false)
+      end
+
+      it "matches a pattern that asks for the rest of the attributes" do
+        matched = case resource
+        in {name:, **rest} then [name, rest.key?(:created_at)]
+        end
+
+        expect(matched).to eq(["rails", false])
+      end
+
+      it "still raises when the reader is called" do
+        expect { resource.created_at }.to raise_error(Gems::InvalidResponse, '"not a timestamp" is not a timestamp')
+      end
+    end
   end
 
   describe "#[]" do

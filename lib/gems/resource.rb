@@ -201,9 +201,14 @@ module Gems
     # A resource matches a `case`/`in` pattern by the names in {.attribute_names}, read as the readers read them, so
     # a pattern sees a timestamp as a `Time` and a boolean as a predicate such as `yanked?`.
     #
+    # A name whose reader raises {InvalidResponse}, such as {APIKey#key} for a response that carries no key or a
+    # timestamp that cannot be parsed, is left out rather than raised from: a pattern asking for it does not match,
+    # and one asking for the rest of the attributes, such as `in {name:, **rest}`, matches without it. Reading that
+    # reader still raises, so a caller that asks for the attribute is told why it cannot be read.
+    #
     # @api public
     # @param keys [Array<Symbol>, nil] the names the pattern asks for, or nil for all of them
-    # @return [Hash{Symbol => Object}] the requested attributes
+    # @return [Hash{Symbol => Object}] the requested attributes, without the ones that cannot be read
     # @example Match a gem by its name and version
     #   case Gems.rubygem("rails")
     #   in {name: "rails", version:} then version
@@ -211,7 +216,13 @@ module Gems
     def deconstruct_keys(keys)
       names = self.class.attribute_names
       names &= keys unless keys.nil?
-      names.to_h { |name| [name, public_send(name)] }
+      requested = {} #: Hash[Symbol, untyped]
+      names.each do |name|
+        requested[name] = public_send(name)
+      rescue InvalidResponse
+        # The attribute cannot be read, so the pattern is answered without it
+      end
+      requested
     end
 
     # Compare with another resource
