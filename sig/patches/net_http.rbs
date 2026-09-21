@@ -1,12 +1,29 @@
-# Widen stdlib signatures to match runtime behavior used by Gems
+# Widen the net-http signatures to match the runtime behavior Gems::Connection relies on
+#
+# Each of these adds an overload to the signature rbs already ships, with the `| ...` that names it, rather than
+# declaring the method again: a second definition of a method rbs has declared makes the whole class invalid, which
+# leaves every call on it unchecked rather than checked against the signature the patch meant to widen.
 module Net
   class HTTP
-    def self.new: (String address, ?Integer? port, ?String | :ENV | nil p_addr, ?Integer? p_port, ?String? p_user, ?String? p_pass, ?untyped? p_no_proxy, ?bool? p_use_ssl) -> Net::HTTP
+    # The p_use_ssl argument, for connecting to an https:// proxy over TLS, which rbs leaves out
+    def self.new: (String address, ?Integer? port, ?String | :ENV | nil p_addr, ?Integer? p_port, ?String? p_user, ?String? p_pass, ?untyped? p_no_proxy, ?bool? p_use_ssl) -> Net::HTTP | ...
 
+    # The timeouts are any Numeric, as the ones Gems::Connection is configured with are, rather than a Float or an
+    # Integer: Net::HTTP hands them to IO.select and Timeout, which take any Numeric
+    def open_timeout=: (Numeric? sec) -> Numeric? | ...
+
+    def read_timeout=: (Numeric? sec) -> Numeric? | ...
+
+    def write_timeout=: (Numeric? sec) -> Numeric? | ...
+
+    def keep_alive_timeout=: (Numeric sec) -> Numeric | ...
+
+    # The debug output is wrapped in the IO that redacts credentials from it
     def set_debug_output: (IO | Gems::RedactedOutput | nil output) -> void | ...
   end
 
   module HTTPHeader
+    # A multipart body is a list of fields, each a name, a value, and the options of the field
     def set_form: (Array[Array[untyped]] params, ?String enctype, ?Hash[untyped, untyped] formopt) -> void | ...
   end
 end
