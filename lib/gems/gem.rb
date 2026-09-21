@@ -118,14 +118,6 @@ module Gems
     #     gem.spec_sha
     attribute :spec_sha
 
-    # @!method spdx_identifier
-    #   The SPDX license identifier
-    #   @api public
-    #   @return [String, nil] the SPDX license identifier
-    #   @example
-    #     gem.spdx_identifier
-    attribute :spdx_identifier
-
     # @!method project_uri
     #   The project URI
     #   @api public

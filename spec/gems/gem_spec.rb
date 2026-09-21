@@ -58,10 +58,6 @@ RSpec.describe Gems::Gem do
     expect(gem.metadata["bug_tracker_uri"]).to eq("https://github.com/rails/rails/issues")
   end
 
-  it "exposes spdx_identifier" do
-    expect(described_class.new("spdx_identifier" => "MIT").spdx_identifier).to eq("MIT")
-  end
-
   it "exposes spec_sha" do
     expect(described_class.new("spec_sha" => "5b60af49").spec_sha).to eq("5b60af49")
   end

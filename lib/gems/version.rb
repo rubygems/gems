@@ -174,14 +174,6 @@ module Gems
     #     version.spec_sha
     checksum_attribute :spec_sha, "spec_sha", "spec_sha256"
 
-    # @!method spdx_identifier
-    #   The SPDX license identifier
-    #   @api public
-    #   @return [String, nil] the SPDX license identifier
-    #   @example
-    #     version.spdx_identifier
-    attribute :spdx_identifier
-
     # @!method metadata
     #   The gemspec metadata
     #   @api public

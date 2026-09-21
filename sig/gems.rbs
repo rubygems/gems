@@ -283,7 +283,6 @@ module Gems
     def yanked?: () -> bool
     def sha: () -> String?
     def spec_sha: () -> String?
-    def spdx_identifier: () -> String?
     def project_uri: () -> String?
     def gem_uri: () -> String?
     def homepage_uri: () -> String?
@@ -322,7 +321,6 @@ module Gems
     def rubygems_version: () -> String?
     def sha: () -> String?
     def spec_sha: () -> String?
-    def spdx_identifier: () -> String?
     def metadata: () -> Hash[String, String]?
 
     private

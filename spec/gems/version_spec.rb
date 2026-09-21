@@ -44,10 +44,6 @@ RSpec.describe Gems::Version do
     expect(described_class.new("full_name" => "abstract-1.0.0").full_name).to eq("abstract-1.0.0")
   end
 
-  it "exposes spdx_identifier" do
-    expect(described_class.new("spdx_identifier" => "MIT").spdx_identifier).to eq("MIT")
-  end
-
   it "exposes built_at as a time" do
     expect(version.built_at).to eq(Time.utc(2023, 6, 29))
   end
