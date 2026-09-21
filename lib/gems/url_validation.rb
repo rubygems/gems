@@ -3,7 +3,8 @@
 require "uri"
 
 module Gems
-  # Checks the URLs a host and a proxy are given as, mixed into the configuration, the client, and the connection
+  # Checks and compares the URLs a host, a proxy, and a redirect are given as, mixed into the configuration, the
+  # client, the connection, and the redirect handler
   #
   # A URL is checked where it is assigned rather than when a request is made with it, so that the error names the
   # assignment that was wrong instead of the call that happened to send the next request. The value that is rejected
@@ -50,6 +51,27 @@ module Gems
       uri.is_a?(URI::HTTP) && !uri.host.to_s.empty?
     rescue ArgumentError, URI::InvalidURIError
       false
+    end
+
+    # Whether two URLs share a scheme, host, and port
+    #
+    # A URL is read as a URI, so a host given as a String and the URI a redirect leads to are compared the same way.
+    #
+    # @api private
+    # @param url [String, URI::Generic] one URL
+    # @param other [String, URI::Generic] the other URL
+    # @return [Boolean] whether the URLs share an origin
+    def same_origin?(url, other)
+      origin(url).eql?(origin(other))
+    end
+
+    # The origin of a URL, with the scheme and host in lowercase
+    # @api private
+    # @param url [String, URI::Generic] the URL
+    # @return [Array] the scheme, host, and port
+    def origin(url)
+      uri = URI(url).normalize
+      [uri.scheme, uri.host, uri.port]
     end
 
     # Remove the user and password from a URL

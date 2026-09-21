@@ -585,8 +585,6 @@ module Gems
     def perform: (request: Net::HTTPRequest, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPResponse
 
     def authenticator_for: (String host) -> Authenticator
-    def same_origin?: (String host, String other) -> bool
-    def origin: (String host) -> [String?, String?, Integer?]
 
     def build_uri: (String host, String path) -> URI::Generic
   end
@@ -780,6 +778,8 @@ module Gems
   end
 
   class RedirectHandler
+    include URLValidation
+
     DEFAULT_MAX_REDIRECTS: Integer
     METHOD_PRESERVING_CODES: Array[Integer]
 
@@ -793,8 +793,6 @@ module Gems
     private
 
     def follow: (response: Net::HTTPResponse, request: Net::HTTPRequest, uri: URI::HTTP, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String], redirect_count: Integer) -> Net::HTTPResponse
-    def same_origin?: (URI::Generic uri, URI::Generic other) -> bool
-    def origin: (URI::Generic uri) -> [String?, String?, Integer?]
     def build_new_uri: (Net::HTTPResponse response, Net::HTTPRequest request) -> URI::HTTP?
     def build_request: (request: Net::HTTPRequest, uri: URI::Generic, response_code: Integer, authenticator: Authenticator, body: request_body?, content_type: String?, headers: Hash[String, String]) -> Net::HTTPRequest
   end
@@ -817,6 +815,8 @@ module Gems
     def validate_host: (String host) -> String
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def http_url?: (untyped host) -> bool
+    def same_origin?: (String | URI::Generic url, String | URI::Generic other) -> bool
+    def origin: (String | URI::Generic url) -> [String?, String?, Integer?]
     def redact: (String? url) -> String?
   end
 

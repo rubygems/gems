@@ -6,11 +6,14 @@ require_relative "authenticator"
 require_relative "connection"
 require_relative "errors/too_many_redirects"
 require_relative "request_builder"
+require_relative "url_validation"
 
 module Gems
   # Handles HTTP redirects for API requests
   # @api private
   class RedirectHandler
+    include URLValidation
+
     # Default maximum number of redirects to follow
     DEFAULT_MAX_REDIRECTS = 10
     # HTTP status codes that preserve the request method and body
@@ -117,24 +120,6 @@ module Gems
       new_response = connection.perform(request: new_request)
       handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:,
         redirect_count: redirect_count + 1)
-    end
-
-    # Whether two URIs share a scheme, host, and port
-    # @api private
-    # @param uri [URI::Generic] one URI
-    # @param other [URI::Generic] the other URI
-    # @return [Boolean] whether the URIs share an origin
-    def same_origin?(uri, other)
-      origin(uri).eql?(origin(other))
-    end
-
-    # The origin of a URI, with the scheme and host in lowercase
-    # @api private
-    # @param uri [URI::Generic] the URI
-    # @return [Array] the scheme, host, and port
-    def origin(uri)
-      normalized = uri.normalize
-      [normalized.scheme, normalized.host, normalized.port]
     end
 
     # Build a new URI from the redirect response

@@ -289,24 +289,6 @@ module Gems
       otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
     end
 
-    # Whether two hosts share a scheme, host, and port
-    # @api private
-    # @param host [String] one host
-    # @param other [String] the other host
-    # @return [Boolean] whether the hosts share an origin
-    def same_origin?(host, other)
-      origin(host).eql?(origin(other))
-    end
-
-    # The origin of a host, with the scheme and host in lowercase
-    # @api private
-    # @param host [String] the host
-    # @return [Array] the scheme, host, and port
-    def origin(host)
-      uri = URI(host).normalize
-      [uri.scheme, uri.host, uri.port]
-    end
-
     # Join a host and a request path, keeping any path prefix on the host
     #
     # @api private
