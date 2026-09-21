@@ -9,7 +9,12 @@ require_relative "url_validation"
 
 module Gems
   # Manages HTTP connections to the RubyGems API
-  # @api public
+  #
+  # The connection of a client is its own, and cannot be given to it or read from it, so this class can change
+  # within 3.x as the rest of the internals can. Its settings are options of {Client} and of the {Gems} module,
+  # such as `open_timeout` and `proxy_url`, which is where they are configured.
+  #
+  # @api private
   class Connection
     include URLValidation
 
@@ -23,21 +28,21 @@ module Gems
     DEFAULT_KEEP_ALIVE_TIMEOUT = 2 # seconds
 
     # The timeout for opening connections in seconds
-    # @api public
+    # @api private
     # @return [Numeric] the timeout for opening connections in seconds
     # @example Get or set the open timeout
     #   connection.open_timeout = 30
     attr_accessor :open_timeout
 
     # The timeout for reading responses in seconds
-    # @api public
+    # @api private
     # @return [Numeric] the timeout for reading responses in seconds
     # @example Get or set the read timeout
     #   connection.read_timeout = 30
     attr_accessor :read_timeout
 
     # The timeout for writing requests in seconds
-    # @api public
+    # @api private
     # @return [Numeric] the timeout for writing requests in seconds
     # @example Get or set the write timeout
     #   connection.write_timeout = 30
@@ -48,7 +53,7 @@ module Gems
     # A request is sent on the connection kept open for its host when one was used within this many seconds, so that
     # a series of requests does not open a connection each. Zero closes every connection when its request is done.
     #
-    # @api public
+    # @api private
     # @return [Numeric] the seconds an idle connection is kept open
     # @example Get or set the keep-alive timeout
     #   connection.keep_alive_timeout = 0
@@ -58,28 +63,28 @@ module Gems
     #
     # The credentials requests and responses carry are redacted from what is written to it (see {RedactedOutput}).
     #
-    # @api public
+    # @api private
     # @return [IO, nil] the IO object for debug output
     # @example Get or set the debug output
     #   connection.debug_output = $stderr
     attr_accessor :debug_output
 
     # The proxy URL for requests
-    # @api public
+    # @api private
     # @return [String, nil] the proxy URL for requests
     # @example Get the proxy URL
     #   connection.proxy_url
     attr_reader :proxy_url
 
     # The parsed proxy URI
-    # @api public
+    # @api private
     # @return [URI::Generic, nil] the parsed proxy URI
     # @example Get the proxy URI
     #   connection.proxy_uri
     attr_reader :proxy_uri
 
     # The host of the proxy
-    # @api public
+    # @api private
     # @return [String, nil] the proxy host, or nil without a proxy URL
     # @example Get the proxy host
     #   connection.proxy_host
@@ -88,7 +93,7 @@ module Gems
     end
 
     # The port of the proxy
-    # @api public
+    # @api private
     # @return [Integer, nil] the proxy port, or nil without a proxy URL
     # @example Get the proxy port
     #   connection.proxy_port
@@ -97,7 +102,7 @@ module Gems
     end
 
     # The user of the proxy, decoded from the proxy URL
-    # @api public
+    # @api private
     # @return [String, nil] the proxy user, or nil without one
     # @example Get the proxy user
     #   connection.proxy_user
@@ -106,7 +111,7 @@ module Gems
     end
 
     # The password of the proxy, decoded from the proxy URL
-    # @api public
+    # @api private
     # @return [String, nil] the proxy password, or nil without one
     # @example Get the proxy password
     #   connection.proxy_pass
@@ -116,7 +121,7 @@ module Gems
 
     # Summarize the connection for the console
     #
-    # @api public
+    # @api private
     # @return [String] the summary, which includes the proxy URL without its user and password
     # @example Inspect a connection
     #   connection.inspect # => #<Gems::Connection proxy_url=nil open_timeout=60 read_timeout=60 write_timeout=60 keep_alive_timeout=2>
@@ -127,7 +132,7 @@ module Gems
 
     # Initialize a new connection
     #
-    # @api public
+    # @api private
     # @param open_timeout [Numeric] the timeout for opening connections in seconds
     # @param read_timeout [Numeric] the timeout for reading responses in seconds
     # @param write_timeout [Numeric] the timeout for writing requests in seconds
@@ -156,7 +161,7 @@ module Gems
     # The request is sent on the connection kept open for its host, when there is one it can be sent on, and that
     # connection is kept open for the next request (see {#keep_alive_timeout}).
     #
-    # @api public
+    # @api private
     # @param request [Net::HTTPRequest] the HTTP request to perform
     # @return [Net::HTTPResponse] the HTTP response
     # @raise [NetworkError] if a network error occurs
@@ -177,7 +182,7 @@ module Gems
     # The connections are opened again as they are needed, so a connection that is closed while it is being used is
     # not interrupted, and requests can still be made afterwards.
     #
-    # @api public
+    # @api private
     # @return [Connection] the connection
     # @example Close the connections a client keeps open
     #   connection.close
@@ -188,7 +193,7 @@ module Gems
 
     # Set the proxy URL for requests
     #
-    # @api public
+    # @api private
     # @param proxy_url [String, nil] the proxy URL, or nil to read proxies from the environment again
     # @return [void]
     # @raise [ArgumentError] if the proxy URL is invalid, in which case the proxy is left as it was

@@ -18,6 +18,12 @@ module Gems
   # Exchanges an OIDC ID token for a RubyGems API key on first use and then
   # authenticates requests with that key.
   #
+  # The ID token and the host it is exchanged with are what an authenticator is built with. The connection, request
+  # builder, redirect handler, and retry handler it sends the exchange with are internals, documented as `@api
+  # private` and able to change within 3.x, and default to ones built for the authenticator: a client hands it the
+  # ones it makes its own requests with, so that the exchange is sent with the timeouts, proxy, and retries the
+  # client was configured with.
+  #
   # @api public
   class TrustedPublisherAuthenticator < Authenticator
     include JSONParsing
@@ -41,28 +47,28 @@ module Gems
     attr_reader :host
 
     # The connection used for the token exchange
-    # @api public
+    # @api private
     # @return [Connection] the connection
     # @example Get the connection
     #   authenticator.connection
     attr_reader :connection
 
     # The request builder used for the token exchange
-    # @api public
+    # @api private
     # @return [RequestBuilder] the request builder
     # @example Get the request builder
     #   authenticator.request_builder
     attr_reader :request_builder
 
     # The redirect handler the token exchange is followed with
-    # @api public
+    # @api private
     # @return [RedirectHandler] the redirect handler
     # @example Get the redirect handler
     #   authenticator.redirect_handler
     attr_reader :redirect_handler
 
     # The retry handler the token exchange is sent again with
-    # @api public
+    # @api private
     # @return [RetryHandler] the retry handler
     # @example Get the retry handler
     #   authenticator.retry_handler
@@ -77,13 +83,16 @@ module Gems
 
     # Initialize a new TrustedPublisherAuthenticator
     #
+    # The ID token and the host are the public part; the four that follow them are the internals the exchange is
+    # sent with, and default to ones built for the authenticator (see the class).
+    #
     # @api public
     # @param id_token [String] the OIDC ID token
     # @param host [String] the host to exchange the token with, including scheme
-    # @param connection [Connection] the connection used for the token exchange
-    # @param request_builder [RequestBuilder] the request builder used for the token exchange
-    # @param redirect_handler [RedirectHandler] the redirect handler the token exchange is followed with
-    # @param retry_handler [RetryHandler] the retry handler the token exchange is sent again with
+    # @param connection [Connection] the connection used for the token exchange (`@api private`)
+    # @param request_builder [RequestBuilder] the request builder used for the token exchange (`@api private`)
+    # @param redirect_handler [RedirectHandler] the redirect handler the exchange is followed with (`@api private`)
+    # @param retry_handler [RetryHandler] the retry handler the exchange is sent again with (`@api private`)
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
