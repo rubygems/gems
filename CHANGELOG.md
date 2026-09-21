@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `trusted_publishers`, `trusted_publisher`, `add_trusted_publisher`, and `remove_trusted_publisher` for the trusted publishers of a gem, which are the workflows allowed to push it without an API key; they need a key with the `configure_trusted_publishers` scope, and a GitHub Actions workflow is trusted by the repository it runs in, its filename, and optionally the environment it runs in and the repository a reusable workflow lives in
 * Add `Gems::TrustedPublisher`, which wraps a trusted publisher and reads the fields of the publisher nested in it, such as `repository_owner` and `workflow_filename`, and `Gems::TrustedPublisher::GITHUB_ACTION`, the type `add_trusted_publisher` sends unless it is given another
 * Add `autocomplete` for gem name suggestions
+* Add `Downloads#total_downloads`, the total downloads of a gem under the name the endpoint gives the field, alongside `Downloads#total`
 * Add a `platform` option to `version` and to `downloads`
 * Add `contents` for the file checksums of a version
 * Add `attestations` for the sigstore attestations of a version
