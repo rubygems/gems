@@ -19,7 +19,7 @@ RSpec.describe Gems::Version do
     name: "rails",
     authors: "David Heinemeier Hansson",
     summary: "Full-stack web application framework.",
-    downloads_count: 1_492_222,
+    downloads_count: 4_221_718,
     platform: "ruby",
     licenses: ["MIT"],
     requirements: [],

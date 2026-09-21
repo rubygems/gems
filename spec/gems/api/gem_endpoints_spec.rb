@@ -161,7 +161,7 @@ RSpec.describe Gems::API::GemEndpoints do
       it "returns the gems you own" do
         gem = client.owned_gems.first
 
-        expect([gem.class, gem.name]).to eq([Gems::Gem, "exchb"])
+        expect([gem.class, gem.name]).to eq([Gems::Gem, "twitter"])
       end
     end
 
@@ -177,7 +177,7 @@ RSpec.describe Gems::API::GemEndpoints do
       it "returns the gems the user owns" do
         gem = client.owned_gems("sferik").first
 
-        expect([gem.class, gem.name]).to eq([Gems::Gem, "exchb"])
+        expect([gem.class, gem.name]).to eq([Gems::Gem, "twitter"])
       end
     end
   end

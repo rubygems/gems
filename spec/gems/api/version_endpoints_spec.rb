@@ -33,7 +33,7 @@ RSpec.describe Gems::API::VersionEndpoints do
     it "returns the gem's versions" do
       version = client.versions("script_helpers").first
 
-      expect([version.class, version.number]).to eq([Gems::Version, "0.1.0"])
+      expect([version.class, version.number]).to eq([Gems::Version, "0.3.0"])
     end
   end
 
@@ -275,11 +275,11 @@ RSpec.describe Gems::API::VersionEndpoints do
     it "returns the versions created in the timeframe" do
       version = client.timeframe_versions(from:, to:).first
 
-      expect([version.class, version.name, version.version]).to eq([Gems::Gem, "rails", "6.0.0.beta1"])
+      expect([version.class, version.name, version.version]).to eq([Gems::Gem, "wreq", "1.2.16"])
     end
 
-    it "keeps releases of the same gem distinct" do
-      expect(client.timeframe_versions(from:, to:).uniq.map(&:version)).to eq(%w[6.0.0.beta1 6.0.0.beta2])
+    it "keeps the platform builds of a release distinct" do
+      expect(client.timeframe_versions(from:, to:).uniq.map(&:platform)).to eq(%w[aarch64-linux arm64-darwin])
     end
   end
 

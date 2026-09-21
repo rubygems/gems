@@ -28,8 +28,8 @@ RSpec.describe Gems::Gem do
   {
     name: "rails",
     version: "7.0.6",
-    downloads: 454_392_739,
-    version_downloads: 1_492_222,
+    downloads: 790_050_187,
+    version_downloads: 4_221_718,
     platform: "ruby",
     authors: "David Heinemeier Hansson",
     licenses: ["MIT"],

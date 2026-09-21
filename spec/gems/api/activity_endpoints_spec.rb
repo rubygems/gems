@@ -15,7 +15,7 @@ RSpec.describe Gems::API::ActivityEndpoints do
     it "returns the latest gems" do
       gem = client.latest.first
 
-      expect([gem.class, gem.name]).to eq([Gems::Gem, "seanwalbran-rpm_contrib"])
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "jevalyn"])
     end
   end
 
@@ -31,7 +31,7 @@ RSpec.describe Gems::API::ActivityEndpoints do
     it "returns the most recently updated gems" do
       gem = client.just_updated.first
 
-      expect([gem.class, gem.name]).to eq([Gems::Gem, "rspec-tag_matchers"])
+      expect([gem.class, gem.name]).to eq([Gems::Gem, "posthog-ruby"])
     end
   end
 end
