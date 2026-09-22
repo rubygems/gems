@@ -77,6 +77,8 @@ module Gems
   module Configuration
     include CertificateOptions
     include Identifiers
+    include Settings
+    extend Settings::Declaration
     include URLValidation
 
     @key: String?
@@ -777,6 +779,8 @@ module Gems
 
   class Connection
     include CertificateOptions
+    include Settings
+    extend Settings::Declaration
     include URLValidation
 
     @pool: ConnectionPool
@@ -843,6 +847,8 @@ module Gems
   end
 
   class RedirectHandler
+    include Settings
+    extend Settings::Declaration
     include URLValidation
 
     DEFAULT_MAX_REDIRECTS: Integer
@@ -898,6 +904,20 @@ module Gems
     def validate_ca_path: (String ca_path) -> String
   end
 
+  module Settings
+    module Declaration : Module
+      def seconds_setting: (Symbol name) -> Symbol
+      def count_setting: (Symbol name) -> Symbol
+    end
+
+    def self.included: (Module base) -> void
+
+    private
+
+    def validate_number: (Symbol name, untyped number) -> Numeric
+    def validate_count: (Symbol name, untyped count) -> Integer
+  end
+
   module URLValidation
     private
 
@@ -937,6 +957,8 @@ module Gems
 
   class RetryHandler
     include RetryAfter
+    include Settings
+    extend Settings::Declaration
 
     DEFAULT_MAX_RETRIES: Integer
     DEFAULT_MAX_RETRY_DELAY: Numeric

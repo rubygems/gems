@@ -70,6 +70,60 @@ RSpec.describe Gems::RetryHandler do
     end
   end
 
+  describe "#max_retries=" do
+    it "assigns a number of retries" do
+      handler.max_retries = 3
+
+      expect(handler.max_retries).to eq(3)
+    end
+
+    it "raises for a negative number of retries" do
+      expect { handler.max_retries = -1 }.to raise_error(ArgumentError, "Invalid max_retries: -1")
+    end
+
+    it "raises for a number of retries that is not whole" do
+      expect { handler.max_retries = 1.5 }.to raise_error(ArgumentError, "Invalid max_retries: 1.5")
+    end
+
+    it "leaves the maximum as it was after a value it refuses" do
+      handler.max_retries = 3
+      handler.max_retries = -1
+    rescue ArgumentError
+      expect(handler.max_retries).to eq(3)
+    end
+
+    it "refuses the maximum the handler is built with" do
+      expect { described_class.new(max_retries: -1) }.to raise_error(ArgumentError, "Invalid max_retries: -1")
+    end
+  end
+
+  describe "#max_retry_delay=" do
+    it "assigns a number of seconds" do
+      handler.max_retry_delay = 0.5
+
+      expect(handler.max_retry_delay).to eq(0.5)
+    end
+
+    it "raises for a negative number of seconds" do
+      expect { handler.max_retry_delay = -1 }.to raise_error(ArgumentError, "Invalid max_retry_delay: -1")
+    end
+
+    it "raises for a value that is not a number" do
+      expect { handler.max_retry_delay = "30" }.to raise_error(ArgumentError, "Invalid max_retry_delay: \"30\"")
+    end
+
+    it "leaves the maximum as it was after a value it refuses" do
+      handler.max_retry_delay = 30
+      handler.max_retry_delay = -1
+    rescue ArgumentError
+      expect(handler.max_retry_delay).to eq(30)
+    end
+
+    it "refuses the maximum the handler is built with" do
+      expect { described_class.new(max_retry_delay: -1) }.to raise_error(ArgumentError, "Invalid max_retry_delay: -1")
+    end
+  end
+
   describe "#handle" do
     it "returns a successful response without sending the request again" do
       response, waited = handle(handler, [success])

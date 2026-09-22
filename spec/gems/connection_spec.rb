@@ -103,6 +103,36 @@ RSpec.describe Gems::Connection do
     end
   end
 
+  %i[open_timeout read_timeout write_timeout keep_alive_timeout].each do |setting|
+    describe "##{setting}=" do
+      it "assigns a number of seconds" do
+        connection.public_send(:"#{setting}=", 0.5)
+
+        expect(connection.public_send(setting)).to eq(0.5)
+      end
+
+      it "raises for a negative number of seconds" do
+        expect { connection.public_send(:"#{setting}=", -1) }.to raise_error(ArgumentError, "Invalid #{setting}: -1")
+      end
+
+      it "raises for a value that is not a number" do
+        expect { connection.public_send(:"#{setting}=", "30") }
+          .to raise_error(ArgumentError, "Invalid #{setting}: \"30\"")
+      end
+
+      it "leaves the setting as it was after a value it refuses" do
+        connection.public_send(:"#{setting}=", 30)
+        connection.public_send(:"#{setting}=", -1)
+      rescue ArgumentError
+        expect(connection.public_send(setting)).to eq(30)
+      end
+
+      it "refuses the value the connection is built with" do
+        expect { described_class.new(setting => -1) }.to raise_error(ArgumentError, "Invalid #{setting}: -1")
+      end
+    end
+  end
+
   describe "#proxy_url=" do
     before { connection.proxy_url = "https://user:pass@proxy.example.com:8080" }
 

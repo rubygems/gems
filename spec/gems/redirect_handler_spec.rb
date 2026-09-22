@@ -58,6 +58,33 @@ RSpec.describe Gems::RedirectHandler do
     end
   end
 
+  describe "#max_redirects=" do
+    it "assigns a number of redirects" do
+      handler.max_redirects = 3
+
+      expect(handler.max_redirects).to eq(3)
+    end
+
+    it "raises for a negative number of redirects" do
+      expect { handler.max_redirects = -1 }.to raise_error(ArgumentError, "Invalid max_redirects: -1")
+    end
+
+    it "raises for a number of redirects that is not whole" do
+      expect { handler.max_redirects = 1.5 }.to raise_error(ArgumentError, "Invalid max_redirects: 1.5")
+    end
+
+    it "leaves the maximum as it was after a value it refuses" do
+      handler.max_redirects = 3
+      handler.max_redirects = -1
+    rescue ArgumentError
+      expect(handler.max_redirects).to eq(3)
+    end
+
+    it "refuses the maximum the handler is built with" do
+      expect { described_class.new(max_redirects: -1) }.to raise_error(ArgumentError, "Invalid max_redirects: -1")
+    end
+  end
+
   describe "#handle" do
     it "returns a non-redirect response unchanged" do
       response = Net::HTTPOK.new("1.1", "200", "OK")

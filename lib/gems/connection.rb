@@ -6,6 +6,7 @@ require_relative "certificate_options"
 require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
+require_relative "settings"
 require_relative "url_validation"
 
 module Gems
@@ -18,6 +19,7 @@ module Gems
   # @api private
   class Connection
     include CertificateOptions
+    include Settings
     include URLValidation
 
     # Default timeout for opening connections in seconds
@@ -29,37 +31,74 @@ module Gems
     # Default seconds an idle connection is kept open for another request
     DEFAULT_KEEP_ALIVE_TIMEOUT = 2 # seconds
 
-    # The timeout for opening connections in seconds
-    # @api private
-    # @return [Numeric] the timeout for opening connections in seconds
-    # @example Get or set the open timeout
-    #   connection.open_timeout = 30
-    attr_accessor :open_timeout
+    # @!method open_timeout
+    #   The timeout for opening connections in seconds
+    #   @api private
+    #   @return [Numeric] the timeout for opening connections in seconds
+    #   @example Get the open timeout
+    #     connection.open_timeout
+    # @!method open_timeout=(open_timeout)
+    #   Set the timeout for opening connections in seconds
+    #   @api private
+    #   @param open_timeout [Numeric] the timeout for opening connections in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the open timeout
+    #     connection.open_timeout = 30
+    seconds_setting :open_timeout
 
-    # The timeout for reading responses in seconds
-    # @api private
-    # @return [Numeric] the timeout for reading responses in seconds
-    # @example Get or set the read timeout
-    #   connection.read_timeout = 30
-    attr_accessor :read_timeout
+    # @!method read_timeout
+    #   The timeout for reading responses in seconds
+    #   @api private
+    #   @return [Numeric] the timeout for reading responses in seconds
+    #   @example Get the read timeout
+    #     connection.read_timeout
+    # @!method read_timeout=(read_timeout)
+    #   Set the timeout for reading responses in seconds
+    #   @api private
+    #   @param read_timeout [Numeric] the timeout for reading responses in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the read timeout
+    #     connection.read_timeout = 30
+    seconds_setting :read_timeout
 
-    # The timeout for writing requests in seconds
-    # @api private
-    # @return [Numeric] the timeout for writing requests in seconds
-    # @example Get or set the write timeout
-    #   connection.write_timeout = 30
-    attr_accessor :write_timeout
+    # @!method write_timeout
+    #   The timeout for writing requests in seconds
+    #   @api private
+    #   @return [Numeric] the timeout for writing requests in seconds
+    #   @example Get the write timeout
+    #     connection.write_timeout
+    # @!method write_timeout=(write_timeout)
+    #   Set the timeout for writing requests in seconds
+    #   @api private
+    #   @param write_timeout [Numeric] the timeout for writing requests in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the write timeout
+    #     connection.write_timeout = 30
+    seconds_setting :write_timeout
 
-    # The seconds an idle connection is kept open for another request
+    # @!method keep_alive_timeout
+    #   The seconds an idle connection is kept open for another request
     #
-    # A request is sent on the connection kept open for its host when one was used within this many seconds, so that
-    # a series of requests does not open a connection each. Zero closes every connection when its request is done.
+    #   A request is sent on the connection kept open for its host when one was used within this many seconds, so
+    #   that a series of requests does not open a connection each. Zero closes every connection when its request is
+    #   done.
     #
-    # @api private
-    # @return [Numeric] the seconds an idle connection is kept open
-    # @example Get or set the keep-alive timeout
-    #   connection.keep_alive_timeout = 0
-    attr_accessor :keep_alive_timeout
+    #   @api private
+    #   @return [Numeric] the seconds an idle connection is kept open
+    #   @example Get the keep-alive timeout
+    #     connection.keep_alive_timeout
+    # @!method keep_alive_timeout=(keep_alive_timeout)
+    #   Set the seconds an idle connection is kept open for another request
+    #   @api private
+    #   @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the keep-alive timeout
+    #     connection.keep_alive_timeout = 0
+    seconds_setting :keep_alive_timeout
 
     # The IO object for debug output
     #
@@ -158,11 +197,11 @@ module Gems
       write_timeout: DEFAULT_WRITE_TIMEOUT, debug_output: nil, proxy_url: nil,
       keep_alive_timeout: DEFAULT_KEEP_ALIVE_TIMEOUT, ca_file: nil, ca_path: nil, cert_store: nil,
       client_cert: nil, client_key: nil)
-      @open_timeout = open_timeout
-      @read_timeout = read_timeout
-      @write_timeout = write_timeout
+      self.open_timeout = open_timeout
+      self.read_timeout = read_timeout
+      self.write_timeout = write_timeout
       @debug_output = debug_output
-      @keep_alive_timeout = keep_alive_timeout
+      self.keep_alive_timeout = keep_alive_timeout
       @pool = ConnectionPool.new
       self.proxy_url = proxy_url
       initialize_certificates(ca_file:, ca_path:, cert_store:, client_cert:, client_key:)

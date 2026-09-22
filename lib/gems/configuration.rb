@@ -7,6 +7,7 @@ require_relative "identifiers"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "retry_handler"
+require_relative "settings"
 require_relative "url_validation"
 
 module Gems
@@ -15,6 +16,7 @@ module Gems
   module Configuration
     include CertificateOptions
     include Identifiers
+    include Settings
     include URLValidation
 
     # The API endpoint used when the RUBYGEMS_HOST environment variable is not set
@@ -95,36 +97,72 @@ module Gems
     #   Gems.username = "nick@gemcutter.org"
     attr_accessor :username
 
-    # The timeout for opening connections in seconds
-    # @api public
-    # @return [Numeric] the timeout for opening connections in seconds
-    # @example Get or set the open timeout
-    #   Gems.open_timeout = 30
-    attr_accessor :open_timeout
+    # @!method open_timeout
+    #   The timeout for opening connections in seconds
+    #   @api public
+    #   @return [Numeric] the timeout for opening connections in seconds
+    #   @example Get the open timeout
+    #     Gems.open_timeout
+    # @!method open_timeout=(open_timeout)
+    #   Set the timeout for opening connections in seconds
+    #   @api public
+    #   @param open_timeout [Numeric] the timeout for opening connections in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the open timeout
+    #     Gems.open_timeout = 30
+    seconds_setting :open_timeout
 
-    # The timeout for reading responses in seconds
-    # @api public
-    # @return [Numeric] the timeout for reading responses in seconds
-    # @example Get or set the read timeout
-    #   Gems.read_timeout = 30
-    attr_accessor :read_timeout
+    # @!method read_timeout
+    #   The timeout for reading responses in seconds
+    #   @api public
+    #   @return [Numeric] the timeout for reading responses in seconds
+    #   @example Get the read timeout
+    #     Gems.read_timeout
+    # @!method read_timeout=(read_timeout)
+    #   Set the timeout for reading responses in seconds
+    #   @api public
+    #   @param read_timeout [Numeric] the timeout for reading responses in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the read timeout
+    #     Gems.read_timeout = 30
+    seconds_setting :read_timeout
 
-    # The timeout for writing requests in seconds
-    # @api public
-    # @return [Numeric] the timeout for writing requests in seconds
-    # @example Get or set the write timeout
-    #   Gems.write_timeout = 30
-    attr_accessor :write_timeout
+    # @!method write_timeout
+    #   The timeout for writing requests in seconds
+    #   @api public
+    #   @return [Numeric] the timeout for writing requests in seconds
+    #   @example Get the write timeout
+    #     Gems.write_timeout
+    # @!method write_timeout=(write_timeout)
+    #   Set the timeout for writing requests in seconds
+    #   @api public
+    #   @param write_timeout [Numeric] the timeout for writing requests in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the write timeout
+    #     Gems.write_timeout = 30
+    seconds_setting :write_timeout
 
-    # The seconds an idle connection is kept open for another request
+    # @!method keep_alive_timeout
+    #   The seconds an idle connection is kept open for another request
     #
-    # Zero closes every connection when its request is done.
+    #   Zero closes every connection when its request is done.
     #
-    # @api public
-    # @return [Numeric] the seconds an idle connection is kept open
-    # @example Get or set the keep-alive timeout
-    #   Gems.keep_alive_timeout = 0
-    attr_accessor :keep_alive_timeout
+    #   @api public
+    #   @return [Numeric] the seconds an idle connection is kept open
+    #   @example Get the keep-alive timeout
+    #     Gems.keep_alive_timeout
+    # @!method keep_alive_timeout=(keep_alive_timeout)
+    #   Set the seconds an idle connection is kept open for another request
+    #   @api public
+    #   @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the timeout is left as it was
+    #   @example Set the keep-alive timeout
+    #     Gems.keep_alive_timeout = 0
+    seconds_setting :keep_alive_timeout
 
     # The IO object for debug output
     # @api public
@@ -160,36 +198,63 @@ module Gems
       @proxy_url = proxy_url
     end
 
-    # The maximum number of redirects to follow
-    # @api public
-    # @return [Integer] the maximum number of redirects to follow
-    # @example Get or set the maximum redirects
-    #   Gems.max_redirects = 5
-    attr_accessor :max_redirects
+    # @!method max_redirects
+    #   The maximum number of redirects to follow
+    #   @api public
+    #   @return [Integer] the maximum number of redirects to follow
+    #   @example Get the maximum redirects
+    #     Gems.max_redirects
+    # @!method max_redirects=(max_redirects)
+    #   Set the maximum number of redirects to follow
+    #   @api public
+    #   @param max_redirects [Integer] the maximum number of redirects to follow
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
+    #   @example Set the maximum redirects
+    #     Gems.max_redirects = 5
+    count_setting :max_redirects
 
-    # The number of times a request that was turned away is sent again
+    # @!method max_retries
+    #   The number of times a request that was turned away is sent again
     #
-    # Two by default. Zero raises {TooManyRequests}, {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or
-    # {NetworkError} rather than waiting. Only an idempotent request is sent again, so a `push` is never retried.
-    # The trusted publishing token exchange is the exception: it is sent again when the server turns it away,
-    # although it is a POST, since those statuses say the endpoint refused the exchange rather than issuing a key
-    # for the token, and is not sent again when it is lost to the network.
+    #   Two by default. Zero raises {TooManyRequests}, {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or
+    #   {NetworkError} rather than waiting. Only an idempotent request is sent again, so a `push` is never retried.
+    #   The trusted publishing token exchange is the exception: it is sent again when the server turns it away,
+    #   although it is a POST, since those statuses say the endpoint refused the exchange rather than issuing a key
+    #   for the token, and is not sent again when it is lost to the network.
     #
-    # @api public
-    # @return [Integer] the number of times a request that was turned away is sent again
-    # @example Get or set the maximum retries
-    #   Gems.max_retries = 3
-    attr_accessor :max_retries
+    #   @api public
+    #   @return [Integer] the number of times a request that was turned away is sent again
+    #   @example Get the maximum retries
+    #     Gems.max_retries
+    # @!method max_retries=(max_retries)
+    #   Set the number of times a request that was turned away is sent again
+    #   @api public
+    #   @param max_retries [Integer] the number of times a request that was turned away is sent again
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
+    #   @example Set the maximum retries
+    #     Gems.max_retries = 3
+    count_setting :max_retries
 
-    # The longest a request waits before it is sent again, in seconds
+    # @!method max_retry_delay
+    #   The longest a request waits before it is sent again, in seconds
     #
-    # A response asking to wait longer than this raises rather than being waited for.
+    #   A response asking to wait longer than this raises rather than being waited for.
     #
-    # @api public
-    # @return [Numeric] the longest a request waits before it is sent again, in seconds
-    # @example Get or set the maximum retry delay
-    #   Gems.max_retry_delay = 30
-    attr_accessor :max_retry_delay
+    #   @api public
+    #   @return [Numeric] the longest a request waits before it is sent again, in seconds
+    #   @example Get the maximum retry delay
+    #     Gems.max_retry_delay
+    # @!method max_retry_delay=(max_retry_delay)
+    #   Set the longest a request waits before it is sent again, in seconds
+    #   @api public
+    #   @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a number of seconds, in which case the maximum is left as it was
+    #   @example Set the maximum retry delay
+    #     Gems.max_retry_delay = 30
+    seconds_setting :max_retry_delay
 
     # Reset the extending module to the default configuration
     #
@@ -211,11 +276,7 @@ module Gems
     # @example Get the API key
     #   Gems.key
     def key
-      if key_configured?
-        @key
-      else
-        default_key
-      end
+      key_configured? ? @key : default_key
     end
 
     # The one-time passcode used for multi-factor authentication
@@ -228,11 +289,7 @@ module Gems
     # @example Get the one-time passcode
     #   Gems.otp
     def otp
-      if otp_configured?
-        @otp
-      else
-        default_otp
-      end
+      otp_configured? ? @otp : default_otp
     end
 
     # The host `gem push` would use

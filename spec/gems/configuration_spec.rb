@@ -296,6 +296,57 @@ RSpec.describe Gems::Configuration do
     end
   end
 
+  %i[open_timeout read_timeout write_timeout keep_alive_timeout max_retry_delay].each do |setting|
+    describe "##{setting}=" do
+      it "assigns a number of seconds" do
+        Gems.public_send(:"#{setting}=", 0.5)
+
+        expect(Gems.public_send(setting)).to eq(0.5)
+      end
+
+      it "raises for a negative number of seconds" do
+        expect { Gems.public_send(:"#{setting}=", -1) }.to raise_error(ArgumentError, "Invalid #{setting}: -1")
+      end
+
+      it "raises for a value that is not a number" do
+        expect { Gems.public_send(:"#{setting}=", "30") }
+          .to raise_error(ArgumentError, "Invalid #{setting}: \"30\"")
+      end
+
+      it "leaves the setting as it was after a value it refuses" do
+        Gems.public_send(:"#{setting}=", 30)
+        Gems.public_send(:"#{setting}=", -1)
+      rescue ArgumentError
+        expect(Gems.public_send(setting)).to eq(30)
+      end
+    end
+  end
+
+  %i[max_redirects max_retries].each do |setting|
+    describe "##{setting}=" do
+      it "assigns a number of times" do
+        Gems.public_send(:"#{setting}=", 3)
+
+        expect(Gems.public_send(setting)).to eq(3)
+      end
+
+      it "raises for a negative number of times" do
+        expect { Gems.public_send(:"#{setting}=", -1) }.to raise_error(ArgumentError, "Invalid #{setting}: -1")
+      end
+
+      it "raises for a number of times that is not whole" do
+        expect { Gems.public_send(:"#{setting}=", 1.5) }.to raise_error(ArgumentError, "Invalid #{setting}: 1.5")
+      end
+
+      it "leaves the setting as it was after a value it refuses" do
+        Gems.public_send(:"#{setting}=", 3)
+        Gems.public_send(:"#{setting}=", -1)
+      rescue ArgumentError
+        expect(Gems.public_send(setting)).to eq(3)
+      end
+    end
+  end
+
   describe "::DEFAULT_USER_AGENT" do
     it "is the user agent a request builder sends" do
       expect(described_class::DEFAULT_USER_AGENT).to equal(Gems::RequestBuilder::DEFAULT_USER_AGENT)
@@ -320,10 +371,7 @@ RSpec.describe Gems::Configuration do
       expect(Gems.configure { nil }).to equal(Gems)
     end
 
-    options = %i[id_token key otp password user_agent username]
-    options += %i[open_timeout read_timeout write_timeout keep_alive_timeout debug_output max_redirects]
-    options += %i[max_retries max_retry_delay]
-    options.each do |key|
+    %i[id_token key otp password user_agent username debug_output].each do |key|
       it "sets the #{key}" do
         Gems.configure { |config| config.public_send(:"#{key}=", key.to_s) }
 
@@ -331,8 +379,10 @@ RSpec.describe Gems::Configuration do
       end
     end
 
-    {host: "https://gems.example.com", proxy_url: "http://proxy.example.com:8080"}.each do |key, value|
-      it "sets the #{key} to a URL" do
+    {host: "https://gems.example.com", proxy_url: "http://proxy.example.com:8080", open_timeout: 10,
+     read_timeout: 20, write_timeout: 30, keep_alive_timeout: 5, max_redirects: 3, max_retries: 4,
+     max_retry_delay: 15}.each do |key, value|
+      it "sets the #{key} to a value of its own" do
         Gems.configure { |config| config.public_send(:"#{key}=", value) }
 
         expect(Gems.public_send(key)).to eq(value)

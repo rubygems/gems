@@ -6,12 +6,14 @@ require_relative "authenticator"
 require_relative "connection"
 require_relative "errors/too_many_redirects"
 require_relative "request_builder"
+require_relative "settings"
 require_relative "url_validation"
 
 module Gems
   # Handles HTTP redirects for API requests
   # @api private
   class RedirectHandler
+    include Settings
     include URLValidation
 
     # Default maximum number of redirects to follow
@@ -20,12 +22,21 @@ module Gems
     METHOD_PRESERVING_CODES = [307, 308].freeze
     private_constant :METHOD_PRESERVING_CODES
 
-    # The maximum number of redirects to follow
-    # @api private
-    # @return [Integer] the maximum number of redirects to follow
-    # @example Get or set the maximum redirects
-    #   handler.max_redirects = 5
-    attr_accessor :max_redirects
+    # @!method max_redirects
+    #   The maximum number of redirects to follow
+    #   @api private
+    #   @return [Integer] the maximum number of redirects to follow
+    #   @example Get the maximum redirects
+    #     handler.max_redirects
+    # @!method max_redirects=(max_redirects)
+    #   Set the maximum number of redirects to follow
+    #   @api private
+    #   @param max_redirects [Integer] the maximum number of redirects to follow
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
+    #   @example Set the maximum redirects
+    #     handler.max_redirects = 5
+    count_setting :max_redirects
 
     # The connection for making requests
     # @api private
@@ -54,7 +65,7 @@ module Gems
       max_redirects: DEFAULT_MAX_REDIRECTS)
       @connection = connection
       @request_builder = request_builder
-      @max_redirects = max_redirects
+      self.max_redirects = max_redirects
     end
 
     # Handle redirects for an HTTP response

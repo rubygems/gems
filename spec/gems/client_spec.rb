@@ -378,12 +378,21 @@ RSpec.describe Gems::Client do
     end
   end
 
-  %i[open_timeout read_timeout write_timeout max_redirects max_retries max_retry_delay].each do |option|
+  %i[open_timeout read_timeout write_timeout keep_alive_timeout max_redirects max_retries max_retry_delay]
+    .each do |option|
     describe "##{option}=" do
       it "sets the #{option}" do
         client.public_send(:"#{option}=", 42)
 
         expect(client.public_send(option)).to eq(42)
+      end
+
+      it "raises for a negative #{option}" do
+        expect { client.public_send(:"#{option}=", -1) }.to raise_error(ArgumentError, "Invalid #{option}: -1")
+      end
+
+      it "raises for a #{option} the client is built with that is not a number" do
+        expect { described_class.new(option => "42") }.to raise_error(ArgumentError, "Invalid #{option}: \"42\"")
       end
     end
   end

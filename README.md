@@ -473,6 +473,12 @@ define, which would otherwise be ignored by the server and leave the key scoped 
 a reverse dependency type other than `development` or `runtime`, which the endpoint answers with every reverse
 dependency for rather than refusing, and an owner role other than `owner` or `maintainer`.
 
+The settings that are numbers are checked where they are assigned too: `open_timeout`, `read_timeout`,
+`write_timeout`, `keep_alive_timeout`, and `max_retry_delay` take a number of zero or more seconds, and
+`max_redirects` and `max_retries` take a whole number of zero or more times. Anything else raises `ArgumentError`
+there, rather than waiting for a negative number of seconds or comparing a count with a String on the next
+request, and the setting is left as it was.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the tests,
