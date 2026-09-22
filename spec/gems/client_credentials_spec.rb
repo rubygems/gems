@@ -175,22 +175,29 @@ RSpec.describe Gems::ClientCredentials do
       expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
     end
 
-    it "is true with a username" do
+    it "is true with a username and a password" do
       stub_rubygems_configuration
+      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD)
 
-      expect(Gems::Client.new(username: TEST_USERNAME).send(:credentials_configured?)).to be(true)
+      expect(client.send(:credentials_configured?)).to be(true)
     end
 
-    it "is true with a password" do
+    it "is false with a username alone, which authenticates nothing" do
       stub_rubygems_configuration
 
-      expect(Gems::Client.new(password: TEST_PASSWORD).send(:credentials_configured?)).to be(true)
+      expect(Gems::Client.new(username: TEST_USERNAME).send(:credentials_configured?)).to be(false)
     end
 
-    it "is true with an ID token" do
+    it "is false with a password alone, which authenticates nothing" do
       stub_rubygems_configuration
 
-      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:credentials_configured?)).to be(true)
+      expect(Gems::Client.new(password: TEST_PASSWORD).send(:credentials_configured?)).to be(false)
+    end
+
+    it "is false with an ID token, which is exchanged for a key the host it was exchanged with issued" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:credentials_configured?)).to be(false)
     end
 
     it "is false with only a one-time passcode" do

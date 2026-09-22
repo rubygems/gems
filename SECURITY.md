@@ -42,6 +42,7 @@ around one of them is a vulnerability rather than a feature request:
 * The values interpolated into request paths are escaped, so one holding a slash cannot walk out of the endpoint it
   was meant for and take the credentials of the request with it.
 * A host nothing is stored for is sent no API key, rather than the RubyGems.org key that `gem push --host` falls
-  back to for it, so that a key is sent only to the host it was issued by.
+  back to for it, so that a key is sent only to the host it was issued by. The API key a trusted publishing ID token
+  is exchanged for is sent only to the host that exchanged it, rather than to whichever host a request names.
 * TLS certificates are verified, and no option turns that off: a host whose certificate OpenSSL does not already
   trust is reached by naming that certificate with `ca_file`, `ca_path`, or `cert_store`.

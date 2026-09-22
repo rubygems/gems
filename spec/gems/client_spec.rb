@@ -762,6 +762,56 @@ RSpec.describe Gems::Client do
         .with(basic_auth: [TEST_USERNAME, TEST_PASSWORD])).to have_been_made
     end
 
+    context "with a trusted publishing ID token" do
+      let(:exchange) { stub_post("/api/v1/oidc/trusted_publisher/exchange_token").to_return(body: fixture("exchange_token.json")) }
+
+      before { exchange }
+
+      it "sends the key stored for another host, rather than the key the token was exchanged for" do
+        stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+        stub_request(:post, "https://gems.example.com/path")
+        described_class.new(id_token: "ID_TOKEN").post("/path", host: "https://gems.example.com")
+
+        expect(a_request(:post, "https://gems.example.com/path")
+          .with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+      end
+
+      it "sends no key to another host nothing is stored for" do
+        stub_rubygems_configuration(rubygems_api_key: nil)
+        stub_request(:post, "https://gems.example.com/path")
+        described_class.new(id_token: "ID_TOKEN").post("/path", host: "https://gems.example.com")
+
+        expect(a_request(:post, "https://gems.example.com/path")
+          .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+      end
+
+      it "does not exchange the token for a request to another host" do
+        stub_rubygems_configuration(rubygems_api_key: nil)
+        stub_request(:post, "https://gems.example.com/path")
+        described_class.new(id_token: "ID_TOKEN").post("/path", host: "https://gems.example.com")
+
+        expect(exchange).not_to have_been_requested
+      end
+    end
+
+    it "sends no key to another host when a username was configured without a password" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(username: TEST_USERNAME).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
+    it "sends no key to another host when a password was configured without a username" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path")
+      described_class.new(password: TEST_PASSWORD).post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:post, "https://gems.example.com/path")
+        .with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
     it "keeps the key of the client for its own host written another way" do
       stub_rubygems_configuration(api_keys: {TEST_HOST => "HOST_KEY"})
       stub_post("/path")

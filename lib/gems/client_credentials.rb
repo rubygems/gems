@@ -169,9 +169,10 @@ module Gems
     # The authenticator for a request to a host
     #
     # A request to a host other than the client's is authenticated with the API key stored for that host, resolved
-    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. Credentials
-    # configured for the client are sent wherever the client sends a request, as the configured credentials of
-    # `gem push --key` are.
+    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. The credentials
+    # the caller gave the client are sent wherever the client sends a request, as the configured credentials of
+    # `gem push --key` are; the API key a trusted publishing ID token is exchanged for is not one of them (see
+    # {#credentials_configured?}).
     #
     # @api private
     # @param host [String] the host of the request
@@ -183,14 +184,22 @@ module Gems
       otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
     end
 
-    # Whether credentials were configured for the client
+    # Whether the caller gave the client credentials of its own
     #
-    # When none were, the client falls back to the API key stored for the host a request is sent to.
+    # An API key and basic authentication are the caller's own, and are sent wherever the client sends a request,
+    # as the key of `gem push --key` is. A trusted publishing ID token is not: the API key it is exchanged for is
+    # issued by the host the exchange was made with, for the audience the token names, so sending that key to
+    # another host would hand a host a credential it did not issue, which is what the key stored for a host is
+    # resolved per request to avoid. A username without a password, or a password without a username, is not
+    # basic authentication either, and authenticates nothing.
+    #
+    # A request to another host falls back to the API key stored for that host instead, as the request of a client
+    # without credentials does; {Client#host=} exchanges the ID token again for the host it points the client at.
     #
     # @api private
-    # @return [Boolean] whether credentials were configured
+    # @return [Boolean] whether the caller gave the client credentials of its own
     def credentials_configured?
-      @key_configured || [username, password, id_token].any?
+      @key_configured || !basic_authenticator.nil?
     end
 
     # Initialize the appropriate authenticator based on available credentials

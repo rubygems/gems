@@ -334,12 +334,18 @@ HTTP basic authentication takes precedence over trusted publishing, which takes 
 
 When no key is configured, the API key is resolved for the host it is sent to, as `gem push --host` resolves it: a
 client built for another host, and a request made to one with `host:`, use the key `gem signin --host` stored for that
-host. A key you configure yourself is sent wherever the client sends a request, as `gem push --key` is.
+host. A key you configure yourself, and a username and password, are sent wherever the client sends a request, as
+`gem push --key` is.
 
 A host nothing is stored for is sent no key at all, so that the key RubyGems.org issued you is not sent to a host it
 was not issued for. This is the one place the library resolves a key differently than `gem push --host`, which falls
 back to the RubyGems.org key for such a host; store a key for the host with `gem signin --host`, or configure one,
 to authenticate there.
+
+An `id_token` is the exception among configured credentials: the API key it is exchanged for is issued by the host
+the exchange was made with, for the audience the token names, so a request to another host resolves the key stored
+for that host rather than carrying the exchanged one there. Assigning `host` exchanges the token again, for the host
+the client is pointed at.
 
 ```ruby
 # Uses the key stored for gems.example.com, not the RubyGems.org key.
