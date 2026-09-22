@@ -39,8 +39,9 @@ Gems.get "/api/v1/gems/rails.json"
 Gems.client.get "/api/v1/gems/rails.json"
 ```
 
-Those methods take a path on the client's host, and a path that is a URL of another scheme, host, or port raises
-`ArgumentError` rather than sending the request there with the credentials the client resolved for its own host.
+Those methods take a path on the client's host, and a path that is a URL of another scheme, host, or port, or that
+climbs out of the prefix the host carries, raises `ArgumentError` rather than sending the request there with the
+credentials the client resolved for its own host.
 Send a request to another host with the `host` argument, which resolves the key stored for the host it names:
 
 ```ruby

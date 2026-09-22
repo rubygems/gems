@@ -349,14 +349,19 @@ module Gems
     # would take them with it, where the `host` argument of a request resolves the key stored for the host it names,
     # and a redirect to another host is followed without them.
     #
+    # A path that climbs out of the prefix the host carries, such as "../.." for a host of
+    # "https://gems.example.com/rubygems", is refused for the same reason: the client was pointed at that prefix,
+    # and a path that leaves it asks the rest of the host with the credentials resolved for it. A host without a
+    # prefix names the whole of its origin, so there is nothing to climb out of.
+    #
     # @api private
     # @param host [String] the host, optionally carrying a path prefix
     # @param path [String] the request path
     # @return [URI] the request URI
-    # @raise [ArgumentError] if the path is a URL of an origin other than the host
+    # @raise [ArgumentError] if the path is a URL of an origin other than the host, or climbs out of its prefix
     def build_uri(host, path)
       uri = URI.join("#{host.chomp("/")}/", path.delete_prefix("/"))
-      raise ArgumentError, "Path is not on #{host}: #{path}" unless same_origin?(uri, host)
+      raise ArgumentError, "Path is not on #{host}: #{path}" unless on_host?(uri, host)
 
       uri
     end

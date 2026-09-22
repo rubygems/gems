@@ -65,6 +65,24 @@ module Gems
       origin(url).eql?(origin(other))
     end
 
+    # Whether a URL is the host's own, at or under the path the host names
+    #
+    # The path is compared as well as the origin, so that a URL climbing out of the prefix a host carries, such as
+    # "../.." for "https://gems.example.com/rubygems", is told from one the host was pointed at, as a URL of
+    # another scheme, host, or port is. A host that carries no prefix names the whole of its origin, so every URL
+    # of that origin is on it.
+    #
+    # The paths are read once the origins are known to match, so a URL that has none, such as a "mailto:" URL, is
+    # answered by the comparison of the origins rather than by reading the path it does not have.
+    #
+    # @api private
+    # @param uri [URI::Generic] the URL, as the URI it was read as
+    # @param host [String, URI::Generic] the host, optionally carrying a path prefix
+    # @return [Boolean] whether the URL is the host's own, at or under the path it names
+    def on_host?(uri, host)
+      same_origin?(uri, host) && uri.path.start_with?("#{URI(host).path.chomp("/")}/") # steep:ignore NoMethod
+    end
+
     # The origin of a URL, with the scheme and host in lowercase
     # @api private
     # @param url [String, URI::Generic] the URL

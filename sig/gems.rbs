@@ -926,6 +926,7 @@ module Gems
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def http_url?: (untyped host) -> bool
     def same_origin?: (String | URI::Generic url, String | URI::Generic other) -> bool
+    def on_host?: (URI::Generic uri, String | URI::Generic host) -> bool
     def origin: (String | URI::Generic url) -> [String?, String?, Integer?]
     def redact: (String? url) -> String?
   end

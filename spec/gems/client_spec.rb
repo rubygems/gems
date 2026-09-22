@@ -643,6 +643,35 @@ RSpec.describe Gems::Client do
       expect(a_request(:get, "http://example.com/path")).to have_been_made
     end
 
+    it "refuses a path that climbs out of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("../../path") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: ../../path")
+    end
+
+    it "refuses a path that climbs to a sibling of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("../gemsfoo") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: ../gemsfoo")
+    end
+
+    it "keeps a path that climbs within the prefix the host names" do
+      client.host = "http://example.com/gems"
+      stub_request(:get, "http://example.com/gems/path")
+      client.get("api/../path")
+
+      expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
+    end
+
+    it "keeps a path that climbs on a host that names no prefix" do
+      stub_get("/path")
+      client.get("../path")
+
+      expect(a_get("/path")).to have_been_made
+    end
+
     it "keeps a path prefix on the host" do
       client.host = "http://example.com/gems"
       stub_request(:get, "http://example.com/gems/path")
