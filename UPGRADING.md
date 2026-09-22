@@ -52,7 +52,8 @@ Gems.client.get "/api/v1/gems/rails.json", host: "https://gems.example.com"
 The API key in `~/.gem/credentials` is read when it is first needed rather than when the library is required, and
 assigning `nil` to `key` turns that fallback off, where 2.x fell back to it anyway. The default key is resolved as
 `gem push` resolves it: the `GEM_HOST_API_KEY` environment variable comes first, then the key `gem signin --host`
-stored for the configured `host`, then the RubyGems.org key, where 2.x read only the RubyGems.org key:
+stored for the configured `host`, then, for RubyGems.org itself, the RubyGems.org key, where 2.x read only the
+RubyGems.org key:
 
 ```ruby
 # 3.0
@@ -62,8 +63,9 @@ Gems.configure { |config| config.key = nil }
 
 The default key is resolved for the host a request is sent to, so a client built for another host, and a request made
 to one with `host:`, send the key `gem signin --host` stored for that host rather than the RubyGems.org key, where 2.x
-sent the RubyGems.org key wherever `push` was pointed. A key you configure yourself is sent wherever the client sends a
-request, as `gem push --key` is:
+sent the RubyGems.org key wherever `push` was pointed. A host nothing is stored for is sent no key at all, rather than
+the RubyGems.org key that `gem push --host` falls back to for it. A key you configure yourself is sent wherever the
+client sends a request, as `gem push --key` is:
 
 ```ruby
 # 3.0

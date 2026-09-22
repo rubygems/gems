@@ -72,18 +72,30 @@ RSpec.describe Gems::Configuration do
       expect(Gems.default_key).to eq("HOST_KEY")
     end
 
-    it "falls back to the RubyGems.org API key for a host without one" do
+    it "returns nil for a configured host without a key of its own, rather than the RubyGems.org key" do
       Gems.host = "https://other.example.com"
 
-      expect(Gems.default_key).to eq("FILE_KEY")
+      expect(Gems.default_key).to be_nil
     end
 
     it "reads the API key stored for a given host" do
       expect(Gems.default_key("https://gems.example.com")).to eq("HOST_KEY")
     end
 
-    it "falls back to the RubyGems.org API key for a given host without one" do
-      expect(Gems.default_key("https://other.example.com")).to eq("FILE_KEY")
+    it "returns nil for a given host without a key of its own, rather than the RubyGems.org key" do
+      expect(Gems.default_key("https://other.example.com")).to be_nil
+    end
+
+    it "reads the RubyGems.org API key for RubyGems.org named with a trailing slash" do
+      expect(Gems.default_key("https://rubygems.org/")).to eq("FILE_KEY")
+    end
+
+    it "returns nil for RubyGems.org over another scheme" do
+      expect(Gems.default_key("http://rubygems.org")).to be_nil
+    end
+
+    it "returns nil for a host that is not a URL" do
+      expect(Gems.default_key("not a host")).to be_nil
     end
 
     it "prefers the GEM_HOST_API_KEY environment variable" do

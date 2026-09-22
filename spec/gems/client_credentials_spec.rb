@@ -77,10 +77,10 @@ RSpec.describe Gems::ClientCredentials do
       expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to eq("HOST_KEY")
     end
 
-    it "falls back to the RubyGems.org key for a host without a stored key" do
+    it "sends no key for a host without a stored key, rather than the RubyGems.org key" do
       stub_rubygems_configuration
 
-      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to eq("FILE_KEY")
+      expect(Gems::Client.new(host: "https://gems.example.com").send(:configured_key)).to be_nil
     end
 
     it "returns nil without a stored key" do

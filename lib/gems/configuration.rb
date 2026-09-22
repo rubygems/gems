@@ -251,10 +251,19 @@ module Gems
     # The API key `gem push` would use for a host
     #
     # This is the `GEM_HOST_API_KEY` environment variable, else the key `gem signin --host` stored for the host in
-    # ~/.gem/credentials, else the RubyGems.org key `gem signin` stored there. The environment is read each time
-    # this method is called, rather than when the library is required, and the credentials file is read the first
-    # time it is needed: RubyGems keeps what it read in `Gem.configuration`, which it shares with everything else
-    # running in the process, so a key `gem signin` stores afterwards is picked up only by a new process.
+    # ~/.gem/credentials, else, for RubyGems.org itself, the key `gem signin` stored there. The environment is read
+    # each time this method is called, rather than when the library is required, and the credentials file is read
+    # the first time it is needed: RubyGems keeps what it read in `Gem.configuration`, which it shares with
+    # everything else running in the process, so a key `gem signin` stores afterwards is picked up only by a new
+    # process.
+    #
+    # A host nothing is stored for is left without a key, where `gem push --host` falls back to the RubyGems.org
+    # key for it. RubyGems keeps the key of RubyGems.org under `rubygems_api_key` rather than under its URL, and
+    # the key of every other host under the URL `gem signin --host` stored it for, so that key is the key of
+    # RubyGems.org rather than one for whichever host is asked about: handing it to another host would send a
+    # credential RubyGems.org issued to a host it was not issued for. The host is read as a URL, so RubyGems.org
+    # named with a trailing slash or a path of its own is still the host the key was stored for, and a host that
+    # is not a URL at all is not.
     #
     # An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, since a continuous integration
     # service sets a variable to the empty string when the secret it was given is not set, and an empty
@@ -275,7 +284,9 @@ module Gems
       env_key = ENV.fetch("GEM_HOST_API_KEY", "")
       return env_key unless env_key.empty?
 
-      ::Gem.configuration.api_keys.fetch(gem_host) { ::Gem.configuration.rubygems_api_key }
+      ::Gem.configuration.api_keys.fetch(gem_host) do
+        ::Gem.configuration.rubygems_api_key if http_url?(gem_host) && same_origin?(gem_host, DEFAULT_HOST)
+      end
     rescue ::Gem::SystemExitException
       nil
     end

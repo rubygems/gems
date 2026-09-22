@@ -307,7 +307,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | Option        | Description                                              | Default                                |
 | ------------- | -------------------------------------------------------- | -------------------------------------- |
 | `host`        | The RubyGems-compatible host, including scheme           | `RUBYGEMS_HOST` or `https://rubygems.org` |
-| `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or the key stored for the host in `~/.gem/credentials` |
+| `key`         | The API key sent in the `Authorization` header           | `GEM_HOST_API_KEY` or the key stored for that host in `~/.gem/credentials` |
 | `username`    | The username for HTTP basic authentication               | `nil`                                  |
 | `password`    | The password for HTTP basic authentication               | `nil`                                  |
 | `otp`         | The one-time passcode sent in the `OTP` header           | `GEM_HOST_OTP_CODE`                    |
@@ -335,6 +335,11 @@ HTTP basic authentication takes precedence over trusted publishing, which takes 
 When no key is configured, the API key is resolved for the host it is sent to, as `gem push --host` resolves it: a
 client built for another host, and a request made to one with `host:`, use the key `gem signin --host` stored for that
 host. A key you configure yourself is sent wherever the client sends a request, as `gem push --key` is.
+
+A host nothing is stored for is sent no key at all, so that the key RubyGems.org issued you is not sent to a host it
+was not issued for. This is the one place the library resolves a key differently than `gem push --host`, which falls
+back to the RubyGems.org key for such a host; store a key for the host with `gem signin --host`, or configure one,
+to authenticate there.
 
 ```ruby
 # Uses the key stored for gems.example.com, not the RubyGems.org key.
