@@ -102,13 +102,15 @@ module Gems
       # @authenticated true
       # @param gem [String, Pathname, File] The path of a built gem, or the open file.
       # @param host [String, nil] A RubyGems compatible host to use (defaults to the client's host).
-      # @param attestations [Array<String, Pathname, File>, nil] The paths of the attestations to push, or the open
-      #   files, or `nil`.
+      # @param attestations [Array<String, Pathname, File>, String, Pathname, File, nil] The paths of the
+      #   attestations to push, or the open files, one of either, or `nil`.
       # @return [String] the message the endpoint answers with
       # @example
       #   Gems.push "pkg/gemcutter-0.2.1.gem"
       # @example
       #   Gems.push File.new("pkg/gemcutter-0.2.1.gem"), host: "https://gems.example.com"
+      # @example
+      #   Gems.push "pkg/gemcutter-0.2.1.gem", attestations: "pkg/gemcutter-0.2.1.gem.sigstore.json"
       def push(gem, host: nil, attestations: nil)
         open_file(gem) do |file|
           body = attestations ? multipart_push_body(file, attestations) : file
@@ -179,14 +181,30 @@ module Gems
       #
       # @api private
       # @param file [File, IO] The open gem file, whose name names the field.
-      # @param attestations [Array<String, Pathname, File>] The paths of the attestations, or the open files.
+      # @param attestations [Array<String, Pathname, File>, String, Pathname, File] The paths of the attestations,
+      #   or the open files, or one of either.
       # @return [Array] the multipart form fields
       def multipart_push_body(file, attestations)
         [
           ["gem", file, {filename: filename_of(file), content_type: RequestBuilder::OCTET_STREAM}],
-          ["attestations", "[#{attestations.map { |attestation| read_file(attestation) }.join(",")}]",
+          ["attestations", "[#{list_of(attestations).map { |attestation| read_file(attestation) }.join(",")}]",
             {content_type: "application/json"}]
         ]
+      end
+
+      # The attestations to push, as a list
+      #
+      # A gem is usually pushed with one attestation, so one given on its own is taken as the list it names rather
+      # than raising. `Array()` is not used for this: it would read an open file as the lines it holds.
+      #
+      # @api private
+      # @param attestations [Array<String, Pathname, File>, String, Pathname, File] the attestations
+      # @return [Array<String, Pathname, File>] the attestations, as a list
+      def list_of(attestations)
+        case attestations
+        when Array then attestations
+        else [attestations]
+        end
       end
 
       # The name a gem is sent under in a multipart body

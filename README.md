@@ -80,6 +80,9 @@ Gems.profile('sferik').handle
 Gems.push 'gemcutter-0.2.1.gem'
 Gems.push File.new 'gemcutter-0.2.1.gem'
 
+# Push the sigstore attestations a gem was signed with, one or several.
+Gems.push 'gemcutter-0.2.1.gem', attestations: 'gemcutter-0.2.1.gem.sigstore.json'
+
 # Remove a gem from RubyGems.org's index.
 # Defaults to the latest version if no version is specified.
 Gems.yank 'bills', '0.0.1'

@@ -10,6 +10,7 @@ module Gems
   type api_key_identifier = String | APIKey
   type trusted_publisher_identifier = Integer | String | TrustedPublisher
   type push_file = String | Pathname | File
+  type push_attestations = Array[push_file] | push_file
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String | File
 
   extend Configuration
@@ -45,7 +46,7 @@ module Gems
   def self.search_each: (String query) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
   def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?user_identifier? user_handle) -> Array[Gem]
-  def self.push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
+  def self.push: (push_file gem, ?host: String?, ?attestations: push_attestations?) -> String
   def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
   def self.versions: (gem_identifier gem_name) -> Array[Version]
   def self.latest_version: (gem_identifier gem_name) -> String
@@ -499,14 +500,15 @@ module Gems
     def search_each: (String query) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
     def autocomplete: (String query) -> Array[String]
     def owned_gems: (?user_identifier? user_handle) -> Array[Gem]
-    def push: (push_file gem, ?host: String?, ?attestations: Array[push_file]?) -> String
+    def push: (push_file gem, ?host: String?, ?attestations: push_attestations?) -> String
     def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
     def reverse_dependencies: (gem_identifier gem_name, ?only: (String | Symbol)?) -> Array[String]
 
     private
 
     def validate_type: ((String | Symbol)? type) -> void
-    def multipart_push_body: (File file, Array[push_file] attestations) -> Array[multipart_field]
+    def multipart_push_body: (File file, push_attestations attestations) -> Array[multipart_field]
+    def list_of: (push_attestations attestations) -> Array[push_file]
     def filename_of: (File file) -> String
     def open_file: [T] (push_file file) { (File file) -> T } -> T
     def read_file: (push_file file) -> String

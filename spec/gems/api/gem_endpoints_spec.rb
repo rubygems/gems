@@ -268,6 +268,12 @@ RSpec.describe Gems::API::GemEndpoints do
         expect(a_post("/api/v1/gems").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
       end
 
+      it "posts a single attestation" do
+        client.push(gem, attestations: fixture("attestations/one.json"))
+
+        expect(a_post("/api/v1/gems").with(headers: {"Content-Type" => "multipart/form-data"})).to have_been_made
+      end
+
       it "builds the multipart body from the open gem file" do
         allow(client).to receive(:multipart_push_body).and_call_original
         client.push(gem, attestations:)
@@ -495,6 +501,18 @@ RSpec.describe Gems::API::GemEndpoints do
       body = client.send(:multipart_push_body, gem, paths)
 
       expect(body.last).to eq(["attestations", '[{"a":1},{"b":2}]', {content_type: "application/json"}])
+    end
+
+    it "takes an attestation given on its own as the list it names" do
+      body = client.send(:multipart_push_body, gem, fixture("attestations/one.json"))
+
+      expect(body.last).to eq(["attestations", '[{"a":1}]', {content_type: "application/json"}])
+    end
+
+    it "takes an attestation given as a path on its own as the list it names" do
+      body = client.send(:multipart_push_body, gem, File.join(fixture_path, "attestations", "one.json"))
+
+      expect(body.last).to eq(["attestations", '[{"a":1}]', {content_type: "application/json"}])
     end
   end
 end
