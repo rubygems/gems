@@ -10,6 +10,13 @@ RSpec.describe Gems::RedactedOutput do
     %(<- "GET /path HTTP/1.1\\r\\n#{headers.map { |name, value| "#{name}: #{value}\\r\\n" }.join}\\r\\n")
   end
 
+  # The CONNECT request that opens a TLS connection through a proxy, which Net::HTTP writes to the debug output as
+  # the buffer it sends rather than as an escaped string
+  def connect_dump(headers)
+    "CONNECT rubygems.org:443 HTTP/1.1\r\nHost: rubygems.org:443\r\n" \
+      "#{headers.map { |name, value| "#{name}: #{value}\r\n" }.join}\r\n"
+  end
+
   describe "#output" do
     it "is the IO the output is written to" do
       expect(redacted_output.output).to equal(io)
@@ -37,6 +44,24 @@ RSpec.describe Gems::RedactedOutput do
       redacted_output << request_dump("Authorization" => "Basic bmljazpzY2h3d3d3aW5n")
 
       expect(io.string).to eq(request_dump("Authorization" => "[REDACTED]"))
+    end
+
+    it "redacts the Proxy-Authorization header a request sent through a proxy carries" do
+      redacted_output << request_dump("Proxy-Authorization" => "Basic dXNlcjpwYXNzd29yZA==")
+
+      expect(io.string).to eq(request_dump("Proxy-Authorization" => "[REDACTED]"))
+    end
+
+    it "redacts the Proxy-Authorization header of the CONNECT that opens a TLS connection through a proxy" do
+      redacted_output << connect_dump("Proxy-Authorization" => "Basic dXNlcjpwYXNzd29yZA==")
+
+      expect(io.string).to eq(connect_dump("Proxy-Authorization" => "[REDACTED]"))
+    end
+
+    it "keeps the lines of a CONNECT that carry no credential" do
+      redacted_output << connect_dump({})
+
+      expect(io.string).to eq(connect_dump({}))
     end
 
     it "redacts the one-time passcode header Net::HTTP capitalizes as Otp" do

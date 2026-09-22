@@ -32,7 +32,9 @@ authentication credentials, one-time passcodes, and the OIDC ID tokens of truste
 those are stored, sent, logged, or resolved are particularly welcome. It already takes these precautions, so a way
 around one of them is a vulnerability rather than a feature request:
 
-* Credentials are redacted from `debug_output`, which Net::HTTP would otherwise write in the clear.
+* Credentials are redacted from `debug_output`, which Net::HTTP would otherwise write in the clear, including the
+  `Proxy-Authorization` header of a request sent through a proxy and of the CONNECT that opens a TLS connection
+  through one.
 * A redirect to another scheme, host, or port is followed without the credentials or the caller's headers, and
   one that would send the body of the request again is not followed at all, since a body carries a credential of
   its own for the endpoints that take an API key or an ID token as a field.

@@ -377,7 +377,8 @@ Gems::Client.new { |client| client.versions 'rails' }  # closed once the block i
 ```
 
 Debug output is redacted before it reaches the IO `debug_output` is set to, so that it can be kept in a log: the
-`Authorization` and `OTP` headers of every request, the ID token of a trusted publishing token exchange, the API key
+`Authorization` and `OTP` headers of every request, the `Proxy-Authorization` header the requests sent through a
+proxy carry, the ID token of a trusted publishing token exchange, the API key
 `update_api_key` sends, and the API key an API key or token exchange response returns are written as `[REDACTED]`.
 Everything else Net::HTTP writes, including the rest of the headers, is left as it is.
 

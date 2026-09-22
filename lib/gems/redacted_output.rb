@@ -5,8 +5,9 @@ module Gems
   #
   # Net::HTTP writes every request it sends and every response it reads to the debug output, headers and body alike,
   # which carry the API key, the basic authentication credentials, the one-time passcode, the OIDC ID token of a
-  # token exchange, and the API key an API key or token exchange response returns. Those values are replaced before
-  # they reach the IO, so that debug output can be kept where the credentials should not be.
+  # token exchange, the API key an API key or token exchange response returns, and the credentials of a proxy.
+  # Those values are replaced before they reach the IO, so that debug output can be kept where the credentials
+  # should not be.
   #
   # @api private
   class RedactedOutput
@@ -20,8 +21,14 @@ module Gems
     # bodies the same way, so the patterns also cover the credentials a body carries: the ID token the token exchange
     # sends as the jwt field of a JSON body, the API key `update_api_key` sends as a form field, and the API key a
     # response to the API key and token exchange endpoints carries.
+    #
+    # The credentials of a proxy are carried by the `Proxy-Authorization` header Net::HTTP sends them as, which is
+    # among the headers of a request sent through an `http://` proxy and is written again in the CONNECT request
+    # that opens a TLS connection through one. That CONNECT is dumped as the buffer it is sent as, with newlines of
+    # its own rather than escaped ones, so it is matched by a pattern of its own.
     CREDENTIALS = [
-      /(\\n(?:Authorization|OTP): )[^\\]*/i,
+      /(\\n(?:Proxy-)?(?:Authorization|OTP): )[^\\]*/i,
+      /(\r\n(?:Proxy-)?Authorization: )[^\r\n]*/i,
       /(\\"jwt\\":\\")[^\\]*/,
       /(api_key=)[^&\\"]*/,
       /(\\"rubygems_api_key\\":\\")[^\\]*/
