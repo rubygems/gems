@@ -938,10 +938,12 @@ module Gems
 
   module Idempotence
     IDEMPOTENT_METHODS: Array[String]
+    SAFE_METHODS: Array[String]
 
     private
 
     def idempotent?: (String | Symbol http_method) -> bool
+    def safe?: (String | Symbol http_method) -> bool
   end
 
   module Pagination
@@ -963,24 +965,25 @@ module Gems
 
     DEFAULT_MAX_RETRIES: Integer
     DEFAULT_MAX_RETRY_DELAY: Numeric
-    RETRIED_STATUSES: Array[Integer]
+    REFUSED_STATUSES: Array[Integer]
+    UNANSWERED_STATUSES: Array[Integer]
 
     attr_accessor max_retries: Integer
     attr_accessor max_retry_delay: Numeric
     attr_reader random: _Random
 
     def initialize: (?max_retries: Integer, ?max_retry_delay: Numeric, ?random: _Random) -> void
-    def handle: (retry_refused: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse
+    def handle: (retry_refused: bool, retry_unanswered: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse
 
     private
 
-    def attempt: (retries: Integer, retry_refused: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse?
+    def attempt: (retries: Integer, retry_refused: bool, retry_unanswered: bool, retry_lost: bool) { () -> Net::HTTPResponse } -> Net::HTTPResponse?
     def wait: (Numeric delay) -> nil
-    def retry_delay: (response: Net::HTTPResponse, retries: Integer, allowed: bool) -> Numeric?
+    def retry_delay: (response: Net::HTTPResponse, retries: Integer, refused: bool, unanswered: bool) -> Numeric?
     def network_retry_delay: (retries: Integer, allowed: bool) -> Numeric?
     def retryable?: (bool allowed, Integer retries) -> bool
     def capped: (Integer delay) -> Integer?
-    def retry?: (Net::HTTPResponse response) -> bool
+    def retry?: (Net::HTTPResponse response, bool refused, bool unanswered) -> bool
     def backoff: (Integer retries) -> Numeric
   end
 end

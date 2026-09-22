@@ -411,16 +411,24 @@ Gems.max_retries = 0  # raise instead of waiting
 Gems.rubygem 'rails'
 ```
 
-A 502 Bad Gateway and a 504 Gateway Timeout are retried too, as is a `Gems::NetworkError`: a connection that was
-refused, reset, or timed out never reached the endpoint, so sending the request again is as safe as it is after a
-429. When the retries run out, the response raises the `Gems::HTTPError` of its status and a network failure is
-raised as it was.
+A `Gems::NetworkError` is retried too: a connection that was refused, reset, or timed out never reached the
+endpoint, so sending the request again is as safe as it is after a 429. When the retries run out, the response
+raises the `Gems::HTTPError` of its status and a network failure is raised as it was.
 
 Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
-idempotent cannot be sent a second time to find out whether the server received the first one. The trusted
-publishing token exchange is the exception: a 429, 502, 503, or 504 says the endpoint turned the exchange away
-rather than issuing a key for the token, so it is sent again, where an exchange lost to the network is not, since
-the answer that went missing may have carried the only key RubyGems.org issues for that token. The wait is the one
+idempotent cannot be sent a second time to find out whether the server received the first one.
+
+A 502 Bad Gateway and a 504 Gateway Timeout are retried for a request that only reads, such as `rubygem` or
+`versions`. They are not retried for one that acts on a gem, such as `yank` or `remove_owner`, although it is
+idempotent: those statuses come from a gateway that read no answer from the origin behind it, which may have acted
+on the request before it went quiet, and a yank sent again after the origin yanked the version answers with the 404
+of the version that is already gone, which would be raised in place of the success the call was owed. A 429 and a
+503 say the server turned the request away rather than acting on it, so they are retried for either.
+
+The trusted publishing token exchange is the exception to all of this: a 429, 502, 503, or 504 answers the exchange
+with no key, and an exchange sent again either is issued one or answers that the token is spent, where the publish
+would have failed either way, so it is sent again although it is a POST. An exchange lost to the network is not,
+since the answer that went missing may have carried the only key RubyGems.org issues for that token. The wait is the one
 `Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the
 header, which is the wait after a network failure too, since a request that never arrived has no response to read a
 wait from. A wait the library chose for itself is jittered down by up to half, so that the clients a server turned

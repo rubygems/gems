@@ -217,6 +217,13 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
         expect(authenticator.exchange_token!.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
       end
 
+      it "sends the exchange again when a gateway answers it with no key" do
+        stub_request(:post, exchange_url)
+          .to_return({status: 502}, {body: fixture("exchange_token.json").read})
+
+        expect(authenticator.exchange_token!.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+      end
+
       it "raises once the retries the handler allows are spent" do
         stub_request(:post, exchange_url).to_return(status: 503, headers: {"Retry-After" => "0"})
 

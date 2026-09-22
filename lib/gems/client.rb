@@ -292,8 +292,11 @@ module Gems
     #
     # Each attempt builds a request of its own (see {#perform}), so the retry handler is told whether the request
     # is safe to send again rather than given one to read the method of. A request whose method is idempotent is
-    # safe to send again whatever turned it away; one whose method is not cannot be sent a second time to find out
-    # whether the server received the first.
+    # safe to send again after the server turned it away, or after the network lost it; one whose method is not
+    # cannot be sent a second time to find out whether the server received the first. A 502 or 504 is answered by a
+    # gateway that read no answer from the origin, which may have acted on the request, so only a safe request,
+    # which asks the server for something rather than asking it to do something, is sent again for one: a yank sent
+    # again after the origin acted on it answers with the 404 of the version it yanked.
     #
     # @api private
     # @param http_method [Symbol] the HTTP method
@@ -309,7 +312,7 @@ module Gems
       uri = build_uri(host, path)
       authenticator = authenticator_for(host)
       retryable = idempotent?(http_method)
-      response = @retry_handler.handle(retry_refused: retryable, retry_lost: retryable) do
+      response = @retry_handler.handle(retry_refused: retryable, retry_unanswered: safe?(http_method), retry_lost: retryable) do
         perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
       end
       @response_parser.parse(response:)

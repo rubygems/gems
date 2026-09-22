@@ -34,11 +34,11 @@ RSpec.describe Gems::RetryHandler do
   end
 
   # Send the given responses in turn, raising the ones that are errors, and recording the seconds waited between them
-  def handle(handler, responses, retry_refused: true, retry_lost: true, **options)
+  def handle(handler, responses, retry_refused: true, retry_unanswered: true, retry_lost: true, **options)
     waited = []
     allow(handler).to receive(:sleep) { |seconds| waited << seconds }
     remaining = responses.dup
-    response = handler.handle(retry_refused:, retry_lost:, **options) do
+    response = handler.handle(retry_refused:, retry_unanswered:, retry_lost:, **options) do
       answer = remaining.shift
       answer.is_a?(Exception) ? raise(answer) : answer
     end
@@ -229,8 +229,39 @@ RSpec.describe Gems::RetryHandler do
       expect([response.code, waited]).to eq(["429", []])
     end
 
+    it "does not send a request again after a 502 when the caller says it may not be answered twice" do
+      response, waited = handle(handler, [bad_gateway, success], retry_unanswered: false)
+
+      expect([response.code, waited]).to eq(["502", []])
+    end
+
+    it "does not send a request again after a 504 when the caller says it may not be answered twice" do
+      response, waited = handle(handler, [gateway_timeout, success], retry_unanswered: false)
+
+      expect([response.code, waited]).to eq(["504", []])
+    end
+
+    it "sends a request the server turned away again although it may not be answered twice" do
+      response, = handle(handler, [rate_limited, success], retry_unanswered: false)
+
+      expect(response).to equal(success)
+    end
+
+    it "sends a request again after a 502 when only that is allowed" do
+      response, = handle(handler, [bad_gateway, success], retry_refused: false)
+
+      expect(response).to equal(success)
+    end
+
+    it "does not send a request the server turned away again when only a 502 is allowed" do
+      response, waited = handle(handler, [rate_limited, success], retry_refused: false)
+
+      expect([response.code, waited]).to eq(["429", []])
+    end
+
     it "does not send a request again when the caller allows neither" do
-      response, waited = handle(handler, [rate_limited, success], retry_refused: false, retry_lost: false)
+      response, waited = handle(handler, [rate_limited, success], retry_refused: false, retry_unanswered: false,
+        retry_lost: false)
 
       expect([response.code, waited]).to eq(["429", []])
     end
@@ -286,7 +317,8 @@ RSpec.describe Gems::RetryHandler do
       end
 
       it "raises the error when the caller allows neither" do
-        expect { handle(handler, [network_error, success], retry_refused: false, retry_lost: false) }.to raise_error(Gems::NetworkError)
+        expect { handle(handler, [network_error, success], retry_refused: false, retry_unanswered: false, retry_lost: false) }
+          .to raise_error(Gems::NetworkError)
       end
 
       it "shortens the wait to the maximum retry delay" do

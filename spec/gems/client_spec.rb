@@ -912,6 +912,36 @@ RSpec.describe Gems::Client do
       expect(client.get("/path")).to eq("body")
     end
 
+    it "sends a safe request again after a 502" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_get("/path").to_return({status: 502}, {body: "body"})
+
+      expect(client.get("/path")).to eq("body")
+    end
+
+    it "does not send a request that acts on a gem again after a 502, which the origin may have acted on" do
+      client.max_retries = 1
+      stub_delete("/path").to_return({status: 502, body: "bad gateway"}, {body: "body"})
+
+      expect { client.delete("/path") }.to raise_error(Gems::BadGateway)
+    end
+
+    it "does not send a request that acts on a gem again after a 504" do
+      client.max_retries = 1
+      stub_delete("/path").to_return({status: 504, body: "gateway timeout"}, {body: "body"})
+
+      expect { client.delete("/path") }.to raise_error(Gems::GatewayTimeout)
+    end
+
+    it "sends a request that acts on a gem again after a 429, which the server turned away" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_delete("/path").to_return({status: 429}, {body: "body"})
+
+      expect(client.delete("/path")).to eq("body")
+    end
+
     it "sends an idempotent request lost to the network again" do
       client.max_retries = 1
       allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
