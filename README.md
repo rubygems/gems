@@ -412,10 +412,12 @@ Gems.rubygem 'rails'
 ```
 
 A `Gems::NetworkError` is retried too: a connection that was refused, reset, or timed out never reached the
-endpoint, so sending the request again is as safe as it is after a 429. When the retries run out, the response
+endpoint, so sending the request again is as safe as it is after a 503. When the retries run out, the response
 raises the `Gems::HTTPError` of its status and a network failure is raised as it was.
 
-Only an idempotent request is retried, so `push` and the other `POST` requests are not: a request that is not
+A 429 is retried for every request, `push` and the other `POST` requests included: RubyGems.org rate limits a
+request before it reaches the endpoint, so the endpoint never saw the attempt that was turned away. Otherwise only an
+idempotent request is retried, so `push` is not sent again after a 503 or a network failure: a request that is not
 idempotent cannot be sent a second time to find out whether the server received the first one.
 
 A 502 Bad Gateway and a 504 Gateway Timeout are retried for a request that only reads, such as `rubygem` or

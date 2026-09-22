@@ -8,8 +8,12 @@ require_relative "settings"
 module Gems
   # Sends a request again when the server, or the network, turns it away
   #
-  # A 429 Too Many Requests and a 503 Service Unavailable say the server turned the request away rather than acting
-  # on it, so sending it again is safe for any request that is idempotent. A 502 Bad Gateway and a 504 Gateway
+  # A 429 Too Many Requests says a rate limiter turned the request away before it reached the endpoint, so sending it
+  # again is safe for any request, even one that is not idempotent, such as pushing a gem: the endpoint never saw the
+  # attempt before it. A 503 Service Unavailable says the server turned the request away rather than acting on it,
+  # so sending it again is safe for any request that is idempotent, but it can come from a proxy that gave up on an
+  # origin still working on the request, so a request that is not idempotent is not sent again for one. A 502 Bad
+  # Gateway and a 504 Gateway
   # Timeout say less: they come from a gateway that could not read an answer from the origin behind it, which may
   # have acted on the request before it went quiet, so a request that asks the server to do something, such as
   # yanking a version, is sent again only when it is safe to be answered twice. Sending a yank again after the
@@ -20,7 +24,7 @@ module Gems
   # `retry_lost` arguments of {#handle}: {Client} says whether the method of the request is idempotent and whether
   # it is safe, since a request such as pushing a gem cannot be sent a second time to find out whether the server
   # received the first one, and a caller that knows better, such as the trusted publishing token exchange, says
-  # what it knows instead.
+  # what it knows instead. A 429 is sent again whatever the caller says, since no request reached the endpoint.
   #
   # A request is sent again twice by default, which is enough for the moment of rate limiting or the lost
   # connection that a retry is for, and {#max_retries} of zero turns retrying off, so that a request that was
@@ -37,11 +41,13 @@ module Gems
     DEFAULT_MAX_RETRIES = 2
     # Default longest a request waits before it is sent again, in seconds
     DEFAULT_MAX_RETRY_DELAY = 60 # seconds
-    # The statuses that say the server turned the request away rather than acting on it
-    REFUSED_STATUSES = [429, 503].freeze
+    # The status that says a rate limiter turned the request away before it reached the endpoint
+    THROTTLED_STATUS = 429
+    # The status that says the server turned the request away rather than acting on it
+    REFUSED_STATUS = 503
     # The statuses that say a gateway read no answer from the origin, which may have acted on the request
     UNANSWERED_STATUSES = [502, 504].freeze
-    private_constant :REFUSED_STATUSES, :UNANSWERED_STATUSES
+    private_constant :THROTTLED_STATUS, :REFUSED_STATUS, :UNANSWERED_STATUSES
 
     # @!method max_retries
     #   The number of times a request is sent again
@@ -109,17 +115,18 @@ module Gems
     # has no retry left is raised as it was.
     #
     # A request the server turned away, one it may have acted on, and one that is lost to the network are told
-    # apart, since they are not equally safe to send again: a 429 or 503 says the server refused the request, a 502
-    # or 504 says a gateway read no answer from the origin, which may have acted on it, and a request lost to the
-    # network may have arrived and been acted on before the answer went missing. The caller says which of the three
-    # its request is safe for, so that the trusted publishing token exchange can be sent again when the endpoint
-    # turns it away although it is a POST, and not when it is lost.
+    # apart, since they are not equally safe to send again: a 503 says the server refused the request, a 502 or 504
+    # says a gateway read no answer from the origin, which may have acted on it, and a request lost to the network
+    # may have arrived and been acted on before the answer went missing. The caller says which of the three its
+    # request is safe for, so that the trusted publishing token exchange can be sent again when the endpoint turns it
+    # away although it is a POST, and not when it is lost. A 429 is sent again for every request, since a rate
+    # limiter answered it before it reached the endpoint.
     #
     # The request is not named, since the block builds one of its own each time it is called, so that a body read
     # as a stream is sent from the start (see {Client#perform}).
     #
     # @api private
-    # @param retry_refused [Boolean] whether a request the server turned away is sent again
+    # @param retry_refused [Boolean] whether a request the server turned away with a 503 is sent again
     # @param retry_unanswered [Boolean] whether a request the origin may have acted on is sent again
     # @param retry_lost [Boolean] whether a request lost to the network is sent again
     # @yield the response, each time the request is sent
@@ -129,6 +136,8 @@ module Gems
     #   handler.handle(retry_refused: true, retry_unanswered: true, retry_lost: true) { connection.perform(request:) }
     # @example Send a request that is safe to send again only when the server turned it away
     #   handler.handle(retry_refused: true, retry_unanswered: false, retry_lost: false) { connection.perform(request:) }
+    # @example Send a request that is safe to send again only when a rate limiter turned it away
+    #   handler.handle(retry_refused: false, retry_unanswered: false, retry_lost: false) { connection.perform(request:) }
     def handle(retry_refused:, retry_unanswered:, retry_lost:)
       retries = 0
       loop do
@@ -145,7 +154,7 @@ module Gems
     #
     # @api private
     # @param retries [Integer] the number of times the request has been sent again
-    # @param retry_refused [Boolean] whether a request the server turned away is sent again
+    # @param retry_refused [Boolean] whether a request the server turned away with a 503 is sent again
     # @param retry_unanswered [Boolean] whether a request the origin may have acted on is sent again
     # @param retry_lost [Boolean] whether a request lost to the network is sent again
     # @yield the response to the request
@@ -184,7 +193,7 @@ module Gems
     # @api private
     # @param response [Net::HTTPResponse] the response to the request
     # @param retries [Integer] the number of times the request has been sent again
-    # @param refused [Boolean] whether a request the server turned away is sent again
+    # @param refused [Boolean] whether a request the server turned away with a 503 is sent again
     # @param unanswered [Boolean] whether a request the origin may have acted on is sent again
     # @return [Numeric, nil] the seconds to wait, or nil when the request is not sent again
     def retry_delay(response:, retries:, refused:, unanswered:)
@@ -224,18 +233,21 @@ module Gems
 
     # Whether a response is one the request is sent again for
     #
-    # A 429 or 503 says the server turned the request away rather than acting on it; a 502 or 504 says a gateway
-    # read no answer from the origin, which may have acted on it, and is sent again only by the caller that says
-    # its request can be answered twice.
+    # A 429 says a rate limiter turned the request away before it reached the endpoint, and is sent again whatever
+    # the request; a 503 says the server turned the request away rather than acting on it, and is sent again only by
+    # the caller that says its request can be sent twice; a 502 or 504 says a gateway read no answer from the
+    # origin, which may have acted on it, and is sent again only by the caller that says its request can be answered
+    # twice.
     #
     # @api private
     # @param response [Net::HTTPResponse] the response to the request
-    # @param refused [Boolean] whether a request the server turned away is sent again
+    # @param refused [Boolean] whether a request the server turned away with a 503 is sent again
     # @param unanswered [Boolean] whether a request the origin may have acted on is sent again
     # @return [Boolean] whether the request is sent again
     def retry?(response, refused, unanswered)
       status = Integer(response.code)
-      (refused && REFUSED_STATUSES.include?(status)) || (unanswered && UNANSWERED_STATUSES.include?(status))
+      status.eql?(THROTTLED_STATUS) || (refused && status.eql?(REFUSED_STATUS)) ||
+        (unanswered && UNANSWERED_STATUSES.include?(status))
     end
 
     # The seconds to wait when the response does not ask for a wait of its own

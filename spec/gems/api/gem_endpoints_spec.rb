@@ -199,6 +199,15 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(client.push(gem)).to eq("Successfully registered gem: gems (0.0.8)")
     end
 
+    it "pushes the whole of the gem again after a 429" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_post("/api/v1/gems").to_return({status: 429, body: "throttled"}, {body: fixture("push")})
+      client.push(gem)
+
+      expect(a_post("/api/v1/gems").with(body: gem_data)).to have_been_made.twice
+    end
+
     it "posts a gem given as a path" do
       client.push(File.join(fixture_path, "gems-0.0.8.gem"))
 

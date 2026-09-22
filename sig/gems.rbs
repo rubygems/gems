@@ -982,7 +982,8 @@ module Gems
 
     DEFAULT_MAX_RETRIES: Integer
     DEFAULT_MAX_RETRY_DELAY: Numeric
-    REFUSED_STATUSES: Array[Integer]
+    THROTTLED_STATUS: Integer
+    REFUSED_STATUS: Integer
     UNANSWERED_STATUSES: Array[Integer]
 
     attr_accessor max_retries: Integer
