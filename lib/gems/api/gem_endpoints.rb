@@ -5,6 +5,7 @@ require_relative "../identifiers"
 require_relative "../json_parsing"
 require_relative "../pagination"
 require_relative "../path_escaping"
+require_relative "../dependency"
 require_relative "../gem"
 require_relative "../request_builder"
 
@@ -142,15 +143,34 @@ module Gems
       # @api public
       # @authenticated false
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version
-      # @param only [String, nil] Restrict the results to "development" or "runtime" dependencies.
+      # @param only [String, Symbol, nil] Restrict the results to "development" or "runtime" dependencies, which
+      #   are the types {Dependency::TYPES} names.
       # @return [Array<String>]
+      # @raise [ArgumentError] if the type is not one the API defines
       # @example
       #   Gems.reverse_dependencies "money", only: "runtime"
       def reverse_dependencies(gem_name, only: nil)
+        validate_type(only)
         parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/reverse_dependencies.json", {only:}.compact))
       end
 
       private
+
+      # Check that a dependency type is one the RubyGems API defines
+      #
+      # The endpoint answers with every reverse dependency for a type it does not define, rather than refusing it,
+      # so a misspelled type would be answered with the dependencies of both types where the caller asked for one.
+      #
+      # @api private
+      # @param type [String, Symbol, nil] the dependency type, or nil to ask for both
+      # @return [void]
+      # @raise [ArgumentError] if the type is not one the API defines
+      def validate_type(type)
+        return if type.nil? || Dependency::TYPES.include?(type.to_s)
+
+        raise ArgumentError, "Unknown dependency type: #{type}. " \
+          "The types the API defines are: #{Dependency::TYPES.join(", ")}"
+      end
 
       # Build the multipart body for pushing a gem with attestations
       #

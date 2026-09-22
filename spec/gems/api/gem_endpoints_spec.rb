@@ -388,6 +388,26 @@ RSpec.describe Gems::API::GemEndpoints do
 
       expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json?only=development")).to have_been_made
     end
+
+    it "accepts a type given as a Symbol" do
+      stub_get("/api/v1/gems/rspec/reverse_dependencies.json?only=runtime")
+        .to_return(body: fixture("reverse_dependencies_short.json"))
+      client.reverse_dependencies("rspec", only: :runtime)
+
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json?only=runtime")).to have_been_made
+    end
+
+    it "rejects a type the API does not define" do
+      expect { client.reverse_dependencies("rspec", only: "runtimes") }
+        .to raise_error(ArgumentError, "Unknown dependency type: runtimes. " \
+          "The types the API defines are: development, runtime")
+    end
+
+    it "does not get the reverse dependencies for a type the API does not define" do
+      client.reverse_dependencies("rspec", only: "runtimes")
+    rescue ArgumentError
+      expect(a_get("/api/v1/gems/rspec/reverse_dependencies.json")).not_to have_been_made
+    end
   end
 
   describe "#read_file" do

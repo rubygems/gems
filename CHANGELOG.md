@@ -88,6 +88,7 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Build the replacement client before closing the client it replaces, so that a configuration a client cannot be built from leaves the client the module has open rather than closing it on the way to raising
 * Count an empty `GEM_HOST_API_KEY` as no key rather than as an empty one, since a continuous integration service sets a variable to the empty string when the secret it was given is not set, and an empty `Authorization` header answers with a puzzling 401 where a request without one answers with the error the endpoint has for an unauthenticated request
 * Raise `ArgumentError` for an API key scope the RubyGems API does not define, rather than sending a misspelled scope for the server to ignore and leaving the key scoped differently than it was meant to be
+* Raise `ArgumentError` for an `only` argument to `reverse_dependencies` other than `development` or `runtime`, which `Gems::Dependency::TYPES` names, rather than sending a misspelled type for the endpoint to ignore: it answers with the reverse dependencies of both types for a type it does not define, so a misspelled one was answered with more than the caller asked for rather than refused
 * Define `Gems::VERSION` in `gems/library_version` rather than in `gems/version`, which defines the `Gems::Version` response object, so that evaluating the gemspec reads the version without loading `Gems::Resource` and the errors and standard libraries beneath it; `require "gems"` defines both, as it did
 
 ### Removed
