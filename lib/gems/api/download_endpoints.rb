@@ -28,6 +28,10 @@ module Gems
 
       # Returns the number of downloads of a gem and of one of its versions
       #
+      # The endpoint answers with the counts alone, so the version they were asked for is kept in the result, as the
+      # name of a gem is kept in the versions of it that {API::VersionEndpoints#versions} returns: counts that are
+      # equal are the counts of the same version only when {Downloads#full_name} says so.
+      #
       # @api public
       # @authenticated false
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version. A version stands in for the
@@ -46,7 +50,9 @@ module Gems
       #   Gems.downloads("nokogiri", "1.15.0", platform: "java").version_downloads
       def downloads(gem_name, version = nil, platform: nil)
         version = version_of(gem_name, version) || latest_version(gem_name)
-        Downloads.new(parse_json(get("/api/v1/downloads/#{escape(full_name_of(gem_name, version, platform))}.json")))
+        full_name = full_name_of(gem_name, version, platform)
+        counts = parse_json(get("/api/v1/downloads/#{escape(full_name)}.json"))
+        Downloads.new({"full_name" => full_name}.merge(counts))
       end
 
       # Returns the top 50 downloaded gem versions of all time

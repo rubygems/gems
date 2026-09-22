@@ -402,6 +402,7 @@ module Gems
   end
 
   class Downloads < Resource
+    def full_name: () -> String?
     def total: () -> Integer?
     def version_downloads: () -> Integer?
   end

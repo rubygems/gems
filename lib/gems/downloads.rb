@@ -4,9 +4,27 @@ require_relative "resource"
 
 module Gems
   # Download counts, as returned by the downloads endpoints
+  #
+  # The endpoint answers with the counts alone, so {API::DownloadEndpoints#downloads} keeps the version it asked
+  # about in the result as {#full_name}, which is what identifies the counts: the downloads of one gem are not the
+  # downloads of another that happens to have been downloaded as many times.
+  #
   # @api public
   class Downloads < Resource
-    inspect_with :total, :version_downloads
+    inspect_with :full_name, :total, :version_downloads
+    identified_by :full_name
+
+    # @!method full_name
+    #   The full name of the version the counts are for
+    #
+    #   The name and version number of the gem, followed by its platform unless it is "ruby". The endpoint answers
+    #   with the counts alone; this is the version they were asked for.
+    #
+    #   @api public
+    #   @return [String, nil] the full name of the version, such as "nokogiri-1.15.0-java"
+    #   @example
+    #     downloads.full_name
+    attribute :full_name
 
     # @!method version_downloads
     #   The downloads of the version

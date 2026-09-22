@@ -105,6 +105,9 @@ Gems.total_downloads
 # (Defaults to the latest version if no version is specified.)
 Gems.downloads('rails_admin', '0.0.1').version_downloads
 
+# The counts name the version they are for, which the endpoint answers without.
+Gems.downloads('rails_admin', '0.0.1').full_name
+
 # Return the downloads of a version for a specific platform.
 Gems.downloads('nokogiri', '1.15.0', platform: 'java').version_downloads
 
@@ -250,7 +253,10 @@ names, at the platform it names, rather than on the latest version. Those five m
 you mean the latest one.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
-`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. Gems and
+`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. The counts
+`downloads` answers with carry the version they were asked for as `full_name`, since the endpoint answers with the
+counts alone, and are compared by it: the downloads of one gem are not the downloads of another that happens to
+have been downloaded as many times. Gems and
 versions also order by their number as RubyGems orders numbers, rather than as the strings they are written with, so
 `Gems.versions('rails').max` answers with `7.0.10` where `max_by(&:number)` would answer with `7.0.9`:
 

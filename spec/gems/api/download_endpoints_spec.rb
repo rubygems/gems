@@ -45,6 +45,22 @@ RSpec.describe Gems::API::DownloadEndpoints do
       expect([downloads.class, downloads.total, downloads.version_downloads]).to eq([Gems::Downloads, 3142, 3142])
     end
 
+    it "names the version the downloads were asked for" do
+      expect(client.downloads("rails_admin", "0.0.0").full_name).to eq("rails_admin-0.0.0")
+    end
+
+    it "names the platform of the version the downloads were asked for" do
+      stub_get("/api/v1/downloads/nokogiri-1.15.0-java.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+
+      expect(client.downloads("nokogiri", "1.15.0", platform: "java").full_name).to eq("nokogiri-1.15.0-java")
+    end
+
+    it "keeps the full name a response carries of its own" do
+      stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: '{"full_name":"rails_admin-0.0.0-java"}')
+
+      expect(client.downloads("rails_admin", "0.0.0").full_name).to eq("rails_admin-0.0.0-java")
+    end
+
     it "includes the platform of a version in the full name" do
       stub_get("/api/v1/downloads/nokogiri-1.15.0-java.json").to_return(body: fixture("rails_admin-0.0.0.json"))
       client.downloads("nokogiri", Gems::Version.new("number" => "1.15.0", "platform" => "java"))
