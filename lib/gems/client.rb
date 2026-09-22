@@ -34,12 +34,15 @@ module Gems
     def_delegators :@connection, :open_timeout, :read_timeout, :write_timeout, :keep_alive_timeout, :proxy_url, :debug_output
     def_delegators :@connection, :open_timeout=, :read_timeout=, :write_timeout=, :keep_alive_timeout=, :proxy_url=, :debug_output=
     def_delegators :@connection, *CertificateOptions::SETTINGS, *CertificateOptions::SETTINGS.map { |s| :"#{s}=" }
-    def_delegators :@redirect_handler, :max_redirects
-    def_delegators :@redirect_handler, :max_redirects=
+    def_delegators :@redirect_handler, :max_redirects, :max_redirects=
     def_delegators :@retry_handler, :max_retries, :max_retry_delay
     def_delegators :@retry_handler, :max_retries=, :max_retry_delay=
     def_delegators :@request_builder, :user_agent
     def_delegators :@request_builder, :user_agent=
+
+    # The methods of Forwardable, which the class delegates with rather than offers, so that `Client.delegate` and
+    # the rest are not mistaken for methods of the API
+    private_class_method(*Forwardable.instance_methods)
 
     # Build a client, and close it once a block is done with it
     #

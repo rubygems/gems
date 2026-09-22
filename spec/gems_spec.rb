@@ -5,6 +5,10 @@ RSpec.describe Gems do
     expect(described_class).to be_a(Gems::Configuration)
   end
 
+  it "keeps the methods of SingleForwardable, which it delegates with, private" do
+    expect(SingleForwardable.instance_methods.select { |method| described_class.respond_to?(method) }).to be_empty
+  end
+
   describe "::VERSION" do
     it "is a String" do
       expect(Gems::VERSION).to be_a(String)

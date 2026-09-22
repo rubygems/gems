@@ -16,6 +16,13 @@ module Gems
   extend Configuration
   extend SingleForwardable
 
+  private def self.def_delegator: (interned accessor, Symbol method, ?Symbol ali) -> void
+  private def self.def_delegators: (interned accessor, *Symbol methods) -> void
+  private def self.def_single_delegator: (interned accessor, Symbol method, ?Symbol ali) -> void
+  private def self.def_single_delegators: (interned accessor, *Symbol methods) -> void
+  private def self.delegate: (Hash[Symbol | Array[Symbol], Symbol] hash) -> void
+  private def self.single_delegate: (Hash[Symbol | Array[Symbol], Symbol] hash) -> void
+
   self.@client: Client
   self.@client_values: Array[untyped]?
   self.@credential_values: Array[untyped]
@@ -594,6 +601,13 @@ module Gems
     include ClientCredentials
     include Idempotence
     include URLValidation
+
+    private def self.def_delegator: (interned accessor, Symbol method, ?Symbol ali) -> void
+    private def self.def_delegators: (interned accessor, *Symbol methods) -> void
+    private def self.def_instance_delegator: (interned accessor, Symbol method, ?Symbol ali) -> void
+    private def self.def_instance_delegators: (interned accessor, *Symbol methods) -> void
+    private def self.delegate: (Hash[Symbol | Array[Symbol], Symbol] hash) -> void
+    private def self.instance_delegate: (Hash[Symbol | Array[Symbol], Symbol] hash) -> void
 
     @connection: Connection
     @request_builder: RequestBuilder

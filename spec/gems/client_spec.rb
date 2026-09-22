@@ -3,6 +3,10 @@
 RSpec.describe Gems::Client do
   subject(:client) { described_class.new(key: nil, username: nil, password: nil) }
 
+  it "keeps the methods of Forwardable, which it delegates with, private" do
+    expect(Forwardable.instance_methods.select { |method| described_class.respond_to?(method) }).to be_empty
+  end
+
   describe ".new" do
     # Builds a client with a block that stubs its close, so that an example can ask whether it was closed, and runs
     # the action the example gives it, such as raising.

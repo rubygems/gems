@@ -49,6 +49,10 @@ module Gems
   # them in the mixin it belongs to.
   def_delegators :client, *API.public_instance_methods
 
+  # The methods of SingleForwardable, which the module delegates with rather than offers, so that `Gems.delegate`
+  # and the rest are not mistaken for methods of the API
+  private_class_method(*SingleForwardable.instance_methods)
+
   # The client the API methods of the module delegate to
   #
   # The client is built from the global configuration, and a change to that configuration is applied to the client it
