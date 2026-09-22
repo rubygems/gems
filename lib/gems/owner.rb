@@ -6,6 +6,15 @@ module Gems
   # An owner of a gem
   # @api public
   class Owner < Resource
+    # The roles the RubyGems API defines for an owner
+    #
+    # A role the API does not define is refused by {API::OwnerEndpoints#add_owner} and
+    # {API::OwnerEndpoints#update_owner} rather than sent, so this is the list a caller building its own role can
+    # check against.
+    #
+    # @api public
+    ROLES = %w[maintainer owner].freeze
+
     inspect_with :handle
     identified_by :id, :handle, :email
 

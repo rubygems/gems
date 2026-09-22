@@ -455,8 +455,8 @@ Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or
 HTTPS URL, a raw request path that is a URL of another scheme, host, or port, which would otherwise carry the
 credentials resolved for the client's host to the host it names, an API key scope the RubyGems API does not
 define, which would otherwise be ignored by the server and leave the key scoped differently than it was meant to be,
-and a reverse dependency type other than `development` or `runtime`, which the endpoint answers with every reverse
-dependency for rather than refusing.
+a reverse dependency type other than `development` or `runtime`, which the endpoint answers with every reverse
+dependency for rather than refusing, and an owner role other than `owner` or `maintainer`.
 
 ## Development
 

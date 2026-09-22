@@ -62,6 +62,23 @@ RSpec.describe Gems::API::OwnerEndpoints do
       expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com", role: "maintainer"})).to have_been_made
     end
 
+    it "posts a role given as a Symbol" do
+      client.add_owner("gems", "sferik@gmail.com", role: :maintainer)
+
+      expect(a_post("/api/v1/gems/gems/owners").with(body: {email: "sferik@gmail.com", role: "maintainer"})).to have_been_made
+    end
+
+    it "rejects a role the API does not define" do
+      expect { client.add_owner("gems", "sferik@gmail.com", role: "maintainers") }
+        .to raise_error(ArgumentError, "Unknown owner role: maintainers. The roles the API defines are: maintainer, owner")
+    end
+
+    it "does not post an owner with a role the API does not define" do
+      client.add_owner("gems", "sferik@gmail.com", role: "maintainers")
+    rescue ArgumentError
+      expect(a_post("/api/v1/gems/gems/owners")).not_to have_been_made
+    end
+
     it "returns the response body" do
       expect(client.add_owner("gems", "sferik@gmail.com")).to eq("Owner added successfully.")
     end
@@ -89,6 +106,17 @@ RSpec.describe Gems::API::OwnerEndpoints do
       client.update_owner("../gems", "sferik@gmail.com", role: "maintainer")
 
       expect(a_request(:patch, rubygems_url("/api/v1/gems/..%2Fgems/owners"))).to have_been_made
+    end
+
+    it "rejects a role the API does not define" do
+      expect { client.update_owner("gems", "sferik@gmail.com", role: "owners") }
+        .to raise_error(ArgumentError, /\AUnknown owner role: owners\./)
+    end
+
+    it "does not patch an owner with a role the API does not define" do
+      client.update_owner("gems", "sferik@gmail.com", role: "owners")
+    rescue ArgumentError
+      expect(a_request(:patch, rubygems_url("/api/v1/gems/gems/owners"))).not_to have_been_made
     end
 
     it "returns the response body" do
