@@ -5,6 +5,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         ruby: ["3.4", "4.0", "head", "jruby"]
     runs-on: ubuntu-latest
