@@ -164,8 +164,14 @@ RSpec.describe Gems::API::TrustedPublisherEndpoints do
       expect(a_delete("/api/v1/gems/..%2Fgems/trusted_publishers/..%2F1")).to have_been_made
     end
 
-    it "returns the empty response body" do
-      expect(client.remove_trusted_publisher("gems", 1)).to eq("")
+    it "returns a message saying the trusted publisher was removed, since the endpoint answers with none" do
+      expect(client.remove_trusted_publisher("gems", 1)).to eq("Trusted publisher removed successfully.")
+    end
+
+    it "returns the message the endpoint answers with, when it answers with one" do
+      stub_delete("/api/v1/gems/gems/trusted_publishers/1").to_return(body: "Removed.")
+
+      expect(client.remove_trusted_publisher("gems", 1)).to eq("Removed.")
     end
   end
 end

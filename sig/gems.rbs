@@ -548,6 +548,8 @@ module Gems
     include JSONParsing
     include PathEscaping
 
+    REMOVED_MESSAGE: String
+
     def trusted_publishers: (gem_identifier gem_name) -> Array[TrustedPublisher]
     def trusted_publisher: (gem_identifier gem_name, trusted_publisher_identifier trusted_publisher) -> TrustedPublisher
     def add_trusted_publisher: (gem_identifier gem_name, repository_owner: String, repository_name: String, workflow_filename: String, ?environment: String?, ?workflow_repository_owner: String?, ?workflow_repository_name: String?, ?type: String) -> TrustedPublisher

@@ -20,6 +20,11 @@ module Gems
       include JSONParsing
       include PathEscaping
 
+      # The message a removal answers with, since the endpoint answers with an empty body where the other remove
+      # endpoints answer with a message of their own
+      REMOVED_MESSAGE = "Trusted publisher removed successfully."
+      private_constant :REMOVED_MESSAGE
+
       # List the trusted publishers configured for a gem
       #
       # @api public
@@ -85,11 +90,13 @@ module Gems
       # @authenticated true
       # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version.
       # @param trusted_publisher [Integer, String, TrustedPublisher] The ID of the trusted publisher, or one.
-      # @return [String] the response body, which the endpoint leaves empty
+      # @return [String] the message the endpoint answers with, or, since it answers with an empty body, a message
+      #   saying the trusted publisher was removed, as {OwnerEndpoints#remove_owner} answers with one
       # @example
       #   Gems.remove_trusted_publisher("gems", Gems.trusted_publishers("gems").first)
       def remove_trusted_publisher(gem_name, trusted_publisher)
-        delete(trusted_publisher_path(gem_name, trusted_publisher))
+        body = delete(trusted_publisher_path(gem_name, trusted_publisher))
+        body.empty? ? REMOVED_MESSAGE : body
       end
 
       private
