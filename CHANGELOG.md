@@ -94,6 +94,9 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Raise `ArgumentError` for a `role` argument to `add_owner` and `update_owner` other than `owner` or `maintainer`, which `Gems::Owner::ROLES` names, so that a misspelled role names the argument that was wrong rather than whatever the endpoint answers with
 * Define `Gems::VERSION` in `gems/library_version` rather than in `gems/version`, which defines the `Gems::Version` response object, so that evaluating the gemspec reads the version without loading `Gems::Resource` and the errors and standard libraries beneath it; `require "gems"` defines both, as it did
 
+### Deprecated
+* Deprecate `GemError`, kept as a constant alias; use `Error` instead
+
 ### Removed
 * Remove the `page` option of `latest` and `just_updated`, which take no arguments now: their endpoints answer with the 50 gems they name whatever page is asked for, so a page other than the first was the first under another name
 * Require Ruby 3.4 or later: Ruby 3.1 and 3.2 have reached end of life, Ruby 3.3 reaches it in March 2027, within the life of 3.x, and Ruby 3.4 bundles the net-http that connects to an HTTPS proxy over TLS
@@ -101,9 +104,6 @@ See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) fo
 * Remove `dependencies`, `api_key`, and `unyank`, whose endpoints have been retired by RubyGems.org; `PUT /api/v1/gems/unyank` answers 403 "This version of the Gemcutter plugin has been deprecated.", so `unyank` could not have worked against RubyGems.org, and `create_api_key` replaces `api_key`
 * Leave `most_downloaded` without a counterpart for the versions downloaded most today, since `GET /api/v1/downloads/top.json` has been retired too and answers 410 Gone
 * Remove `Gems::AbstractClient`, `Gems::Request`, `Gems::BaseClient`, `Gems.options`, `Gems::Configuration::VALID_OPTIONS_KEYS`, and `Gems::Configuration::DEFAULT_KEY`
-
-### Deprecated
-* Deprecate `GemError`, kept as a constant alias; use `Error` instead
 
 ### Security
 * Verify SSL certificates instead of disabling verification
