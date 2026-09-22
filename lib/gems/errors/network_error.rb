@@ -2,6 +2,7 @@
 
 require "net/http"
 require "openssl"
+require "timeout"
 require "zlib"
 require_relative "error"
 
