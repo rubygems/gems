@@ -216,8 +216,9 @@ Gems.configure do |config|
   config.id_token = ENV.fetch('ID_TOKEN')
 end
 
-# The methods of the Gems module share one client, Gems.client, which is built again when the
-# configured credentials change. Use it for raw requests.
+# The methods of the Gems module share one client, Gems.client, which is built again only when the
+# configured host or ID token changes, or the key it falls back to when none is configured; any other
+# change to the configuration is applied to the client it has. Use it for raw requests.
 Gems.client.get '/api/v1/gems/rails.json'
 
 # Raw requests take headers of your own, alongside the User-Agent and the credentials of the client.

@@ -28,8 +28,10 @@ Gems.version "rails", "7.0.6"
 ```
 
 The `Gems` module delegates the API methods alone to one client, `Gems.client`, which is built from the global
-configuration and built again when it changes, where 2.x delegated every client method to a new client for every
-call. The raw request methods are on that client:
+configuration, where 2.x delegated every client method to a new client for every call. It is built again only when
+the configured host or ID token changes, or the key it falls back to when none is configured; any other change to the
+configuration, such as a key, a passcode, or a timeout, is applied to the client it has. The raw request methods are
+on that client:
 
 ```ruby
 # 2.x
