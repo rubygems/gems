@@ -106,6 +106,14 @@ module Gems
     #     version.platform
     attribute :platform
 
+    # @!method ruby_abi
+    #   The Ruby ABI the version was built for
+    #   @api public
+    #   @return [String, nil] the Ruby ABI the version was built for, or nil for a version built for none
+    #   @example
+    #     version.ruby_abi
+    attribute :ruby_abi
+
     # @!method prerelease?
     #   Whether the version is a prerelease
     #   @api public

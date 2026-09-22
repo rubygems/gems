@@ -62,6 +62,14 @@ module Gems
     #     gem.platform
     attribute :platform
 
+    # @!method ruby_abi
+    #   The Ruby ABI the version was built for
+    #   @api public
+    #   @return [String, nil] the Ruby ABI the version was built for, or nil for a version built for none
+    #   @example
+    #     gem.ruby_abi
+    attribute :ruby_abi
+
     # @!method authors
     #   The authors
     #   @api public

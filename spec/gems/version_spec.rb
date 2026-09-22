@@ -44,6 +44,14 @@ RSpec.describe Gems::Version do
     expect(described_class.new("full_name" => "abstract-1.0.0").full_name).to eq("abstract-1.0.0")
   end
 
+  it "exposes the Ruby ABI a version built for one names" do
+    expect(described_class.new("ruby_abi" => "3.4").ruby_abi).to eq("3.4")
+  end
+
+  it "exposes no Ruby ABI for a version built for none" do
+    expect(version.ruby_abi).to be_nil
+  end
+
   it "exposes built_at as a time" do
     expect(version.built_at).to eq(Time.utc(2023, 6, 29))
   end

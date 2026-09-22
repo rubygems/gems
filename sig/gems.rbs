@@ -307,6 +307,7 @@ module Gems
     def downloads: () -> Integer?
     def version_downloads: () -> Integer?
     def platform: () -> String?
+    def ruby_abi: () -> String?
     def authors: () -> String?
     def info: () -> String?
     def licenses: () -> Array[String]?
@@ -341,6 +342,7 @@ module Gems
     def summary: () -> String?
     def downloads_count: () -> Integer?
     def platform: () -> String?
+    def ruby_abi: () -> String?
     def prerelease?: () -> bool
     def yanked?: () -> bool
     def licenses: () -> Array[String]?
