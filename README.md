@@ -335,9 +335,8 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `client_cert` | The certificate presented to a host that asks for one    | `nil`                                  |
 | `client_key`  | The private key of `client_cert`                         | `nil`                                  |
 
-Each authentication method has its own authenticator class: `Gems::APIKeyAuthenticator`, `Gems::BasicAuthenticator`,
-`Gems::TrustedPublisherAuthenticator`, and `Gems::OTPAuthenticator` (which wraps one of the others).
-HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key.
+HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key, and a
+one-time passcode is sent alongside whichever of them is used.
 
 When no key is configured, the API key is resolved for the host it is sent to, as `gem push --host` resolves it: a
 client built for another host, and a request made to one with `host:`, use the key `gem signin --host` stored for that

@@ -7,21 +7,21 @@ module Gems
   #
   # Wraps another authenticator and adds the OTP header to its headers.
   #
-  # @api public
+  # @api private
   class OTPAuthenticator < Authenticator
     # The HTTP header name for the one-time passcode
     OTP_HEADER = "OTP"
     private_constant :OTP_HEADER
 
     # The authenticator providing the underlying credentials
-    # @api public
+    # @api private
     # @return [Authenticator] the wrapped authenticator
     # @example Get the wrapped authenticator
     #   authenticator.authenticator
     attr_reader :authenticator
 
     # The one-time passcode
-    # @api public
+    # @api private
     # @return [String] the one-time passcode
     # @example Get the one-time passcode
     #   authenticator.otp
@@ -29,7 +29,7 @@ module Gems
 
     # Initialize a new OTPAuthenticator
     #
-    # @api public
+    # @api private
     # @param authenticator [Authenticator] the authenticator providing the underlying credentials
     # @param otp [String] the one-time passcode
     # @return [OTPAuthenticator] a new instance
@@ -42,7 +42,7 @@ module Gems
 
     # Generate the authentication headers for a request
     #
-    # @api public
+    # @api private
     # @param request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the wrapped authenticator's headers plus the OTP header
     # @example Generate authentication headers with a one-time passcode
@@ -53,7 +53,7 @@ module Gems
 
     # Summarize the authenticator for the console
     #
-    # @api public
+    # @api private
     # @return [String] the summary, which includes the wrapped authenticator but not the passcode
     # @example Inspect an OTP authenticator
     #   authenticator.inspect # => #<Gems::OTPAuthenticator authenticator=#<Gems::APIKeyAuthenticator>>

@@ -56,7 +56,11 @@ module Gems
     attr_reader :id_token
 
     # The authenticator for API requests
-    # @api public
+    #
+    # The authenticators are internals, which can change within 3.x; a credential is changed with the setters of the
+    # client, which build the authenticator again.
+    #
+    # @api private
     # @return [Authenticator] the authenticator instance
     # @example Get the authenticator
     #   client.authenticator

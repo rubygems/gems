@@ -4,17 +4,17 @@ require_relative "authenticator"
 
 module Gems
   # Authenticator for HTTP basic authentication
-  # @api public
+  # @api private
   class BasicAuthenticator < Authenticator
     # The username
-    # @api public
+    # @api private
     # @return [String] the username
     # @example Get the username
     #   authenticator.username
     attr_reader :username
 
     # The password
-    # @api public
+    # @api private
     # @return [String] the password
     # @example Get the password
     #   authenticator.password
@@ -22,7 +22,7 @@ module Gems
 
     # Initialize a new BasicAuthenticator
     #
-    # @api public
+    # @api private
     # @param username [String] the username
     # @param password [String] the password
     # @return [BasicAuthenticator] a new instance
@@ -35,7 +35,7 @@ module Gems
 
     # Generate the authentication headers for a request
     #
-    # @api public
+    # @api private
     # @param _request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the authentication headers with basic credentials
     # @example Generate a basic authentication header
@@ -46,7 +46,7 @@ module Gems
 
     # Summarize the authenticator for the console
     #
-    # @api public
+    # @api private
     # @return [String] the summary, which includes the username but not the password
     # @example Inspect a basic authenticator
     #   authenticator.inspect # => #<Gems::BasicAuthenticator username="nick@gemcutter.org">

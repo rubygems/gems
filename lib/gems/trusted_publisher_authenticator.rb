@@ -18,13 +18,13 @@ module Gems
   # Exchanges an OIDC ID token for a RubyGems API key on first use and then
   # authenticates requests with that key.
   #
-  # The ID token and the host it is exchanged with are what an authenticator is built with. The connection, request
-  # builder, redirect handler, and retry handler it sends the exchange with are internals, documented as `@api
-  # private` and able to change within 3.x, and default to ones built for the authenticator: a client hands it the
-  # ones it makes its own requests with, so that the exchange is sent with the timeouts, proxy, and retries the
-  # client was configured with.
+  # The ID token and the host it is exchanged with are what an authenticator is built with, beside the connection,
+  # request builder, redirect handler, and retry handler it sends the exchange with, which default to ones built for
+  # the authenticator: a client hands it the ones it makes its own requests with, so that the exchange is sent with
+  # the timeouts, proxy, and retries the client was configured with. The ID token is given to a client with the
+  # `id_token` option, and exchanged by hand with {API::APIKeyEndpoints#exchange_trusted_publisher_token}.
   #
-  # @api public
+  # @api private
   class TrustedPublisherAuthenticator < Authenticator
     include JSONParsing
 
@@ -33,14 +33,14 @@ module Gems
     private_constant :EXCHANGE_TOKEN_PATH
 
     # The OIDC ID token
-    # @api public
+    # @api private
     # @return [String] the OIDC ID token
     # @example Get the ID token
     #   authenticator.id_token
     attr_reader :id_token
 
     # The host to exchange the token with
-    # @api public
+    # @api private
     # @return [String] the host, including scheme
     # @example Get the host
     #   authenticator.host
@@ -75,7 +75,7 @@ module Gems
     attr_reader :retry_handler
 
     # The API key obtained from the token exchange
-    # @api public
+    # @api private
     # @return [String, nil] the API key, or nil before the token has been exchanged
     # @example Get the exchanged API key
     #   authenticator.api_key
@@ -83,16 +83,16 @@ module Gems
 
     # Initialize a new TrustedPublisherAuthenticator
     #
-    # The ID token and the host are the public part; the four that follow them are the internals the exchange is
-    # sent with, and default to ones built for the authenticator (see the class).
+    # The four that follow the ID token and the host are what the exchange is sent with, and default to ones built
+    # for the authenticator (see the class).
     #
-    # @api public
+    # @api private
     # @param id_token [String] the OIDC ID token
     # @param host [String] the host to exchange the token with, including scheme
-    # @param connection [Connection] the connection used for the token exchange (`@api private`)
-    # @param request_builder [RequestBuilder] the request builder used for the token exchange (`@api private`)
-    # @param redirect_handler [RedirectHandler] the redirect handler the exchange is followed with (`@api private`)
-    # @param retry_handler [RetryHandler] the retry handler the exchange is sent again with (`@api private`)
+    # @param connection [Connection] the connection used for the token exchange
+    # @param request_builder [RequestBuilder] the request builder used for the token exchange
+    # @param redirect_handler [RedirectHandler] the redirect handler the exchange is followed with
+    # @param retry_handler [RetryHandler] the retry handler the exchange is sent again with
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
@@ -114,7 +114,7 @@ module Gems
     # Exchanges the ID token for an API key on first use, once even when requests are made concurrently, since
     # RubyGems.org issues the key only once per token.
     #
-    # @api public
+    # @api private
     # @param _request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the authentication headers with the exchanged API key
     # @raise [HTTPError] if the token exchange fails
@@ -127,7 +127,7 @@ module Gems
 
     # Summarize the authenticator for the console
     #
-    # @api public
+    # @api private
     # @return [String] the summary, which includes the host but not the ID token or API key
     # @example Inspect a trusted publisher authenticator
     #   authenticator.inspect # => #<Gems::TrustedPublisherAuthenticator host="https://rubygems.org">
@@ -145,7 +145,7 @@ module Gems
     # The exchange is made under the lock that {#header} takes, so that a caller exchanging the token itself while
     # a request is being authenticated exchanges it once rather than twice, which RubyGems.org would refuse.
     #
-    # @api public
+    # @api private
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     # @example Exchange the ID token

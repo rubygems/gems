@@ -310,7 +310,7 @@ Everything documented as `@api private` can change within 3.x, and is hidden fro
 `Gems::URLValidation`. Configure them through the options of `Gems::Client`, such as `user_agent`, `max_redirects`,
 and `max_retries`. The class methods that declare the readers of a resource, such as `Gems::Resource.attribute` and
 `Gems::Resource.identified_by`, are internals too, since no endpoint answers with a resource of your own;
-`Gems::Resource.attribute_names`, which a pattern matches by, is public. The authenticators are read-only; change a credential with the setters of `Gems::Client` or the
-`Gems` module, which build the authenticator again. `Gems::TrustedPublisherAuthenticator` is public, but only its
-`id_token` and `host` are: the connection, request builder, redirect handler, and retry handler it is built with are
-internals too.
+`Gems::Resource.attribute_names`, which a pattern matches by, is public. The authenticators, such as `Gems::APIKeyAuthenticator` and `Gems::TrustedPublisherAuthenticator`, and
+`Gems::Client#authenticator`, which reads the one a client uses, are internals too; change a credential with the
+setters of `Gems::Client` or the `Gems` module, which build the authenticator again, and exchange an ID token by hand
+with `exchange_trusted_publisher_token`.

@@ -4,10 +4,10 @@ require_relative "authenticator"
 
 module Gems
   # Authenticator for RubyGems API key authentication
-  # @api public
+  # @api private
   class APIKeyAuthenticator < Authenticator
     # The API key
-    # @api public
+    # @api private
     # @return [String] the API key
     # @example Get the API key
     #   authenticator.key
@@ -15,7 +15,7 @@ module Gems
 
     # Initialize a new APIKeyAuthenticator
     #
-    # @api public
+    # @api private
     # @param key [String] the API key
     # @return [APIKeyAuthenticator] a new instance
     # @example Create an API key authenticator
@@ -26,7 +26,7 @@ module Gems
 
     # Generate the authentication headers for a request
     #
-    # @api public
+    # @api private
     # @param _request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the authentication headers with the API key
     # @example Generate an API key authentication header

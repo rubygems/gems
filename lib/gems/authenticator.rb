@@ -2,7 +2,7 @@
 
 module Gems
   # Base class for authentication (no authentication)
-  # @api public
+  # @api private
   class Authenticator
     # The HTTP header name for authentication
     AUTHENTICATION_HEADER = "Authorization"
@@ -10,7 +10,7 @@ module Gems
 
     # Generate the authentication headers for a request
     #
-    # @api public
+    # @api private
     # @param _request [Net::HTTPRequest] the HTTP request
     # @return [Hash{String => String}] the authentication headers (empty)
     # @example Generate empty authentication headers
@@ -22,7 +22,7 @@ module Gems
 
     # Summarize the authenticator for the console
     #
-    # @api public
+    # @api private
     # @return [String] the summary, which never includes credentials
     # @example Inspect an authenticator
     #   authenticator.inspect # => #<Gems::Authenticator>
