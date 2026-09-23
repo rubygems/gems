@@ -471,6 +471,10 @@ RSpec.describe Gems::Connection do
       connection.send(:build_http_client, uri)
     end
 
+    it "leaves sending a request again to the retry handler" do
+      expect(build_http_client(https_uri).max_retries).to eq(0)
+    end
+
     it "returns a Net::HTTP client" do
       expect(build_http_client(https_uri)).to be_a(Net::HTTP)
     end

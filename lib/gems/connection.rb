@@ -321,6 +321,10 @@ module Gems
     # The debug output is wrapped, so that the credentials Net::HTTP writes with the headers of a request do not
     # reach the IO.
     #
+    # Net::HTTP sends an idempotent request again once on its own when the connection it was sent on fails, which
+    # the retries of {RetryHandler} would otherwise come on top of, so a request that timed out reading its response
+    # would wait twice as many read timeouts as `max_retries` allows for. It is left to {RetryHandler} alone.
+    #
     # @api private
     # @param http_client [Net::HTTP] the HTTP client to configure
     # @return [Net::HTTP] the configured HTTP client
@@ -330,6 +334,7 @@ module Gems
         c.read_timeout = read_timeout
         c.write_timeout = write_timeout
         c.keep_alive_timeout = keep_alive_timeout
+        c.max_retries = 0
         c.set_debug_output(debug_output && RedactedOutput.new(debug_output))
         configure_certificates(c)
       end

@@ -419,7 +419,9 @@ Gems.rubygem 'rails'
 
 A `Gems::NetworkError` is retried too: a connection that was refused, reset, or timed out never reached the
 endpoint, so sending the request again is as safe as it is after a 503. When the retries run out, the response
-raises the `Gems::HTTPError` of its status and a network failure is raised as it was.
+raises the `Gems::HTTPError` of its status and a network failure is raised as it was. Net::HTTP's own retry of a
+request whose connection failed is turned off, so `max_retries` is every time a request is sent again, and a request
+that times out reading its response waits `read_timeout` once for each attempt rather than twice.
 
 A 429 is retried for every request, `push` and the other `POST` requests included: RubyGems.org rate limits a
 request before it reaches the endpoint, so the endpoint never saw the attempt that was turned away. Otherwise only an
