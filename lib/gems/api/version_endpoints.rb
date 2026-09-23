@@ -59,6 +59,8 @@ module Gems
       #   as the gem, or to the latest version).
       # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
       #   platform of a gem or version object, or "ruby".
+      # @param ruby_abi [String, nil] The Ruby ABI a version of the platform was built for, such as "3.4"; defaults to
+      #   the Ruby ABI of a gem or version object, or to the version built for none.
       # @return [Version]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
@@ -67,11 +69,11 @@ module Gems
       #   Gems.version "nokogiri", "1.15.0", platform: "java"
       # @example
       #   Gems.version Gems.rubygem("rails")
-      def version(gem_name, version = nil, platform: nil)
+      def version(gem_name, version = nil, platform: nil, ruby_abi: nil)
         version = version_of(gem_name, version)
         number = number_of(version) || latest_version(gem_name)
         path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number)}.json"
-        Version.new(parse_json(get(path, {platform: platform || platform_of(version)}.compact)))
+        Version.new(parse_json(get(path, build_params(version, platform, ruby_abi))))
       end
 
       # Returns the SHA-256 checksum of every file packaged in a specific gem version
@@ -86,17 +88,19 @@ module Gems
       #   as the gem, or to the latest version).
       # @param platform [String, nil] The platform of the version, such as "java" or "x86_64-linux"; defaults to the
       #   platform of a gem or version object, or "ruby".
+      # @param ruby_abi [String, nil] The Ruby ABI a version of the platform was built for, such as "3.4"; defaults to
+      #   the Ruby ABI of a gem or version object, or to the version built for none.
       # @return [Hash{String => Hash{String => String}}] the checksums of each file, keyed by path
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.contents("rails", "8.1.3.1")["README.md"]["sha256"]
       # @example
       #   Gems.contents Gems.rubygem("rails")
-      def contents(gem_name, version = nil, platform: nil)
+      def contents(gem_name, version = nil, platform: nil, ruby_abi: nil)
         version = version_of(gem_name, version)
         number = number_of(version) || latest_version(gem_name)
         path = "/api/v2/rubygems/#{escape(name_of(gem_name))}/versions/#{escape(number)}/contents.json"
-        parse_json(get(path, {platform: platform || platform_of(version)}.compact))
+        parse_json(get(path, build_params(version, platform, ruby_abi)))
       end
 
       # Returns the sigstore attestations published with a gem version
@@ -111,6 +115,8 @@ module Gems
       #   platform of a gem or version object, or "ruby".
       # @return [Array<Hash>] the sigstore bundles, empty for versions pushed without attestations
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
+      # @raise [ArgumentError] if the version was built for a Ruby ABI, which the endpoint looks up by a full name
+      #   RubyGems.org answers with only for the versions {API::DownloadEndpoints#most_downloaded} returns
       # @example
       #   Gems.attestations("rails", "8.1.3.1").first["mediaType"]
       # @example
@@ -154,6 +160,21 @@ module Gems
       #   Gems.timeframe_versions_each(from: Time.now - 86_400).count
       def timeframe_versions_each(from:, to: nil, &block)
         each_page(block) { |page| timeframe_versions(from:, to:, page:) }
+      end
+
+      private
+
+      # The query parameters that name the build of a version
+      #
+      # A platform and a Ruby ABI given to the method are sent, else those of the gem or version it was given.
+      #
+      # @api private
+      # @param version [String, Version, Gem, nil] the version number, version, or gem
+      # @param platform [String, nil] the platform the method was given
+      # @param ruby_abi [String, nil] the Ruby ABI the method was given
+      # @return [Hash{Symbol => String}] the platform and Ruby ABI, each left out when there is none
+      def build_params(version, platform, ruby_abi)
+        {platform: platform || platform_of(version), ruby_abi: ruby_abi || ruby_abi_of(version)}.compact
       end
     end
   end

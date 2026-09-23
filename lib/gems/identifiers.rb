@@ -71,16 +71,38 @@ module Gems
       end
     end
 
+    # Resolve the Ruby ABI from a version or a gem
+    # @api private
+    # @param version [String, Version, Gem, nil] a version number, version, or gem
+    # @return [String, nil] the Ruby ABI a version or gem was built for, or nil for a version number
+    def ruby_abi_of(version)
+      case version
+      when Version, Gem then version.ruby_abi
+      end
+    end
+
     # Resolve the full name of a gem version, such as "nokogiri-1.15.0-java"
     #
-    # The platform is omitted when it is "ruby".
+    # The platform is omitted when it is "ruby". A version that carries a full name of its own, as the versions
+    # {API::DownloadEndpoints#most_downloaded} answers with do, is named by it unless another platform is asked for.
+    #
+    # A version built for a Ruby ABI is named by a content address RubyGems.org gives it in place of its platform,
+    # which the endpoints answer with only in that full name, so one that carries no full name cannot be named, and
+    # naming it by its platform would name the version of that platform built for no ABI.
     #
     # @api private
     # @param gem [String, Gem, Version] a gem name, gem, or version
-    # @param version [String, Version] a version number or version
+    # @param version [String, Version, Gem] a version number, version, or gem
     # @param platform [String, nil] the platform; defaults to the platform of a version object
     # @return [String] the full name
+    # @raise [ArgumentError] if the version was built for a Ruby ABI and carries no full name
     def full_name_of(gem, version, platform = nil)
+      full_name = version.full_name if version.is_a?(Version) && platform.nil?
+      return full_name if full_name
+
+      ruby_abi = ruby_abi_of(version)
+      raise ArgumentError, "#{version} was built for Ruby ABI #{ruby_abi}, which has no full name to look it up by" if ruby_abi
+
       ::Gem::NameTuple.new(name_of(gem), number_of(version), platform || platform_of(version)).full_name
     end
 

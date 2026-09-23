@@ -115,6 +115,31 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java")).to have_been_made
     end
 
+    it "requests the version built for a Ruby ABI" do
+      path = "/api/v2/rubygems/nokogiri/versions/1.15.0.json?platform=x86_64-linux&ruby_abi=3.4"
+      stub_get(path).to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version("nokogiri", "1.15.0", platform: "x86_64-linux", ruby_abi: "3.4")
+
+      expect(a_get(path)).to have_been_made
+    end
+
+    it "defaults to the Ruby ABI of a version" do
+      path = "/api/v2/rubygems/nokogiri/versions/1.15.0.json?platform=x86_64-linux&ruby_abi=3.4"
+      stub_get(path).to_return(body: fixture("v2/rails-7.0.6.json"))
+      client.version(Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "x86_64-linux", "ruby_abi" => "3.4"))
+
+      expect(a_get(path)).to have_been_made
+    end
+
+    it "prefers a Ruby ABI to the Ruby ABI of a version" do
+      path = "/api/v2/rubygems/nokogiri/versions/1.15.0.json?platform=x86_64-linux&ruby_abi=3.5"
+      stub_get(path).to_return(body: fixture("v2/rails-7.0.6.json"))
+      version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "x86_64-linux", "ruby_abi" => "3.4")
+      client.version(version, ruby_abi: "3.5")
+
+      expect(a_get(path)).to have_been_made
+    end
+
     it "defaults to the platform of a version" do
       stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
       client.version("rails", Gems::Version.new("number" => "7.0.6", "platform" => "java"))
@@ -209,6 +234,22 @@ RSpec.describe Gems::API::VersionEndpoints do
       client.contents("rails", "8.1.3.1", platform: "java")
 
       expect(a_get("/api/v2/rubygems/rails/versions/8.1.3.1/contents.json?platform=java")).to have_been_made
+    end
+
+    it "requests the contents of the version built for the Ruby ABI it is given" do
+      path = "/api/v2/rubygems/nokogiri/versions/1.15.0/contents.json?platform=x86_64-linux&ruby_abi=3.4"
+      stub_get(path).to_return(body: fixture("contents.json"))
+      client.contents("nokogiri", "1.15.0", platform: "x86_64-linux", ruby_abi: "3.4")
+
+      expect(a_get(path)).to have_been_made
+    end
+
+    it "requests the contents of the version built for a Ruby ABI" do
+      path = "/api/v2/rubygems/nokogiri/versions/1.15.0/contents.json?platform=x86_64-linux&ruby_abi=3.4"
+      stub_get(path).to_return(body: fixture("contents.json"))
+      client.contents(Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "x86_64-linux", "ruby_abi" => "3.4"))
+
+      expect(a_get(path)).to have_been_made
     end
 
     it "defaults to the platform of a version" do

@@ -319,6 +319,22 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
 
+    it "yanks the version built for a Ruby ABI" do
+      path = "/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=x86_64-linux&ruby_abi=3.4"
+      stub_delete(path).to_return(body: fixture("yank"))
+      client.yank("gems", "0.0.8", platform: "x86_64-linux", ruby_abi: "3.4")
+
+      expect(a_delete(path)).to have_been_made
+    end
+
+    it "defaults to the Ruby ABI of a version" do
+      path = "/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=x86_64-linux&ruby_abi=3.4"
+      stub_delete(path).to_return(body: fixture("yank"))
+      client.yank(Gems::Version.new("name" => "gems", "number" => "0.0.8", "platform" => "x86_64-linux", "ruby_abi" => "3.4"))
+
+      expect(a_delete(path)).to have_been_made
+    end
+
     it "defaults to the platform of a version" do
       stub_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java").to_return(body: fixture("yank"))
       client.yank("gems", Gems::Version.new("number" => "0.0.8", "platform" => "java"))

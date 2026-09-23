@@ -42,6 +42,8 @@ module Gems
       #   platform of a version object, or "ruby".
       # @return [Downloads]
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
+      # @raise [ArgumentError] if the version was built for a Ruby ABI, which the endpoint looks up by a full name
+      #   RubyGems.org answers with only for the versions {#most_downloaded} returns
       # @example
       #   Gems.downloads("rails_admin", "0.0.1").version_downloads
       # @example

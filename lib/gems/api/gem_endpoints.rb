@@ -127,17 +127,22 @@ module Gems
       # @param version [String, Version, nil] The version of a gem (defaults to the version given as the gem, or to
       #   the latest version).
       # @param platform [String, nil] The platform of the gem; defaults to the platform of a version object.
+      # @param ruby_abi [String, nil] The Ruby ABI a version of the platform was built for, such as "3.4"; defaults to
+      #   the Ruby ABI of a version object, or to the version built for none.
       # @return [String] the message the endpoint answers with
       # @raise [NoLatestVersion] if no version is given and the gem has no published version
       # @example
       #   Gems.yank "gemcutter", "0.2.1", platform: "x86-darwin-10"
       # @example
+      #   Gems.yank "gemcutter", "0.2.1", platform: "x86_64-linux", ruby_abi: "3.4"
+      # @example
       #   Gems.yank Gems.version("gemcutter", "0.2.1")
-      def yank(gem_name, version = nil, platform: nil)
+      def yank(gem_name, version = nil, platform: nil, ruby_abi: nil)
         version = version_of(gem_name, version)
         platform ||= platform_of(version)
+        ruby_abi ||= ruby_abi_of(version)
         version = number_of(version) || latest_version(gem_name)
-        delete("/api/v1/gems/yank", {gem_name: name_of(gem_name), version:, platform:}.compact)
+        delete("/api/v1/gems/yank", {gem_name: name_of(gem_name), version:, platform:, ruby_abi:}.compact)
       end
 
       # Returns an array of all the reverse dependencies to the given gem

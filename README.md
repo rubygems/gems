@@ -46,6 +46,9 @@ version.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", .
 # Return information about a version for a specific platform.
 Gems.version 'nokogiri', '1.15.0', platform: 'java'
 
+# Return information about the version of a platform built for a specific Ruby ABI.
+Gems.version 'nokogiri', '1.15.0', platform: 'x86_64-linux', ruby_abi: '3.4'
+
 # Defaults to the latest version if no version is specified.
 Gems.version 'rails'
 
@@ -250,8 +253,11 @@ accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.r
 `Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work. A gem or version given
 where a gem is expected stands in for the version too, when it carries a version number, so `Gems.version(gem)`,
 `Gems.contents(gem)`, `Gems.attestations(gem)`, `Gems.downloads(gem)`, and `Gems.yank(gem)` act on the version it
-names, at the platform it names, rather than on the latest version. Those five methods take no version at all when
-you mean the latest one.
+names, at the platform and Ruby ABI it names, rather than on the latest version. Those five methods take no version
+at all when you mean the latest one. RubyGems.org looks the downloads and attestations of a version up by a full name,
+which for a version built for a Ruby ABI is a content address it answers with only in the versions `most_downloaded`
+returns, so `downloads` and `attestations` raise `ArgumentError` for any other version built for one rather than
+answer for the version of its platform built for none.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. The counts

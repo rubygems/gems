@@ -124,6 +124,20 @@ RSpec.describe Gems::API::DownloadEndpoints do
 
       expect(a_get("/api/v1/downloads/rails_admin-0.0.0.json")).to have_been_made
     end
+
+    it "asks for the downloads of a version by the full name it carries" do
+      stub_get("/api/v1/downloads/nokogiri-1.15.0-a1b2c3d4.json").to_return(body: fixture("rails_admin-0.0.0.json"))
+      version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "x86_64-linux",
+        "ruby_abi" => "3.4", "full_name" => "nokogiri-1.15.0-a1b2c3d4")
+
+      expect(client.downloads(version).full_name).to eq("nokogiri-1.15.0-a1b2c3d4")
+    end
+
+    it "raises for a version built for a Ruby ABI that carries no full name" do
+      version = Gems::Version.new("name" => "nokogiri", "number" => "1.15.0", "platform" => "x86_64-linux", "ruby_abi" => "3.4")
+
+      expect { client.downloads(version) }.to raise_error(ArgumentError, /Ruby ABI 3\.4/)
+    end
   end
 
   describe "#most_downloaded" do

@@ -46,15 +46,15 @@ module Gems
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
-  def self.version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Version
-  def self.contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Hash[String, Hash[String, String]]
+  def self.version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> Version
+  def self.contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> Hash[String, Hash[String, String]]
   def self.attestations: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Array[Hash[String, untyped]]
   def self.search: (String query, ?page: Integer?) -> Array[Gem]
   def self.search_each: (String query) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
   def self.autocomplete: (String query) -> Array[String]
   def self.owned_gems: (?user_identifier? user_handle) -> Array[Gem]
   def self.push: (push_file gem, ?host: String?, ?attestations: push_attestations?) -> String
-  def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
+  def self.yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> String
   def self.versions: (gem_identifier gem_name) -> Array[Version]
   def self.latest_version: (gem_identifier gem_name) -> String
   def self.total_downloads: () -> Integer
@@ -440,6 +440,7 @@ module Gems
     def number_of: (version_identifier? version) -> String?
     def version_of: (gem_identifier? gem, version_identifier? version) -> version_identifier?
     def platform_of: (version_identifier? version) -> String?
+    def ruby_abi_of: (version_identifier? version) -> String?
     def full_name_of: (gem_identifier gem, version_identifier version, ?String? platform) -> String
     def handle_of: (user_identifier owner) -> (String | Integer)?
     def slug_of: (user_identifier user) -> (String | Integer)?
@@ -514,7 +515,7 @@ module Gems
     def autocomplete: (String query) -> Array[String]
     def owned_gems: (?user_identifier? user_handle) -> Array[Gem]
     def push: (push_file gem, ?host: String?, ?attestations: push_attestations?) -> String
-    def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> String
+    def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> String
     def reverse_dependencies: (gem_identifier gem_name, ?only: (String | Symbol)?) -> Array[String]
 
     private
@@ -576,11 +577,15 @@ module Gems
 
     def versions: (gem_identifier gem_name) -> Array[Version]
     def latest_version: (gem_identifier gem_name) -> String
-    def version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Version
-    def contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Hash[String, Hash[String, String]]
+    def version: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> Version
+    def contents: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> Hash[String, Hash[String, String]]
     def attestations: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?) -> Array[Hash[String, untyped]]
     def timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
     def timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
+
+    private
+
+    def build_params: (version_identifier? version, String? platform, String? ruby_abi) -> Hash[Symbol, String]
   end
 
   module API::WebHookEndpoints : Object, _Requests
