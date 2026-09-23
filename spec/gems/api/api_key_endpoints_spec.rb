@@ -3,76 +3,97 @@
 RSpec.describe Gems::API::APIKeyEndpoints do
   let(:client) { Gems::Client.new(key: nil, username: nil, password: nil) }
 
+  # The form fields that grant an API key the scopes given, as the endpoints are sent them
+  def scope_fields(*granted)
+    Gems::APIKey::SCOPES.to_h { |scope| [scope, granted.include?(scope).to_s] }
+  end
+
   describe "#create_api_key" do
     subject(:client) { Gems::Client.new(key: nil, username: "nick@gemcutter.org", password: "schwwwwing") }
 
     before { stub_post("/api/v1/api_key.json").to_return(body: fixture("api_key.json")) }
 
     it "posts the correct resource with basic authentication" do
-      client.create_api_key("ci-push", push_rubygem: true)
+      client.create_api_key("ci-push", scopes: %i[push_rubygem])
 
       expect(a_post("/api/v1/api_key.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing],
-        body: {name: "ci-push", push_rubygem: "true"})).to have_been_made
+        body: {name: "ci-push", **scope_fields(:push_rubygem)})).to have_been_made
     end
 
-    it "posts the name without options" do
-      client.create_api_key("ci-push")
+    it "grants every scope it is given" do
+      client.create_api_key("ci-push", scopes: %i[push_rubygem yank_rubygem])
 
-      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push"})).to have_been_made
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", **scope_fields(:push_rubygem, :yank_rubygem)}))
+        .to have_been_made
+    end
+
+    it "accepts the scopes as strings" do
+      client.create_api_key("ci-push", scopes: %w[push_rubygem])
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", **scope_fields(:push_rubygem)})).to have_been_made
+    end
+
+    it "accepts one scope on its own" do
+      client.create_api_key("ci-push", scopes: :push_rubygem)
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", **scope_fields(:push_rubygem)})).to have_been_made
+    end
+
+    it "grants no scope for an empty list" do
+      client.create_api_key("ci-push", scopes: [])
+
+      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", **scope_fields})).to have_been_made
     end
 
     it "rejects a scope the API does not define" do
-      expect { client.create_api_key("ci-push", push_rubygems: true) }
+      expect { client.create_api_key("ci-push", scopes: %i[push_rubygems]) }
         .to raise_error(ArgumentError, "Unknown API key scope: push_rubygems. The scopes the API defines are: " \
           "access_webhooks, add_owner, configure_trusted_publishers, index_rubygems, push_rubygem, remove_owner, " \
           "show_dashboard, update_owner, yank_rubygem")
     end
 
     it "reports every scope the API does not define" do
-      expect { client.create_api_key("ci-push", push_rubygems: true, name: "other") }
+      expect { client.create_api_key("ci-push", scopes: %i[push_rubygem push_rubygems name]) }
         .to raise_error(ArgumentError, /\AUnknown API key scope: push_rubygems, name\./)
     end
 
     it "does not post a key with a scope the API does not define" do
-      client.create_api_key("ci-push", push_rubygems: true)
+      client.create_api_key("ci-push", scopes: %i[push_rubygems])
     rescue ArgumentError
       expect(a_post("/api/v1/api_key.json")).not_to have_been_made
     end
 
     it "posts an expiry, a gem restriction, and a passcode requirement" do
-      client.create_api_key("ci-push", expires_at: Time.utc(2027, 1, 1), rubygem_name: Gems::Gem.new("name" => "gems"), mfa: true)
+      client.create_api_key("ci-push", scopes: %i[push_rubygem], expires_at: Time.utc(2027, 1, 1),
+        rubygem_name: Gems::Gem.new("name" => "gems"), mfa: true)
 
-      expect(a_post("/api/v1/api_key.json")
-        .with(body: {name: "ci-push", expires_at: "2027-01-01T00:00:00Z", rubygem_name: "gems", mfa: "true"})).to have_been_made
+      body = {name: "ci-push", **scope_fields(:push_rubygem), expires_at: "2027-01-01T00:00:00Z", rubygem_name: "gems",
+              mfa: "true"}
+
+      expect(a_post("/api/v1/api_key.json").with(body:)).to have_been_made
     end
 
     it "accepts an expiry as an ISO 8601 string" do
-      client.create_api_key("ci-push", expires_at: "2027-01-01T00:00:00Z")
-
-      expect(a_post("/api/v1/api_key.json").with(body: {name: "ci-push", expires_at: "2027-01-01T00:00:00Z"})).to have_been_made
-    end
-
-    it "posts scopes alongside settings" do
-      client.create_api_key("ci-push", push_rubygem: true, mfa: true)
+      client.create_api_key("ci-push", scopes: %i[push_rubygem], expires_at: "2027-01-01T00:00:00Z")
 
       expect(a_post("/api/v1/api_key.json")
-        .with(body: {name: "ci-push", push_rubygem: "true", mfa: "true"})).to have_been_made
+        .with(body: {name: "ci-push", **scope_fields(:push_rubygem), expires_at: "2027-01-01T00:00:00Z"})).to have_been_made
     end
 
     it "returns the new API key" do
-      api_key = client.create_api_key("ci-push", push_rubygem: true)
+      api_key = client.create_api_key("ci-push", scopes: %i[push_rubygem])
 
       expect([api_key.class, api_key.key]).to eq([Gems::APIKey, "rubygems_701243f217cdf23b1370c7b66b65ca97"])
     end
 
     it "keeps the name the key was asked for, which the endpoint answers without" do
-      expect(client.create_api_key("ci-push", push_rubygem: true).name).to eq("ci-push")
+      expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).name).to eq("ci-push")
     end
 
     it "keeps a name the endpoint answers with" do
       stub_post("/api/v1/api_key.json").to_return(body: JSON.generate("rubygems_api_key" => "key", "name" => "named"))
 
-      expect(client.create_api_key("ci-push").name).to eq("named")
+      expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).name).to eq("named")
     end
   end
 
@@ -82,33 +103,41 @@ RSpec.describe Gems::API::APIKeyEndpoints do
     before { stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated") }
 
     it "accepts an API key" do
-      stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(body: "Scopes for the API key ci-push updated")
-      client.update_api_key(Gems::APIKey.new("rubygems_api_key" => "rubygems_701243f217cdf23b1370c7b66b65ca97"), yank_rubygem: true)
+      client.update_api_key(Gems::APIKey.new("rubygems_api_key" => "rubygems_701243f217cdf23b1370c7b66b65ca97"),
+        scopes: %i[yank_rubygem])
 
       expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
-        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
+        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", **scope_fields(:yank_rubygem)})).to have_been_made
     end
 
     it "patches the correct resource with basic authentication" do
-      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true)
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[yank_rubygem])
 
       expect(a_request(:patch, rubygems_url("/api/v1/api_key")).with(basic_auth: %w[nick@gemcutter.org schwwwwing],
-        body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: "true"})).to have_been_made
+        body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", **scope_fields(:yank_rubygem)})).to have_been_made
+    end
+
+    it "takes away every scope it is not given" do
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: [])
+
+      expect(a_request(:patch, rubygems_url("/api/v1/api_key"))
+        .with(body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", **scope_fields})).to have_been_made
     end
 
     it "rejects a scope the API does not define" do
-      expect { client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", api_key: "other") }
+      expect { client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[api_key]) }
         .to raise_error(ArgumentError, /\AUnknown API key scope: api_key\./)
     end
 
     it "does not patch a key with a scope the API does not define" do
-      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygems: true)
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[yank_rubygems])
     rescue ArgumentError
       expect(a_request(:patch, rubygems_url("/api/v1/api_key"))).not_to have_been_made
     end
 
     it "returns the response body" do
-      expect(client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97")).to eq("Scopes for the API key ci-push updated")
+      expect(client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[yank_rubygem]))
+        .to eq("Scopes for the API key ci-push updated")
     end
   end
 

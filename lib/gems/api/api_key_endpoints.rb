@@ -24,28 +24,29 @@ module Gems
       # @api public
       # @authenticated true
       # @param name [String] A name for the key.
+      # @param scopes [Array<Symbol, String>] The scopes to grant the key, which are among the scopes
+      #   {APIKey::SCOPES} names, such as push_rubygem and yank_rubygem; the key is granted these alone.
       # @param expires_at [Time, String, nil] When the key expires, as a Time or an ISO 8601 string.
       # @param rubygem_name [String, Gem, nil] A gem to restrict the key to.
       # @param mfa [Boolean, nil] Whether to require a one-time passcode when the key is used.
-      # @param scopes [Hash{Symbol => Boolean}] The scopes to enable: push_rubygem, yank_rubygem, index_rubygems,
-      #   add_owner, remove_owner, access_webhooks, update_owner, configure_trusted_publishers, and show_dashboard,
-      #   which are the scopes {APIKey::SCOPES} names.
       # @return [APIKey] the new API key
+      # @raise [ArgumentError] if a scope is not one the API defines
       # @example
       #   Gems.configure do |config|
       #     config.username = "nick@gemcutter.org"
       #     config.password = "schwwwwing"
       #   end
-      #   Gems.create_api_key("ci-push", push_rubygem: true).key
+      #   Gems.create_api_key("ci-push", scopes: %i[push_rubygem]).key
       # @example
-      #   Gems.create_api_key("ci-push", push_rubygem: true, rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
-      def create_api_key(name, expires_at: nil, rubygem_name: nil, mfa: nil, **scopes)
-        validate_scopes(scopes)
+      #   Gems.create_api_key("ci-push", scopes: %i[push_rubygem], rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
+      def create_api_key(name, scopes:, expires_at: nil, rubygem_name: nil, mfa: nil)
         settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
-        APIKey.new({"name" => name}.merge(parse_json(post("/api/v1/api_key.json", {**scopes, **settings, name:}))))
+        APIKey.new({"name" => name}.merge(parse_json(post("/api/v1/api_key.json", {**scope_fields(scopes), **settings, name:}))))
       end
 
       # Update the scopes of an API key using HTTP basic auth
+      #
+      # The key is granted the scopes it is given alone, and every other scope it had is taken away.
       #
       # The endpoint answers with a message rather than with the key it updated, as the endpoints of {#push},
       # {API::OwnerEndpoints#add_owner}, and the rest of the endpoints that act on something do, so that message is
@@ -54,14 +55,14 @@ module Gems
       # @api public
       # @authenticated true
       # @param key [String, APIKey] The API key to update.
-      # @param scopes [Hash{Symbol => Boolean}] Scopes to enable or disable, such as push_rubygem or yank_rubygem;
-      #   {APIKey::SCOPES} names them all.
+      # @param scopes [Array<Symbol, String>] The scopes to grant the key, which are among the scopes
+      #   {APIKey::SCOPES} names, such as push_rubygem and yank_rubygem.
       # @return [String] the message the endpoint answers with
+      # @raise [ArgumentError] if a scope is not one the API defines
       # @example
-      #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", yank_rubygem: true
-      def update_api_key(key, **scopes)
-        validate_scopes(scopes)
-        patch("/api/v1/api_key", {**scopes, api_key: key_of(key)})
+      #   Gems.update_api_key "rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[push_rubygem yank_rubygem]
+      def update_api_key(key, scopes:)
+        patch("/api/v1/api_key", {**scope_fields(scopes), api_key: key_of(key)})
       end
 
       # Exchange an OIDC ID token for an API key via trusted publishing
@@ -79,21 +80,25 @@ module Gems
 
       private
 
-      # Check that every scope is one the RubyGems API defines
+      # The form fields that grant an API key the scopes given
       #
-      # A scope the API does not define would be ignored by the server, leaving a key scoped differently than it
-      # was meant to be, so a misspelled scope is reported rather than sent.
+      # Every other scope is taken away: every scope the API defines is sent, as granted or not, since the endpoints leave a scope they are not sent
+      # as it was. A scope the API does not define would be ignored by the server, leaving a key scoped differently
+      # than it was meant to be, so a misspelled scope is reported rather than sent.
       #
       # @api private
-      # @param scopes [Hash{Symbol => Boolean}] the scopes
-      # @return [void]
+      # @param scopes [Array<Symbol, String>] the scopes to grant
+      # @return [Hash{Symbol => Boolean}] whether each scope the API defines is granted
       # @raise [ArgumentError] if a scope is not one the API defines
-      def validate_scopes(scopes)
-        unknown = scopes.keys - APIKey::SCOPES
-        return if unknown.empty?
+      def scope_fields(scopes)
+        granted = [*scopes].map(&:to_sym)
+        unknown = granted - APIKey::SCOPES
+        unless unknown.empty?
+          raise ArgumentError, "Unknown API key scope: #{unknown.join(", ")}. " \
+            "The scopes the API defines are: #{APIKey::SCOPES.join(", ")}"
+        end
 
-        raise ArgumentError, "Unknown API key scope: #{unknown.join(", ")}. " \
-          "The scopes the API defines are: #{APIKey::SCOPES.join(", ")}"
+        APIKey::SCOPES.to_h { |scope| [scope, granted.include?(scope)] }
       end
     end
   end

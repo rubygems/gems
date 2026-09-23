@@ -279,7 +279,7 @@ Gems.configure do |config|
   config.username = "nick@gemcutter.org"
   config.password = "schwwwwing"
 end
-Gems.create_api_key("ci-push", push_rubygem: true).key
+Gems.create_api_key("ci-push", scopes: %i[push_rubygem]).key
 ```
 
 `create_api_key` and `update_api_key` raise `ArgumentError` for a scope the RubyGems API does not define, where 2.x

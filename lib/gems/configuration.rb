@@ -62,7 +62,7 @@ module Gems
     # @example Set the API key
     #   Gems.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
     # @example Set the API key from a newly created API key
-    #   Gems.key = Gems.create_api_key("ci-push", push_rubygem: true)
+    #   Gems.key = Gems.create_api_key("ci-push", scopes: %i[push_rubygem])
     def key=(key)
       @key = key_of(key)
     end

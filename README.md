@@ -159,16 +159,16 @@ Gems.configure do |config|
   config.username = 'nick@gemcutter.org'
   config.password = 'schwwwwing'
 end
-Gems.create_api_key('ci-push', push_rubygem: true).key
+Gems.create_api_key('ci-push', scopes: %i[push_rubygem]).key
 
 # Create a key restricted to one gem that expires in a day and requires a one-time passcode.
-Gems.create_api_key('ci-push', push_rubygem: true, rubygem_name: 'gems', expires_at: Time.now + 86_400, mfa: true)
+Gems.create_api_key('ci-push', scopes: %i[push_rubygem], rubygem_name: 'gems', expires_at: Time.now + 86_400, mfa: true)
 
 # Return your own profile, including its multi-factor authentication level.
 Gems.me.mfa
 
-# Update the scopes of an API key.
-Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', yank_rubygem: true
+# Update the scopes of an API key, which is granted these alone.
+Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', scopes: %i[push_rubygem yank_rubygem]
 
 # The scopes the API defines, which a misspelled scope is checked against.
 Gems::APIKey::SCOPES
