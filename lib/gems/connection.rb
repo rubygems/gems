@@ -224,6 +224,8 @@ module Gems
     #   response = connection.perform(request: request)
     def perform(request:)
       send_request(request, settings, keep_alive_timeout)
+    rescue *NetworkError::WRAPPED => e
+      raise NetworkError, "Network error: #{e}"
     end
 
     # Close the connections kept open for the next request
@@ -282,17 +284,27 @@ module Gems
     # @param opened_with [Array<Object>] the settings a connection must have been opened with to send it on
     # @param kept_for [Numeric] the seconds the connection is kept open afterwards
     # @return [Net::HTTPResponse] the HTTP response
-    # @raise [NetworkError] if a network error occurs
     def send_request(request, opened_with, kept_for)
-      http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) do
-        build_http_client(request.uri)
-      end
-      response = http_client.request(request)
+      http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) { build_http_client(request.uri) }
+      response = request_on(http_client, request)
       pool.checkin(request:, http_client:, settings: opened_with, keep_alive_timeout: kept_for)
       response
-    rescue *NetworkError::WRAPPED => e
+    end
+
+    # Send a request on a connection, and close the connection if the request raises
+    #
+    # The connection is closed whatever the request raises, rather than left open with a response half read: a
+    # timeout of the caller's own, a Thread#raise, or an interrupt stops a request as surely as the network does.
+    #
+    # @api private
+    # @param http_client [Net::HTTP] the connection
+    # @param request [Net::HTTPRequest] the HTTP request to send
+    # @return [Net::HTTPResponse] the HTTP response
+    def request_on(http_client, request)
+      http_client.request(request)
+    rescue Exception # rubocop:disable Lint/RescueException
       pool.discard(http_client)
-      raise NetworkError, "Network error: #{e}"
+      raise
     end
 
     # Decode a percent-encoded component of a URL

@@ -371,6 +371,12 @@ RSpec.describe Gems::Connection do
         nil
       end
 
+      def get_rescuing(error_class)
+        get
+      rescue error_class
+        nil
+      end
+
       it "sends a second request on the connection the first left open" do
         2.times { get }
 
@@ -459,6 +465,15 @@ RSpec.describe Gems::Connection do
         get_ignoring_errors(http_uri)
 
         expect(built.first).not_to be_started
+      end
+
+      [RuntimeError, Interrupt].each do |error_class|
+        it "closes the connection of a request interrupted by #{error_class}" do
+          stub_request(:get, https_uri.to_s).to_raise(error_class)
+          get_rescuing(error_class)
+
+          expect(built.first).not_to be_started
+        end
       end
 
       it "does not keep the connection of a request that failed" do
