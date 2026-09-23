@@ -144,22 +144,6 @@ RSpec.describe Gems::Connection do
       expect(connection.proxy_uri).to eq(URI("https://user:pass@proxy.example.com:8080"))
     end
 
-    it "exposes the proxy host" do
-      expect(connection.proxy_host).to eq("proxy.example.com")
-    end
-
-    it "exposes the proxy port" do
-      expect(connection.proxy_port).to eq(8080)
-    end
-
-    it "exposes the proxy user" do
-      expect(connection.proxy_user).to eq("user")
-    end
-
-    it "exposes the proxy password" do
-      expect(connection.proxy_pass).to eq("pass")
-    end
-
     it "raises an ArgumentError for a non-HTTP proxy URL" do
       expect { connection.proxy_url = "ftp://proxy.example.com/" }
         .to raise_error(ArgumentError, "Invalid proxy URL: ftp://proxy.example.com/")
@@ -186,18 +170,6 @@ RSpec.describe Gems::Connection do
         .to raise_error(ArgumentError, "Invalid proxy URL: http://proxy example.com/")
     end
 
-    it "decodes a percent-encoded proxy user" do
-      connection.proxy_url = "http://us%40er:p%40ss@proxy.example.com:8080"
-
-      expect(connection.proxy_user).to eq("us@er")
-    end
-
-    it "decodes a percent-encoded proxy password" do
-      connection.proxy_url = "http://us%40er:p%40ss@proxy.example.com:8080"
-
-      expect(connection.proxy_pass).to eq("p@ss")
-    end
-
     context "when set to nil" do
       before { connection.proxy_url = nil }
 
@@ -207,22 +179,6 @@ RSpec.describe Gems::Connection do
 
       it "clears the proxy URI" do
         expect(connection.proxy_uri).to be_nil
-      end
-
-      it "returns nil from proxy_host" do
-        expect(connection.proxy_host).to be_nil
-      end
-
-      it "returns nil from proxy_port" do
-        expect(connection.proxy_port).to be_nil
-      end
-
-      it "returns nil from proxy_user" do
-        expect(connection.proxy_user).to be_nil
-      end
-
-      it "returns nil from proxy_pass" do
-        expect(connection.proxy_pass).to be_nil
       end
     end
   end

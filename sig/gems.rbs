@@ -816,11 +816,6 @@ module Gems
     attr_reader proxy_url: String?
     attr_reader proxy_uri: URI::Generic?
 
-    def proxy_host: () -> String?
-    def proxy_port: () -> Integer?
-    def proxy_user: () -> String?
-    def proxy_pass: () -> String?
-
     def initialize: (?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> void
     def inspect: () -> String
     def perform: (request: Net::HTTPRequest) -> Net::HTTPResponse

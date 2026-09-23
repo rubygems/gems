@@ -124,42 +124,6 @@ module Gems
     #   connection.proxy_uri
     attr_reader :proxy_uri
 
-    # The host of the proxy
-    # @api private
-    # @return [String, nil] the proxy host, or nil without a proxy URL
-    # @example Get the proxy host
-    #   connection.proxy_host
-    def proxy_host
-      proxy_uri&.host
-    end
-
-    # The port of the proxy
-    # @api private
-    # @return [Integer, nil] the proxy port, or nil without a proxy URL
-    # @example Get the proxy port
-    #   connection.proxy_port
-    def proxy_port
-      proxy_uri&.port
-    end
-
-    # The user of the proxy, decoded from the proxy URL
-    # @api private
-    # @return [String, nil] the proxy user, or nil without one
-    # @example Get the proxy user
-    #   connection.proxy_user
-    def proxy_user
-      decode(proxy_uri&.user)
-    end
-
-    # The password of the proxy, decoded from the proxy URL
-    # @api private
-    # @return [String, nil] the proxy password, or nil without one
-    # @example Get the proxy password
-    #   connection.proxy_pass
-    def proxy_pass
-      decode(proxy_uri&.password)
-    end
-
     # Summarize the connection for the console
     #
     # @api private
