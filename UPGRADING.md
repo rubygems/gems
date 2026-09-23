@@ -95,8 +95,11 @@ The options `otp`, `id_token`, `open_timeout`, `read_timeout`, `write_timeout`, 
 `max_redirects`, `max_retries`, `max_retry_delay`, `ca_file`, `ca_path`, `cert_store`, `client_cert`, and
 `client_key` are new, and every option can be set globally or per client.
 A request the server turns away with 429, 502, 503, or 504, or that the network loses, is now sent again twice
-before it raises, where 2.x raised straight away; `max_retries` of zero restores that. Only an idempotent request
-is sent again, so `push` never is.
+before it raises, where 2.x raised straight away; `max_retries` of zero restores that. A 429 is retried for every
+request, `push` included, since RubyGems.org rate limits a request before it reaches the endpoint. Otherwise only an
+idempotent request is sent again, so `push` is not after a 503 or a network failure, and a 502 or 504 is retried
+only for a request that reads, such as `rubygem`, rather than for one that acts on a gem, such as `yank`. See the
+README for the whole of it.
 
 ### Renamed methods
 
