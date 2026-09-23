@@ -9,6 +9,13 @@ module Gems
   # Those values are replaced before they reach the IO, so that debug output can be kept where the credentials
   # should not be.
   #
+  # Net::HTTP writes a response body as it reads it, a line for each read from the socket, so a credential the body
+  # carries can be split across two of those lines, where neither half matches the pattern that redacts it. The
+  # lines of one read of a body, which Net::HTTP writes between the line that says how many bytes it is reading and
+  # the line that says how many it read, are joined into one before they are redacted and written. A connection
+  # with a debug output asks for its responses uncompressed (see {Connection}), since a compressed body is written as
+  # the bytes it was sent as, which no pattern can find a credential in.
+  #
   # @api private
   class RedactedOutput
     # The value written in place of a credential
@@ -34,6 +41,12 @@ module Gems
       /(\\"rubygems_api_key\\":\\")[^\\]*/
     ].freeze
     private_constant :CREDENTIALS
+
+    # What Net::HTTP writes before the bytes it read from the socket, which it writes as an escaped string
+    READ = '-> "'
+    # What Net::HTTP writes before it reads a body, whether it reads a number of bytes or all of them
+    READING = "reading "
+    private_constant :READ, :READING
 
     # The IO the redacted output is written to
     # @api private
@@ -61,8 +74,34 @@ module Gems
     # @example Write debug output
     #   output << '<- "GET / HTTP/1.1\r\nAuthorization: key\r\n\r\n"'
     def <<(string)
-      output << CREDENTIALS.reduce(string) { |redacted, pattern| redacted.gsub(pattern, "\\1#{REDACTION}") }
+      body = @body
+      if body && string.start_with?(READ)
+        body << string.delete_prefix(READ).chomp.delete_suffix('"')
+      else
+        flush
+        @body = [] if string.start_with?(READING)
+        write(string)
+      end
       self
+    end
+
+    private
+
+    # Write the lines of the read of a body joined so far, as one line
+    # @api private
+    # @return [void]
+    def flush
+      body = @body
+      write(%(#{READ}#{body.join}"\n)) if body&.any?
+      @body = nil
+    end
+
+    # Write a string to the IO, with credentials redacted
+    # @api private
+    # @param string [String] the debug output
+    # @return [void]
+    def write(string)
+      output << CREDENTIALS.reduce(string) { |redacted, pattern| redacted.gsub(pattern, "\\1#{REDACTION}") }
     end
   end
 end

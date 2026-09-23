@@ -764,13 +764,21 @@ module Gems
   class RedactedOutput
     REDACTION: String
     CREDENTIALS: Array[Regexp]
+    READ: String
+    READING: String
 
     @output: IO
+    @body: Array[String]?
 
     attr_reader output: IO
 
     def initialize: (IO output) -> void
     def <<: (String string) -> self
+
+    private
+
+    def flush: () -> void
+    def write: (String string) -> void
   end
 
   class ConnectionPool
@@ -826,8 +834,8 @@ module Gems
 
     attr_reader pool: ConnectionPool
 
-    def settings: () -> Array[untyped]
-    def send_request: (Net::HTTPRequest request, Array[untyped] opened_with, Numeric kept_for) -> Net::HTTPResponse
+    def settings: () -> Hash[Symbol, untyped]
+    def send_request: (Net::HTTPRequest request, Hash[Symbol, untyped] opened_with, Numeric kept_for) -> Net::HTTPResponse
     def request_on: (Net::HTTP http_client, Net::HTTPRequest request) -> Net::HTTPResponse
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def redact: (String? url) -> String?

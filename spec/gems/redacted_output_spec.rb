@@ -106,10 +106,92 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq(%(-> "{\\"name\\":\\"ci-push\\",\\"rubygems_api_key\\":\\"[REDACTED]\\"}"))
     end
 
+    it "redacts the API key of a response body read in two parts" do
+      ["reading 64 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), %(-> "1243f2\\"}"\n), "read 64 bytes\n"]
+        .each { |string| redacted_output << string }
+
+      expect(io.string).to eq(%(reading 64 bytes...\n-> "{\\"rubygems_api_key\\":\\"[REDACTED]\\"}"\nread 64 bytes\n))
+    end
+
+    it "joins the parts of a body read to the end of the connection" do
+      ["reading all...\n", %(-> "one"\n), %(-> "two"\n), "read 6 bytes\n"].each { |string| redacted_output << string }
+
+      expect(io.string).to eq(%(reading all...\n-> "onetwo"\nread 6 bytes\n))
+    end
+
+    it "writes nothing for a body read in no parts" do
+      ["reading 0 bytes...\n", "read 0 bytes\n"].each { |string| redacted_output << string }
+
+      expect(io.string).to eq("reading 0 bytes...\nread 0 bytes\n")
+    end
+
+    it "does not join the lines of a response that are not a body" do
+      [%(-> "HTTP/1.1 200 OK\\r\\n"\n), %(-> "Content-Length: 3\\r\\n"\n)].each { |string| redacted_output << string }
+
+      expect(io.string).to eq(%(-> "HTTP/1.1 200 OK\\r\\n"\n-> "Content-Length: 3\\r\\n"\n))
+    end
+
+    it "writes the parts of a body read so far before whatever is written next" do
+      ["reading 6 bytes...\n", %(-> "one"\n), "Conn close\n"].each { |string| redacted_output << string }
+
+      expect(io.string).to eq(%(reading 6 bytes...\n-> "one"\nConn close\n))
+    end
+
+    it "does not join the lines of a response after the body read before them" do
+      ["reading 3 bytes...\n", %(-> "one"\n), "read 3 bytes\n", %(-> "HTTP/1.1 200 OK\\r\\n"\n), %(-> "two"\n)]
+        .each { |string| redacted_output << string }
+
+      expect(io.string).to eq(%(reading 3 bytes...\n-> "one"\nread 3 bytes\n-> "HTTP/1.1 200 OK\\r\\n"\n-> "two"\n))
+    end
+
     it "does not redact a header that only looks like one, without the escaped newline" do
       redacted_output << '-> "X-Note: Authorization: not a header\\r\\n"'
 
       expect(io.string).to eq('-> "X-Note: Authorization: not a header\\r\\n"')
+    end
+
+    context "with the debug output of Net::HTTP" do
+      let(:body) { %({"name":"ci-push","rubygems_api_key":"rubygems_701243f217cdf23b1370c7b66b65ca97"}) }
+      let(:server) { TCPServer.new("127.0.0.1", 0) }
+
+      around do |example|
+        WebMock.allow_net_connect!
+        example.run
+      ensure
+        WebMock.disable_net_connect!
+        server.close
+      end
+
+      # Answer one request with the body, sent in two parts, so that it is read from the socket in two
+      def serve_in_two_parts
+        Thread.new do
+          socket = server.accept
+          nil until socket.gets == "\r\n"
+          socket.write("HTTP/1.1 200 OK\r\nContent-Length: #{body.bytesize}\r\n\r\n#{body[0, 50]}")
+          sleep 0.1
+          socket.write(body[50..])
+          socket.close
+        end
+      end
+
+      def get
+        connection = Gems::Connection.new(debug_output: io, keep_alive_timeout: 0)
+        connection.perform(request: Net::HTTP::Get.new(URI("http://127.0.0.1:#{server.addr[1]}/api/v1/api_key.json")))
+      end
+
+      it "writes no part of an API key a response body carries, when the body is read in two parts" do
+        serve_in_two_parts
+        get
+
+        expect(io.string).not_to include("b1370c7b")
+      end
+
+      it "writes the body with the API key redacted" do
+        serve_in_two_parts
+        get
+
+        expect(io.string).to include('\\"rubygems_api_key\\":\\"[REDACTED]\\"}')
+      end
     end
   end
 end

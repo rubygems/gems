@@ -400,7 +400,10 @@ Debug output is redacted before it reaches the IO `debug_output` is set to, so t
 `Authorization` and `OTP` headers of every request, the `Proxy-Authorization` header the requests sent through a
 proxy carry, the ID token of a trusted publishing token exchange, the API key
 `update_api_key` sends, and the API key an API key or token exchange response returns are written as `[REDACTED]`.
-Everything else Net::HTTP writes, including the rest of the headers, is left as it is.
+Everything else Net::HTTP writes, including the rest of the headers, is left as it is. A client with a debug output
+asks for its responses uncompressed, since a compressed body would be written as bytes no credential could be found in,
+and a body read from the socket in parts is written as one line, so that a credential split between them is redacted
+whole.
 
 ## Retries
 

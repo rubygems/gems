@@ -234,21 +234,27 @@ module Gems
     # A connection kept open must still have them to be reused.
     #
     # @api private
-    # @return [Array<Object>] the settings
+    # @return [Hash{Symbol => Object}] the settings
     def settings
-      [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url, certificate_settings]
+      {open_timeout:, read_timeout:, write_timeout:, keep_alive_timeout:, debug_output:, proxy_url:,
+       certificates: certificate_settings}
     end
 
     # Send a request on a connection opened with the settings given
     #
     # The connection is kept under those settings afterwards, rather than under the settings as they are then.
     #
+    # A request sent on a connection with a debug output asks for its response uncompressed, since the debug output
+    # is written the body as it was sent, and the credentials of a compressed body could not be redacted from it
+    # (see {RedactedOutput}).
+    #
     # @api private
     # @param request [Net::HTTPRequest] the HTTP request to send
-    # @param opened_with [Array<Object>] the settings a connection must have been opened with to send it on
+    # @param opened_with [Hash{Symbol => Object}] the settings a connection must have been opened with to send it on
     # @param kept_for [Numeric] the seconds the connection is kept open afterwards
     # @return [Net::HTTPResponse] the HTTP response
     def send_request(request, opened_with, kept_for)
+      request["Accept-Encoding"] = "identity" if opened_with.fetch(:debug_output)
       http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) { build_http_client(request.uri) }
       response = request_on(http_client, request)
       pool.checkin(request:, http_client:, settings: opened_with, keep_alive_timeout: kept_for)

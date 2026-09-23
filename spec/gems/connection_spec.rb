@@ -240,6 +240,16 @@ RSpec.describe Gems::Connection do
     end
   end
 
+  describe "#settings" do
+    it "names each setting a connection is opened with" do
+      connection = described_class.new(debug_output: $stderr, proxy_url: "http://proxy.example.com:8080")
+
+      expect(connection.send(:settings)).to eq(open_timeout: 60, read_timeout: 60, write_timeout: 60,
+        keep_alive_timeout: 2, debug_output: $stderr, proxy_url: "http://proxy.example.com:8080",
+        certificates: [nil, nil, nil, nil, nil])
+    end
+  end
+
   describe "#perform" do
     it "performs the request" do
       stub_request(:get, https_uri.to_s)
@@ -297,6 +307,21 @@ RSpec.describe Gems::Connection do
 
       expect { connection.perform(request: Net::HTTP::Get.new(https_uri)) }
         .to raise_error(Gems::NetworkError, "Network error: Connection refused - Exception from WebMock")
+    end
+
+    it "asks for a response that is not compressed when it has a debug output" do
+      stub_request(:get, https_uri.to_s)
+      connection.debug_output = StringIO.new
+      connection.perform(request: Net::HTTP::Get.new(https_uri))
+
+      expect(a_request(:get, https_uri.to_s).with(headers: {"Accept-Encoding" => "identity"})).to have_been_made
+    end
+
+    it "asks for a compressed response without a debug output" do
+      stub_request(:get, https_uri.to_s)
+      connection.perform(request: Net::HTTP::Get.new(https_uri))
+
+      expect(a_request(:get, https_uri.to_s).with(headers: {"Accept-Encoding" => /gzip/})).to have_been_made
     end
 
     it "does not wrap other errors" do
