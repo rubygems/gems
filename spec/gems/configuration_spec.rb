@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe Gems::Configuration do
+  # Set RUBYGEMS_HOST for the block, restoring it before the configuration is reset between examples
+  def with_gem_host(host)
+    original = ENV.fetch("RUBYGEMS_HOST", nil)
+    ENV["RUBYGEMS_HOST"] = host
+    yield
+  ensure
+    ENV["RUBYGEMS_HOST"] = original
+  end
+
   describe "::DEFAULT_HOST" do
     it "defaults to rubygems.org" do
       expect(described_class::DEFAULT_HOST).to eq("https://rubygems.org")
@@ -8,15 +17,6 @@ RSpec.describe Gems::Configuration do
   end
 
   describe "#default_host" do
-    # Set RUBYGEMS_HOST for the block, restoring it before the configuration is reset between examples
-    def with_gem_host(host)
-      original = ENV.fetch("RUBYGEMS_HOST", nil)
-      ENV["RUBYGEMS_HOST"] = host
-      yield
-    ensure
-      ENV["RUBYGEMS_HOST"] = original
-    end
-
     it "defaults to rubygems.org" do
       expect(Gems.default_host).to eq("https://rubygems.org")
     end
@@ -259,9 +259,7 @@ RSpec.describe Gems::Configuration do
     end
 
     it "does not check the host a reset restores, so that a bad RUBYGEMS_HOST does not raise on require" do
-      stub_const("ENV", ENV.to_h.merge("RUBYGEMS_HOST" => "gems.example.com"))
-
-      expect { Gems.reset }.not_to raise_error
+      expect { with_gem_host("gems.example.com") { Gems.reset } }.not_to raise_error
     end
   end
 
