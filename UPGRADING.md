@@ -207,17 +207,17 @@ Some return values changed shape:
 
 ```ruby
 # 2.x
-Gems.latest_version("rails")                # => {"version" => "8.1.2"}
+Gems.latest_version("rails")                # => {"version" => "8.1.3.1"}
 Gems.total_downloads                        # => {:total => 123}
-Gems.total_downloads("rails", "8.1.2")      # => {:version_downloads => 1, :total_downloads => 2}
-Gems.most_downloaded                        # => [[{"full_name" => "rails-8.1.2", ...}, 123], ...]
+Gems.total_downloads("rails", "8.1.3.1")    # => {:version_downloads => 1, :total_downloads => 2}
+Gems.most_downloaded                        # => [[{"full_name" => "rails-8.1.3.1", ...}, 123], ...]
 Gems.web_hooks                              # => {"all gems" => [{"url" => ...}], "rails" => [...]}
 
 # 3.0
-Gems.latest_version("rails")                # => "8.1.2"
+Gems.latest_version("rails")                # => "8.1.3.1"
 Gems.total_downloads                        # => 123
-Gems.downloads("rails", "8.1.2")            # => #<Gems::Downloads total=2 version_downloads=1>
-Gems.most_downloaded                        # => [#<Gems::Version name="rails" number="8.1.2">, ...], with downloads_count
+Gems.downloads("rails", "8.1.3.1")          # => #<Gems::Downloads full_name="rails-8.1.3.1" total=2 version_downloads=1>
+Gems.most_downloaded                        # => [#<Gems::Version name="rails" number="8.1.3.1">, ...], with downloads_count
 Gems.web_hooks                              # => [#<Gems::WebHook gem_name="*" url=...>, ...]
 ```
 

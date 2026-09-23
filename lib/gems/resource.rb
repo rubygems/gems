@@ -278,7 +278,7 @@ module Gems
     # @api public
     # @return [String] the summary
     # @example Inspect a gem
-    #   gem.inspect # => #<Gems::Gem name="rails" version="8.1.2">
+    #   gem.inspect # => #<Gems::Gem name="rails" version="8.1.3.1">
     def inspect
       fields = self.class.inspect_readers.map { |reader| " #{reader}=#{public_send(reader).inspect}" }
       "#<#{self.class}#{fields.join}>"
@@ -292,7 +292,7 @@ module Gems
     # @api public
     # @return [String] the summary
     # @example Write a gem into a message
-    #   "fetched #{gem}" # => 'fetched #<Gems::Gem name="rails" version="8.1.2">'
+    #   "fetched #{gem}" # => 'fetched #<Gems::Gem name="rails" version="8.1.3.1">'
     def to_s = inspect
 
     # Generate a hash code for the resource

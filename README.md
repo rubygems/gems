@@ -31,7 +31,7 @@ require 'gems'
 # Return some basic information about rails.
 gem = Gems.rubygem 'rails'
 gem.name             # => "rails"
-gem.version          # => "8.1.2"
+gem.version          # => "8.1.3.1"
 gem.downloads        # => 704478420
 gem.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", ...]
 
@@ -40,7 +40,7 @@ version = Gems.version 'rails', '7.0.6'
 version.number       # => "7.0.6"
 version.built_at     # => 2023-06-29 00:00:00 UTC
 version.sha          # => "5dfbd481...", the checksum of the gem file
-version.spec_sha     # => "9d5f4a10...", the checksum of the gemspec it was pushed with
+version.spec_sha     # => "9c8cfe74...", the checksum of the gemspec it was pushed with
 version.runtime_dependencies.map(&:name) # => ["actioncable", "actionmailbox", ...]
 
 # Return information about a version for a specific platform.
@@ -203,7 +203,8 @@ Gems.trusted_publisher('gems', 1).workflow_filename
 # Stop trusting a publisher.
 Gems.remove_trusted_publisher 'gems', Gems.trusted_publishers('gems').first
 
-# The following methods require authentication.
+# The methods that act on your account or your gems, such as push, yank, and the owner, web hook, API key, and
+# trusted publisher methods above, require authentication.
 # By default, we load your API key as `gem push` does: from GEM_HOST_API_KEY, or from
 # ~/.gem/credentials, where `gem signin` stores it (`gem signin --host` for another host).
 # You can override this default by specifying a custom API key.
@@ -270,11 +271,11 @@ counts alone, and are compared by it as well as by the counts: the downloads of 
 another that happens to have been downloaded as many times. An API key is compared by all of its attributes, its
 key among them, so two keys that share a name are not equal. Gems and
 versions also order by their number as RubyGems orders numbers, rather than as the strings they are written with, so
-`Gems.versions('rails').max` answers with `7.0.10` where `max_by(&:number)` would answer with `7.0.9`:
+`7.0.10` comes after `7.0.9`, where comparing the strings, as `max_by(&:number)` does, puts it before:
 
 ```ruby
 Gems.versions('rails').sort      # oldest first, prereleases before the versions they lead to
-Gems.versions('rails').max       # => #<Gems::Version name="rails" number="8.1.2">
+Gems.versions('rails').max       # => #<Gems::Version name="rails" number="8.1.3.1">
 version.gem_version              # => the number as a Gem::Version, to compare with one of your own
 
 Gems.search('cucumber').sort     # the endpoints that answer with gems order the same way
@@ -296,7 +297,7 @@ gem['dependencies'] # => {"development" => [...], "runtime" => [...]}
 gem.to_h            # => the parsed JSON response, as a Hash you can change
 gem.to_h['metadata']['fetched_at'] = Time.now # => the nested values are copies too
 gem.attributes      # => the same fields, frozen
-gem.to_s            # => '#<Gems::Gem name="rails" version="8.1.2">', the summary it inspects as
+gem.to_s            # => '#<Gems::Gem name="rails" version="8.1.3.1">', the summary it inspects as
 ```
 
 Two endpoints return their JSON as it is, by design, rather than wrapping it: `contents` answers with a plain map of

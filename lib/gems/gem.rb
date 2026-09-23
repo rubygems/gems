@@ -219,7 +219,7 @@ module Gems
     # @return [::Gem::Version, nil] the version, or nil when the gem carries no version, or one RubyGems cannot
     #   read
     # @example Read the version as a Gem::Version
-    #   gem.gem_version # => Gem::Version.new("8.1.2")
+    #   gem.gem_version # => Gem::Version.new("8.1.3.1")
     def gem_version
       gem_version_of(version)
     end
