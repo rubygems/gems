@@ -223,6 +223,7 @@ module Gems
     def configured_key: () -> String?
     def authenticator_for: (String host) -> Authenticator
     def credentials_configured?: () -> bool
+    def trusted_publishing?: () -> bool
     def initialize_authenticator: () -> Authenticator
     def otp_authenticator: (Authenticator authenticator) -> Authenticator
     def basic_authenticator: () -> BasicAuthenticator?

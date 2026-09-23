@@ -146,6 +146,58 @@ RSpec.describe Gems::ClientCredentials do
       expect(Gems::Client.new(key: TEST_KEY).send(:authenticator_for, "https://gems.example.com"))
         .to have_attributes(class: Gems::APIKeyAuthenticator, key: TEST_KEY)
     end
+
+    it "sends another host the configured key rather than the key an ID token is exchanged for" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(key: TEST_KEY, id_token: "ID_TOKEN").send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: TEST_KEY)
+    end
+
+    it "sends another host the key stored for it rather than the key an ID token is exchanged for" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "sends no key to another host a configured key of nil turns the fallback off for" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(key: nil, id_token: "ID_TOKEN").send(:authenticator_for, "https://gems.example.com"))
+        .to be_an_instance_of(Gems::Authenticator)
+    end
+
+    it "keeps basic authentication for another host when the client has an ID token too" do
+      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
+
+      expect(client.send(:authenticator_for, "https://gems.example.com")).to be_an_instance_of(Gems::BasicAuthenticator)
+    end
+
+    it "keeps the key an ID token is exchanged for for the host of the client" do
+      expect(Gems::Client.new(key: TEST_KEY, id_token: "ID_TOKEN").send(:authenticator_for, TEST_HOST))
+        .to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
+    end
+  end
+
+  describe "#trusted_publishing?" do
+    it "is true with an ID token" do
+      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:trusted_publishing?)).to be(true)
+    end
+
+    it "is true with an ID token and an API key" do
+      expect(Gems::Client.new(key: TEST_KEY, id_token: "ID_TOKEN").send(:trusted_publishing?)).to be(true)
+    end
+
+    it "is false without an ID token" do
+      expect(Gems::Client.new(key: TEST_KEY).send(:trusted_publishing?)).to be(false)
+    end
+
+    it "is false with basic authentication, which takes precedence" do
+      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
+
+      expect(client.send(:trusted_publishing?)).to be(false)
+    end
   end
 
   describe "#credentials_configured?" do

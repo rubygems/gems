@@ -172,16 +172,28 @@ module Gems
     # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. The credentials
     # the caller gave the client are sent wherever the client sends a request, as the configured credentials of
     # `gem push --key` are; the API key a trusted publishing ID token is exchanged for is not one of them (see
-    # {#credentials_configured?}).
+    # {#credentials_configured?}), so a client that authenticates its own host with that key sends another host the
+    # API key the caller gave it, when it was given one, rather than the key the token was exchanged for.
     #
     # @api private
     # @param host [String] the host of the request
     # @return [Authenticator] the authenticator for the request
     def authenticator_for(host)
-      return authenticator if credentials_configured? || same_origin?(host, @host)
+      return authenticator if same_origin?(host, @host) || (credentials_configured? && !trusted_publishing?)
 
-      key = Gems.default_key(host)
-      otp_authenticator(key ? APIKeyAuthenticator.new(key:) : Authenticator.new)
+      host_key = @key_configured ? key : Gems.default_key(host)
+      otp_authenticator(host_key ? APIKeyAuthenticator.new(key: host_key) : Authenticator.new)
+    end
+
+    # Whether the client authenticates its own host by trusted publishing
+    #
+    # It does so with the API key a trusted publishing ID token is exchanged for, when it has an ID token and no basic authentication, which takes precedence over trusted publishing;
+    # an API key the caller gave it does not, since trusted publishing takes precedence over an API key.
+    #
+    # @api private
+    # @return [Boolean] whether the client authenticates its own host by trusted publishing
+    def trusted_publishing?
+      basic_authenticator.nil? && !id_token.nil?
     end
 
     # Whether the caller gave the client credentials of its own
