@@ -776,7 +776,7 @@ module Gems
   class ConnectionPool
     include Idempotence
 
-    @connections: Hash[untyped, [Net::HTTP, untyped]]
+    @connections: Hash[untyped, untyped]
     @mutex: Thread::Mutex
 
     def initialize: () -> void
@@ -790,6 +790,7 @@ module Gems
     private
 
     def delete: (untyped key) -> Net::HTTP?
+    def opened_here?: (Integer? pid) -> bool
     def keep_alive?: (Net::HTTPRequest request, Numeric keep_alive_timeout) -> bool
     def pool_key: (Net::HTTPRequest request) -> [String?, String?, Integer?]
   end

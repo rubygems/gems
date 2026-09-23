@@ -10,6 +10,11 @@ module Gems
   # own rather than waiting for one another, and the connections they opened are closed when they are given back.
   # A connection opened with settings that have since changed is closed rather than reused.
   #
+  # A process forked from one that kept a connection open shares the socket of that connection with it, so the
+  # connection is kept for the process that opened it alone: a forked process opens one of its own, rather than
+  # reading the responses to the requests of the other process, and leaves the one it inherited alone, rather than
+  # closing it under the process still using it.
+  #
   # @api private
   class ConnectionPool
     include Idempotence
@@ -73,7 +78,8 @@ module Gems
     # Take the connection kept for a key
     #
     # The connection is removed from the pool, so that it is used by one request at a time, and is given back with
-    # {#store}. A connection opened with other settings is closed instead of returned.
+    # {#store}. A connection opened with other settings is closed instead of returned, and one opened by the process
+    # this one was forked from is left to that process.
     #
     # @api private
     # @param key [Object] the key the connection is kept under
@@ -82,17 +88,19 @@ module Gems
     # @example Take the connection kept for a host
     #   pool.take(["https", "rubygems.org", 443], settings)
     def take(key, settings)
-      kept = @mutex.synchronize { @connections.delete(key) }
-      return kept.first if kept && settings.eql?(kept.last)
+      http_client, kept_settings, pid = @mutex.synchronize { @connections.delete(key) }
+      return unless opened_here?(pid)
+      return http_client if settings.eql?(kept_settings)
 
-      discard(kept&.first)
+      discard(http_client)
       nil
     end
 
     # Keep a connection for a key
     #
     # A connection is kept only when none is kept for the key already, so that the pool holds one connection per
-    # host; a connection it cannot keep is closed.
+    # host; a connection it cannot keep is closed. One kept by the process this one was forked from does not count,
+    # and is replaced.
     #
     # @api private
     # @param key [Object] the key to keep the connection under
@@ -102,7 +110,9 @@ module Gems
     # @example Keep a connection for a host
     #   pool.store(["https", "rubygems.org", 443], http_client, settings)
     def store(key, http_client, settings)
-      stored = @mutex.synchronize { @connections[key] = [http_client, settings] unless @connections.key?(key) }
+      stored = @mutex.synchronize do
+        @connections[key] = [http_client, settings, Process.pid] unless opened_here?(@connections.dig(key, 2))
+      end
       discard(http_client) if stored.nil?
       !stored.nil?
     end
@@ -112,7 +122,8 @@ module Gems
     # The keys are read under the lock, as every other read and write of the connections is, since a request giving
     # its connection back at that moment writes to them from another thread. The connections are then taken one at a
     # time, so that a connection given back while the pool is closing is either closed with the rest or kept for the
-    # next request, rather than dropped without being closed.
+    # next request, rather than dropped without being closed. The connections opened by the process this one was
+    # forked from are forgotten rather than closed, since that process may still be using them.
     #
     # @api private
     # @return [ConnectionPool] the pool
@@ -129,10 +140,22 @@ module Gems
     # Take the connection kept for a key, whatever settings it was opened with
     # @api private
     # @param key [Object] the key the connection is kept under
-    # @return [Net::HTTP, nil] the connection, or nil when none is kept for the key
+    # @return [Net::HTTP, nil] the connection, or nil when none is kept for the key or the one kept was opened by the
+    #   process this one was forked from
     def delete(key)
-      entry = @mutex.synchronize { @connections.delete(key) }
-      entry&.first
+      http_client, _settings, pid = @mutex.synchronize { @connections.delete(key) }
+      http_client if opened_here?(pid)
+    end
+
+    # Whether a connection was opened by this process
+    #
+    # A connection opened by the process this one was forked from was not, and shares its socket with that process.
+    #
+    # @api private
+    # @param pid [Integer, nil] the ID of the process that opened the connection, or nil when none is kept
+    # @return [Boolean] whether it is the ID of this process
+    def opened_here?(pid)
+      Process.pid.eql?(pid)
     end
 
     # Whether a request can be sent on a connection that is kept open

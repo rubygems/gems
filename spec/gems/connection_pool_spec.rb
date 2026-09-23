@@ -23,6 +23,13 @@ RSpec.describe Gems::ConnectionPool do
     Net::HTTP::Post.new(URI("https://rubygems.org/path"))
   end
 
+  # Keep a connection as the process this one was forked from, which kept it before the fork
+  def store_before_fork(http_client, key: self.key)
+    allow(Process).to receive(:pid).and_return(1)
+    pool.store(key, http_client, settings)
+    allow(Process).to receive(:pid).and_return(2)
+  end
+
   # Spy on the lock the pool holds while it reads and writes the connections it keeps
   def spy_on_lock
     pool.instance_variable_get(:@mutex).tap { |mutex| allow(mutex).to receive(:synchronize).and_call_original }
@@ -143,6 +150,26 @@ RSpec.describe Gems::ConnectionPool do
 
       expect(pool.send(:delete, key)).to be_nil
     end
+
+    it "returns nothing for a connection opened by the process this one was forked from" do
+      store_before_fork(http_client)
+
+      expect(pool.send(:delete, key)).to be_nil
+    end
+  end
+
+  describe "#opened_here?" do
+    it "is true for the ID of this process" do
+      expect(pool.send(:opened_here?, Process.pid)).to be(true)
+    end
+
+    it "is false for the ID of another process" do
+      expect(pool.send(:opened_here?, Process.pid + 1)).to be(false)
+    end
+
+    it "is false when no connection is kept" do
+      expect(pool.send(:opened_here?, nil)).to be(false)
+    end
   end
 
   describe "#take" do
@@ -187,6 +214,19 @@ RSpec.describe Gems::ConnectionPool do
       pool.take(key, [1, 60, 60, 2, nil, nil])
 
       expect(http_client).to have_received(:finish)
+    end
+
+    it "returns nothing for a connection opened by the process this one was forked from" do
+      store_before_fork(http_client)
+
+      expect(pool.take(key, settings)).to be_nil
+    end
+
+    it "does not close a connection opened by the process this one was forked from" do
+      store_before_fork(http_client)
+      pool.take(key, [1, 60, 60, 2, nil, nil])
+
+      expect(http_client).not_to have_received(:finish)
     end
   end
 
@@ -243,6 +283,28 @@ RSpec.describe Gems::ConnectionPool do
 
       expect(pool.store(key, closed, settings)).to be(false)
     end
+
+    it "keeps a connection in place of one opened by the process this one was forked from" do
+      other = instance_double(Net::HTTP, started?: true, finish: nil)
+      store_before_fork(http_client)
+
+      expect(pool.store(key, other, settings)).to be(true)
+    end
+
+    it "returns the connection it kept in place of one opened by the process this one was forked from" do
+      other = instance_double(Net::HTTP, started?: true, finish: nil)
+      store_before_fork(http_client)
+      pool.store(key, other, settings)
+
+      expect(pool.take(key, settings)).to equal(other)
+    end
+
+    it "does not close a connection opened by the process this one was forked from when it replaces it" do
+      store_before_fork(http_client)
+      pool.store(key, instance_double(Net::HTTP, started?: true, finish: nil), settings)
+
+      expect(http_client).not_to have_received(:finish)
+    end
   end
 
   describe "#close" do
@@ -285,6 +347,46 @@ RSpec.describe Gems::ConnectionPool do
       pool.store(key, closed, settings)
 
       expect(pool.close).to equal(pool)
+    end
+
+    it "does not close a connection opened by the process this one was forked from" do
+      store_before_fork(http_client)
+      pool.close
+
+      expect(http_client).not_to have_received(:finish)
+    end
+
+    it "forgets a connection opened by the process this one was forked from" do
+      store_before_fork(http_client)
+      pool.close
+      allow(Process).to receive(:pid).and_return(1)
+
+      expect(pool.take(key, settings)).to be_nil
+    end
+
+    it "closes the connections it opened beside one opened by the process this one was forked from" do
+      other = instance_double(Net::HTTP, started?: true, finish: nil)
+      store_before_fork(http_client)
+      pool.store(["http", "rubygems.org", 80], other, settings)
+      pool.close
+
+      expect(other).to have_received(:finish)
+    end
+  end
+
+  describe "in a forked process", if: Process.respond_to?(:fork) do
+    # What a block evaluates to in a process forked from this one, inspected
+    def in_fork
+      reader, writer = IO.pipe
+      Process.wait(fork { writer.write(yield.inspect) && exit!(0) })
+      writer.close
+      reader.read
+    end
+
+    it "does not send a request on the connection the process it was forked from kept open" do
+      pool.store(key, http_client, settings)
+
+      expect(in_fork { pool.take(key, settings) }).to eq("nil")
     end
   end
 end

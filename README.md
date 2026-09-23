@@ -385,7 +385,9 @@ A request is sent on the connection the last request to the same host left open,
 open a connection each. `keep_alive_timeout` sets how long an idle connection is kept open, and `0` closes every
 connection once its request is done. A request that is not idempotent, such as `push`, is sent on a connection of its
 own, since a connection the server closed while it was idle cannot be retried for it. `close` closes the connections a
-client keeps open; they are opened again as they are needed, so requests can still be made afterwards. A client
+client keeps open; they are opened again as they are needed, so requests can still be made afterwards. A process
+forked from one that left a connection open, such as a worker of a server that preloads the application, opens one of
+its own rather than sharing the socket of the process it was forked from. A client
 built with a block is closed once the block returns or raises, as `Net::HTTP.start` closes the connection it opened:
 
 ```ruby
