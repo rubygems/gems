@@ -3,6 +3,7 @@
 require_relative "../identifiers"
 require_relative "../json_parsing"
 require_relative "../api_key"
+require_relative "../path_escaping"
 require_relative "../trusted_publisher_authenticator"
 
 module Gems
@@ -12,6 +13,7 @@ module Gems
     module APIKeyEndpoints
       include Identifiers
       include JSONParsing
+      include PathEscaping
 
       # Create an API key using HTTP basic auth
       #
@@ -76,6 +78,49 @@ module Gems
       def exchange_trusted_publisher_token(id_token)
         TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:,
           redirect_handler:, retry_handler:).exchange_token!
+      end
+
+      # List the API key roles of the user the API key belongs to
+      #
+      # @api public
+      # @authenticated true
+      # @return [Array<APIKeyRole>] the roles
+      # @example
+      #   Gems.api_key_roles.map(&:name)
+      def api_key_roles
+        APIKeyRole.list(parse_json(get("/api/v1/oidc/api_key_roles.json")))
+      end
+
+      # Return one of the API key roles of the user the API key belongs to
+      #
+      # @api public
+      # @authenticated true
+      # @param token [String, APIKeyRole] The token of the role, or a role.
+      # @return [APIKeyRole] the role
+      # @example
+      #   Gems.api_key_role("0123456789abcdef0123456789abcdef").api_key_permissions
+      def api_key_role(token)
+        APIKeyRole.new(parse_json(get("/api/v1/oidc/api_key_roles/#{escape(token_of(token))}.json")))
+      end
+
+      # Exchange an OIDC ID token for an API key by assuming an API key role
+      #
+      # The role issues a key granted the permissions it was set up with when the ID token satisfies its access
+      # policy, whichever gem the key will act on, where {#exchange_trusted_publisher_token} issues one for the gems
+      # that trust the workflow the token names. The exchange is sent as that one is: without the credentials of the
+      # client, and again when the server turns it away or the network loses it.
+      #
+      # @api public
+      # @authenticated false
+      # @param token [String, APIKeyRole] The token of the role, or a role.
+      # @param id_token [String] The OIDC ID token.
+      # @return [APIKey] the API key the role issued, including its name, scopes, and expiry
+      # @example
+      #   Gems.assume_api_key_role("0123456789abcdef0123456789abcdef", ENV.fetch("ID_TOKEN")).key
+      def assume_api_key_role(token, id_token)
+        TrustedPublisherAuthenticator.new(id_token:, host:, connection:, request_builder:, redirect_handler:,
+          retry_handler:, exchange_path: "/api/v1/oidc/api_key_roles/#{escape(token_of(token))}/assume_role.json")
+          .exchange_token!
       end
 
       private

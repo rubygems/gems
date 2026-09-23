@@ -74,6 +74,13 @@ module Gems
     #   authenticator.retry_handler
     attr_reader :retry_handler
 
+    # The path of the endpoint the ID token is exchanged with
+    # @api private
+    # @return [String] the path, which is the trusted publishing exchange unless an API key role is assumed
+    # @example Get the path of the exchange
+    #   authenticator.exchange_path
+    attr_reader :exchange_path
+
     # The API key obtained from the token exchange
     # @api private
     # @return [String, nil] the API key, or nil before the token has been exchanged
@@ -93,14 +100,17 @@ module Gems
     # @param request_builder [RequestBuilder] the request builder used for the token exchange
     # @param redirect_handler [RedirectHandler] the redirect handler the exchange is followed with
     # @param retry_handler [RetryHandler] the retry handler the exchange is sent again with
+    # @param exchange_path [String] the path of the endpoint the token is exchanged with, which is the trusted
+    #   publishing exchange unless the token assumes an API key role
     # @return [TrustedPublisherAuthenticator] a new instance
     # @example Create a trusted publisher authenticator
     #   authenticator = Gems::TrustedPublisherAuthenticator.new(id_token: ENV.fetch("ID_TOKEN"))
     def initialize(id_token:, host: Gems.default_host, connection: Connection.new,
       request_builder: RequestBuilder.new,
       redirect_handler: RedirectHandler.new(connection:, request_builder:),
-      retry_handler: RetryHandler.new)
+      retry_handler: RetryHandler.new, exchange_path: EXCHANGE_TOKEN_PATH)
       @id_token = id_token
+      @exchange_path = exchange_path
       @host = host
       @connection = connection
       @request_builder = request_builder
@@ -179,7 +189,7 @@ module Gems
     # @api private
     # @return [Net::HTTPResponse] the response the exchange ended at
     def exchange_response
-      uri = URI.join("#{host.chomp("/")}/", EXCHANGE_TOKEN_PATH.delete_prefix("/"))
+      uri = URI.join("#{host.chomp("/")}/", exchange_path.delete_prefix("/"))
       body = JSON.generate({jwt: id_token})
       headers = {"Accept" => RequestBuilder::APPLICATION_JSON}
       request = request_builder.build(http_method: :post, uri:, body:,

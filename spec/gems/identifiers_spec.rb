@@ -225,6 +225,16 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#token_of" do
+    it "returns a token unchanged" do
+      expect(client.send(:token_of, "0123456789abcdef")).to eq("0123456789abcdef")
+    end
+
+    it "returns the token of a role" do
+      expect(client.send(:token_of, Gems::APIKeyRole.new("token" => "0123456789abcdef"))).to eq("0123456789abcdef")
+    end
+  end
+
   describe "#key_of" do
     it "returns a key unchanged" do
       expect(client.send(:key_of, TEST_KEY)).to eq(TEST_KEY)

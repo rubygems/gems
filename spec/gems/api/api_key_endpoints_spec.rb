@@ -141,6 +141,133 @@ RSpec.describe Gems::API::APIKeyEndpoints do
     end
   end
 
+  describe "#api_key_roles" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    before { stub_get("/api/v1/oidc/api_key_roles.json").to_return(body: fixture("api_key_roles.json")) }
+
+    it "gets the roles with the API key" do
+      client.api_key_roles
+
+      expect(a_get("/api/v1/oidc/api_key_roles.json").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "returns the roles" do
+      expect(client.api_key_roles.map(&:token)).to eq(["0123456789abcdef0123456789abcdef"])
+    end
+  end
+
+  describe "#api_key_role" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    let(:path) { "/api/v1/oidc/api_key_roles/0123456789abcdef0123456789abcdef.json" }
+
+    before { stub_get(path).to_return(body: fixture("api_key_role.json")) }
+
+    it "gets the role with the API key" do
+      client.api_key_role("0123456789abcdef0123456789abcdef")
+
+      expect(a_get(path).with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "accepts a role" do
+      client.api_key_role(Gems::APIKeyRole.new("token" => "0123456789abcdef0123456789abcdef"))
+
+      expect(a_get(path)).to have_been_made
+    end
+
+    it "escapes the token" do
+      stub_get("/api/v1/oidc/api_key_roles/..%2Fx.json").to_return(body: fixture("api_key_role.json"))
+      client.api_key_role("../x")
+
+      expect(a_get("/api/v1/oidc/api_key_roles/..%2Fx.json")).to have_been_made
+    end
+
+    it "returns the role" do
+      expect(client.api_key_role("0123456789abcdef0123456789abcdef").name).to eq("Push gems")
+    end
+  end
+
+  describe "#assume_api_key_role" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    let(:assume_url) { "https://rubygems.org/api/v1/oidc/api_key_roles/0123456789abcdef0123456789abcdef/assume_role.json" }
+
+    before { stub_request(:post, assume_url).to_return(body: fixture("exchange_token.json")) }
+
+    it "posts the ID token as JSON" do
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+
+      expect(a_request(:post, assume_url).with(body: '{"jwt":"ID_TOKEN"}',
+        headers: {"Content-Type" => "application/json"})).to have_been_made
+    end
+
+    it "sends the exchange without the API key of the client" do
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+
+      expect(a_request(:post, assume_url).with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
+    it "accepts a role" do
+      client.assume_api_key_role(Gems::APIKeyRole.new("token" => "0123456789abcdef0123456789abcdef"), "ID_TOKEN")
+
+      expect(a_request(:post, assume_url)).to have_been_made
+    end
+
+    it "escapes the token" do
+      stub_request(:post, "https://rubygems.org/api/v1/oidc/api_key_roles/..%2Fx/assume_role.json")
+        .to_return(body: fixture("exchange_token.json"))
+      client.assume_api_key_role("../x", "ID_TOKEN")
+
+      expect(a_request(:post, "https://rubygems.org/api/v1/oidc/api_key_roles/..%2Fx/assume_role.json")).to have_been_made
+    end
+
+    it "returns the API key the role issued" do
+      expect(client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN").key)
+        .to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+    end
+
+    it "assumes the role with the client's host" do
+      client.host = "http://example.com"
+      url = "http://example.com/api/v1/oidc/api_key_roles/0123456789abcdef0123456789abcdef/assume_role.json"
+      stub_request(:post, url).to_return(body: fixture("exchange_token.json"))
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+
+      expect(a_request(:post, url)).to have_been_made
+    end
+
+    it "uses the client's request builder" do
+      client.user_agent = "Custom User Agent"
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+
+      expect(a_request(:post, assume_url).with(headers: {"User-Agent" => "Custom User Agent"})).to have_been_made
+    end
+
+    it "follows the redirects of the exchange as far as the client does" do
+      client.max_redirects = 0
+      stub_request(:post, assume_url).to_return(status: 308, headers: {"Location" => "#{assume_url}/moved"})
+
+      expect { client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN") }
+        .to raise_error(Gems::TooManyRedirects)
+    end
+
+    it "uses the client's connection" do
+      connection = client.send(:connection)
+      allow(connection).to receive(:perform).and_call_original
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+
+      expect(connection).to have_received(:perform).with(request: an_instance_of(Net::HTTP::Post))
+    end
+
+    it "sends the exchange again as many times as the client does" do
+      client.max_retries = 0
+      stub_request(:post, assume_url).to_return(status: 429, headers: {"Retry-After" => "0"})
+      client.assume_api_key_role("0123456789abcdef0123456789abcdef", "ID_TOKEN")
+    rescue Gems::TooManyRequests
+      expect(a_request(:post, assume_url)).to have_been_made.once
+    end
+  end
+
   describe "#exchange_trusted_publisher_token" do
     let(:exchange_url) { "https://rubygems.org/api/v1/oidc/trusted_publisher/exchange_token" }
 

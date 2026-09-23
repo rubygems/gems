@@ -179,6 +179,10 @@ Gems::APIKey::SCOPES
 # Exchange an OIDC ID token for an API key via trusted publishing.
 Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 
+# List your API key roles, and exchange an OIDC ID token for an API key by assuming one.
+Gems.api_key_roles.map(&:name)
+Gems.assume_api_key_role('0123456789abcdef0123456789abcdef', ENV.fetch('ID_TOKEN')).key
+
 # Trust a GitHub Actions workflow to publish a gem, so that it can push without an API key.
 Gems.add_trusted_publisher('gems', repository_owner: 'rubygems', repository_name: 'gems',
   workflow_filename: 'push_gem.yml')

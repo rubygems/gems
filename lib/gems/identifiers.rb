@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "api_key"
+require_relative "api_key_role"
 require_relative "gem"
 require_relative "owner"
 require_relative "profile"
@@ -158,6 +159,17 @@ module Gems
       case trusted_publisher
       when TrustedPublisher then trusted_publisher.id
       else trusted_publisher
+      end
+    end
+
+    # Resolve the token of an API key role from a token or a role
+    # @api private
+    # @param role [String, APIKeyRole] a token, or a role
+    # @return [String, nil] the token
+    def token_of(role)
+      case role
+      when APIKeyRole then role.token
+      else role
       end
     end
 

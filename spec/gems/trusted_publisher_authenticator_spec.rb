@@ -94,6 +94,15 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect(described_class.new(id_token: "ID_TOKEN", retry_handler:).retry_handler).to equal(retry_handler)
     end
 
+    it "defaults the exchange path to the trusted publishing exchange" do
+      expect(authenticator.exchange_path).to eq("/api/v1/oidc/trusted_publisher/exchange_token")
+    end
+
+    it "sets a custom exchange path" do
+      expect(described_class.new(id_token: "ID_TOKEN", exchange_path: "/assume_role.json").exchange_path)
+        .to eq("/assume_role.json")
+    end
+
     it "builds a mutex, so that concurrent requests exchange the token once" do
       expect(authenticator.instance_variable_get(:@mutex)).to be_an_instance_of(Thread::Mutex)
     end
