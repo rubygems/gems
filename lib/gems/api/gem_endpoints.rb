@@ -161,6 +161,21 @@ module Gems
         parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/reverse_dependencies.json", {only:}.compact))
       end
 
+      # Returns the full names of the versions that depend on the given gem
+      #
+      # Where {#reverse_dependencies} names each gem that depends on the gem once, this names every indexed version
+      # of those gems that does, at every platform, such as "foreman-0.63.0-java", with dependencies of both types.
+      #
+      # @api public
+      # @authenticated false
+      # @param gem_name [String, Gem, Version] The name of a gem, or a gem or version
+      # @return [Array<String>] the full names of the versions
+      # @example
+      #   Gems.reverse_dependency_versions "dotenv"
+      def reverse_dependency_versions(gem_name)
+        parse_json(get("/api/v1/versions/#{escape(name_of(gem_name))}/reverse_dependencies.json"))
+      end
+
       private
 
       # Check that a dependency type is one the RubyGems API defines

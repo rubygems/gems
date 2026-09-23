@@ -385,6 +385,33 @@ RSpec.describe Gems::API::GemEndpoints do
     end
   end
 
+  describe "#reverse_dependency_versions" do
+    before { stub_get("/api/v1/versions/dotenv/reverse_dependencies.json").to_return(body: '["dotenv-rails-0.6.0","foreman-0.63.0-java"]') }
+
+    it "gets the correct resource" do
+      client.reverse_dependency_versions("dotenv")
+
+      expect(a_get("/api/v1/versions/dotenv/reverse_dependencies.json")).to have_been_made
+    end
+
+    it "accepts a gem" do
+      client.reverse_dependency_versions(Gems::Gem.new("name" => "dotenv"))
+
+      expect(a_get("/api/v1/versions/dotenv/reverse_dependencies.json")).to have_been_made
+    end
+
+    it "escapes the gem name" do
+      stub_get("/api/v1/versions/..%2Fdotenv/reverse_dependencies.json").to_return(body: "[]")
+      client.reverse_dependency_versions("../dotenv")
+
+      expect(a_get("/api/v1/versions/..%2Fdotenv/reverse_dependencies.json")).to have_been_made
+    end
+
+    it "returns the full names of the versions" do
+      expect(client.reverse_dependency_versions("dotenv")).to eq(%w[dotenv-rails-0.6.0 foreman-0.63.0-java])
+    end
+  end
+
   describe "#reverse_dependencies" do
     before { stub_get("/api/v1/gems/rspec/reverse_dependencies.json").to_return(body: fixture("reverse_dependencies_short.json")) }
 

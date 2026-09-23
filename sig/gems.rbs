@@ -76,6 +76,7 @@ module Gems
   def self.update_api_key: (api_key_identifier key, scopes: Array[Symbol | String] | Symbol | String) -> String
   def self.exchange_trusted_publisher_token: (String id_token) -> APIKey
   def self.reverse_dependencies: (gem_identifier gem_name, ?only: (String | Symbol)?) -> Array[String]
+  def self.reverse_dependency_versions: (gem_identifier gem_name) -> Array[String]
   def self.trusted_publishers: (gem_identifier gem_name) -> Array[TrustedPublisher]
   def self.trusted_publisher: (gem_identifier gem_name, trusted_publisher_identifier trusted_publisher) -> TrustedPublisher
   def self.add_trusted_publisher: (gem_identifier gem_name, repository_owner: String, repository_name: String, workflow_filename: String, ?environment: String?, ?workflow_repository_owner: String?, ?workflow_repository_name: String?, ?type: String) -> TrustedPublisher
@@ -517,6 +518,7 @@ module Gems
     def push: (push_file gem, ?host: String?, ?attestations: push_attestations?) -> String
     def yank: (gem_identifier gem_name, ?version_identifier? version, ?platform: String?, ?ruby_abi: String?) -> String
     def reverse_dependencies: (gem_identifier gem_name, ?only: (String | Symbol)?) -> Array[String]
+    def reverse_dependency_versions: (gem_identifier gem_name) -> Array[String]
 
     private
 

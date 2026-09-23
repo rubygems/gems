@@ -297,7 +297,8 @@ gem.to_s            # => '#<Gems::Gem name="rails" version="8.1.2">', the summar
 
 Two endpoints return their JSON as it is, by design, rather than wrapping it: `contents` answers with a plain map of
 path to checksum, and `attestations` answers with sigstore bundles, whose shape is defined by sigstore rather than by
-RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem names for the same reason.
+RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem names for the same reason, and
+`reverse_dependency_versions` an array of the full names of the versions that depend on a gem.
 
 ## Pagination
 
