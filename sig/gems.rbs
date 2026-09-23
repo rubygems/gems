@@ -832,6 +832,7 @@ module Gems
     attr_reader pool: ConnectionPool
 
     def settings: () -> Array[untyped]
+    def send_request: (Net::HTTPRequest request, Array[untyped] opened_with, Numeric kept_for) -> Net::HTTPResponse
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def redact: (String? url) -> String?
     def decode: (String? component) -> String?

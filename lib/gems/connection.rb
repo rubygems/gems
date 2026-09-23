@@ -212,6 +212,10 @@ module Gems
     # The request is sent on the connection kept open for its host, when there is one it can be sent on, and that
     # connection is kept open for the next request (see {#keep_alive_timeout}).
     #
+    # The settings are read once, before the connection is taken, and the connection is kept under them, so that a
+    # setting changed while the request is being sent, from another thread, closes the connection when the next
+    # request is sent rather than keeping it as though it had been opened with the setting as it is now.
+    #
     # @api private
     # @param request [Net::HTTPRequest] the HTTP request to perform
     # @return [Net::HTTPResponse] the HTTP response
@@ -219,13 +223,7 @@ module Gems
     # @example Perform a request
     #   response = connection.perform(request: request)
     def perform(request:)
-      http_client = pool.checkout(request:, settings:, keep_alive_timeout:) { build_http_client(request.uri) }
-      response = http_client.request(request)
-      pool.checkin(request:, http_client:, settings:, keep_alive_timeout:)
-      response
-    rescue *NetworkError::WRAPPED => e
-      pool.discard(http_client)
-      raise NetworkError, "Network error: #{e}"
+      send_request(request, settings, keep_alive_timeout)
     end
 
     # Close the connections kept open for the next request
@@ -273,6 +271,28 @@ module Gems
     # @return [Array<Object>] the settings
     def settings
       [open_timeout, read_timeout, write_timeout, keep_alive_timeout, debug_output, proxy_url, certificate_settings]
+    end
+
+    # Send a request on a connection opened with the settings given
+    #
+    # The connection is kept under those settings afterwards, rather than under the settings as they are then.
+    #
+    # @api private
+    # @param request [Net::HTTPRequest] the HTTP request to send
+    # @param opened_with [Array<Object>] the settings a connection must have been opened with to send it on
+    # @param kept_for [Numeric] the seconds the connection is kept open afterwards
+    # @return [Net::HTTPResponse] the HTTP response
+    # @raise [NetworkError] if a network error occurs
+    def send_request(request, opened_with, kept_for)
+      http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) do
+        build_http_client(request.uri)
+      end
+      response = http_client.request(request)
+      pool.checkin(request:, http_client:, settings: opened_with, keep_alive_timeout: kept_for)
+      response
+    rescue *NetworkError::WRAPPED => e
+      pool.discard(http_client)
+      raise NetworkError, "Network error: #{e}"
     end
 
     # Decode a percent-encoded component of a URL

@@ -423,6 +423,29 @@ RSpec.describe Gems::Connection do
         end
       end
 
+      it "opens a connection again when a setting changed while the request before it was sent" do
+        stub_request(:get, https_uri.to_s).to_return { (connection.read_timeout = 1) && {status: 200} }.then
+          .to_return(status: 200)
+        2.times { get }
+
+        expect(built.size).to eq(2)
+      end
+
+      it "closes the connection kept open when a setting changed while its request was sent" do
+        stub_request(:get, https_uri.to_s).to_return { (connection.read_timeout = 1) && {status: 200} }.then
+          .to_return(status: 200)
+        2.times { get }
+
+        expect(built.first).not_to be_started
+      end
+
+      it "keeps the connection open when the keep-alive timeout changed to zero while its request was sent" do
+        stub_request(:get, https_uri.to_s).to_return { (connection.keep_alive_timeout = 0) && {status: 200} }
+        get
+
+        expect(built.first).to be_started
+      end
+
       it "closes the connection it kept open when a setting has changed" do
         get
         connection.read_timeout = 1
