@@ -222,8 +222,8 @@ module Gems
     #   the request reaches the endpoint, so a `push` that was rate limited is sent again; otherwise only an
     #   idempotent request is sent again, and a 502 or 504 sends only a request that reads again, since a request
     #   that acts on a gem may have been acted on by the origin the gateway read no answer from. The trusted
-    #   publishing token exchange is the exception: it is sent again when the endpoint answers it with no key,
-    #   although it is a POST, and is not sent again when it is lost to the network.
+    #   publishing token exchange is the exception: it is sent again when the endpoint answers it with no key or
+    #   the network loses it, although it is a POST.
     #
     #   @api public
     #   @return [Integer] the number of times a request that was turned away is sent again

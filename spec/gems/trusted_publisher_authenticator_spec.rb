@@ -237,17 +237,25 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
         expect(a_request(:post, exchange_url)).to have_been_made.times(3)
       end
 
-      it "raises the network error of an exchange that was lost" do
+      it "sends an exchange lost to the network again" do
+        stub_request(:post, exchange_url)
+          .to_raise(Errno::ECONNRESET).then
+          .to_return(body: fixture("exchange_token.json").read)
+
+        expect(authenticator.exchange_token!.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
+      end
+
+      it "raises the network error of an exchange that is lost every time" do
         stub_request(:post, exchange_url).to_raise(Errno::ECONNRESET)
 
         expect { authenticator.exchange_token! }.to raise_error(Gems::NetworkError)
       end
 
-      it "does not send an exchange lost to the network again, since it may have issued the only key" do
+      it "sends an exchange lost to the network again as many times as the retry handler allows" do
         stub_request(:post, exchange_url).to_raise(Errno::ECONNRESET)
         authenticator.exchange_token!
       rescue Gems::NetworkError
-        expect(a_request(:post, exchange_url)).to have_been_made.once
+        expect(a_request(:post, exchange_url)).to have_been_made.times(3)
       end
     end
   end

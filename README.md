@@ -429,9 +429,9 @@ of the version that is already gone, which would be raised in place of the succe
 503 say the server turned the request away rather than acting on it, so they are retried for either.
 
 The trusted publishing token exchange is the exception to all of this: a 429, 502, 503, or 504 answers the exchange
-with no key, and an exchange sent again either is issued one or answers that the token is spent, where the publish
-would have failed either way, so it is sent again although it is a POST. An exchange lost to the network is not,
-since the answer that went missing may have carried the only key RubyGems.org issues for that token. The wait is the one
+with no key, and an exchange lost to the network may have been issued one whose answer went missing, but an exchange
+sent again for any of them either is issued a key or answers that the token is spent, where the publish would have
+failed either way, so it is sent again although it is a POST. The wait is the one
 `Retry-After` asks for, and doubles from one second up to `max_retry_delay` when the response does not carry the
 header, which is the wait after a network failure too, since a request that never arrived has no response to read a
 wait from. A wait the library chose for itself is jittered down by up to half, so that the clients a server turned
