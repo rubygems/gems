@@ -33,13 +33,13 @@ module Gems
 
   def self.client: () -> Client
   def self.reset: () -> self
-  def self.rebuild_client: () -> Array[untyped]
-  def self.client_values: () -> Array[untyped]
-  def self.fallback_key: () -> String?
-  def self.credential_values: () -> Array[untyped]
-  def self.apply_credential_values: () -> Array[untyped]
-  def self.connection_values: () -> Array[untyped]
-  def self.apply_connection_values: () -> void
+  private def self.rebuild_client: () -> Array[untyped]
+  private def self.client_values: () -> Array[untyped]
+  private def self.fallback_key: () -> String?
+  private def self.credential_values: () -> Array[untyped]
+  private def self.apply_credential_values: () -> Array[untyped]
+  private def self.connection_values: () -> Array[untyped]
+  private def self.apply_connection_values: () -> void
 
   def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
               | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
@@ -249,8 +249,8 @@ module Gems
     def self.predicate: (Symbol name, *(String | Symbol) keys) -> Symbol
     def self.time_attribute: (Symbol name, *(String | Symbol) keys) -> Symbol
     def self.attribute_names: () -> Array[Symbol]
-    def self.record_attribute: (Symbol name) -> Symbol
-    def self.keys_for: (Symbol name, Array[String | Symbol] keys) -> Array[String]
+    private def self.record_attribute: (Symbol name) -> Symbol
+    private def self.keys_for: (Symbol name, Array[String | Symbol] keys) -> Array[String]
     def initialize: (Hash[String | Symbol, untyped] attributes) -> void
     def []: (String | Symbol key) -> untyped
     def deconstruct_keys: (Array[Symbol]? keys) -> Hash[Symbol, untyped]
@@ -341,7 +341,7 @@ module Gems
     include Dependencies
     include Ordering
 
-    def self.checksum_attribute: (Symbol name, String hex_key, String base64_key) -> Symbol
+    private def self.checksum_attribute: (Symbol name, String hex_key, String base64_key) -> Symbol
     def name: () -> String?
     def full_name: () -> String?
     def number: () -> String?
@@ -389,7 +389,7 @@ module Gems
   class TrustedPublisher < Resource
     GITHUB_ACTION: String
 
-    def self.publisher_attribute: (Symbol name) -> Symbol
+    private def self.publisher_attribute: (Symbol name) -> Symbol
     def id: () -> Integer?
     def type: () -> String?
     def name: () -> String?
