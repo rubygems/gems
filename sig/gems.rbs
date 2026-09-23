@@ -948,6 +948,8 @@ module Gems
   end
 
   module RetryAfter
+    DELTA_SECONDS: Regexp
+
     private
 
     def retry_after_of: (Net::HTTPResponse response) -> Integer?

@@ -10,6 +10,10 @@ module Gems
   #
   # @api private
   module RetryAfter
+    # A `Retry-After` header that is a number of seconds, which HTTP writes in decimal digits alone
+    DELTA_SECONDS = /\A-?\d+\z/
+    private_constant :DELTA_SECONDS
+
     private
 
     # The seconds a response asks to wait before the request is sent again
@@ -22,7 +26,7 @@ module Gems
       value = response["Retry-After"]
       return if value.nil?
 
-      seconds = Integer(value, exception: false) || (Time.httpdate(value) - Time.now).ceil
+      seconds = DELTA_SECONDS.match?(value) ? value.to_i : (Time.httpdate(value) - Time.now).ceil
       [seconds, 0].max
     rescue ArgumentError
       nil

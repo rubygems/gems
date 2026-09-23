@@ -64,6 +64,27 @@ RSpec.describe Gems::HTTPError do
       expect(described_class.new(response:).retry_after).to eq(120)
     end
 
+    it "reads the seconds of a Retry-After header in decimal, whatever digit they start with" do
+      response["Retry-After"] = "010"
+
+      expect(described_class.new(response:).retry_after).to eq(10)
+    end
+
+    {
+      "hexadecimal" => "0x1E",
+      "binary" => "0b11",
+      "written with an underscore" => "1_0",
+      "preceded by anything else" => "in 5",
+      "followed by anything else" => "5 seconds",
+      "empty" => ""
+    }.each do |description, value|
+      it "is nil for a Retry-After header of seconds #{description}" do
+        response["Retry-After"] = value
+
+        expect(described_class.new(response:).retry_after).to be_nil
+      end
+    end
+
     it "returns zero for a negative number of seconds" do
       response["Retry-After"] = "-5"
 
