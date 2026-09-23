@@ -70,7 +70,7 @@ module Gems
     # Set the one-time passcode used for multi-factor authentication
     #
     # @api public
-    # @param otp [String, nil] the one-time passcode, or nil to send requests without one
+    # @param value [String, nil] the one-time passcode, or nil to send requests without one
     # @return [void]
     # @example Set the one-time passcode
     #   Gems.otp = "123456"
