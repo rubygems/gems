@@ -10,10 +10,16 @@ RSpec.describe Gems::Downloads do
       .to eq("#<Gems::Downloads full_name=\"rails-8.1.2\" total=3142 version_downloads=42>")
   end
 
-  it "is the downloads of the version it names" do
+  it "is equal to the same counts of the version it names" do
     counts = described_class.new("full_name" => "rails-8.1.2", "version_downloads" => 42)
 
-    expect(counts).to eq(described_class.new("full_name" => "rails-8.1.2", "version_downloads" => 3142))
+    expect(counts).to eq(described_class.new("full_name" => "rails-8.1.2", "version_downloads" => 42))
+  end
+
+  it "is not equal to other counts of the version it names" do
+    counts = described_class.new("full_name" => "rails-8.1.2", "version_downloads" => 42)
+
+    expect(counts).not_to eq(described_class.new("full_name" => "rails-8.1.2", "version_downloads" => 3142))
   end
 
   it "is not the downloads of another version with the same counts" do

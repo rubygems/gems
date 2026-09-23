@@ -36,10 +36,14 @@ RSpec.describe Gems::APIKey do
     expect(matched).to eq([api_key.name, api_key.key])
   end
 
-  it "is identified by its name, so that the key is not compared" do
-    other = described_class.new("rubygems_api_key" => "another", "name" => api_key.name)
+  it "is not equal to another key of the same name" do
+    other = described_class.new(api_key.to_h.merge("rubygems_api_key" => "another"))
 
-    expect(api_key).to eq(other)
+    expect(api_key).not_to eq(other)
+  end
+
+  it "is equal to the same key" do
+    expect(api_key).to eq(described_class.new(api_key.to_h))
   end
 
   it "is not equal to a key of another name" do

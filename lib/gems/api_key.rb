@@ -6,6 +6,10 @@ require_relative "resource"
 
 module Gems
   # An API key, as returned by the API key and trusted publishing endpoints
+  #
+  # An API key is compared by all of its attributes, the key among them, so that two keys given the same name, by
+  # two accounts or by two token exchanges, are not taken for one another in a Set or as the keys of a Hash.
+  #
   # @api public
   class APIKey < Resource
     # The scopes the RubyGems API defines for an API key
@@ -28,7 +32,6 @@ module Gems
     ].freeze
 
     inspect_with :name, :scopes
-    identified_by :name
 
     # @!method name
     #   The name of the API key

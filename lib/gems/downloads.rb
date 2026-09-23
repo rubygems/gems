@@ -6,13 +6,13 @@ module Gems
   # Download counts, as returned by the downloads endpoints
   #
   # The endpoint answers with the counts alone, so {API::DownloadEndpoints#downloads} keeps the version it asked
-  # about in the result as {#full_name}, which is what identifies the counts: the downloads of one gem are not the
-  # downloads of another that happens to have been downloaded as many times.
+  # about in the result as {#full_name}. Counts are compared by that and by the counts themselves, since the counts
+  # are all they hold: the downloads of one gem are not the downloads of another that happens to have been
+  # downloaded as many times, and the downloads of a version today are not its downloads yesterday.
   #
   # @api public
   class Downloads < Resource
     inspect_with :full_name, :total, :version_downloads
-    identified_by :full_name
 
     # @!method full_name
     #   The full name of the version the counts are for
