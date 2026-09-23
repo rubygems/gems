@@ -556,7 +556,6 @@ module Gems
     include JSONParsing
     include PathEscaping
 
-    REMOVED_MESSAGE: String
 
     def trusted_publishers: (gem_identifier gem_name) -> Array[TrustedPublisher]
     def trusted_publisher: (gem_identifier gem_name, trusted_publisher_identifier trusted_publisher) -> TrustedPublisher
