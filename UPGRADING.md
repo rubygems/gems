@@ -127,9 +127,9 @@ Gems.push File.new("gems-0.0.8.gem"), host: "https://gems.example.com"
 Gems.yank "gems", "0.0.8", platform: "java"
 ```
 
-`reverse_dependencies`, `create_api_key`, and `update_api_key` changed the same way. `latest` and
-`just_updated` now take no arguments at all: their endpoints answer with the 50 gems they name whatever page is
-asked for, so the `page` 2.x took was never more than the first page under another name.
+`reverse_dependencies` changed the same way. `latest` and `just_updated` now take no arguments at all: their
+endpoints answer with the 50 gems they name whatever page is asked for, so the `page` 2.x took was never more than
+the first page under another name.
 
 ```ruby
 # 2.x
@@ -282,8 +282,8 @@ end
 Gems.create_api_key("ci-push", scopes: %i[push_rubygem]).key
 ```
 
-`create_api_key` and `update_api_key` raise `ArgumentError` for a scope the RubyGems API does not define, where 2.x
-sent whatever it was given for the server to ignore, leaving the key scoped differently than it was meant to be.
+`create_api_key` and `update_api_key` are new in 3.0: they take the scopes to grant a key as a list, and raise
+`ArgumentError` for a scope the RubyGems API does not define.
 
 `Gems::Version::MAJOR`, `MINOR`, `PATCH`, and `PRE` are gone. `Gems::VERSION` is the library's version string, and
 `Gems::Version` is the object returned for a version of a gem.
