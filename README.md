@@ -275,7 +275,8 @@ answer for the version of its platform built for none.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
 Objects compare by identity (a gem or version by its name, version number, platform, and Ruby ABI, and so on), so
 `Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between, while the
-builds of one version for two Ruby ABIs are not equal. The counts
+builds of one version for two Ruby ABIs are not equal. A gem or version inspects with its platform, unless it is
+`ruby`, and with its Ruby ABI, when it was built for one, so that two builds of a version inspect apart. The counts
 `downloads` answers with carry the version they were asked for as `full_name`, since the endpoint answers with the
 counts alone, and are compared by it as well as by the counts: the downloads of one gem are not the downloads of
 another that happens to have been downloaded as many times. An API key is compared by all of its attributes, its

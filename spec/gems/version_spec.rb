@@ -21,6 +21,28 @@ RSpec.describe Gems::Version do
     expect(version.inspect).to eq('#<Gems::Version name="rails" number="7.0.6">')
   end
 
+  it "inspects without a platform it does not carry" do
+    expect(described_class.new("name" => "rails", "number" => "7.0.6").inspect).to eq('#<Gems::Version name="rails" number="7.0.6">')
+  end
+
+  it "inspects with a platform other than ruby" do
+    version = described_class.new("name" => "nokogiri", "number" => "1.19.4", "platform" => "x86_64-linux")
+
+    expect(version.inspect).to eq('#<Gems::Version name="nokogiri" number="1.19.4" platform="x86_64-linux">')
+  end
+
+  it "inspects with the Ruby ABI it was built for" do
+    version = described_class.new("name" => "nokogiri", "number" => "1.19.4", "platform" => "x86_64-linux", "ruby_abi" => "3.4")
+
+    expect(version.inspect).to eq('#<Gems::Version name="nokogiri" number="1.19.4" platform="x86_64-linux" ruby_abi="3.4">')
+  end
+
+  it "inspects with a Ruby ABI of the ruby platform" do
+    version = described_class.new("name" => "nokogiri", "number" => "1.19.4", "platform" => "ruby", "ruby_abi" => "3.4")
+
+    expect(version.inspect).to eq('#<Gems::Version name="nokogiri" number="1.19.4" ruby_abi="3.4">')
+  end
+
   {
     name: "rails",
     authors: "David Heinemeier Hansson",

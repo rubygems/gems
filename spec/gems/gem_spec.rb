@@ -31,6 +31,12 @@ RSpec.describe Gems::Gem do
     expect(gem.inspect).to eq('#<Gems::Gem name="rails" version="7.0.6">')
   end
 
+  it "inspects with the platform and Ruby ABI it was built for" do
+    gem = described_class.new("name" => "nokogiri", "version" => "1.19.4", "platform" => "x86_64-linux", "ruby_abi" => "3.4")
+
+    expect(gem.inspect).to eq('#<Gems::Gem name="nokogiri" version="1.19.4" platform="x86_64-linux" ruby_abi="3.4">')
+  end
+
   {
     name: "rails",
     version: "7.0.6",

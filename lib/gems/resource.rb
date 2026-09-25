@@ -280,7 +280,7 @@ module Gems
     # @example Inspect a gem
     #   gem.inspect # => #<Gems::Gem name="rails" version="8.1.3.1">
     def inspect
-      fields = self.class.inspect_readers.map { |reader| " #{reader}=#{public_send(reader).inspect}" }
+      fields = inspect_values.map { |reader, value| " #{reader}=#{value.inspect}" }
       "#<#{self.class}#{fields.join}>"
     end
 
@@ -324,6 +324,14 @@ module Gems
     end
 
     private
+
+    # The readers {#inspect} shows, with their values
+    #
+    # These are the readers {.inspect_with} declares, which a resource that shows more when it has it adds to.
+    #
+    # @api private
+    # @return [Hash{Symbol => Object}] the value of each reader shown, in the order they are shown
+    def inspect_values = self.class.inspect_readers.to_h { |reader| [reader, public_send(reader)] }
 
     # The value of the first of the given keys the response contains
     # @api private

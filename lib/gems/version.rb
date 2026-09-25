@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "build_summary"
 require_relative "dependencies"
 require_relative "errors/invalid_response"
 require_relative "ordering"
@@ -9,6 +10,7 @@ module Gems
   # A version of a gem, as returned by the versions, downloads, and API v2 endpoints
   # @api public
   class Version < Resource
+    include BuildSummary
     include Dependencies
     include Ordering
 

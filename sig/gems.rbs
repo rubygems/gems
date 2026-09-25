@@ -278,6 +278,7 @@ module Gems
 
     private
 
+    def inspect_values: () -> Hash[Symbol, untyped]
     def value_of: (Array[String] keys) -> untyped
     def parse_time: (untyped value) -> Time
   end
@@ -305,6 +306,17 @@ module Gems
     def dependencies_of: (String type) -> Array[Dependency]
   end
 
+  interface _Build
+    def platform: () -> String?
+    def ruby_abi: () -> String?
+  end
+
+  module BuildSummary : Resource, _Build
+    private
+
+    def inspect_values: () -> Hash[Symbol, untyped]
+  end
+
   interface _Ordered
     def name: () -> String?
     def platform: () -> String?
@@ -322,6 +334,7 @@ module Gems
   end
 
   class Gem < Resource
+    include BuildSummary
     include Dependencies
     include Ordering
 
@@ -353,6 +366,7 @@ module Gems
   end
 
   class Version < Resource
+    include BuildSummary
     include Dependencies
     include Ordering
 

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "build_summary"
 require_relative "dependencies"
 require_relative "ordering"
 require_relative "resource"
@@ -8,6 +9,7 @@ module Gems
   # A gem, as returned by the gem information, search, and activity endpoints
   # @api public
   class Gem < Resource
+    include BuildSummary
     include Dependencies
     include Ordering
 

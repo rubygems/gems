@@ -1,4 +1,5 @@
-# Declare the RubyGems classes and methods used by Gems::Configuration and Gems::Identifiers that rbs does not
+# Declare the RubyGems classes, methods, and constants used by Gems::Configuration, Gems::Identifiers, and
+# Gems::BuildSummary that rbs does not
 #
 # Gem::Version is not among them: rbs declares it, so declaring it again would make the class invalid and leave
 # every call on it unchecked (see sig/patches/net_http.rbs).
@@ -9,6 +10,10 @@ module Gem
   class ConfigFile
     def rubygems_api_key: () -> String?
     def api_keys: () -> Hash[untyped, String]
+  end
+
+  class Platform
+    RUBY: String
   end
 
   class NameTuple
