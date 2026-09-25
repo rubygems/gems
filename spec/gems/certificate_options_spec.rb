@@ -148,7 +148,8 @@ RSpec.describe Gems::CertificateOptions do
   describe "#configure_certificates" do
     subject(:connection) { Gems::Connection.new(**certificates) }
 
-    let(:http_client) { connection.send(:build_http_client, URI("https://rubygems.org/path")) }
+    let(:uri) { URI("https://rubygems.org/path") }
+    let(:http_client) { connection.send(:build_http_client, uri, connection.send(:settings_for, uri)) }
 
     it "hands the CA file to the HTTP client" do
       expect(http_client.ca_file).to eq(ca_file)
@@ -171,7 +172,8 @@ RSpec.describe Gems::CertificateOptions do
     end
 
     it "hands nothing to the HTTP client without certificates" do
-      http_client = Gems::Connection.new.send(:build_http_client, URI("https://rubygems.org/path"))
+      connection = Gems::Connection.new
+      http_client = connection.send(:build_http_client, uri, connection.send(:settings_for, uri))
 
       expect([http_client.ca_file, http_client.ca_path, http_client.cert_store, http_client.cert, http_client.key])
         .to all(be_nil)

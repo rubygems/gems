@@ -908,15 +908,15 @@ module Gems
 
     attr_reader pool: ConnectionPool
 
-    def settings: () -> Hash[Symbol, untyped]
-    def send_request: (Net::HTTPRequest request, Hash[Symbol, untyped] opened_with, Numeric kept_for) -> Net::HTTPResponse
+    def settings_for: (URI::Generic uri) -> Hash[Symbol, untyped]
+    def send_request: (Net::HTTPRequest request, Hash[Symbol, untyped] opened_with) -> Net::HTTPResponse
     def request_on: (Net::HTTP http_client, Net::HTTPRequest request) -> Net::HTTPResponse
     def parse_proxy_uri: (String proxy_url) -> URI::HTTP
     def redact: (String? url) -> String?
     def decode: (String? component) -> String?
-    def build_http_client: (URI::Generic uri) -> Net::HTTP
-    def proxy_arguments_for: (URI::Generic uri) -> [String?, Integer?, String?, String?, bool?]
-    def configure_http_client: (Net::HTTP http_client) -> Net::HTTP
+    def build_http_client: (URI::Generic uri, Hash[Symbol, untyped] opened_with) -> Net::HTTP
+    def proxy_arguments_for: (URI::Generic? proxy) -> [String?, Integer?, String?, String?, bool?]
+    def configure_http_client: (Net::HTTP http_client, Hash[Symbol, untyped] opened_with) -> Net::HTTP
   end
 
   class RequestBuilder
@@ -996,7 +996,7 @@ module Gems
     def initialize_certificates: (**untyped settings) -> void
     def reset_certificates: () -> void
     def certificate_settings: () -> Array[untyped]
-    def configure_certificates: (Net::HTTP http_client) -> void
+    def configure_certificates: (Net::HTTP http_client, Array[untyped] certificates) -> void
     def validate_ca_file: (String ca_file) -> String
     def validate_ca_path: (String ca_path) -> String
   end

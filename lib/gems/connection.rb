@@ -176,9 +176,10 @@ module Gems
     # The request is sent on the connection kept open for its host, when there is one it can be sent on, and that
     # connection is kept open for the next request (see {#keep_alive_timeout}).
     #
-    # The settings are read once, before the connection is taken, and the connection is kept under them, so that a
-    # setting changed while the request is being sent, from another thread, closes the connection when the next
-    # request is sent rather than keeping it as though it had been opened with the setting as it is now.
+    # The settings are read once, before the connection is taken, and a connection that has to be opened is opened
+    # with them and kept under them, so that a setting changed while the request is being sent, from another thread,
+    # closes the connection when the next request is sent rather than keeping it as though it had been opened with
+    # the setting as it is now, and a connection is never opened with one setting and kept under another.
     #
     # @api private
     # @param request [Net::HTTPRequest] the HTTP request to perform
@@ -187,7 +188,7 @@ module Gems
     # @example Perform a request
     #   response = connection.perform(request: request)
     def perform(request:)
-      send_request(request, settings, keep_alive_timeout)
+      send_request(request, settings_for(request.uri))
     rescue *NetworkError::WRAPPED => e
       raise NetworkError, "Network error: #{e}"
     end
@@ -229,20 +230,24 @@ module Gems
     # @return [ConnectionPool] the pool
     attr_reader :pool
 
-    # The settings a connection is opened with
+    # The settings a connection to a URI is opened with
     #
-    # A connection kept open must still have them to be reused.
+    # A connection kept open must still have them to be reused. The proxy is the one a request to the URI is sent
+    # through, which is read from the http_proxy, https_proxy, and no_proxy environment variables when no proxy URL
+    # is configured, so that a connection kept open is not reused past a change to the environment either.
     #
     # @api private
+    # @param uri [URI::Generic] the URI a request is sent to
     # @return [Hash{Symbol => Object}] the settings
-    def settings
-      {open_timeout:, read_timeout:, write_timeout:, keep_alive_timeout:, debug_output:, proxy_url:,
-       certificates: certificate_settings}
+    def settings_for(uri)
+      {open_timeout:, read_timeout:, write_timeout:, keep_alive_timeout:, debug_output:,
+       proxy: proxy_uri || uri.find_proxy, certificates: certificate_settings}
     end
 
     # Send a request on a connection opened with the settings given
     #
-    # The connection is kept under those settings afterwards, rather than under the settings as they are then.
+    # A connection that has to be opened is opened with those settings, and the connection is kept under them
+    # afterwards, rather than under the settings as they are then.
     #
     # A request sent on a connection with a debug output asks for its response uncompressed, since the debug output
     # is written the body as it was sent, and the credentials of a compressed body could not be redacted from it
@@ -251,11 +256,13 @@ module Gems
     # @api private
     # @param request [Net::HTTPRequest] the HTTP request to send
     # @param opened_with [Hash{Symbol => Object}] the settings a connection must have been opened with to send it on
-    # @param kept_for [Numeric] the seconds the connection is kept open afterwards
     # @return [Net::HTTPResponse] the HTTP response
-    def send_request(request, opened_with, kept_for)
+    def send_request(request, opened_with)
+      kept_for = opened_with.fetch(:keep_alive_timeout)
       request["Accept-Encoding"] = "identity" if opened_with.fetch(:debug_output)
-      http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) { build_http_client(request.uri) }
+      http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) do
+        build_http_client(request.uri, opened_with)
+      end
       response = request_on(http_client, request)
       pool.checkin(request:, http_client:, settings: opened_with, keep_alive_timeout: kept_for)
       response
@@ -285,38 +292,37 @@ module Gems
       component && URI.decode_uri_component(component)
     end
 
-    # Build an HTTP client for the given URI
+    # Build an HTTP client for the given URI, with the settings given
     #
-    # If no proxy URL is configured, the proxy is looked up from the environment
-    # (http_proxy, https_proxy, and no_proxy) for the URI's scheme. An https:// proxy is connected to over TLS.
+    # An https:// proxy is connected to over TLS.
     #
     # @api private
     # @param uri [URI::Generic] the URI to connect to
+    # @param opened_with [Hash{Symbol => Object}] the settings to open the connection with
     # @return [Net::HTTP] the HTTP client
     # @raise [ArgumentError] if the URI has no host
-    def build_http_client(uri)
+    def build_http_client(uri, opened_with)
       host = uri.host
       raise ArgumentError, "URI has no host: #{uri}" if host.nil?
 
-      proxy_host, proxy_port, proxy_user, proxy_pass, proxy_use_ssl = proxy_arguments_for(uri)
+      proxy_host, proxy_port, proxy_user, proxy_pass, proxy_use_ssl = proxy_arguments_for(opened_with.fetch(:proxy))
       http_client = Net::HTTP.new(host, uri.port, proxy_host, proxy_port, proxy_user, proxy_pass, nil, proxy_use_ssl)
       http_client.use_ssl = uri.scheme.eql?("https")
-      configure_http_client(http_client)
+      configure_http_client(http_client, opened_with)
     end
 
-    # The proxy host, port, user, password, and whether to use TLS for a URI
+    # The proxy host, port, user, password, and whether to use TLS for a proxy
     #
     # The user and password are decoded from the proxy URL, and an https:// proxy is connected to over TLS.
     #
     # @api private
-    # @param uri [URI::Generic] the URI to connect to
+    # @param proxy [URI::Generic, nil] the proxy, or nil to connect directly
     # @return [Array] the proxy host, port, user, password, and whether to use TLS, each nil without a proxy
-    def proxy_arguments_for(uri)
-      proxy = proxy_uri || uri.find_proxy
+    def proxy_arguments_for(proxy)
       [proxy&.host, proxy&.port, decode(proxy&.user), decode(proxy&.password), proxy&.instance_of?(URI::HTTPS)]
     end
 
-    # Configure an HTTP client with timeout settings
+    # Configure an HTTP client with the timeouts, debug output, and certificates given
     #
     # The debug output is wrapped, so that the credentials Net::HTTP writes with the headers of a request do not
     # reach the IO.
@@ -327,16 +333,18 @@ module Gems
     #
     # @api private
     # @param http_client [Net::HTTP] the HTTP client to configure
+    # @param opened_with [Hash{Symbol => Object}] the settings to configure it with
     # @return [Net::HTTP] the configured HTTP client
-    def configure_http_client(http_client)
+    def configure_http_client(http_client, opened_with)
+      debug_output = opened_with.fetch(:debug_output)
       http_client.tap do |c|
-        c.open_timeout = open_timeout
-        c.read_timeout = read_timeout
-        c.write_timeout = write_timeout
-        c.keep_alive_timeout = keep_alive_timeout
+        c.open_timeout = opened_with.fetch(:open_timeout)
+        c.read_timeout = opened_with.fetch(:read_timeout)
+        c.write_timeout = opened_with.fetch(:write_timeout)
+        c.keep_alive_timeout = opened_with.fetch(:keep_alive_timeout)
         c.max_retries = 0
         c.set_debug_output(debug_output && RedactedOutput.new(debug_output))
-        configure_certificates(c)
+        configure_certificates(c, opened_with.fetch(:certificates))
       end
     end
   end

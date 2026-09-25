@@ -240,13 +240,23 @@ RSpec.describe Gems::Connection do
     end
   end
 
-  describe "#settings" do
+  describe "#settings_for" do
     it "names each setting a connection is opened with" do
       connection = described_class.new(debug_output: $stderr, proxy_url: "http://proxy.example.com:8080")
 
-      expect(connection.send(:settings)).to eq(open_timeout: 60, read_timeout: 60, write_timeout: 60,
-        keep_alive_timeout: 2, debug_output: $stderr, proxy_url: "http://proxy.example.com:8080",
+      expect(connection.send(:settings_for, https_uri)).to eq(open_timeout: 60, read_timeout: 60, write_timeout: 60,
+        keep_alive_timeout: 2, debug_output: $stderr, proxy: URI("http://proxy.example.com:8080"),
         certificates: [nil, nil, nil, nil, nil])
+    end
+
+    it "names the proxy the environment names for the URI when no proxy URL is configured" do
+      with_env("https_proxy" => "http://env.example.com:9999") do
+        expect(connection.send(:settings_for, https_uri).fetch(:proxy)).to eq(URI("http://env.example.com:9999"))
+      end
+    end
+
+    it "names no proxy when neither the configuration nor the environment names one" do
+      expect(connection.send(:settings_for, https_uri).fetch(:proxy)).to be_nil
     end
   end
 
@@ -467,8 +477,8 @@ RSpec.describe Gems::Connection do
   end
 
   describe "#build_http_client" do
-    def build_http_client(uri, connection: self.connection)
-      connection.send(:build_http_client, uri)
+    def build_http_client(uri, connection: self.connection, opened_with: connection.send(:settings_for, uri))
+      connection.send(:build_http_client, uri, opened_with)
     end
 
     it "leaves sending a request again to the retry handler" do
@@ -511,8 +521,24 @@ RSpec.describe Gems::Connection do
       expect(build_http_client(http_uri)).not_to be_use_ssl
     end
 
+    it "opens the connection with the settings it is given, rather than as they have changed since" do
+      opened_with = connection.send(:settings_for, https_uri)
+      connection.read_timeout = 5
+      connection.proxy_url = "http://proxy.example.com:8080"
+
+      expect(build_http_client(https_uri, opened_with:)).to have_attributes(read_timeout: 60, proxy?: false)
+    end
+
+    it "hands the HTTP client the certificates it is given, rather than as they have changed since" do
+      opened_with = connection.send(:settings_for, https_uri)
+      connection.cert_store = OpenSSL::X509::Store.new
+
+      expect(build_http_client(https_uri, opened_with:).cert_store).to be_nil
+    end
+
     it "raises an ArgumentError for a URI without a host" do
-      expect { build_http_client(URI("/path")) }.to raise_error(ArgumentError, "URI has no host: /path")
+      expect { build_http_client(URI("/path"), opened_with: connection.send(:settings_for, https_uri)) }
+        .to raise_error(ArgumentError, "URI has no host: /path")
     end
 
     it "applies the open timeout" do
@@ -591,7 +617,7 @@ RSpec.describe Gems::Connection do
 
       it "decodes the proxy user and password" do
         connection = described_class.new(proxy_url: "http://us%40er:p%40ss@proxy.example.com:8080")
-        http_client = connection.send(:build_http_client, https_uri)
+        http_client = build_http_client(https_uri, connection:)
 
         expect([http_client.proxy_user, http_client.proxy_pass]).to eq(["us@er", "p@ss"])
       end

@@ -120,20 +120,18 @@ module Gems
       SETTINGS.map { |setting| public_send(setting) }
     end
 
-    # Hand the certificates to an HTTP client
+    # Hand certificates to an HTTP client
     #
     # They are assigned whatever the scheme of the request is, as the timeouts are: Net::HTTP reads them only when
     # it opens a TLS connection.
     #
     # @api private
     # @param http_client [Net::HTTP] the HTTP client
+    # @param certificates [Array<Object>] the values of the certificate settings, as {#certificate_settings} reads
+    #   them
     # @return [void]
-    def configure_certificates(http_client)
-      http_client.ca_file = ca_file
-      http_client.ca_path = ca_path
-      http_client.cert_store = cert_store
-      http_client.cert = client_cert
-      http_client.key = client_key
+    def configure_certificates(http_client, certificates)
+      http_client.ca_file, http_client.ca_path, http_client.cert_store, http_client.cert, http_client.key = certificates
     end
 
     # Check that a path names a file of certificates
