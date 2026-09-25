@@ -18,7 +18,7 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Add an `otp` option for multi-factor authentication, which falls back to `GEM_HOST_OTP_CODE` as `gem push` does
 * Add a `page` option to `autocomplete`, a `platform` option to `version`, `contents`, `attestations`, and `downloads`, a `ruby_abi` option to `version`, `contents`, and `yank`, and a `role` option to `add_owner` and `update_owner`
 * Add `search_each` and `timeframe_versions_each`, which walk the pages of those endpoints lazily
-* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, `APIKey`, `APIKeyRole`, `OIDCProvider`, `OIDCIDToken`, `TrustedPublisher`, and `WebAuthnVerification` objects, which are immutable, compare by identity, match `case`/`in` patterns, inspect as short summaries, and keep `[]` and `to_h` for the raw response
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, `APIKey`, `APIKeyRole`, `OIDCProvider`, `OIDCIDToken`, `TrustedPublisher`, `WebAuthnVerification`, and `WebAuthnVerificationStatus` objects, which are immutable, compare by identity, match `case`/`in` patterns, inspect as short summaries, and keep `[]` and `to_h` for the raw response
 * Order gems and versions with `<=>` as RubyGems orders version numbers, so `"7.0.10"` sorts after `"7.0.9"`
 * Compare and order gems and versions by the platform and Ruby ABI of their build, and show both in `inspect` where they tell one build from another
 * Accept those objects wherever a gem name, version, owner, web hook URL, or API key is expected; a gem or version given as the gem acts on the version and build it names

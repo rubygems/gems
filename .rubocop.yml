@@ -47,8 +47,10 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: true
 
-# Name the specs of OIDCIDToken and WebAuthnVerification as their files are named, which the cop cannot tell
+# Name the specs of OIDCIDToken, WebAuthnVerification, and WebAuthnVerificationStatus as their files are named,
+# which the cop cannot tell
 RSpec/SpecFilePathFormat:
   CustomTransform:
     OIDCIDToken: oidc_id_token
     WebAuthnVerification: webauthn_verification
+    WebAuthnVerificationStatus: webauthn_verification_status

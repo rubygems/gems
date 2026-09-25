@@ -173,7 +173,7 @@ Gems.me.mfa
 # Verify your account with a security key in a browser, for the one-time passcode `gem push` would ask for.
 verification = Gems.webauthn_verification
 puts "Open #{verification.path}"
-Gems.webauthn_verification_status(verification)  # => {"status" => "success", "code" => "123456"}, once it is done
+Gems.webauthn_verification_status(verification).code  # => "123456", once it is done
 
 # Update the scopes of an API key, which is granted these alone.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', scopes: %i[push_rubygem yank_rubygem]

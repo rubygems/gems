@@ -5,6 +5,7 @@ require_relative "../json_parsing"
 require_relative "../path_escaping"
 require_relative "../profile"
 require_relative "../webauthn_verification"
+require_relative "../webauthn_verification_status"
 
 module Gems
   module API
@@ -63,18 +64,19 @@ module Gems
       # Returns the status of a WebAuthn verification of your account
       #
       # The status is "pending" until the verification is done in a browser, and "success" once it has been, with
-      # the one-time passcode as the "code"; "expired" and "not_found" say the verification cannot be done, with a
-      # "message" that says why.
+      # the one-time passcode as the {WebAuthnVerificationStatus#code}; "expired" and "not_found" say the
+      # verification cannot be done, with a {WebAuthnVerificationStatus#message} that says why.
       #
       # @api public
       # @authenticated true
       # @param verification [String, WebAuthnVerification] The token of the verification, or the verification.
-      # @return [Hash{String => String}] the "status", with the "code" or a "message"
+      # @return [WebAuthnVerificationStatus] the status, with the passcode or a message
       # @example
       #   verification = Gems.webauthn_verification
-      #   Gems.webauthn_verification_status(verification)["code"]
+      #   Gems.webauthn_verification_status(verification).code
       def webauthn_verification_status(verification)
-        parse_json(get("/api/v1/webauthn_verification/#{escape(webauthn_token_of(verification))}/status.json"))
+        path = "/api/v1/webauthn_verification/#{escape(webauthn_token_of(verification))}/status.json"
+        WebAuthnVerificationStatus.new(parse_json(get(path)))
       end
     end
   end

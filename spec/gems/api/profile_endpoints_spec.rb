@@ -116,7 +116,9 @@ RSpec.describe Gems::API::ProfileEndpoints do
     end
 
     it "returns the status, with the one-time passcode" do
-      expect(client.webauthn_verification_status("odow34b93t6aPCdY")).to eq("status" => "success", "code" => "123456")
+      status = client.webauthn_verification_status("odow34b93t6aPCdY")
+
+      expect([status.class, status.status, status.code]).to eq([Gems::WebAuthnVerificationStatus, "success", "123456"])
     end
   end
 end
