@@ -134,11 +134,11 @@ RSpec.describe Gems::API::TrustedPublisherEndpoints do
       expect([trusted_publisher.class, trusted_publisher.id]).to eq([Gems::TrustedPublisher, 1])
     end
 
-    it "raises UnprocessableEntity when the publisher is refused" do
+    it "raises UnprocessableContent when the publisher is refused" do
       stub_post("/api/v1/gems/gems/trusted_publishers")
         .to_return(status: 422, body: '{"errors":{"base":["publisher already exists"]}}')
 
-      expect { client.add_trusted_publisher("gems", **publisher) }.to raise_error(Gems::UnprocessableEntity)
+      expect { client.add_trusted_publisher("gems", **publisher) }.to raise_error(Gems::UnprocessableContent)
     end
   end
 

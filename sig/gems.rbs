@@ -741,7 +741,10 @@ module Gems
   class Conflict < ClientError
   end
 
-  class UnprocessableEntity < ClientError
+  class Gone < ClientError
+  end
+
+  class UnprocessableContent < ClientError
   end
 
   class TooManyRequests < ClientError

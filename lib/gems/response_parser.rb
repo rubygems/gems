@@ -7,6 +7,7 @@ require_relative "errors/client_error"
 require_relative "errors/conflict"
 require_relative "errors/forbidden"
 require_relative "errors/gateway_timeout"
+require_relative "errors/gone"
 require_relative "errors/http_error"
 require_relative "errors/internal_server_error"
 require_relative "errors/not_found"
@@ -14,7 +15,7 @@ require_relative "errors/server_error"
 require_relative "errors/service_unavailable"
 require_relative "errors/too_many_requests"
 require_relative "errors/unauthorized"
-require_relative "errors/unprocessable_entity"
+require_relative "errors/unprocessable_content"
 
 module Gems
   # Parses HTTP responses from the RubyGems API
@@ -27,7 +28,8 @@ module Gems
       403 => Forbidden,
       404 => NotFound,
       409 => Conflict,
-      422 => UnprocessableEntity,
+      410 => Gone,
+      422 => UnprocessableContent,
       429 => TooManyRequests,
       500 => InternalServerError,
       502 => BadGateway,
