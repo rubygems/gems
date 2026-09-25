@@ -14,11 +14,11 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Add `autocomplete`, `contents`, `attestations`, `timeframe_versions`, `reverse_dependency_versions`, `profile`, and `me` for endpoints 2.x had no method for
 * Add `create_api_key` and `update_api_key`, which take the scopes to grant as `scopes: %i[push_rubygem]` and check them against `Gems::APIKey::SCOPES`
 * Add trusted publishing: an `id_token` option, `exchange_trusted_publisher_token`, and `trusted_publishers`, `trusted_publisher`, `add_trusted_publisher`, and `remove_trusted_publisher`
-* Add `api_key_roles`, `api_key_role`, and `assume_api_key_role` for OIDC API key roles
+* Add `api_key_roles`, `api_key_role`, `assume_api_key_role`, `oidc_providers`, `oidc_provider`, `oidc_id_tokens`, and `oidc_id_token` for OIDC API key roles
 * Add an `otp` option for multi-factor authentication, which falls back to `GEM_HOST_OTP_CODE` as `gem push` does
 * Add a `page` option to `autocomplete`, a `platform` option to `version`, `contents`, `attestations`, and `downloads`, a `ruby_abi` option to `version`, `contents`, and `yank`, and a `role` option to `add_owner` and `update_owner`
 * Add `search_each` and `timeframe_versions_each`, which walk the pages of those endpoints lazily
-* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, `APIKey`, `APIKeyRole`, and `TrustedPublisher` objects, which are immutable, compare by identity, match `case`/`in` patterns, inspect as short summaries, and keep `[]` and `to_h` for the raw response
+* Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, `APIKey`, `APIKeyRole`, `OIDCProvider`, `OIDCIDToken`, and `TrustedPublisher` objects, which are immutable, compare by identity, match `case`/`in` patterns, inspect as short summaries, and keep `[]` and `to_h` for the raw response
 * Order gems and versions with `<=>` as RubyGems orders version numbers, so `"7.0.10"` sorts after `"7.0.9"`
 * Accept those objects wherever a gem name, version, owner, web hook URL, or API key is expected; a gem or version given as the gem acts on the version and build it names
 * Add `open_timeout`, `read_timeout`, `write_timeout`, `keep_alive_timeout`, `debug_output`, `proxy_url`, and `max_redirects` options, set globally or per client

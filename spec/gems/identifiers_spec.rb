@@ -258,6 +258,10 @@ RSpec.describe Gems::Identifiers do
       expect(client.send(:id_of, Gems::TrustedPublisher.new("id" => 1))).to eq(1)
     end
 
+    it "returns the ID of an OIDC provider" do
+      expect(client.send(:id_of, Gems::OIDCProvider.new("id" => 1))).to eq(1)
+    end
+
     it "returns nil for nil" do
       expect(client.send(:id_of, nil)).to be_nil
     end

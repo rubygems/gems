@@ -3,6 +3,7 @@
 require_relative "api_key"
 require_relative "api_key_role"
 require_relative "gem"
+require_relative "oidc_provider"
 require_relative "owner"
 require_relative "profile"
 require_relative "trusted_publisher"
@@ -151,14 +152,14 @@ module Gems
       end
     end
 
-    # Resolve the ID of a trusted publisher from an ID or a trusted publisher
+    # Resolve the ID of a trusted publisher or an OIDC provider from an ID or either
     # @api private
-    # @param trusted_publisher [Integer, String, TrustedPublisher] an ID, or a trusted publisher
+    # @param resource [Integer, String, TrustedPublisher, OIDCProvider] an ID, a trusted publisher, or a provider
     # @return [Integer, String, nil] the ID
-    def id_of(trusted_publisher)
-      case trusted_publisher
-      when TrustedPublisher then trusted_publisher.id
-      else trusted_publisher
+    def id_of(resource)
+      case resource
+      when TrustedPublisher, OIDCProvider then resource.id
+      else resource
       end
     end
 

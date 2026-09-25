@@ -3,6 +3,8 @@
 require_relative "../identifiers"
 require_relative "../json_parsing"
 require_relative "../api_key"
+require_relative "../oidc_id_token"
+require_relative "../oidc_provider"
 require_relative "../path_escaping"
 require_relative "../trusted_publisher_authenticator"
 
@@ -107,6 +109,55 @@ module Gems
       #   Gems.api_key_role("0123456789abcdef0123456789abcdef").api_key_permissions
       def api_key_role(token)
         APIKeyRole.new(parse_json(get("/api/v1/oidc/api_key_roles/#{escape(token_of(token))}.json")))
+      end
+
+      # List the OIDC providers whose ID tokens RubyGems.org accepts
+      #
+      # @api public
+      # @authenticated true
+      # @return [Array<OIDCProvider>] the providers
+      # @example
+      #   Gems.oidc_providers.map(&:issuer)
+      def oidc_providers
+        OIDCProvider.list(parse_json(get("/api/v1/oidc/providers.json")))
+      end
+
+      # Return one of the OIDC providers whose ID tokens RubyGems.org accepts
+      #
+      # @api public
+      # @authenticated true
+      # @param provider [Integer, String, OIDCProvider] The ID of the provider, such as the {APIKeyRole#provider_id}
+      #   of a role, or a provider.
+      # @return [OIDCProvider] the provider
+      # @example
+      #   Gems.oidc_provider(Gems.api_key_role("0123456789abcdef0123456789abcdef").provider_id).issuer
+      def oidc_provider(provider)
+        OIDCProvider.new(parse_json(get("/api/v1/oidc/providers/#{escape(id_of(provider))}.json")))
+      end
+
+      # List the OIDC ID tokens the API key roles of the user have accepted
+      #
+      # @api public
+      # @authenticated true
+      # @return [Array<OIDCIDToken>] the ID tokens, with their claims and headers
+      # @example
+      #   Gems.oidc_id_tokens.map { |id_token| id_token.jwt["claims"]["repository"] }
+      def oidc_id_tokens
+        OIDCIDToken.list(parse_json(get("/api/v1/oidc/id_tokens.json")))
+      end
+
+      # Return one of the OIDC ID tokens the API key roles of the user have accepted
+      #
+      # The endpoint looks the ID token up by its ID, which neither it nor {#oidc_id_tokens} answers with.
+      #
+      # @api public
+      # @authenticated true
+      # @param id [Integer, String] The ID of the ID token.
+      # @return [OIDCIDToken] the ID token, with its claims and header
+      # @example
+      #   Gems.oidc_id_token(42).api_key_role_token
+      def oidc_id_token(id)
+        OIDCIDToken.new(parse_json(get("/api/v1/oidc/id_tokens/#{escape(id)}.json")))
       end
 
       # Exchange an OIDC ID token for an API key by assuming an API key role

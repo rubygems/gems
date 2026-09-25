@@ -204,6 +204,98 @@ RSpec.describe Gems::API::APIKeyEndpoints do
     end
   end
 
+  describe "#oidc_providers" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    before { stub_get("/api/v1/oidc/providers.json").to_return(body: fixture("oidc_providers.json")) }
+
+    it "gets the providers with the API key" do
+      client.oidc_providers
+
+      expect(a_get("/api/v1/oidc/providers.json").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "returns the providers" do
+      provider = client.oidc_providers.first
+
+      expect([provider.class, provider.issuer]).to eq([Gems::OIDCProvider, "https://token.actions.githubusercontent.com"])
+    end
+  end
+
+  describe "#oidc_provider" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    before { stub_get("/api/v1/oidc/providers/1.json").to_return(body: fixture("oidc_provider.json")) }
+
+    it "gets the provider with the API key" do
+      client.oidc_provider(1)
+
+      expect(a_get("/api/v1/oidc/providers/1.json").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "accepts a provider" do
+      client.oidc_provider(Gems::OIDCProvider.new("id" => 1))
+
+      expect(a_get("/api/v1/oidc/providers/1.json")).to have_been_made
+    end
+
+    it "escapes the ID" do
+      stub_get("/api/v1/oidc/providers/..%2F1.json").to_return(body: fixture("oidc_provider.json"))
+      client.oidc_provider("../1")
+
+      expect(a_get("/api/v1/oidc/providers/..%2F1.json")).to have_been_made
+    end
+
+    it "returns the provider" do
+      provider = client.oidc_provider(1)
+
+      expect([provider.class, provider.id]).to eq([Gems::OIDCProvider, 1])
+    end
+  end
+
+  describe "#oidc_id_tokens" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    before { stub_get("/api/v1/oidc/id_tokens.json").to_return(body: fixture("oidc_id_tokens.json")) }
+
+    it "gets the ID tokens with the API key" do
+      client.oidc_id_tokens
+
+      expect(a_get("/api/v1/oidc/id_tokens.json").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "returns the ID tokens" do
+      id_token = client.oidc_id_tokens.first
+
+      expect([id_token.class, id_token.api_key_role_token]).to eq([Gems::OIDCIDToken, "0123456789abcdef0123456789abcdef"])
+    end
+  end
+
+  describe "#oidc_id_token" do
+    subject(:client) { Gems::Client.new(key: TEST_KEY) }
+
+    before { stub_get("/api/v1/oidc/id_tokens/42.json").to_return(body: fixture("oidc_id_token.json")) }
+
+    it "gets the ID token with the API key" do
+      client.oidc_id_token(42)
+
+      expect(a_get("/api/v1/oidc/id_tokens/42.json").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "escapes the ID" do
+      stub_get("/api/v1/oidc/id_tokens/..%2F42.json").to_return(body: fixture("oidc_id_token.json"))
+      client.oidc_id_token("../42")
+
+      expect(a_get("/api/v1/oidc/id_tokens/..%2F42.json")).to have_been_made
+    end
+
+    it "returns the ID token" do
+      id_token = client.oidc_id_token(42)
+
+      expect([id_token.class, id_token.jwt["claims"]["repository"]]).to eq([Gems::OIDCIDToken, "rubygems/gems"])
+    end
+  end
+
   describe "#api_key_role" do
     subject(:client) { Gems::Client.new(key: TEST_KEY) }
 

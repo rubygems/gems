@@ -183,6 +183,10 @@ Gems.exchange_trusted_publisher_token(ENV.fetch('ID_TOKEN')).key
 Gems.api_key_roles.map(&:name)
 Gems.assume_api_key_role('0123456789abcdef0123456789abcdef', ENV.fetch('ID_TOKEN')).key
 
+# List the OIDC providers RubyGems.org accepts ID tokens from, and the ID tokens your roles have accepted.
+Gems.oidc_providers.map(&:issuer)
+Gems.oidc_id_tokens.map { |id_token| id_token.jwt['claims']['repository'] }
+
 # Trust a GitHub Actions workflow to publish a gem, so that it can push without an API key.
 Gems.add_trusted_publisher('gems', repository_owner: 'rubygems', repository_name: 'gems',
   workflow_filename: 'push_gem.yml')

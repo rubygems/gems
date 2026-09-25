@@ -1,0 +1,11 @@
+{
+  "api_key_role_token": "0123456789abcdef0123456789abcdef",
+  "jwt": {
+    "claims": {
+      "iss": "https://token.actions.githubusercontent.com",
+      "repository": "rubygems/gems",
+      "jti": "5f5a6e2e-3a6c-4d4f-9a1e-2b9d6c7e8f90"
+    },
+    "header": {"alg": "RS256", "typ": "JWT", "kid": "1F2AB83404C08EC9EA0BB99DAED02186B091DBF4"}
+  }
+}

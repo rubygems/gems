@@ -46,3 +46,8 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Enabled: true
+
+# Name the spec of OIDCIDToken as its file is named, which the cop cannot tell from the run of capitals
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    OIDCIDToken: oidc_id_token

@@ -10,6 +10,7 @@ module Gems
   type api_key_identifier = String | APIKey
   type api_key_role_identifier = String | APIKeyRole
   type trusted_publisher_identifier = Integer | String | TrustedPublisher
+  type oidc_provider_identifier = Integer | String | OIDCProvider
   type push_file = String | Pathname | File
   type push_attestations = Array[push_file] | push_file
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String | File
@@ -78,6 +79,10 @@ module Gems
   def self.exchange_trusted_publisher_token: (String id_token) -> APIKey
   def self.api_key_roles: () -> Array[APIKeyRole]
   def self.api_key_role: (api_key_role_identifier token) -> APIKeyRole
+  def self.oidc_providers: () -> Array[OIDCProvider]
+  def self.oidc_provider: (oidc_provider_identifier provider) -> OIDCProvider
+  def self.oidc_id_tokens: () -> Array[OIDCIDToken]
+  def self.oidc_id_token: (Integer | String id) -> OIDCIDToken
   def self.assume_api_key_role: (api_key_role_identifier token, String id_token) -> APIKey
   def self.reverse_dependencies: (gem_identifier gem_name, ?only: (String | Symbol)?) -> Array[String]
   def self.reverse_dependency_versions: (gem_identifier gem_name) -> Array[String]
@@ -431,6 +436,20 @@ module Gems
     def rubygem: () -> Gem?
   end
 
+  class OIDCProvider < Resource
+    def id: () -> Integer?
+    def issuer: () -> String?
+    def configuration: () -> Hash[String, untyped]?
+    def jwks: () -> Hash[String, untyped]?
+    def created_at: () -> Time?
+    def updated_at: () -> Time?
+  end
+
+  class OIDCIDToken < Resource
+    def api_key_role_token: () -> String?
+    def jwt: () -> Hash[String, untyped]?
+  end
+
   class APIKeyRole < Resource
     def id: () -> Integer?
     def name: () -> String?
@@ -465,7 +484,7 @@ module Gems
     def url_of: (web_hook_identifier web_hook) -> String?
     def token_of: (api_key_role_identifier? role) -> String?
     def key_of: (api_key_identifier? api_key) -> String?
-    def id_of: (trusted_publisher_identifier? trusted_publisher) -> (Integer | String)?
+    def id_of: ((trusted_publisher_identifier | oidc_provider_identifier)? resource) -> (Integer | String)?
     def timestamp_of: ((Time | String)? time) -> String?
   end
 
@@ -499,6 +518,10 @@ module Gems
     def exchange_trusted_publisher_token: (String id_token) -> APIKey
     def api_key_roles: () -> Array[APIKeyRole]
     def api_key_role: (api_key_role_identifier token) -> APIKeyRole
+    def oidc_providers: () -> Array[OIDCProvider]
+    def oidc_provider: (oidc_provider_identifier provider) -> OIDCProvider
+    def oidc_id_tokens: () -> Array[OIDCIDToken]
+    def oidc_id_token: (Integer | String id) -> OIDCIDToken
     def assume_api_key_role: (api_key_role_identifier token, String id_token) -> APIKey
 
     private
