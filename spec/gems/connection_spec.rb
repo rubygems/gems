@@ -377,14 +377,14 @@ RSpec.describe Gems::Connection do
         expect(built.first).to be_started
       end
 
-      it "opens a connection of its own for a request that is not idempotent" do
+      it "opens a connection of its own for a request that acts on the server" do
         get
         connection.perform(request: Net::HTTP::Post.new(https_uri))
 
         expect(built.size).to eq(2)
       end
 
-      it "closes the connection of a request that is not idempotent" do
+      it "closes the connection of a request that acts on the server" do
         connection.perform(request: Net::HTTP::Post.new(https_uri))
 
         expect(built.first).not_to be_started

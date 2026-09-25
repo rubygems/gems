@@ -65,7 +65,7 @@ RSpec.describe Gems::ConnectionPool do
       expect(pool.checkout(request:, settings:, keep_alive_timeout: 0) { opened }).to equal(opened)
     end
 
-    it "opens a connection for a request that is not idempotent" do
+    it "opens a connection for a request that acts on the server" do
       pool.store(key, http_client, settings)
 
       expect(pool.checkout(request: post, settings:, keep_alive_timeout: 2) { opened }).to equal(opened)
@@ -91,13 +91,13 @@ RSpec.describe Gems::ConnectionPool do
       expect(http_client).not_to have_received(:finish)
     end
 
-    it "closes a request that is not idempotent" do
+    it "closes a request that acts on the server" do
       pool.checkin(request: post, http_client:, settings:, keep_alive_timeout: 2)
 
       expect(http_client).to have_received(:finish)
     end
 
-    it "keeps nothing for a request that is not idempotent" do
+    it "keeps nothing for a request that acts on the server" do
       pool.checkin(request: post, http_client:, settings:, keep_alive_timeout: 2)
 
       expect(pool.take(key, settings)).to be_nil

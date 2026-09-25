@@ -395,8 +395,8 @@ rather than failing as a TLS error on the next request.
 
 A request is sent on the connection the last request to the same host left open, so that a series of requests does not
 open a connection each. `keep_alive_timeout` sets how long an idle connection is kept open, and `0` closes every
-connection once its request is done. A request that is not idempotent, such as `push`, is sent on a connection of its
-own, since a connection the server closed while it was idle cannot be retried for it. `close` closes the connections a
+connection once its request is done. A request that acts on a gem, such as `push` or `yank`, is sent on a connection
+of its own, since a connection the server closed while it was idle cannot be retried for it. `close` closes the connections a
 client keeps open; they are opened again as they are needed, so requests can still be made afterwards. A process
 forked from one that left a connection open, such as a worker of a server that preloads the application, opens one of
 its own rather than sharing the socket of the process it was forked from. A client
@@ -419,9 +419,8 @@ whole.
 
 ## Retries
 
-RubyGems.org answers a request it turned away with 429 Too Many Requests, or 503 Service Unavailable, and a
-`Retry-After` header saying how long to wait. A request is waited for and sent again twice by default, and
-`max_retries` sets how many times:
+RubyGems.org answers a request it rate limited with 429 Too Many Requests and a `Retry-After` header saying how long
+to wait. A request is waited for and sent again twice by default, and `max_retries` sets how many times:
 
 ```ruby
 Gems.max_retries = 3  # send a request again up to three times
@@ -429,23 +428,21 @@ Gems.max_retries = 0  # raise instead of waiting
 Gems.rubygem 'rails'
 ```
 
-A `Gems::NetworkError` is retried too: a connection that was refused, reset, or timed out never reached the
-endpoint, so sending the request again is as safe as it is after a 503. When the retries run out, the response
-raises the `Gems::HTTPError` of its status and a network failure is raised as it was. Net::HTTP's own retry of a
-request whose connection failed is turned off, so `max_retries` is every time a request is sent again, and a request
-that times out reading its response waits `read_timeout` once for each attempt rather than twice.
+A 429 is retried for every request, `push` and `yank` included: RubyGems.org rate limits a request before it reaches
+the endpoint, so the endpoint never saw the attempt that was turned away.
 
-A 429 is retried for every request, `push` and the other `POST` requests included: RubyGems.org rate limits a
-request before it reaches the endpoint, so the endpoint never saw the attempt that was turned away. Otherwise only an
-idempotent request is retried, so `push` is not sent again after a 503 or a network failure: a request that is not
-idempotent cannot be sent a second time to find out whether the server received the first one.
+A 502 Bad Gateway, a 503 Service Unavailable, a 504 Gateway Timeout, and a `Gems::NetworkError` are retried for a
+request that only reads, such as `rubygem` or `versions`, and not for one that acts on a gem, such as `push`, `yank`,
+or `remove_owner`. Each of them can be answered after the origin acted on the request: a 502 or 504 comes from a
+gateway that read no answer from the origin behind it, a 503 from a CDN that gave up waiting on an origin still at
+work, and a read that timed out from a request that arrived. A yank sent again after the origin yanked the version
+answers with the error of the version that is already gone, which would be raised in place of the success the call
+was owed.
 
-A 502 Bad Gateway and a 504 Gateway Timeout are retried for a request that only reads, such as `rubygem` or
-`versions`. They are not retried for one that acts on a gem, such as `yank` or `remove_owner`, although it is
-idempotent: those statuses come from a gateway that read no answer from the origin behind it, which may have acted
-on the request before it went quiet, and a yank sent again after the origin yanked the version answers with the 404
-of the version that is already gone, which would be raised in place of the success the call was owed. A 429 and a
-503 say the server turned the request away rather than acting on it, so they are retried for either.
+When the retries run out, the response raises the `Gems::HTTPError` of its status and a network failure is raised as
+it was. Net::HTTP's own retry of a request whose connection failed is turned off, so `max_retries` is every time a
+request is sent again, and a request that times out reading its response waits `read_timeout` once for each attempt
+rather than twice.
 
 The trusted publishing token exchange is the exception to all of this: a 429, 502, 503, or 504 answers the exchange
 with no key, and an exchange lost to the network may have been issued one whose answer went missing, but an exchange

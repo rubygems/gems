@@ -34,11 +34,11 @@ RSpec.describe Gems::RetryHandler do
   end
 
   # Send the given responses in turn, raising the ones that are errors, and recording the seconds waited between them
-  def handle(handler, responses, retry_refused: true, retry_unanswered: true, retry_lost: true, **options)
+  def handle(handler, responses, retry_unanswered: true, **options)
     waited = []
     allow(handler).to receive(:sleep) { |seconds| waited << seconds }
     remaining = responses.dup
-    response = handler.handle(retry_refused:, retry_unanswered:, retry_lost:, **options) do
+    response = handler.handle(retry_unanswered:, **options) do
       answer = remaining.shift
       answer.is_a?(Exception) ? raise(answer) : answer
     end
@@ -247,36 +247,15 @@ RSpec.describe Gems::RetryHandler do
       expect(response).to equal(success)
     end
 
-    it "sends a request again after a 502 when only that is allowed" do
-      response, = handle(handler, [bad_gateway, success], retry_refused: false)
-
-      expect(response).to equal(success)
-    end
-
-    it "does not send a request the server turned away again when only a 502 is allowed" do
-      response, waited = handle(handler, [unavailable, success], retry_refused: false)
+    it "does not send a request again after a 503 when the caller says it may not be answered twice" do
+      response, waited = handle(handler, [unavailable, success], retry_unanswered: false)
 
       expect([response.code, waited]).to eq(["503", []])
-    end
-
-    it "does not send a request again when the caller allows neither" do
-      response, waited = handle(handler, [unavailable, success], retry_refused: false, retry_unanswered: false,
-        retry_lost: false)
-
-      expect([response.code, waited]).to eq(["503", []])
-    end
-
-    it "sends a request a rate limiter turned away again although the caller allows nothing" do
-      response, waited = handle(handler, [rate_limited, success], retry_refused: false, retry_unanswered: false,
-        retry_lost: false)
-
-      expect([response, waited]).to eq([success, [1]])
     end
 
     it "does not send a request a rate limiter turned away again once the retries run out" do
       handler = described_class.new(max_retries: 0, random: steady)
-      response, waited = handle(handler, [rate_limited, success], retry_refused: false, retry_unanswered: false,
-        retry_lost: false)
+      response, waited = handle(handler, [rate_limited, success], retry_unanswered: false)
 
       expect([response.code, waited]).to eq(["429", []])
     end
@@ -331,9 +310,8 @@ RSpec.describe Gems::RetryHandler do
           .to raise_error(Gems::NetworkError, "Network error: connection reset")
       end
 
-      it "raises the error when the caller allows neither" do
-        expect { handle(handler, [network_error, success], retry_refused: false, retry_unanswered: false, retry_lost: false) }
-          .to raise_error(Gems::NetworkError)
+      it "raises the error when the caller says the request may not be answered twice" do
+        expect { handle(handler, [network_error, success], retry_unanswered: false) }.to raise_error(Gems::NetworkError)
       end
 
       it "shortens the wait to the maximum retry delay" do
@@ -348,35 +326,6 @@ RSpec.describe Gems::RetryHandler do
         _, waited = handle(handler, [network_error, success])
 
         expect(waited).to eq([1])
-      end
-    end
-
-    context "when the caller says what the request is safe to be sent again for" do
-      it "sends a request again when only a refusal is allowed and the server turns it away" do
-        response, waited = handle(handler, [rate_limited, success], retry_refused: true, retry_lost: false)
-
-        expect([response, waited]).to eq([success, [1]])
-      end
-
-      it "raises when only a refusal is allowed and the request is lost to the network" do
-        expect { handle(handler, [network_error, success], retry_refused: true, retry_lost: false) }
-          .to raise_error(Gems::NetworkError)
-      end
-
-      it "sends a request again when only a loss is allowed and it is lost to the network" do
-        response, = handle(handler, [network_error, success], retry_refused: false, retry_lost: true)
-
-        expect(response).to equal(success)
-      end
-
-      it "leaves a request the server turned away as it is when a refusal is not allowed" do
-        response, waited = handle(handler, [unavailable, success], retry_refused: false)
-
-        expect([response.code, waited]).to eq(["503", []])
-      end
-
-      it "raises for a request lost to the network when a loss is not allowed" do
-        expect { handle(handler, [network_error, success], retry_lost: false) }.to raise_error(Gems::NetworkError)
       end
     end
   end

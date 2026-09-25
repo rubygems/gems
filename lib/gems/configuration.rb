@@ -219,9 +219,9 @@ module Gems
     #
     #   Two by default. Zero raises {TooManyRequests}, {BadGateway}, {ServiceUnavailable}, {GatewayTimeout}, or
     #   {NetworkError} rather than waiting. A 429 sends any request again, since a rate limiter answers it before
-    #   the request reaches the endpoint, so a `push` that was rate limited is sent again; otherwise only an
-    #   idempotent request is sent again, and a 502 or 504 sends only a request that reads again, since a request
-    #   that acts on a gem may have been acted on by the origin the gateway read no answer from. The trusted
+    #   the request reaches the endpoint, so a `push` that was rate limited is sent again; a 502, 503, 504, or
+    #   {NetworkError} sends only a request that reads again, since a request that acts on a gem may have been acted
+    #   on by the origin before the answer went missing. The trusted
     #   publishing token exchange is the exception: it is sent again when the endpoint answers it with no key or
     #   the network loses it, although it is a POST.
     #

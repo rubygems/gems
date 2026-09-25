@@ -930,14 +930,14 @@ RSpec.describe Gems::Client do
       expect { client.get("/path") }.to raise_error(Gems::TooManyRequests)
     end
 
-    it "does not send a request that is not idempotent again after a 503" do
+    it "does not send a request that acts on the server again after a 503" do
       client.max_retries = 1
       stub_post("/path").to_return({status: 503, body: "down"}, {body: "body"})
 
       expect { client.post("/path") }.to raise_error(Gems::ServiceUnavailable)
     end
 
-    it "sends a request that is not idempotent again after a 429, which a rate limiter answered before the endpoint" do
+    it "sends a request that acts on the server again after a 429, which a rate limiter answered before the endpoint" do
       client.max_retries = 1
       allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
       stub_post("/path").to_return({status: 429, body: "throttled"}, {body: "body"})
@@ -945,7 +945,7 @@ RSpec.describe Gems::Client do
       expect(client.post("/path")).to eq("body")
     end
 
-    it "does not send a request that is not idempotent again after it is lost to the network" do
+    it "does not send a request that acts on the server again after it is lost to the network" do
       client.max_retries = 1
       stub_post("/path").to_raise(Errno::ECONNRESET).then.to_return(body: "body")
 
@@ -990,15 +990,36 @@ RSpec.describe Gems::Client do
       expect(client.delete("/path")).to eq("body")
     end
 
-    it "sends a request that acts on a gem again after a 503, which the server turned away" do
+    it "does not send a request that acts on a gem again after a 503, which a CDN answers for an origin still at work" do
       client.max_retries = 1
-      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
-      stub_delete("/path").to_return({status: 503}, {body: "body"})
+      stub_delete("/path").to_return({status: 503, body: "first byte timeout"}, {body: "body"})
 
-      expect(client.delete("/path")).to eq("body")
+      expect { client.delete("/path") }.to raise_error(Gems::ServiceUnavailable)
     end
 
-    it "sends an idempotent request lost to the network again" do
+    it "does not send a request that acts on a gem again after it is lost to the network, which it may have reached" do
+      client.max_retries = 1
+      stub_delete("/path").to_raise(Net::ReadTimeout).then.to_return(body: "body")
+
+      expect { client.delete("/path") }.to raise_error(Gems::NetworkError)
+    end
+
+    it "does not send a request that updates a gem again after it is lost to the network" do
+      client.max_retries = 1
+      stub_put("/path").to_raise(Net::ReadTimeout).then.to_return(body: "body")
+
+      expect { client.put("/path") }.to raise_error(Gems::NetworkError)
+    end
+
+    it "sends a safe request again after a 503" do
+      client.max_retries = 1
+      allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
+      stub_get("/path").to_return({status: 503}, {body: "body"})
+
+      expect(client.get("/path")).to eq("body")
+    end
+
+    it "sends a safe request lost to the network again" do
       client.max_retries = 1
       allow(client.instance_variable_get(:@retry_handler)).to receive(:sleep)
       stub_get("/path").to_raise(Errno::ECONNREFUSED).then.to_return(body: "body")

@@ -160,17 +160,18 @@ module Gems
 
     # Whether a request can be sent on a connection that is kept open
     #
-    # The connection it is sent on is kept open afterwards too. A request that is not idempotent is sent on a
-    # connection of its own and that connection is closed afterwards: Net::HTTP reconnects before it reuses a
-    # connection the server has closed, and retries an idempotent request whose connection breaks, but a request
-    # that is not idempotent cannot be sent again to find out whether the server received the first one.
+    # The connection it is sent on is kept open afterwards too. A request that asks the server to do something is
+    # sent on a connection of its own and that connection is closed afterwards: Net::HTTP reconnects before it reuses
+    # a connection the server has closed, and {RetryHandler} sends a safe request whose connection breaks again, but
+    # a request that asks the server to do something cannot be sent again to find out whether the server acted on
+    # the first one.
     #
     # @api private
     # @param request [Net::HTTPRequest] the request
     # @param keep_alive_timeout [Numeric] the seconds an idle connection is kept open
     # @return [Boolean] whether the connection is kept open
     def keep_alive?(request, keep_alive_timeout)
-      keep_alive_timeout.positive? && idempotent?(request.method)
+      keep_alive_timeout.positive? && safe?(request.method)
     end
 
     # The key a connection is kept under, which is the host it is open to

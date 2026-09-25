@@ -194,7 +194,7 @@ module Gems
       headers = {"Accept" => RequestBuilder::APPLICATION_JSON}
       request = request_builder.build(http_method: :post, uri:, body:,
         content_type: RequestBuilder::APPLICATION_JSON, headers:)
-      retry_handler.handle(retry_refused: true, retry_unanswered: true, retry_lost: true) do
+      retry_handler.handle(retry_unanswered: true) do
         redirect_handler.handle(response: connection.perform(request:), request:, body:,
           content_type: RequestBuilder::APPLICATION_JSON, headers:)
       end
