@@ -83,6 +83,26 @@ RSpec.describe Gems::Client do
       expect { described_class.new(host: nil) }.to raise_error(ArgumentError, "Invalid host: ")
     end
 
+    it "raises ArgumentError for a host that carries a user and password, without them" do
+      expect { described_class.new(host: "https://user:secret@gems.example.com") }
+        .to raise_error(ArgumentError, "Invalid host: https://gems.example.com carries a user and password, which are " \
+          "not sent; give them as username: and password:")
+    end
+
+    it "raises ArgumentError for a host given as a URI it cannot send requests to" do
+      expect { described_class.new(host: URI("ftp://user:secret@gems.example.com")) }
+        .to raise_error(ArgumentError, "Invalid host: ftp://gems.example.com/")
+    end
+
+    it "raises ArgumentError for a host that carries a user alone" do
+      expect { described_class.new(host: "https://user@gems.example.com") }.to raise_error(ArgumentError, /carries a user/)
+    end
+
+    it "leaves the user and password out of the message for a host that is not a URL requests can be sent to" do
+      expect { described_class.new(host: "ftp://user:secret@gems.example.com") }
+        .to raise_error(ArgumentError, "Invalid host: ftp://gems.example.com")
+    end
+
     it "reads the API key stored for its host when no key is configured" do
       stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
 

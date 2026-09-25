@@ -512,7 +512,7 @@ latest version of a gem that has none, directly or by omitting the version from 
 `Gems::NoLatestVersion`.
 
 Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or `proxy_url` that is not an HTTP or
-HTTPS URL, a raw request path that is a URL of another scheme, host, or port, which would otherwise carry the
+HTTPS URL, a `host` that carries a user and password, which Net::HTTP would not send, a raw request path that is a URL of another scheme, host, or port, which would otherwise carry the
 credentials resolved for the client's host to the host it names, a raw request path that climbs out of the prefix
 its host carries, such as `../..` for a host of `https://gems.example.com/rubygems`, an API key scope the RubyGems API does not
 define, which would otherwise be ignored by the server and leave the key scoped differently than it was meant to be,

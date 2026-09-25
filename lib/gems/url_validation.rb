@@ -16,12 +16,21 @@ module Gems
 
     # Check that a host is a URL requests can be sent to
     #
+    # A host that carries a user and password, such as "https://user:pass@gems.example.com", is refused: Net::HTTP
+    # sends neither, so the requests would go without the credentials the caller meant to send, and the host is
+    # shown by {Client#inspect} and in error messages, which would show the password. The message the host is
+    # refused with leaves them out.
+    #
     # @api private
     # @param host [String] the host, including scheme
     # @return [String] the host
-    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL
+    # @raise [ArgumentError] if the host is not an HTTP or HTTPS URL, or carries a user and password
     def validate_host(host)
-      raise ArgumentError, "Invalid host: #{host}" unless http_url?(host)
+      raise ArgumentError, "Invalid host: #{redact(host.to_s)}" unless http_url?(host)
+      if URI(host).userinfo
+        raise ArgumentError, "Invalid host: #{redact(host)} carries a user and password, which are not sent; " \
+          "give them as username: and password:"
+      end
 
       host
     end
