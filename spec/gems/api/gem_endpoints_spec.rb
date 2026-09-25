@@ -118,6 +118,13 @@ RSpec.describe Gems::API::GemEndpoints do
     it "returns the gem names that match the query" do
       expect(client.autocomplete("nokogiri")).to eq(%w[nokogiri nokogiri-diff nokogiri-happymapper nokogiri-styles])
     end
+
+    it "asks for a page of the gem names" do
+      stub_get("/api/v1/search/autocomplete?query=nokogiri&page=2").to_return(body: "[]")
+      client.autocomplete("nokogiri", page: 2)
+
+      expect(a_get("/api/v1/search/autocomplete?query=nokogiri&page=2")).to have_been_made
+    end
   end
 
   describe "#owned_gems" do

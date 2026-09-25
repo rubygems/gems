@@ -16,7 +16,7 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Add trusted publishing: an `id_token` option, `exchange_trusted_publisher_token`, and `trusted_publishers`, `trusted_publisher`, `add_trusted_publisher`, and `remove_trusted_publisher`
 * Add `api_key_roles`, `api_key_role`, and `assume_api_key_role` for OIDC API key roles
 * Add an `otp` option for multi-factor authentication, which falls back to `GEM_HOST_OTP_CODE` as `gem push` does
-* Add a `platform` option to `version`, `contents`, `attestations`, and `downloads`, a `ruby_abi` option to `version`, `contents`, and `yank`, and a `role` option to `add_owner` and `update_owner`
+* Add a `page` option to `autocomplete`, a `platform` option to `version`, `contents`, `attestations`, and `downloads`, a `ruby_abi` option to `version`, `contents`, and `yank`, and a `role` option to `add_owner` and `update_owner`
 * Add `search_each` and `timeframe_versions_each`, which walk the pages of those endpoints lazily
 * Wrap responses in `Gem`, `Version`, `Dependency`, `Owner`, `Profile`, `WebHook`, `Downloads`, `APIKey`, `APIKeyRole`, and `TrustedPublisher` objects, which are immutable, compare by identity, match `case`/`in` patterns, inspect as short summaries, and keep `[]` and `to_h` for the raw response
 * Order gems and versions with `<=>` as RubyGems orders version numbers, so `"7.0.10"` sorts after `"7.0.9"`

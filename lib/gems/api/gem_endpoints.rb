@@ -69,11 +69,14 @@ module Gems
       # @api public
       # @authenticated false
       # @param query [String] The query to autocomplete.
+      # @param page [Integer, nil] The page of names to return.
       # @return [Array<String>]
       # @example
       #   Gems.autocomplete "nokogiri"
-      def autocomplete(query)
-        parse_json(get("/api/v1/search/autocomplete", {query:}))
+      # @example
+      #   Gems.autocomplete "nokogiri", page: 2
+      def autocomplete(query, page: nil)
+        parse_json(get("/api/v1/search/autocomplete", {query:, page:}.compact))
       end
 
       # List all gems that you own, or that the given user owns
