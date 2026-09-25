@@ -257,8 +257,9 @@ versions = Gems::Client.new(host: 'https://gems.example.com') { |client| client.
 ## Response objects
 
 Responses are wrapped in objects with readers for each documented field: `Gems::Gem`, `Gems::Version`,
-`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, `Gems::APIKey`, and
-`Gems::TrustedPublisher`.
+`Gems::Dependency`, `Gems::Owner`, `Gems::Profile`, `Gems::WebHook`, `Gems::Downloads`, `Gems::APIKey`,
+`Gems::APIKeyRole`, `Gems::OIDCProvider`, `Gems::OIDCIDToken`, `Gems::TrustedPublisher`,
+`Gems::WebAuthnVerification`, and `Gems::WebAuthnVerificationStatus`.
 Timestamps are parsed into `Time` objects and boolean fields have predicate readers such as `yanked?`. A gem and a
 version read the dependencies the endpoint they came from answered with as `runtime_dependencies` and
 `development_dependencies`; the endpoints that answer without them, such as the versions of a gem, leave both
