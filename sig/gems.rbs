@@ -794,9 +794,13 @@ module Gems
     CREDENTIALS: Array[Regexp]
     READ: String
     READING: String
+    DONE: String
+    CHUNK_END: String
 
     @output: IO
-    @body: Array[String]?
+    @lines: Array[String]?
+    @body: String?
+    @reading: bool?
 
     attr_reader output: IO
 
@@ -805,7 +809,9 @@ module Gems
 
     private
 
-    def flush: () -> void
+    def hold: (Array[String] lines, String string) -> void
+    def read: (Array[String] lines, String string) -> void
+    def flush: (Array[String] lines) -> void
     def write: (String string) -> void
   end
 

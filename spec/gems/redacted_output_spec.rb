@@ -5,6 +5,22 @@ RSpec.describe Gems::RedactedOutput do
 
   let(:io) { StringIO.new }
 
+  # The lines Net::HTTP writes for a body sent in two chunks, with an API key split between them
+  let(:chunked_body) do
+    [%(-> "1f\\r\\n"\n), "reading 31 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), "read 31 bytes\n",
+      "reading 2 bytes...\n", %(-> "\\r\\n"\n), "read 2 bytes\n", %(-> "a\\r\\n"\n), "reading 10 bytes...\n",
+      %(-> "1243f2\\"}"\n), "read 10 bytes\n", "reading 2 bytes...\n", %(-> "\\r\\n"\n), "read 2 bytes\n",
+      %(-> "0\\r\\n"\n), %(-> "\\r\\n"\n), "Conn keep-alive\n"]
+  end
+
+  # The same lines as they are written, with the body joined where its first part was read and the key redacted
+  let(:chunked_output) do
+    [%(-> "1f\\r\\n"\n), "reading 31 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"[REDACTED]\\"}"\n), "read 31 bytes\n",
+      "reading 2 bytes...\n", %(-> "\\r\\n"\n), "read 2 bytes\n", %(-> "a\\r\\n"\n), "reading 10 bytes...\n",
+      "read 10 bytes\n", "reading 2 bytes...\n", %(-> "\\r\\n"\n), "read 2 bytes\n", %(-> "0\\r\\n"\n),
+      %(-> "\\r\\n"\n), "Conn keep-alive\n"].join
+  end
+
   # The headers of a request, as Net::HTTP dumps them to the debug output
   def request_dump(headers)
     %(<- "GET /path HTTP/1.1\\r\\n#{headers.map { |name, value| "#{name}: #{value}\\r\\n" }.join}\\r\\n")
@@ -107,22 +123,36 @@ RSpec.describe Gems::RedactedOutput do
     end
 
     it "redacts the API key of a response body read in two parts" do
-      ["reading 64 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), %(-> "1243f2\\"}"\n), "read 64 bytes\n"]
-        .each { |string| redacted_output << string }
+      ["reading 64 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), %(-> "1243f2\\"}"\n), "read 64 bytes\n",
+        "Conn keep-alive\n"].each { |string| redacted_output << string }
 
-      expect(io.string).to eq(%(reading 64 bytes...\n-> "{\\"rubygems_api_key\\":\\"[REDACTED]\\"}"\nread 64 bytes\n))
+      expect(io.string)
+        .to eq(%(reading 64 bytes...\n-> "{\\"rubygems_api_key\\":\\"[REDACTED]\\"}"\nread 64 bytes\nConn keep-alive\n))
     end
 
     it "joins the parts of a body read to the end of the connection" do
-      ["reading all...\n", %(-> "one"\n), %(-> "two"\n), "read 6 bytes\n"].each { |string| redacted_output << string }
+      ["reading all...\n", %(-> "one"\n), %(-> "two"\n), "read 6 bytes\n", "Conn close\n"]
+        .each { |string| redacted_output << string }
 
-      expect(io.string).to eq(%(reading all...\n-> "onetwo"\nread 6 bytes\n))
+      expect(io.string).to eq(%(reading all...\n-> "onetwo"\nread 6 bytes\nConn close\n))
     end
 
     it "writes nothing for a body read in no parts" do
-      ["reading 0 bytes...\n", "read 0 bytes\n"].each { |string| redacted_output << string }
+      ["reading 0 bytes...\n", "read 0 bytes\n", "Conn close\n"].each { |string| redacted_output << string }
 
-      expect(io.string).to eq("reading 0 bytes...\nread 0 bytes\n")
+      expect(io.string).to eq("reading 0 bytes...\nread 0 bytes\nConn close\n")
+    end
+
+    it "holds the lines of a body until the response is done" do
+      ["reading 3 bytes...\n", %(-> "one"\n), "read 3 bytes\n"].each { |string| redacted_output << string }
+
+      expect(io.string).to eq("")
+    end
+
+    it "redacts the API key of a body sent in chunks, split between two of them" do
+      chunked_body.each { |string| redacted_output << string }
+
+      expect(io.string).to eq(chunked_output)
     end
 
     it "does not join the lines of a response that are not a body" do
@@ -137,11 +167,19 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq(%(reading 6 bytes...\n-> "one"\nConn close\n))
     end
 
-    it "does not join the lines of a response after the body read before them" do
-      ["reading 3 bytes...\n", %(-> "one"\n), "read 3 bytes\n", %(-> "HTTP/1.1 200 OK\\r\\n"\n), %(-> "two"\n)]
+    it "does not join the lines read between the reads of a body to it" do
+      ["reading 3 bytes...\n", %(-> "one"\n), "read 3 bytes\n", %(-> "HTTP/1.1 200 OK\\r\\n"\n), %(-> "two"\n),
+        "Conn close\n"].each { |string| redacted_output << string }
+
+      expect(io.string)
+        .to eq(%(reading 3 bytes...\n-> "one"\nread 3 bytes\n-> "HTTP/1.1 200 OK\\r\\n"\n-> "two"\nConn close\n))
+    end
+
+    it "writes the lines of the next response as they come once a body is done" do
+      ["reading 3 bytes...\n", %(-> "one"\n), "read 3 bytes\n", "Conn keep-alive\n", %(-> "two"\n)]
         .each { |string| redacted_output << string }
 
-      expect(io.string).to eq(%(reading 3 bytes...\n-> "one"\nread 3 bytes\n-> "HTTP/1.1 200 OK\\r\\n"\n-> "two"\n))
+      expect(io.string).to eq(%(reading 3 bytes...\n-> "one"\nread 3 bytes\nConn keep-alive\n-> "two"\n))
     end
 
     it "does not redact a header that only looks like one, without the escaped newline" do
@@ -174,6 +212,18 @@ RSpec.describe Gems::RedactedOutput do
         end
       end
 
+      # Answer one request with the body, sent in two chunks split in the middle of the API key
+      def serve_in_two_chunks
+        Thread.new do
+          socket = server.accept
+          nil until socket.gets == "\r\n"
+          socket.write("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n")
+          [body[0, 50], body[50..]].each { |chunk| socket.write("#{chunk.bytesize.to_s(16)}\r\n#{chunk}\r\n") && sleep(0.1) }
+          socket.write("0\r\n\r\n")
+          socket.close
+        end
+      end
+
       def get
         connection = Gems::Connection.new(debug_output: io, keep_alive_timeout: 0)
         connection.perform(request: Net::HTTP::Get.new(URI("http://127.0.0.1:#{server.addr[1]}/api/v1/api_key.json")))
@@ -188,6 +238,20 @@ RSpec.describe Gems::RedactedOutput do
 
       it "writes the body with the API key redacted" do
         serve_in_two_parts
+        get
+
+        expect(io.string).to include('\\"rubygems_api_key\\":\\"[REDACTED]\\"}')
+      end
+
+      it "writes no part of an API key a response body carries, when the body is sent in two chunks" do
+        serve_in_two_chunks
+        get
+
+        expect(io.string).not_to include("b1370c7b")
+      end
+
+      it "writes the body sent in chunks with the API key redacted" do
+        serve_in_two_chunks
         get
 
         expect(io.string).to include('\\"rubygems_api_key\\":\\"[REDACTED]\\"}')

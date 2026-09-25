@@ -10,11 +10,14 @@ module Gems
   # should not be.
   #
   # Net::HTTP writes a response body as it reads it, a line for each read from the socket, so a credential the body
-  # carries can be split across two of those lines, where neither half matches the pattern that redacts it. The
-  # lines of one read of a body, which Net::HTTP writes between the line that says how many bytes it is reading and
-  # the line that says how many it read, are joined into one before they are redacted and written. A connection
-  # with a debug output asks for its responses uncompressed (see {Connection}), since a compressed body is written as
-  # the bytes it was sent as, which no pattern can find a credential in.
+  # carries can be split across two of those lines, where neither half matches the pattern that redacts it. A body
+  # sent in chunks is read a chunk at a time, each between the line that says how many bytes it is reading and the
+  # line that says how many it read, with the size of the next chunk and the line break that ends each one read in
+  # between, so a credential can be split across two chunks as well. The lines of a body are therefore held until
+  # the response is done, which Net::HTTP writes a line of its own for, and the parts of the body are joined into
+  # one line, written where its first part was read, before they are redacted; the lines around them are written as
+  # they were. A connection with a debug output asks for its responses uncompressed (see {Connection}), since a
+  # compressed body is written as the bytes it was sent as, which no pattern can find a credential in.
   #
   # @api private
   class RedactedOutput
@@ -44,9 +47,14 @@ module Gems
 
     # What Net::HTTP writes before the bytes it read from the socket, which it writes as an escaped string
     READ = '-> "'
-    # What Net::HTTP writes before it reads a body, whether it reads a number of bytes or all of them
+    # What Net::HTTP writes before it reads a body, or a chunk of one, whether it reads a number of bytes or all
     READING = "reading "
-    private_constant :READ, :READING
+    # What Net::HTTP writes once it has read a body, or a chunk of one
+    DONE = "read "
+    # The line break Net::HTTP reads after each chunk of a body sent in chunks, which ends the chunk rather than
+    # carrying a part of the body, as it is written escaped
+    CHUNK_END = '\r\n'
+    private_constant :READ, :READING, :DONE, :CHUNK_END
 
     # The IO the redacted output is written to
     # @api private
@@ -68,18 +76,22 @@ module Gems
 
     # Write debug output, with credentials redacted
     #
+    # The lines of a response body are held until the response is done, and written, with the parts of the body
+    # joined, before whatever is written next.
+    #
     # @api private
     # @param string [String] the debug output
     # @return [RedactedOutput] self, so that writes can be chained as they can to an IO
     # @example Write debug output
     #   output << '<- "GET / HTTP/1.1\r\nAuthorization: key\r\n\r\n"'
     def <<(string)
-      body = @body
-      if body && string.start_with?(READ)
-        body << string.delete_prefix(READ).chomp.delete_suffix('"')
+      if string.start_with?(READING)
+        lines = @lines ||= [] #: Array[String]
+        lines << string
+        @reading = true
+      elsif (lines = @lines)
+        hold(lines, string)
       else
-        flush
-        @body = [] if string.start_with?(READING)
         write(string)
       end
       self
@@ -87,13 +99,56 @@ module Gems
 
     private
 
-    # Write the lines of the read of a body joined so far, as one line
+    # Hold a line of a body being read, or write the body once the response is done
+    #
+    # A line that is not a part of the body, nor one Net::HTTP writes between the parts of a body sent in chunks, says
+    # the response is done.
+    #
     # @api private
+    # @param lines [Array<String>] the lines of the body held so far
+    # @param string [String] the debug output
     # @return [void]
-    def flush
+    def hold(lines, string)
+      if @reading && string.start_with?(READ)
+        read(lines, string)
+      elsif string.start_with?(READ, DONE)
+        @reading = false
+        lines << string
+      else
+        flush(lines)
+        write(string)
+      end
+    end
+
+    # Hold a part of a body, joining it to the parts read before it
+    #
+    # The line break that ends a chunk is held as a line of its own, so that it does not come between the parts of
+    # the body on either side of it.
+    #
+    # @api private
+    # @param lines [Array<String>] the lines of the body held so far
+    # @param string [String] the line Net::HTTP wrote for the part
+    # @return [void]
+    def read(lines, string)
+      part = string.delete_prefix(READ).chomp.delete_suffix('"')
       body = @body
-      write(%(#{READ}#{body.join}"\n)) if body&.any?
-      @body = nil
+      if part.eql?(CHUNK_END)
+        lines << string
+      elsif body
+        body << part
+      else
+        lines << (@body = part)
+      end
+    end
+
+    # Write the lines of a body held so far, with its parts joined into one line
+    # @api private
+    # @param lines [Array<String>] the lines of the body held so far
+    # @return [void]
+    def flush(lines)
+      body = @body
+      lines.each { |line| write(line.equal?(body) ? %(#{READ}#{line}"\n) : line) }
+      @lines = @body = nil
     end
 
     # Write a string to the IO, with credentials redacted
