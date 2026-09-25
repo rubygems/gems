@@ -508,8 +508,8 @@ RSpec.describe Gems::Client do
         .with(headers: {"Authorization" => TEST_KEY})).to have_been_made
     end
 
-    it "sends configured basic authentication to another host" do
-      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+    it "sends configured basic authentication to another host no key is stored for" do
+      stub_rubygems_configuration
       stub_request(:post, "https://gems.example.com/path")
       described_class.new(username: TEST_USERNAME, password: TEST_PASSWORD).post("/path", host: "https://gems.example.com")
 
@@ -795,8 +795,22 @@ RSpec.describe Gems::Client do
         .with(headers: {"Authorization" => TEST_KEY})).to have_been_made
     end
 
-    it "sends configured basic authentication to another host" do
-      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+    it "sends the username and password to an endpoint that takes them, rather than the key" do
+      stub_post("/api/v1/api_key.json")
+      described_class.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD).post("/api/v1/api_key.json")
+
+      expect(a_post("/api/v1/api_key.json").with(basic_auth: [TEST_USERNAME, TEST_PASSWORD])).to have_been_made
+    end
+
+    it "sends the key to an endpoint that takes one, rather than the username and password" do
+      stub_post("/api/v1/gems")
+      described_class.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD).post("/api/v1/gems")
+
+      expect(a_post("/api/v1/gems").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "sends configured basic authentication to another host no key is stored for" do
+      stub_rubygems_configuration
       stub_request(:post, "https://gems.example.com/path")
       described_class.new(username: TEST_USERNAME, password: TEST_PASSWORD).post("/path", host: "https://gems.example.com")
 

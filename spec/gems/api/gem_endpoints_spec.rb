@@ -188,6 +188,15 @@ RSpec.describe Gems::API::GemEndpoints do
 
     before { stub_post("/api/v1/gems").to_return(body: fixture("push")) }
 
+    it "authenticates with the API key rather than a username and password the client has too" do
+      client = Gems::Client.new(key: "rubygems_701243f217cdf23b1370c7b66b65ca97", username: "nick@gemcutter.org",
+        password: "schwwwwing")
+      client.push(gem)
+
+      expect(a_post("/api/v1/gems").with(headers: {"Authorization" => "rubygems_701243f217cdf23b1370c7b66b65ca97"}))
+        .to have_been_made
+    end
+
     it "posts the gem as a binary body" do
       client.push(gem)
 

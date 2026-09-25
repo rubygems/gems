@@ -34,20 +34,23 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.id_token).to eq("ID_TOKEN")
     end
 
-    it "records a key given to the client as configured" do
-      expect(Gems::Client.new(key: TEST_KEY).send(:credentials_configured?)).to be(true)
+    it "records a key given to the client as configured, so that it is sent to every host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+
+      expect(Gems::Client.new(key: TEST_KEY).send(:authenticator_for, "https://gems.example.com")).to have_attributes(key: TEST_KEY)
     end
 
     it "records a configured key as configured" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
       Gems.key = TEST_KEY
 
-      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+      expect(Gems::Client.new.send(:authenticator_for, "https://gems.example.com")).to have_attributes(key: TEST_KEY)
     end
 
-    it "records no key as not configured" do
-      stub_rubygems_configuration
+    it "records no key as not configured, so that another host is sent the key stored for it" do
+      stub_rubygems_configuration(api_keys: {TEST_HOST => TEST_KEY, "https://gems.example.com" => "HOST_KEY"})
 
-      expect(Gems::Client.new.send(:credentials_configured?)).to be(false)
+      expect(Gems::Client.new.send(:authenticator_for, "https://gems.example.com")).to have_attributes(key: "HOST_KEY")
     end
 
     it "falls back to the key stored for the host without a key" do
@@ -169,9 +172,38 @@ RSpec.describe Gems::ClientCredentials do
     end
 
     it "keeps basic authentication for another host when the client has an ID token too" do
+      stub_rubygems_configuration
       client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
 
       expect(client.send(:authenticator_for, "https://gems.example.com")).to be_an_instance_of(Gems::BasicAuthenticator)
+    end
+
+    it "sends basic authentication to another host when the key given to the client is nil" do
+      client = Gems::Client.new(key: nil, username: TEST_USERNAME, password: TEST_PASSWORD)
+
+      expect(client.send(:authenticator_for, "https://gems.example.com")).to be_an_instance_of(Gems::BasicAuthenticator)
+    end
+
+    it "prefers the key given to the client over basic authentication for another host" do
+      client = Gems::Client.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD)
+
+      expect(client.send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: TEST_KEY)
+    end
+
+    it "prefers the key stored for another host over basic authentication" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD)
+
+      expect(client.send(:authenticator_for, "https://gems.example.com"))
+        .to have_attributes(class: Gems::APIKeyAuthenticator, key: "HOST_KEY")
+    end
+
+    it "sends nothing to another host with a username alone, which authenticates nothing" do
+      stub_rubygems_configuration
+
+      expect(Gems::Client.new(username: TEST_USERNAME).send(:authenticator_for, "https://gems.example.com"))
+        .to be_an_instance_of(Gems::Authenticator)
     end
 
     it "keeps the key an ID token is exchanged for for the host of the client" do
@@ -180,82 +212,57 @@ RSpec.describe Gems::ClientCredentials do
     end
   end
 
-  describe "#trusted_publishing?" do
-    it "is true with an ID token" do
-      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:trusted_publishing?)).to be(true)
+  describe "#password_authenticator_for" do
+    let(:client) { Gems::Client.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD) }
+
+    it "authenticates the creation of an API key with basic authentication" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/api_key.json")))
+        .to be_an_instance_of(Gems::BasicAuthenticator)
     end
 
-    it "is true with an ID token and an API key" do
-      expect(Gems::Client.new(key: TEST_KEY, id_token: "ID_TOKEN").send(:trusted_publishing?)).to be(true)
+    it "authenticates the update of an API key with basic authentication" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/api_key")))
+        .to be_an_instance_of(Gems::BasicAuthenticator)
     end
 
-    it "is false without an ID token" do
-      expect(Gems::Client.new(key: TEST_KEY).send(:trusted_publishing?)).to be(false)
+    it "authenticates the profile of the account with basic authentication" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/profile/me.json")))
+        .to have_attributes(class: Gems::BasicAuthenticator, username: TEST_USERNAME)
     end
 
-    it "is false with basic authentication, which takes precedence" do
-      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
-
-      expect(client.send(:trusted_publishing?)).to be(false)
-    end
-  end
-
-  describe "#credentials_configured?" do
-    it "is false when the client falls back to the key stored for its host" do
-      stub_rubygems_configuration
-
-      expect(Gems::Client.new.send(:credentials_configured?)).to be(false)
+    it "matches an endpoint under the path prefix of a host" do
+      expect(client.send(:password_authenticator_for, URI("https://gems.example.com/prefix/api/v1/profile/me.yaml")))
+        .to be_an_instance_of(Gems::BasicAuthenticator)
     end
 
-    it "is true with a key given to the client" do
-      expect(Gems::Client.new(key: TEST_KEY).send(:credentials_configured?)).to be(true)
+    it "matches an endpoint sent a query" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/profile/me.json?fields=mfa")))
+        .to be_an_instance_of(Gems::BasicAuthenticator)
     end
 
-    it "is true with a key of nil given to the client" do
-      expect(Gems::Client.new(key: nil).send(:credentials_configured?)).to be(true)
+    it "leaves an endpoint that takes an API key to the API key" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/gems"))).to be_nil
     end
 
-    it "is true with a configured key" do
-      Gems.key = TEST_KEY
-
-      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+    it "does not match an endpoint that only begins like one that takes a password" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/api_key/other"))).to be_nil
     end
 
-    it "is true with a configured key of nil" do
-      Gems.key = nil
-
-      expect(Gems::Client.new.send(:credentials_configured?)).to be(true)
+    it "does not match an endpoint that only ends like one that takes a password" do
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/other/v1/api_key"))).to be_nil
     end
 
-    it "is true with a username and a password" do
-      stub_rubygems_configuration
-      client = Gems::Client.new(username: TEST_USERNAME, password: TEST_PASSWORD)
+    it "leaves a client without a username and password to its authenticator" do
+      client = Gems::Client.new(key: TEST_KEY, otp: "123456")
 
-      expect(client.send(:credentials_configured?)).to be(true)
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/api_key"))).to be_nil
     end
 
-    it "is false with a username alone, which authenticates nothing" do
-      stub_rubygems_configuration
+    it "sends the one-time passcode with the username and password" do
+      client.otp = "123456"
 
-      expect(Gems::Client.new(username: TEST_USERNAME).send(:credentials_configured?)).to be(false)
-    end
-
-    it "is false with a password alone, which authenticates nothing" do
-      stub_rubygems_configuration
-
-      expect(Gems::Client.new(password: TEST_PASSWORD).send(:credentials_configured?)).to be(false)
-    end
-
-    it "is false with an ID token, which is exchanged for a key the host it was exchanged with issued" do
-      stub_rubygems_configuration
-
-      expect(Gems::Client.new(id_token: "ID_TOKEN").send(:credentials_configured?)).to be(false)
-    end
-
-    it "is false with only a one-time passcode" do
-      stub_rubygems_configuration
-
-      expect(Gems::Client.new(otp: "123456").send(:credentials_configured?)).to be(false)
+      expect(client.send(:password_authenticator_for, URI("#{TEST_HOST}/api/v1/api_key")))
+        .to have_attributes(class: Gems::OTPAuthenticator, authenticator: an_instance_of(Gems::BasicAuthenticator))
     end
   end
 
@@ -276,10 +283,10 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
     end
 
-    it "prefers basic authentication over API key authentication" do
+    it "prefers API key authentication over basic authentication" do
       client = Gems::Client.new(key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD)
 
-      expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::APIKeyAuthenticator)
     end
 
     it "uses trusted publisher authentication with an ID token" do
@@ -294,10 +301,10 @@ RSpec.describe Gems::ClientCredentials do
       expect(client.authenticator).to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
     end
 
-    it "prefers basic authentication over trusted publisher authentication" do
+    it "prefers trusted publisher authentication over basic authentication" do
       client = Gems::Client.new(key: nil, username: TEST_USERNAME, password: TEST_PASSWORD, id_token: "ID_TOKEN")
 
-      expect(client.authenticator).to be_an_instance_of(Gems::BasicAuthenticator)
+      expect(client.authenticator).to be_an_instance_of(Gems::TrustedPublisherAuthenticator)
     end
 
     it "wraps the authenticator with a one-time passcode" do
@@ -482,7 +489,7 @@ RSpec.describe Gems::ClientCredentials do
       client = Gems::Client.new
       client.key = TEST_KEY
 
-      expect(client.send(:credentials_configured?)).to be(true)
+      expect(client.send(:authenticator_for, "https://gems.example.com")).to have_attributes(key: TEST_KEY)
     end
   end
 

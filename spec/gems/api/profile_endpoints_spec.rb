@@ -57,6 +57,13 @@ RSpec.describe Gems::API::ProfileEndpoints do
       expect(a_get("/api/v1/profile/me.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing])).to have_been_made
     end
 
+    it "authenticates with the username and password rather than an API key the client has too" do
+      client.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
+      client.me
+
+      expect(a_get("/api/v1/profile/me.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing])).to have_been_made
+    end
+
     it "returns your profile" do
       profile = client.me
 

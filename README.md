@@ -348,13 +348,15 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `client_cert` | The certificate presented to a host that asks for one    | `nil`                                  |
 | `client_key`  | The private key of `client_cert`                         | `nil`                                  |
 
-HTTP basic authentication takes precedence over trusted publishing, which takes precedence over the API key, and a
-one-time passcode is sent alongside whichever of them is used.
+Trusted publishing takes precedence over the API key, which takes precedence over HTTP basic authentication, and a
+one-time passcode is sent alongside whichever of them is used. RubyGems.org takes a username and password only to
+create or update an API key and for `me`, and an API key for everything else, so a client given both sends the username
+and password to those three endpoints and the key to the rest.
 
 When no key is configured, the API key is resolved for the host it is sent to, as `gem push --host` resolves it: a
 client built for another host, and a request made to one with `host:`, use the key `gem signin --host` stored for that
-host. A key you configure yourself, and a username and password, are sent wherever the client sends a request, as
-`gem push --key` is.
+host. A key you configure yourself is sent wherever the client sends a request, as `gem push --key` is, and a
+username and password are sent to a host no key is sent to.
 
 A host nothing is stored for is sent no key at all, so that the key RubyGems.org issued you is not sent to a host it
 was not issued for. This is the one place the library resolves a key differently than `gem push --host`, which falls

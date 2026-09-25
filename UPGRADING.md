@@ -84,6 +84,10 @@ a client's `host`, or the `host:` a client is built with, and an invalid `proxy_
 Gems.host = "rubygems.org"      # ArgumentError: Invalid host: rubygems.org
 ```
 
+A client given both an API key and a username and password sends the key, and sends the username and password only to
+`create_api_key`, `update_api_key`, and `me`, the endpoints RubyGems.org takes them for. 2.x sent the username and
+password in place of the key to every endpoint, where the endpoints that take a key refused them.
+
 An empty `GEM_HOST_API_KEY` counts as no key rather than as an empty one, so a continuous integration job whose
 secret is not set sends an unauthenticated request instead of an empty `Authorization` header.
 

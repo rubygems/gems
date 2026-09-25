@@ -38,6 +38,7 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a version string from `latest_version` and a flat list of `WebHook` objects from `web_hooks`
 * Delegate only the API methods from the `Gems` module, to one client, `Gems.client`, which also has the raw request methods
+* Send the API key rather than the username and password to every endpoint but `create_api_key`, `update_api_key`, and `me`, which take only the username and password
 * Resolve the default API key as `gem push` does, for the host each request is sent to, and read it and `RUBYGEMS_HOST` when they are needed rather than when the library is required
 * Return `nil` from `default_key`, rather than exiting the process, when `~/.gem/credentials` has the wrong permissions
 * Push to the client's host by default, streaming the gem rather than reading it into memory

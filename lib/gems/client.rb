@@ -312,7 +312,7 @@ module Gems
     def execute_request(http_method, path, host:, headers:, params: {}, body: nil, content_type: nil)
       host = host.nil? ? @host : validate_host(host)
       uri = build_uri(host, path)
-      authenticator = authenticator_for(host)
+      authenticator = password_authenticator_for(uri) || authenticator_for(host)
       response = @retry_handler.handle(retry_unanswered: safe?(http_method)) do
         perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
       end

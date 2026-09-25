@@ -18,7 +18,11 @@ module Gems
     # Sentinel for a key that was not given, so that a key given as nil, which sends requests without one, is told
     # apart from no key at all, which falls back to the configured key or the key stored for the host
     UNSET = Object.new.freeze
-    private_constant :UNSET
+
+    # The paths of the endpoints RubyGems.org authenticates with a username and password rather than an API key,
+    # matched at the end of the path of a request so that a host with a path prefix is matched too
+    PASSWORD_ENDPOINT = %r{/api/v1/(?:api_key|profile/me)(?:\.[a-z]+)?\z}
+    private_constant :UNSET, :PASSWORD_ENDPOINT
 
     # The API key
     # @api public
@@ -173,60 +177,50 @@ module Gems
     # The authenticator for a request to a host
     #
     # A request to a host other than the client's is authenticated with the API key stored for that host, resolved
-    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. The credentials
-    # the caller gave the client are sent wherever the client sends a request, as the configured credentials of
-    # `gem push --key` are; the API key a trusted publishing ID token is exchanged for is not one of them (see
-    # {#credentials_configured?}), so a client that authenticates its own host with that key sends another host the
-    # API key the caller gave it, when it was given one, rather than the key the token was exchanged for.
+    # as `gem push --host` resolves it, so that pushing to another host uses the key kept for it. A key the caller
+    # gave the client is sent wherever the client sends a request, as the key of `gem push --key` is; the API key a
+    # trusted publishing ID token is exchanged for is not one the caller gave it, since it was issued by the host the
+    # exchange was made with, for the audience the token names, so a client that authenticates its own host with
+    # that key sends another host the API key the caller gave it, when it was given one, rather than the key the
+    # token was exchanged for; {Client#host=} exchanges the ID token again for the host it points the client at. A
+    # username and password are sent to a host no key is sent to, as they are to the client's own.
     #
     # @api private
     # @param host [String] the host of the request
     # @return [Authenticator] the authenticator for the request
     def authenticator_for(host)
-      return authenticator if same_origin?(host, @host) || (credentials_configured? && !trusted_publishing?)
+      return authenticator if same_origin?(host, @host)
 
       host_key = @key_configured ? key : Gems.default_key(host)
-      otp_authenticator(host_key ? APIKeyAuthenticator.new(key: host_key) : Authenticator.new)
+      otp_authenticator(host_key ? APIKeyAuthenticator.new(key: host_key) : basic_authenticator || Authenticator.new)
     end
 
-    # Whether the client authenticates its own host by trusted publishing
+    # The authenticator for an endpoint that takes a username and password
     #
-    # It does so with the API key a trusted publishing ID token is exchanged for, when it has an ID token and no basic authentication, which takes precedence over trusted publishing;
-    # an API key the caller gave it does not, since trusted publishing takes precedence over an API key.
-    #
-    # @api private
-    # @return [Boolean] whether the client authenticates its own host by trusted publishing
-    def trusted_publishing?
-      basic_authenticator.nil? && !id_token.nil?
-    end
-
-    # Whether the caller gave the client credentials of its own
-    #
-    # An API key and basic authentication are the caller's own, and are sent wherever the client sends a request,
-    # as the key of `gem push --key` is. A trusted publishing ID token is not: the API key it is exchanged for is
-    # issued by the host the exchange was made with, for the audience the token names, so sending that key to
-    # another host would hand a host a credential it did not issue, which is what the key stored for a host is
-    # resolved per request to avoid. A username without a password, or a password without a username, is not
-    # basic authentication either, and authenticates nothing.
-    #
-    # A request to another host falls back to the API key stored for that host instead, as the request of a client
-    # without credentials does; {Client#host=} exchanges the ID token again for the host it points the client at.
+    # RubyGems.org authenticates the requests that create and update an API key, and the request for the profile of
+    # the account, with a username and password rather than an API key, and every other request with an API key
+    # rather than a username and password, so a client given both sends each of them to the endpoints that take it.
     #
     # @api private
-    # @return [Boolean] whether the caller gave the client credentials of its own
-    def credentials_configured?
-      @key_configured || !basic_authenticator.nil?
+    # @param uri [URI::Generic] the URI of the request
+    # @return [Authenticator, nil] the basic authenticator, or nil when the endpoint takes an API key or the client
+    #   has no username and password
+    def password_authenticator_for(uri)
+      path = uri.path #: String
+      basic = basic_authenticator
+      otp_authenticator(basic) if basic && PASSWORD_ENDPOINT.match?(path)
     end
 
     # Initialize the appropriate authenticator based on available credentials
     #
-    # Basic authentication takes precedence over trusted publishing, which takes
-    # precedence over an API key. A one-time passcode wraps whichever is chosen.
+    # Trusted publishing takes precedence over an API key, which takes precedence over basic authentication, since
+    # RubyGems.org takes a username and password only for the endpoints that sign in (see
+    # {#password_authenticator_for}). A one-time passcode wraps whichever is chosen.
     #
     # @api private
     # @return [Authenticator] the initialized authenticator
     def initialize_authenticator
-      authenticator = basic_authenticator || trusted_publisher_authenticator || api_key_authenticator || Authenticator.new
+      authenticator = trusted_publisher_authenticator || api_key_authenticator || basic_authenticator || Authenticator.new
       @authenticator = otp_authenticator(authenticator)
     end
 

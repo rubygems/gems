@@ -208,6 +208,7 @@ module Gems
     @trusted_publisher_authenticator: TrustedPublisherAuthenticator?
 
     UNSET: untyped
+    PASSWORD_ENDPOINT: Regexp
 
     attr_reader key: String?
     attr_reader username: String?
@@ -228,8 +229,7 @@ module Gems
     def resolve_key_for_host: () -> void
     def configured_key: () -> String?
     def authenticator_for: (String host) -> Authenticator
-    def credentials_configured?: () -> bool
-    def trusted_publishing?: () -> bool
+    def password_authenticator_for: (URI::Generic uri) -> Authenticator?
     def initialize_authenticator: () -> Authenticator
     def otp_authenticator: (Authenticator authenticator) -> Authenticator
     def basic_authenticator: () -> BasicAuthenticator?

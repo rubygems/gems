@@ -20,6 +20,13 @@ RSpec.describe Gems::API::APIKeyEndpoints do
         body: {name: "ci-push", **scope_fields(:push_rubygem)})).to have_been_made
     end
 
+    it "authenticates with the username and password rather than an API key the client has too" do
+      client.key = "rubygems_701243f217cdf23b1370c7b66b65ca97"
+      client.create_api_key("ci-push", scopes: %i[push_rubygem])
+
+      expect(a_post("/api/v1/api_key.json").with(basic_auth: %w[nick@gemcutter.org schwwwwing])).to have_been_made
+    end
+
     it "grants every scope it is given" do
       client.create_api_key("ci-push", scopes: %i[push_rubygem yank_rubygem])
 
