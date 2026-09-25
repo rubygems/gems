@@ -97,6 +97,36 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).name).to eq("ci-push")
     end
 
+    it "keeps the scopes the key was granted, as the API names them" do
+      expect(client.create_api_key("ci-push", scopes: %i[yank_rubygem push_rubygem]).scopes).to eq(%w[push_rubygem yank_rubygem])
+    end
+
+    it "keeps no scopes for a key granted none" do
+      expect(client.create_api_key("ci-push", scopes: []).scopes).to eq([])
+    end
+
+    it "keeps when the key was asked to expire" do
+      api_key = client.create_api_key("ci-push", scopes: %i[push_rubygem], expires_at: Time.utc(2027))
+
+      expect(api_key.expires_at).to eq(Time.utc(2027))
+    end
+
+    it "keeps when the key was asked to expire, given as a string" do
+      api_key = client.create_api_key("ci-push", scopes: %i[push_rubygem], expires_at: "2027-01-01T00:00:00Z")
+
+      expect(api_key.expires_at).to eq(Time.utc(2027))
+    end
+
+    it "keeps no expiry for a key asked for none" do
+      expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).to_h).not_to have_key("expires_at")
+    end
+
+    it "keeps the scopes the endpoint answers with" do
+      stub_post("/api/v1/api_key.json").to_return(body: JSON.generate("rubygems_api_key" => "key", "scopes" => %w[index_rubygems]))
+
+      expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).scopes).to eq(%w[index_rubygems])
+    end
+
     it "keeps a name the endpoint answers with" do
       stub_post("/api/v1/api_key.json").to_return(body: JSON.generate("rubygems_api_key" => "key", "name" => "named"))
 

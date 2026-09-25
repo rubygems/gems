@@ -19,9 +19,10 @@ module Gems
       #
       # The key is only returned once, so store it somewhere safe.
       #
-      # The endpoint answers with the key alone, so the name the key was asked for is kept in the result, as the
-      # name of a gem is kept in the versions of it that {API::VersionEndpoints#versions} returns. A name the
-      # endpoint answers with is left as it is.
+      # The endpoint answers with the key alone, so the name, scopes, and expiry the key was asked for are kept in
+      # the result, as the name of a gem is kept in the versions of it that {API::VersionEndpoints#versions}
+      # returns, and the key answers {APIKey#scopes} and {APIKey#expires_at} as the keys of a token exchange do.
+      # What the endpoint answers with is left as it is.
       #
       # @api public
       # @authenticated true
@@ -42,8 +43,11 @@ module Gems
       # @example
       #   Gems.create_api_key("ci-push", scopes: %i[push_rubygem], rubygem_name: "gems", expires_at: Time.now + 86_400, mfa: true)
       def create_api_key(name, scopes:, expires_at: nil, rubygem_name: nil, mfa: nil)
-        settings = {expires_at: timestamp_of(expires_at), rubygem_name: name_of(rubygem_name), mfa:}.compact
-        APIKey.new({"name" => name}.merge(parse_json(post("/api/v1/api_key.json", {**scope_fields(scopes), **settings, name:}))))
+        fields = scope_fields(scopes)
+        expires_at = timestamp_of(expires_at)
+        settings = {expires_at:, rubygem_name: name_of(rubygem_name), mfa:}.compact
+        requested = {"name" => name, "scopes" => granted_scopes(fields), "expires_at" => expires_at}.compact
+        APIKey.new(requested.merge(parse_json(post("/api/v1/api_key.json", {**fields, **settings, name:}))))
       end
 
       # Update the scopes of an API key using HTTP basic auth
@@ -144,6 +148,15 @@ module Gems
         end
 
         APIKey::SCOPES.to_h { |scope| [scope, granted.include?(scope)] }
+      end
+
+      # The scopes the form fields grant, named as the API names them in a key
+      #
+      # @api private
+      # @param fields [Hash{Symbol => Boolean}] whether each scope the API defines is granted
+      # @return [Array<String>] the scopes granted
+      def granted_scopes(fields)
+        fields.filter_map { |scope, granted| scope.to_s if granted }
       end
     end
   end

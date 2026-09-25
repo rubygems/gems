@@ -507,6 +507,7 @@ module Gems
     def redirect_handler: () -> RedirectHandler
     def retry_handler: () -> RetryHandler
     def scope_fields: (Array[Symbol | String] | Symbol | String scopes) -> Hash[Symbol, bool]
+    def granted_scopes: (Hash[Symbol, bool] fields) -> Array[String]
   end
 
   module API::DownloadEndpoints : Object, _Requests, API::VersionEndpoints
