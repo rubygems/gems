@@ -351,12 +351,8 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
 
-    it "defaults to the latest version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
-      stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
-      client.yank("gems")
-
-      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
+    it "raises rather than yanking the latest version when no version is given" do
+      expect { client.yank("gems") }.to raise_error(ArgumentError, "No version of gems given to yank")
     end
 
     it "yanks the version given as the gem" do
@@ -373,24 +369,18 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8&platform=java")).to have_been_made
     end
 
-    it "yanks the latest version of a gem that carries none" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"3.0.9"}')
-      stub_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9").to_return(body: fixture("yank"))
-      client.yank(Gems::Gem.new("name" => "gems"))
+    it "raises for a gem that carries no version, naming the gem" do
+      expect { client.yank(Gems::Gem.new("name" => "gems")) }.to raise_error(ArgumentError, "No version of gems given to yank")
+    end
 
-      expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=3.0.9")).to have_been_made
+    it "raises for a version that carries no number" do
+      expect { client.yank("gems", Gems::Version.new("name" => "gems")) }.to raise_error(ArgumentError)
     end
 
     it "prefers an explicit version to the version given as the gem" do
       client.yank(Gems::Version.new("name" => "gems", "number" => "0.0.7"), "0.0.8")
 
       expect(a_delete("/api/v1/gems/yank?gem_name=gems&version=0.0.8")).to have_been_made
-    end
-
-    it "raises NoLatestVersion when the gem has no published version" do
-      stub_get("/api/v1/versions/gems/latest.json").to_return(body: '{"version":"unknown"}')
-
-      expect { client.yank("gems") }.to raise_error(Gems::NoLatestVersion)
     end
   end
 

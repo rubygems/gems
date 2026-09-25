@@ -133,7 +133,20 @@ Gems.push File.new("gems-0.0.8.gem"), host: "https://gems.example.com"
 Gems.yank "gems", "0.0.8", platform: "java"
 ```
 
-`reverse_dependencies` changed the same way. `latest` and `just_updated` now take no arguments at all: their
+`yank` needs to be told which version to yank. 2.x yanked the latest version of a gem when it was given none, which
+a yank cannot undo; 3.0 raises `ArgumentError` instead, and takes the version from a gem or version object that
+carries one:
+
+```ruby
+# 2.x
+Gems.yank "gems"                            # yanks whatever the latest version is
+
+# 3.0
+Gems.yank "gems"                            # ArgumentError: No version of gems given to yank
+Gems.yank "gems", Gems.latest_version("gems")
+```
+
+`reverse_dependencies` changed the same way as `search`. `latest` and `just_updated` now take no arguments at all: their
 endpoints answer with the 50 gems they name whatever page is asked for, so the `page` 2.x took was never more than
 the first page under another name.
 
@@ -229,7 +242,7 @@ A web hook on all gems has a `gem_name` of `"*"`. Objects are accepted wherever 
 so `Gems.rubygem("rails") == Gems.rubygem("rails")` even when the download counts have changed in between. A gem or
 version given where a gem is expected stands in for the version it carries, so `Gems.version(gem)`,
 `Gems.contents(gem)`, `Gems.attestations(gem)`, `Gems.downloads(gem)`, and `Gems.yank(gem)` act on that version;
-without one they act on the latest version of the gem.
+without one the first four act on the latest version of the gem.
 
 ### Errors
 
@@ -255,8 +268,8 @@ Failures that 2.x let through as other exceptions are `Gems::Error` subclasses n
   `rubygem` and `version` raise it rather than return `{}`. A response whose JSON lacks a field the library reads,
   such as the `version` of `latest_version` or the key of an API key, raises it rather than `KeyError`, and a
   timestamp that cannot be parsed raises it rather than `ArgumentError`.
-* Asking for the latest version of a gem that has none, directly or by omitting the version from `yank` or
-  `downloads`, raises `Gems::NoLatestVersion` rather than sending `"unknown"` as the version.
+* Asking for the latest version of a gem that has none, directly or by omitting the version from `downloads`,
+  raises `Gems::NoLatestVersion` rather than sending `"unknown"` as the version.
 * A redirect loop raises `Gems::TooManyRedirects` after `max_redirects` hops rather than recursing forever.
 
 SSL certificates are verified, where 2.x disabled verification. A host with a certificate that Ruby's OpenSSL does

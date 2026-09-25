@@ -35,6 +35,7 @@ needs, and the [README](https://github.com/rubygems/gems/blob/master/README.md) 
 * Collapse `Gems::V1` and `Gems::V2` into one `Gems::Client`
 * Take keyword arguments in `Gems::Client.new`, `Gems.new`, the raw request methods, `search`, `yank`, `reverse_dependencies`, and `push`; unknown options raise `ArgumentError`
 * Rename `info` to `rubygem`, `Gems::V2.info` to `version`, `gems` to `owned_gems`, and `GemError` to `Error`
+* Raise `ArgumentError` from `yank` when no version is given, rather than yanking the latest version
 * Split `total_downloads` into `total_downloads` (all gems) and `downloads` (one gem)
 * Return a version string from `latest_version` and a flat list of `WebHook` objects from `web_hooks`
 * Delegate only the API methods from the `Gems` module, to one client, `Gems.client`, which also has the raw request methods

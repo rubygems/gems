@@ -258,8 +258,8 @@ accepted wherever their identifier is expected, so `Gems.versions(gem)`, `Gems.r
 `Gems.remove_trusted_publisher(gem, trusted_publisher)`, and `Gems.key = api_key` all work. A gem or version given
 where a gem is expected stands in for the version too, when it carries a version number, so `Gems.version(gem)`,
 `Gems.contents(gem)`, `Gems.attestations(gem)`, `Gems.downloads(gem)`, and `Gems.yank(gem)` act on the version it
-names, at the platform and Ruby ABI it names, rather than on the latest version. Those five methods take no version
-at all when you mean the latest one. RubyGems.org looks the downloads and attestations of a version up by a full name,
+names, at the platform and Ruby ABI it names, rather than on the latest version. The first four take no version at
+all when you mean the latest one; `yank` raises `ArgumentError` without a version, since a yank cannot be undone. RubyGems.org looks the downloads and attestations of a version up by a full name,
 which for a version built for a Ruby ABI is a content address it answers with only in the versions `most_downloaded`
 returns, so `downloads` and `attestations` raise `ArgumentError` for any other version built for one rather than
 answer for the version of its platform built for none.
@@ -498,7 +498,7 @@ Network failures raise `Gems::NetworkError`, whose `cause` is the `SystemCallErr
 raise `Gems::TooManyRedirects`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
 portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the
-latest version of a gem that has none, directly or by omitting the version from `yank` or `downloads`, raises
+latest version of a gem that has none, directly or by omitting the version from `downloads`, raises
 `Gems::NoLatestVersion`.
 
 Invalid arguments raise `ArgumentError` rather than a `Gems::Error`: a `host` or `proxy_url` that is not an HTTP or
