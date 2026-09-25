@@ -428,6 +428,7 @@ module Gems
     def name: () -> String?
     def scopes: () -> Array[String]?
     def expires_at: () -> Time?
+    def rubygem: () -> Gem?
   end
 
   class APIKeyRole < Resource

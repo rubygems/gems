@@ -2,6 +2,7 @@
 
 require "json"
 require_relative "errors/invalid_response"
+require_relative "gem"
 require_relative "resource"
 
 module Gems
@@ -56,6 +57,23 @@ module Gems
     #   @example
     #     api_key.expires_at
     time_attribute :expires_at
+
+    # The gem the API key is restricted to
+    #
+    # The token exchange and an API key role answer with the gem the key they issue may act on, when it is restricted
+    # to one, as a record of the gem rather than as the gem endpoint answers with it, so the gem carries its name and
+    # little else. {API::APIKeyEndpoints#create_api_key} keeps the name of the gem it was asked to restrict the key
+    # to.
+    #
+    # @api public
+    # @return [Gem, nil] the gem, or nil when the key may act on any gem
+    # @example Get the name of the gem an API key is restricted to
+    #   api_key.rubygem&.name
+    def rubygem
+      rubygem = self[:gem]
+      Gem.new(rubygem) if rubygem
+    end
+    record_attribute(:rubygem)
 
     # The API key
     #

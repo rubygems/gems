@@ -19,8 +19,8 @@ module Gems
       #
       # The key is only returned once, so store it somewhere safe.
       #
-      # The endpoint answers with the key alone, so the name, scopes, and expiry the key was asked for are kept in
-      # the result, as the name of a gem is kept in the versions of it that {API::VersionEndpoints#versions}
+      # The endpoint answers with the key alone, so the name, scopes, expiry, and gem the key was asked for are kept
+      # in the result, as the name of a gem is kept in the versions of it that {API::VersionEndpoints#versions}
       # returns, and the key answers {APIKey#scopes} and {APIKey#expires_at} as the keys of a token exchange do.
       # What the endpoint answers with is left as it is.
       #
@@ -45,8 +45,10 @@ module Gems
       def create_api_key(name, scopes:, expires_at: nil, rubygem_name: nil, mfa: nil)
         fields = scope_fields(scopes)
         expires_at = timestamp_of(expires_at)
-        settings = {expires_at:, rubygem_name: name_of(rubygem_name), mfa:}.compact
-        requested = {"name" => name, "scopes" => granted_scopes(fields), "expires_at" => expires_at}.compact
+        rubygem_name = name_of(rubygem_name)
+        settings = {expires_at:, rubygem_name:, mfa:}.compact
+        requested = {"name" => name, "scopes" => granted_scopes(fields), "expires_at" => expires_at,
+                     "gem" => rubygem_name && {"name" => rubygem_name}}.compact
         APIKey.new(requested.merge(parse_json(post("/api/v1/api_key.json", {**fields, **settings, name:}))))
       end
 

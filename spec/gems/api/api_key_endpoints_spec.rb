@@ -121,6 +121,16 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).to_h).not_to have_key("expires_at")
     end
 
+    it "keeps the gem the key was restricted to" do
+      api_key = client.create_api_key("ci-push", scopes: %i[push_rubygem], rubygem_name: Gems::Gem.new("name" => "gems"))
+
+      expect(api_key.rubygem.name).to eq("gems")
+    end
+
+    it "keeps no gem for a key that may act on any" do
+      expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).to_h).not_to have_key("gem")
+    end
+
     it "keeps the scopes the endpoint answers with" do
       stub_post("/api/v1/api_key.json").to_return(body: JSON.generate("rubygems_api_key" => "key", "scopes" => %w[index_rubygems]))
 

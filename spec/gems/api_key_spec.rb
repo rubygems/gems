@@ -28,6 +28,16 @@ RSpec.describe Gems::APIKey do
     expect(api_key.key).to eq("rubygems_701243f217cdf23b1370c7b66b65ca97")
   end
 
+  it "exposes the gem it is restricted to" do
+    api_key = described_class.new("rubygems_api_key" => "secret", "gem" => {"id" => 1, "name" => "gems"})
+
+    expect([api_key.rubygem.class, api_key.rubygem.name]).to eq([Gems::Gem, "gems"])
+  end
+
+  it "has no gem when it may act on any" do
+    expect(api_key.rubygem).to be_nil
+  end
+
   it "matches a pattern by its key, as it does by the rest of its readers" do
     matched = case api_key
     in {name: String => name, key: String => key} then [name, key]
