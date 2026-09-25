@@ -7,8 +7,14 @@ RSpec.describe Gems::Gem do
     expect(gem).to be_a(Gems::Resource)
   end
 
-  it "is identified by its name, version, and platform" do
-    expect(gem.send(:identity)).to eq(["rails", "7.0.6", "ruby"])
+  it "is identified by its name, version, platform, and Ruby ABI" do
+    expect(gem.send(:identity)).to eq(["rails", "7.0.6", "ruby", nil])
+  end
+
+  it "distinguishes the builds of a version for different Ruby ABIs" do
+    build = {"name" => "nokogiri", "version" => "1.19.4", "platform" => "x86_64-linux"}
+
+    expect(described_class.new(build.merge("ruby_abi" => "3.4"))).not_to eq(described_class.new(build.merge("ruby_abi" => "3.3")))
   end
 
   it "ignores other attributes when comparing" do
@@ -133,8 +139,8 @@ RSpec.describe Gems::Gem do
   end
 
   describe "#<=>" do
-    def build(version, name: "rails", platform: "ruby")
-      described_class.new("name" => name, "version" => version, "platform" => platform)
+    def build(version, name: "rails", platform: "ruby", ruby_abi: nil)
+      described_class.new({"name" => name, "version" => version, "platform" => platform, "ruby_abi" => ruby_abi}.compact)
     end
 
     it "orders versions as RubyGems orders them, rather than as strings" do
@@ -157,6 +163,14 @@ RSpec.describe Gems::Gem do
 
     it "orders gems of the same version by platform" do
       expect(build("7.0.6", platform: "java") <=> build("7.0.6", platform: "ruby")).to eq(-1)
+    end
+
+    it "orders builds of the same platform by Ruby ABI" do
+      expect(build("7.0.6", ruby_abi: "3.4") <=> build("7.0.6", ruby_abi: "3.3")).to eq(1)
+    end
+
+    it "orders a build for no Ruby ABI before one for a Ruby ABI" do
+      expect(build("7.0.6") <=> build("7.0.6", ruby_abi: "3.4")).to eq(-1)
     end
 
     it "orders a gem without a name before one with a name" do

@@ -12,7 +12,7 @@ module Gems
     include Ordering
 
     inspect_with :name, :version
-    identified_by :name, :version, :platform
+    identified_by :name, :version, :platform, :ruby_abi
 
     # @!method name
     #   The name of the gem

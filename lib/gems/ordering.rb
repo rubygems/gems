@@ -6,7 +6,7 @@ module Gems
   # Orders the resources that carry the number of a gem version, included in {Gem} and {Version}
   #
   # A resource is ordered by the name of its gem, then by its number as RubyGems orders numbers, and then by its
-  # platform, so that the gems and versions of a response sort as `gem list` orders them rather than as the strings
+  # platform and the Ruby ABI it was built for, so that the gems and versions of a response sort as `gem list` orders them rather than as the strings
   # they are written with, where "7.0.10" comes before "7.0.9". Each class reads the number from the key its
   # endpoints answer with: {Gem#gem_version} from `version`, and {Version#gem_version} from `number`.
   #
@@ -44,10 +44,11 @@ module Gems
     # with nil rather than with an order the numbers do not give.
     #
     # @api private
-    # @return [Array<Object>, nil] the name, number, and platform, or nil when there is no number to order by
+    # @return [Array<Object>, nil] the name, number, platform, and Ruby ABI, or nil when there is no number to order
+    #   by
     def ordering
       version = gem_version
-      [name.to_s, version, platform.to_s] if version
+      [name.to_s, version, platform.to_s, ruby_abi.to_s] if version
     end
 
     private

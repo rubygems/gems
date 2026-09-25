@@ -158,7 +158,7 @@ module Gems
     # @param readers [Array<Symbol>] the identifying readers
     # @return [Array<Symbol>] the identifying readers
     # @example Declare what identifies a resource
-    #   identified_by :name, :number, :platform
+    #   identified_by :name, :number, :platform, :ruby_abi
     def self.identified_by(*readers)
       @identity_readers = readers
     end
@@ -169,7 +169,7 @@ module Gems
     # @return [Array<Symbol>] the identifying readers, inherited from the superclass until the class declares its
     #   own, and empty when the resource is identified by all of its attributes
     # @example
-    #   Gems::Gem.identity_readers # => [:name, :version, :platform]
+    #   Gems::Gem.identity_readers # => [:name, :version, :platform, :ruby_abi]
     def self.identity_readers
       @identity_readers || (superclass.identity_readers if superclass.respond_to?(:identity_readers)) || [] # steep:ignore NoMethod
     end

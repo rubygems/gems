@@ -13,7 +13,7 @@ module Gems
     include Ordering
 
     inspect_with :name, :number
-    identified_by :name, :number, :platform
+    identified_by :name, :number, :platform, :ruby_abi
 
     # Define a reader for a checksum, in hex from one endpoint and base64 from another
     #

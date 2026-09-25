@@ -7,8 +7,14 @@ RSpec.describe Gems::Version do
     expect(version).to be_a(Gems::Resource)
   end
 
-  it "is identified by its name, number, and platform" do
-    expect(version.send(:identity)).to eq(["rails", "7.0.6", "ruby"])
+  it "is identified by its name, number, platform, and Ruby ABI" do
+    expect(version.send(:identity)).to eq(["rails", "7.0.6", "ruby", nil])
+  end
+
+  it "distinguishes the builds of a version for different Ruby ABIs" do
+    build = {"name" => "nokogiri", "number" => "1.19.4", "platform" => "x86_64-linux"}
+
+    expect([described_class.new(build.merge("ruby_abi" => "3.4")), described_class.new(build.merge("ruby_abi" => "3.3"))].uniq.size).to eq(2)
   end
 
   it "inspects as the name and number" do
@@ -279,8 +285,8 @@ RSpec.describe Gems::Version do
   end
 
   describe "#<=>" do
-    def build(number, name: "rails", platform: "ruby")
-      described_class.new("name" => name, "number" => number, "platform" => platform)
+    def build(number, name: "rails", platform: "ruby", ruby_abi: nil)
+      described_class.new({"name" => name, "number" => number, "platform" => platform, "ruby_abi" => ruby_abi}.compact)
     end
 
     it "orders numbers as RubyGems orders them, rather than as strings" do
@@ -303,6 +309,14 @@ RSpec.describe Gems::Version do
 
     it "orders versions of the same number by platform" do
       expect(build("7.0.6", platform: "java") <=> build("7.0.6", platform: "ruby")).to eq(-1)
+    end
+
+    it "orders builds of the same platform by Ruby ABI" do
+      expect(build("7.0.6", ruby_abi: "3.4") <=> build("7.0.6", ruby_abi: "3.3")).to eq(1)
+    end
+
+    it "orders a build for no Ruby ABI before one for a Ruby ABI" do
+      expect(build("7.0.6") <=> build("7.0.6", ruby_abi: "3.4")).to eq(-1)
     end
 
     it "orders a version without a name before one with a name" do

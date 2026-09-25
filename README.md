@@ -273,8 +273,9 @@ which for a version built for a Ruby ABI is a content address it answers with on
 returns, so `downloads` and `attestations` raise `ArgumentError` for any other version built for one rather than
 answer for the version of its platform built for none.
 Objects match `case`/`in` patterns by their readers, so `case gem in {name:, version:}` binds both.
-Objects compare by identity (a gem or version by its name, version number, and platform, and so on), so
-`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between. The counts
+Objects compare by identity (a gem or version by its name, version number, platform, and Ruby ABI, and so on), so
+`Gems.rubygem('rails') == Gems.rubygem('rails')` even when download counts have changed in between, while the
+builds of one version for two Ruby ABIs are not equal. The counts
 `downloads` answers with carry the version they were asked for as `full_name`, since the endpoint answers with the
 counts alone, and are compared by it as well as by the counts: the downloads of one gem are not the downloads of
 another that happens to have been downloaded as many times. An API key is compared by all of its attributes, its
