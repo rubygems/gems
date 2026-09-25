@@ -47,7 +47,8 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: true
 
-# Name the spec of OIDCIDToken as its file is named, which the cop cannot tell from the run of capitals
+# Name the specs of OIDCIDToken and WebAuthnVerification as their files are named, which the cop cannot tell
 RSpec/SpecFilePathFormat:
   CustomTransform:
     OIDCIDToken: oidc_id_token
+    WebAuthnVerification: webauthn_verification

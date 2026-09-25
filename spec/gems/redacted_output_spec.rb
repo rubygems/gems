@@ -122,6 +122,12 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq(%(-> "{\\"name\\":\\"ci-push\\",\\"rubygems_api_key\\":\\"[REDACTED]\\"}"))
     end
 
+    it "redacts the one-time passcode the status of a WebAuthn verification carries" do
+      redacted_output << %(-> "{\\"status\\":\\"success\\",\\"code\\":\\"123456\\"}")
+
+      expect(io.string).to eq(%(-> "{\\"status\\":\\"success\\",\\"code\\":\\"[REDACTED]\\"}"))
+    end
+
     it "redacts the API key of a response body read in two parts" do
       ["reading 64 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), %(-> "1243f2\\"}"\n), "read 64 bytes\n",
         "Conn keep-alive\n"].each { |string| redacted_output << string }

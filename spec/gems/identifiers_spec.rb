@@ -249,6 +249,18 @@ RSpec.describe Gems::Identifiers do
     end
   end
 
+  describe "#webauthn_token_of" do
+    it "returns a token unchanged" do
+      expect(client.send(:webauthn_token_of, "odow34b93t6aPCdY")).to eq("odow34b93t6aPCdY")
+    end
+
+    it "returns the token of a verification" do
+      verification = Gems::WebAuthnVerification.new("path" => "https://rubygems.org/webauthn_verification/odow34b93t6aPCdY")
+
+      expect(client.send(:webauthn_token_of, verification)).to eq("odow34b93t6aPCdY")
+    end
+  end
+
   describe "#id_of" do
     it "returns an ID unchanged" do
       expect(client.send(:id_of, 1)).to eq(1)

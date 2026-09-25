@@ -5,7 +5,8 @@ module Gems
   #
   # Net::HTTP writes every request it sends and every response it reads to the debug output, headers and body alike,
   # which carry the API key, the basic authentication credentials, the one-time passcode, the OIDC ID token of a
-  # token exchange, the API key an API key or token exchange response returns, and the credentials of a proxy.
+  # token exchange, the API key an API key or token exchange response returns, the one-time passcode a WebAuthn
+  # verification returns, and the credentials of a proxy.
   # Those values are replaced before they reach the IO, so that debug output can be kept where the credentials
   # should not be.
   #
@@ -29,8 +30,9 @@ module Gems
     # Net::HTTP dumps a request as one escaped string, in which a header is preceded by an escaped newline and its
     # value runs to the next one, and it capitalizes the header names it writes, so OTP is written as Otp. It dumps
     # bodies the same way, so the patterns also cover the credentials a body carries: the ID token the token exchange
-    # sends as the jwt field of a JSON body, the API key `update_api_key` sends as a form field, and the API key a
-    # response to the API key and token exchange endpoints carries.
+    # sends as the jwt field of a JSON body, the API key `update_api_key` sends as a form field, the API key a
+    # response to the API key and token exchange endpoints carries, and the one-time passcode the status of a
+    # WebAuthn verification carries once it has succeeded.
     #
     # The credentials of a proxy are carried by the `Proxy-Authorization` header Net::HTTP sends them as, which is
     # among the headers of a request sent through an `http://` proxy and is written again in the CONNECT request
@@ -41,7 +43,8 @@ module Gems
       /(\r\n(?:Proxy-)?Authorization: )[^\r\n]*/i,
       /(\\"jwt\\":\\")[^\\]*/,
       /(api_key=)[^&\\"]*/,
-      /(\\"rubygems_api_key\\":\\")[^\\]*/
+      /(\\"rubygems_api_key\\":\\")[^\\]*/,
+      /(\\"code\\":\\")[^\\]*/
     ].freeze
     private_constant :CREDENTIALS
 

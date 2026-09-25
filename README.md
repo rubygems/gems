@@ -170,6 +170,11 @@ Gems.create_api_key('ci-push', scopes: %i[push_rubygem], rubygem_name: 'gems', e
 # Return your own profile, including its multi-factor authentication level.
 Gems.me.mfa
 
+# Verify your account with a security key in a browser, for the one-time passcode `gem push` would ask for.
+verification = Gems.webauthn_verification
+puts "Open #{verification.path}"
+Gems.webauthn_verification_status(verification)  # => {"status" => "success", "code" => "123456"}, once it is done
+
 # Update the scopes of an API key, which is granted these alone.
 Gems.update_api_key 'rubygems_701243f217cdf23b1370c7b66b65ca97', scopes: %i[push_rubygem yank_rubygem]
 
@@ -417,7 +422,8 @@ Gems::Client.new { |client| client.versions 'rails' }  # closed once the block i
 Debug output is redacted before it reaches the IO `debug_output` is set to, so that it can be kept in a log: the
 `Authorization` and `OTP` headers of every request, the `Proxy-Authorization` header the requests sent through a
 proxy carry, the ID token of a trusted publishing token exchange, the API key
-`update_api_key` sends, and the API key an API key or token exchange response returns are written as `[REDACTED]`.
+`update_api_key` sends, the API key an API key or token exchange response returns, and the one-time passcode
+`webauthn_verification_status` returns are written as `[REDACTED]`.
 Everything else Net::HTTP writes, including the rest of the headers, is left as it is. A client with a debug output
 asks for its responses uncompressed, since a compressed body would be written as bytes no credential could be found in,
 and a body read from the socket in parts, or sent in chunks, is written as one line once the response is done, so that

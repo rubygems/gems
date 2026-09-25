@@ -11,6 +11,7 @@ module Gems
   type api_key_role_identifier = String | APIKeyRole
   type trusted_publisher_identifier = Integer | String | TrustedPublisher
   type oidc_provider_identifier = Integer | String | OIDCProvider
+  type webauthn_verification_identifier = String | WebAuthnVerification
   type push_file = String | Pathname | File
   type push_attestations = Array[push_file] | push_file
   type request_body = Hash[Symbol | String, untyped] | Array[multipart_field] | String | File
@@ -73,6 +74,8 @@ module Gems
   def self.latest: () -> Array[Gem]
   def self.profile: (user_identifier user) -> Profile
   def self.me: () -> Profile
+  def self.webauthn_verification: () -> WebAuthnVerification
+  def self.webauthn_verification_status: (webauthn_verification_identifier verification) -> Hash[String, String]
   def self.just_updated: () -> Array[Gem]
   def self.create_api_key: (String name, scopes: Array[Symbol | String] | Symbol | String, ?expires_at: (Time | String)?, ?rubygem_name: gem_identifier?, ?mfa: bool?) -> APIKey
   def self.update_api_key: (api_key_identifier key, scopes: Array[Symbol | String] | Symbol | String) -> String
@@ -436,6 +439,12 @@ module Gems
     def rubygem: () -> Gem?
   end
 
+  class WebAuthnVerification < Resource
+    def path: () -> String?
+    def expires_at: () -> Time?
+    def token: () -> String?
+  end
+
   class OIDCProvider < Resource
     def id: () -> Integer?
     def issuer: () -> String?
@@ -484,6 +493,7 @@ module Gems
     def url_of: (web_hook_identifier web_hook) -> String?
     def token_of: (api_key_role_identifier? role) -> String?
     def key_of: (api_key_identifier? api_key) -> String?
+    def webauthn_token_of: (webauthn_verification_identifier? verification) -> String?
     def id_of: ((trusted_publisher_identifier | oidc_provider_identifier)? resource) -> (Integer | String)?
     def timestamp_of: ((Time | String)? time) -> String?
   end
@@ -598,6 +608,8 @@ module Gems
 
     def profile: (user_identifier user) -> Profile
     def me: () -> Profile
+    def webauthn_verification: () -> WebAuthnVerification
+    def webauthn_verification_status: (webauthn_verification_identifier verification) -> Hash[String, String]
   end
 
   module API::TrustedPublisherEndpoints : Object, _Requests

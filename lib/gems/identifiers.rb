@@ -9,6 +9,7 @@ require_relative "profile"
 require_relative "trusted_publisher"
 require_relative "version"
 require_relative "web_hook"
+require_relative "webauthn_verification"
 
 module Gems
   # Resolves identifiers from resource objects, so API methods accept either
@@ -171,6 +172,17 @@ module Gems
       case role
       when APIKeyRole then role.token
       else role
+      end
+    end
+
+    # Resolve the token of a WebAuthn verification from a token or a verification
+    # @api private
+    # @param verification [String, WebAuthnVerification] a token, or a verification
+    # @return [String, nil] the token
+    def webauthn_token_of(verification)
+      case verification
+      when WebAuthnVerification then verification.token
+      else verification
       end
     end
 
