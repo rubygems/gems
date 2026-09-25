@@ -82,13 +82,15 @@ module Gems
 
       # Derive the gem name from a version's full name
       #
-      # The full name is the gem name and version number, followed by the platform unless it is "ruby".
+      # The full name is the gem name and version number, followed by the content address RubyGems.org gives a
+      # version built for a Ruby ABI, or else by the platform unless it is "ruby".
       #
       # @api private
       # @param version [Hash{String => Object}] the version attributes
       # @return [String] the gem name
       def gem_name_from(version)
-        version.fetch("full_name").delete_suffix("-#{version.fetch("platform")}").delete_suffix("-#{version.fetch("number")}")
+        build = version["content_address"] || version.fetch("platform")
+        version.fetch("full_name").delete_suffix("-#{build}").delete_suffix("-#{version.fetch("number")}")
       end
     end
   end

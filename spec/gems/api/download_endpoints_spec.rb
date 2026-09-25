@@ -185,5 +185,20 @@ RSpec.describe Gems::API::DownloadEndpoints do
 
       expect(client.most_downloaded.first.name).to eq("nokogiri")
     end
+
+    it "excludes the content address of a version built for a Ruby ABI from the derived gem name" do
+      version = {"full_name" => "nokogiri-1.19.0-1a2b3c4d", "number" => "1.19.0", "platform" => "x86_64-linux",
+                 "ruby_abi" => "3.4", "content_address" => "1a2b3c4d"}
+      stub_get("/api/v1/downloads/all.json").to_return(body: JSON.generate("gems" => [[version, 5]]))
+
+      expect(client.most_downloaded.first.name).to eq("nokogiri")
+    end
+
+    it "excludes the platform from the derived gem name when the content address is null" do
+      version = {"full_name" => "nokogiri-1.15.0-java", "number" => "1.15.0", "platform" => "java", "content_address" => nil}
+      stub_get("/api/v1/downloads/all.json").to_return(body: JSON.generate("gems" => [[version, 5]]))
+
+      expect(client.most_downloaded.first.name).to eq("nokogiri")
+    end
   end
 end
