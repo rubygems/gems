@@ -214,6 +214,25 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect(a_request(:post, exchange_url)).to have_been_made.once
     end
 
+    it "exchanges the token once when it is exchanged again" do
+      2.times { authenticator.exchange_token! }
+
+      expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
+
+    it "does not exchange the token again once a request has been authenticated with it" do
+      authenticator.header(request)
+      authenticator.exchange_token!
+
+      expect(a_request(:post, exchange_url)).to have_been_made.once
+    end
+
+    it "returns the key a request was authenticated with" do
+      authenticator.header(request)
+
+      expect(authenticator.exchange_token!).to eq(Gems::APIKey.new(JSON.parse(fixture("exchange_token.json").read)))
+    end
+
     context "when the server turns the exchange away" do
       subject(:authenticator) { described_class.new(id_token: "ID_TOKEN", retry_handler:) }
 

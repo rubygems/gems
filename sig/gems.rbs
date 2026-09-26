@@ -188,12 +188,13 @@ module Gems
     attr_reader redirect_handler: RedirectHandler
     attr_reader retry_handler: RetryHandler
     attr_reader exchange_path: String
-    attr_reader api_key: String?
 
     @mutex: Thread::Mutex
+    @exchanged_key: APIKey?
 
     def initialize: (id_token: String, ?host: String, ?connection: Connection, ?request_builder: RequestBuilder, ?redirect_handler: RedirectHandler, ?retry_handler: RetryHandler, ?exchange_path: String) -> void
     def header: (Net::HTTPRequest? request) -> Hash[String, String]
+    def api_key: () -> String?
     def inspect: () -> String
     def exchange_token!: () -> APIKey
 

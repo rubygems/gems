@@ -81,13 +81,6 @@ module Gems
     #   authenticator.exchange_path
     attr_reader :exchange_path
 
-    # The API key obtained from the token exchange
-    # @api private
-    # @return [String, nil] the API key, or nil before the token has been exchanged
-    # @example Get the exchanged API key
-    #   authenticator.api_key
-    attr_reader :api_key
-
     # Initialize a new TrustedPublisherAuthenticator
     #
     # The four that follow the ID token and the host are what the exchange is sent with, and default to ones built
@@ -132,7 +125,17 @@ module Gems
     # @example Generate an authentication header
     #   authenticator.header(request)
     def header(_request)
-      {AUTHENTICATION_HEADER => @mutex.synchronize { api_key || exchange!.key }}
+      {AUTHENTICATION_HEADER => exchange_token!.key}
+    end
+
+    # The API key obtained from the token exchange
+    #
+    # @api private
+    # @return [String, nil] the API key, or nil before the token has been exchanged
+    # @example Get the exchanged API key
+    #   authenticator.api_key
+    def api_key
+      @exchanged_key&.key
     end
 
     # Summarize the authenticator for the console
@@ -152,8 +155,9 @@ module Gems
     # another scheme, host, or port is followed without the `Accept` header of the exchange, as it is for a request
     # of the client, and with the body only when the redirect preserves the method.
     #
-    # The exchange is made under the lock that {#header} takes, so that a caller exchanging the token itself while
-    # a request is being authenticated exchanges it once rather than twice, which RubyGems.org would refuse.
+    # The token is exchanged once, under a lock, and the key it was exchanged for is returned from then on, since
+    # RubyGems.org refuses to exchange a token again: a caller exchanging the token itself while a request is being
+    # authenticated is given the key the request was authenticated with, whichever of them took the lock first.
     #
     # @api private
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
@@ -161,20 +165,18 @@ module Gems
     # @example Exchange the ID token
     #   authenticator.exchange_token!.expires_at
     def exchange_token!
-      @mutex.synchronize { exchange! }
+      @mutex.synchronize { @exchanged_key ||= exchange! }
     end
 
     private
 
-    # Exchange the ID token, under the lock its callers hold
+    # Exchange the ID token, under the lock {#exchange_token!} holds
     #
     # @api private
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     def exchange!
-      api_key = APIKey.new(parse_json(ResponseParser.new.parse(response: exchange_response)))
-      @api_key = api_key.key
-      api_key
+      APIKey.new(parse_json(ResponseParser.new.parse(response: exchange_response)))
     end
 
     # Send the token exchange request and follow the redirects of its response
