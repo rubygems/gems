@@ -2,11 +2,13 @@
 
 require "bundler/gem_tasks"
 
-# Override the release task to skip the gem push, which is handled by GitHub Actions with attestations
-# when a GitHub release is created (see .github/workflows/push_gem.yml)
-Rake::Task["release"].clear
-desc "Build the gem and create a tag (the gem push is handled by CI)"
-task release: %w[build release:guard_clean release:source_control_push]
+# Leave the gem push to GitHub Actions: the tag the release task pushes runs .github/workflows/push_gem.yml, which
+# checks the tag with CI and then runs this task there, with the push, to push the gem with trusted publishing
+unless ENV["GITHUB_ACTIONS"]
+  Rake::Task["release"].clear
+  desc "Build the gem and push a tag, which CI pushes the gem for (see .github/workflows/push_gem.yml)"
+  task release: %w[build release:guard_clean release:source_control_push]
+end
 
 require "rspec/core/rake_task"
 

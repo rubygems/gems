@@ -1,20 +1,34 @@
 name: Push Gem
 
+# Pushing a version tag, which `rake release` does, checks the tag with CI and then pushes the gem to RubyGems.org
+# with trusted publishing
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: read
 
 jobs:
+  docs:
+    uses: ./.github/workflows/docs.yml
+  lint:
+    uses: ./.github/workflows/lint.yml
+  mutant:
+    uses: ./.github/workflows/mutant.yml
+  steep:
+    uses: ./.github/workflows/steep.yml
+  test:
+    uses: ./.github/workflows/test.yml
+
   push:
+    needs: [docs, lint, mutant, steep, test]
     if: github.repository == 'rubygems/gems'
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
@@ -32,6 +46,11 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: ruby
+
+      # The release task tags the version it builds when that tag is missing, so a tag that names another version
+      # would push a gem and a tag nobody asked for
+      - name: Check that the tag names the version
+        run: ruby -r ./lib/gems/library_version -e 'abort "#{ARGV[0]} is not v#{Gems::VERSION}" unless ARGV[0] == "v#{Gems::VERSION}"' "$GITHUB_REF_NAME"
 
       # Release
       - uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1

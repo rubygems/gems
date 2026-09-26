@@ -1,5 +1,10 @@
 name: type checker
-on: [push, pull_request]
+# A tag is checked by push_gem.yml, which calls this workflow before it pushes the gem
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_call:
 permissions:
   contents: read
 jobs:
