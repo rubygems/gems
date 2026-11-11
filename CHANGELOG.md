@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+* Raise `Gems::InvalidResponse`, which carries the response, rather than `NoMethodError` or `TypeError`, when the
+  JSON of a response is not the object a resource reads its attributes from — one answered with a scalar, `null`,
+  or a list, such as the single-resource endpoints answer — and when the `dependencies` a response carries are
+  not an object or a list, so that a host which answers one of these cannot crash the caller with a raw error
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x

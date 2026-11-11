@@ -108,6 +108,13 @@ RSpec.describe Gems::API::VersionEndpoints do
       expect(a_get("/api/v2/rubygems/rails/versions/..%2F7.0.6.json")).to have_been_made
     end
 
+    it "raises InvalidResponse when the response is JSON but not an object" do
+      stub_get("/api/v2/rubygems/rails/versions/7.0.6.json").to_return(body: '"7.0.6"')
+
+      expect { client.version("rails", "7.0.6") }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "7.0.6")))
+    end
+
     it "requests a specific platform" do
       stub_get("/api/v2/rubygems/rails/versions/7.0.6.json?platform=java").to_return(body: fixture("v2/rails-7.0.6.json"))
       client.version("rails", "7.0.6", platform: "java")

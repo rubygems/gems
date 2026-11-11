@@ -182,9 +182,12 @@ module Gems
     # @api public
     # @param attributes [Hash{String, Symbol => Object}] the raw attributes from the API response
     # @return [Resource] a new instance
+    # @raise [InvalidResponse] if the attributes are not a JSON object, such as the parsed body of a response that
+    #   answered one, since there is nothing to read the attributes of a resource from
     # @example Wrap a parsed response
     #   Gems::Gem.new(JSON.parse(body))
     def initialize(attributes)
+      raise InvalidResponse.new(body: attributes.to_s, message: "#{attributes.inspect} is not a JSON object") unless attributes.is_a?(Hash)
       @attributes = deep_freeze(attributes)
     end
 
@@ -301,9 +304,7 @@ module Gems
     # @return [Integer] the hash code
     # @example Use resources as hash keys
     #   {gem => true}
-    def hash
-      [self.class, identity].hash
-    end
+    def hash = [self.class, identity].hash
 
     protected
 

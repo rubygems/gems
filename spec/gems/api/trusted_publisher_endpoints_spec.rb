@@ -45,6 +45,13 @@ RSpec.describe Gems::API::TrustedPublisherEndpoints do
       expect(a_get("/api/v1/gems/gems/trusted_publishers/1")).to have_been_made
     end
 
+    it "raises InvalidResponse when the response is JSON but not an object" do
+      stub_get("/api/v1/gems/gems/trusted_publishers/1").to_return(body: '"gems"')
+
+      expect { client.trusted_publisher("gems", 1) }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "gems")))
+    end
+
     it "accepts a trusted publisher, using its ID" do
       client.trusted_publisher("gems", Gems::TrustedPublisher.new("id" => 1))
 

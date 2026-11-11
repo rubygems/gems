@@ -167,6 +167,28 @@ RSpec.describe Gems::Resource do
       expect(resource.attributes).to eq(attributes)
     end
 
+    it "accepts a Hash of a subclass" do
+      hash = Class.new(Hash).new
+      hash.store("name", "rails")
+
+      expect(resource_class.new(hash).name).to eq("rails")
+    end
+
+    ["rails", nil, [1], 1].each do |not_an_object|
+      it "raises InvalidResponse for #{not_an_object.inspect}, which is not a JSON object" do
+        expect { resource_class.new(not_an_object) }
+          .to raise_error(Gems::InvalidResponse, "#{not_an_object.inspect} is not a JSON object")
+      end
+    end
+
+    it "attaches the response the resource was asked for to the error" do
+      expect { resource_class.new("rails") }.to raise_error(having_attributes(body: "rails"))
+    end
+
+    it "attaches a response that is not a String as the String it reads as" do
+      expect { resource_class.new(nil) }.to raise_error(having_attributes(body: ""))
+    end
+
     it "leaves the hash it was given mutable" do
       raw = {"metadata" => {"changelog_uri" => +"https://example.com"}, "licenses" => [+"MIT"]}
       resource_class.new(raw)
