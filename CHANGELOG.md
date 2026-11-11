@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+* Follow a redirect outside the path prefix a host carries without the credentials and the headers of the caller,
+  and refuse one that would send the body of the request again, as a redirect to another scheme, host, or port
+  already is: a request path that climbs out of the prefix is refused for the credentials it would take with it,
+  which a redirect could take instead
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x

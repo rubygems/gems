@@ -188,6 +188,13 @@ module Gems
     # again for any of them either is issued a key or answers that the token is spent, where the publish would have
     # failed either way, which is why sending it again is worth it where a request that acts on a gem is not.
     #
+    # The redirects of the exchange are followed as those of every other request are, bounded by the host the
+    # exchange is made with, so that a host that answers the endpoint with one is exchanged with rather than
+    # raising the {HTTPError} of the redirect. A redirect to another scheme, host, or port, or outside the path
+    # prefix of the host, is followed without the `Accept` header of the exchange, as it is for a request of the
+    # client, and with the body only when the redirect preserves the method and stays where the request was meant
+    # for.
+    #
     # @api private
     # @return [Net::HTTPResponse] the response the exchange ended at
     def exchange_response
@@ -198,7 +205,7 @@ module Gems
         content_type: RequestBuilder::APPLICATION_JSON, headers:)
       retry_handler.handle(retry_unanswered: true) do
         redirect_handler.handle(response: connection.perform(request:), request:, body:,
-          content_type: RequestBuilder::APPLICATION_JSON, headers:)
+          content_type: RequestBuilder::APPLICATION_JSON, headers:, host:)
       end
     end
   end

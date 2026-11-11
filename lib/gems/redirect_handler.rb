@@ -71,9 +71,12 @@ module Gems
     # Handle redirects for an HTTP response
     #
     # A redirect to another scheme, host, or port is followed without the credentials of the request, as curl and
-    # browsers do, so that a redirect cannot send them to a host they were not meant for. The headers the caller
+    # browsers do, so that a redirect cannot send them to a host they were not meant for. A redirect to a path
+    # outside the prefix the host carries is followed without them as well, since the client was pointed at that
+    # prefix and a path that leaves it asks the rest of the host with the credentials resolved for the prefix, as
+    # a request path that climbs out of the prefix is refused for (see {Client#build_uri}). The headers the caller
     # asked for are dropped along with them, since a header of the caller's own may carry a credential too. A later
-    # redirect back to the original host does not restore either.
+    # redirect back inside does not restore either.
     #
     # A redirect that cannot be followed, such as 304 Not Modified or one whose Location header is missing, is not a
     # valid URL, or is not an HTTP or HTTPS URL, is returned as it is, so that the caller raises the HTTPError of its
@@ -81,15 +84,18 @@ module Gems
     #
     # A 307 or 308 redirect is followed with the method of the request and the body it was built from, which is
     # given as it was given to {RequestBuilder#build}, since a multipart body cannot be read back from the request.
-    # One to another scheme, host, or port is not followed at all when the request has a body, and is returned as a
-    # redirect that cannot be followed is: the credentials of a request are not all carried by the headers a
-    # cross-origin redirect drops, since {API::APIKeyEndpoints#update_api_key} sends an API key as a form field and
-    # the trusted publishing token exchange sends an ID token as a JSON field, and a body replayed to the host the
-    # redirect names would take them there.
+    # One to another scheme, host, or port, or outside the prefix of the host, is not followed at all when the
+    # request has a body, and is returned as a redirect that cannot be followed is: the credentials of a request
+    # are not all carried by the headers a redirect that leaves where the request was meant for drops, since
+    # {API::APIKeyEndpoints#update_api_key} sends an API key as a form field and the trusted publishing token
+    # exchange sends an ID token as a JSON field, and a body replayed where the redirect names would take them
+    # there.
     #
     # @api private
     # @param response [Net::HTTPResponse] the HTTP response to handle
     # @param request [Net::HTTPRequest] the original HTTP request
+    # @param host [String] the host the request was sent to, which its redirects stay on and within the path
+    #   prefix of to keep the credentials of the request
     # @param authenticator [Authenticator] the authenticator for requests
     # @param body [Hash, Array, String, nil] the body the request was built from
     # @param content_type [String, nil] the content type the request was built with, for a String body
@@ -98,8 +104,8 @@ module Gems
     # @return [Net::HTTPResponse] the final HTTP response after following redirects
     # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
     # @example Handle a response
-    #   response = handler.handle(response: resp, request: req)
-    def handle(response:, request:, authenticator: Authenticator.new, body: nil, content_type: nil, headers: {},
+    #   response = handler.handle(response: resp, request: req, host: "https://rubygems.org")
+    def handle(response:, request:, host:, authenticator: Authenticator.new, body: nil, content_type: nil, headers: {},
       redirect_count: 0)
       return response unless response.is_a?(Net::HTTPRedirection)
 
@@ -108,15 +114,15 @@ module Gems
       new_uri = build_new_uri(response, request)
       return response if new_uri.nil?
 
-      follow(response:, request:, uri: new_uri, authenticator:, body:, content_type:, headers:, redirect_count:)
+      follow(response:, request:, uri: new_uri, authenticator:, body:, content_type:, headers:, host:, redirect_count:)
     end
 
     private
 
     # Send the request again to where a redirect leads
     #
-    # A redirect to another origin that would replay the body is not followed, and its response is returned for the
-    # caller to raise the HTTPError of (see {#handle}).
+    # A redirect to another origin, or outside the path prefix of the host, that would replay the body is not
+    # followed, and its response is returned for the caller to raise the HTTPError of (see {#handle}).
     #
     # @api private
     # @param response [Net::HTTPResponse] the redirect response
@@ -126,12 +132,14 @@ module Gems
     # @param body [Hash, Array, String, nil] the body the request was built from
     # @param content_type [String, nil] the content type the request was built with, for a String body
     # @param headers [Hash{String => String}] the headers the request was built with
+    # @param host [String] the host the request was sent to, whose origin and path prefix bound where its redirects
+    #   keep the credentials of the request
     # @param redirect_count [Integer] the current redirect count
     # @return [Net::HTTPResponse] the final HTTP response after following redirects
     # @raise [TooManyRedirects] if the maximum number of redirects is exceeded
-    def follow(response:, request:, uri:, authenticator:, body:, content_type:, headers:, redirect_count:)
+    def follow(response:, request:, uri:, authenticator:, body:, content_type:, headers:, host:, redirect_count:)
       response_code = Integer(response.code)
-      unless same_origin?(request.uri, uri)
+      unless on_host?(uri, host)
         return response if replays_body?(response_code, body)
 
         authenticator = Authenticator.new
@@ -139,7 +147,7 @@ module Gems
       end
       new_request = build_request(request:, uri:, response_code:, authenticator:, body:, content_type:, headers:)
       new_response = connection.perform(request: new_request)
-      handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:,
+      handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:, host:,
         redirect_count: redirect_count + 1)
     end
 
