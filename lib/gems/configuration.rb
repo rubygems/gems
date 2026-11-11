@@ -4,6 +4,7 @@ require "rubygems"
 require_relative "certificate_options"
 require_relative "connection"
 require_relative "identifiers"
+require_relative "pagination"
 require_relative "redirect_handler"
 require_relative "request_builder"
 require_relative "retry_handler"
@@ -213,6 +214,28 @@ module Gems
     #   @example Set the maximum redirects
     #     Gems.max_redirects = 5
     count_setting :max_redirects
+
+    # @!method max_pages
+    #   The maximum number of pages a page-at-a-time endpoint enumerates
+    #
+    #   A page past the maximum is not enumerated: one that answers with results raises {TooManyPages} as it is
+    #   reached, so a host that answers every page with results — one that ignores the page an endpoint asks
+    #   for — cannot keep an enumeration going for as long as the caller enumerates.
+    #
+    #   @api public
+    #   @return [Integer] the maximum number of pages to enumerate
+    #   @example Get the maximum pages
+    #     Gems.max_pages
+    # @!method max_pages=(max_pages)
+    #   Set the maximum number of pages a page-at-a-time endpoint enumerates
+    #
+    #   @api public
+    #   @param max_pages [Integer] the maximum number of pages to enumerate
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
+    #   @example Set the maximum pages
+    #     Gems.max_pages = 100
+    count_setting :max_pages
 
     # @!method max_retries
     #   The number of times a request that was turned away is sent again
@@ -454,6 +477,7 @@ module Gems
       self.max_redirects = RedirectHandler::DEFAULT_MAX_REDIRECTS
       self.max_retries = RetryHandler::DEFAULT_MAX_RETRIES
       self.max_retry_delay = RetryHandler::DEFAULT_MAX_RETRY_DELAY
+      self.max_pages = Pagination::DEFAULT_MAX_PAGES
     end
   end
 end

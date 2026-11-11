@@ -95,6 +95,7 @@ module Gems
     # @param max_redirects [Integer] the maximum number of redirects to follow
     # @param max_retries [Integer] the number of times a request that was turned away is sent again
     # @param max_retry_delay [Numeric] the longest a request waits before it is sent again, in seconds
+    # @param max_pages [Integer] the maximum number of pages a page-at-a-time endpoint enumerates
     # @param ca_file [String, nil] the path of a file of certificates TLS is verified with
     # @param ca_path [String, nil] the path of a directory of certificates TLS is verified with
     # @param cert_store [OpenSSL::X509::Store, nil] the store of certificates TLS is verified with
@@ -123,7 +124,7 @@ module Gems
       keep_alive_timeout: Gems.keep_alive_timeout,
       max_redirects: Gems.max_redirects,
       max_retries: Gems.max_retries,
-      max_retry_delay: Gems.max_retry_delay,
+      max_retry_delay: Gems.max_retry_delay, max_pages: Gems.max_pages,
       ca_file: Gems.ca_file, ca_path: Gems.ca_path, cert_store: Gems.cert_store,
       client_cert: Gems.client_cert, client_key: Gems.client_key)
       @host = validate_host(host)
@@ -132,6 +133,7 @@ module Gems
       @request_builder = RequestBuilder.new(user_agent:)
       @redirect_handler = RedirectHandler.new(connection: @connection, request_builder: @request_builder, max_redirects:)
       @retry_handler = RetryHandler.new(max_retries:, max_retry_delay:)
+      self.max_pages = max_pages
       initialize_credentials(key:, username:, password:, otp:, id_token:)
       initialize_authenticator
       @response_parser = ResponseParser.new

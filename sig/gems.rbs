@@ -44,8 +44,8 @@ module Gems
   private def self.connection_values: () -> Array[untyped]
   private def self.apply_connection_values: () -> void
 
-  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
-              | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
+  def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?max_pages: Integer, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
+              | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?max_pages: Integer, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
   def self.rubygem: (gem_identifier gem_name) -> Gem
   def self.timeframe_versions: (from: Time | String, ?to: (Time | String)?, ?page: Integer?) -> Array[Gem]
   def self.timeframe_versions_each: (from: Time | String, ?to: (Time | String)?) ?{ (Gem gem) -> void } -> Enumerator[Gem, void]
@@ -125,6 +125,7 @@ module Gems
     attr_accessor max_redirects: Integer
     attr_accessor max_retries: Integer
     attr_accessor max_retry_delay: Numeric
+    attr_accessor max_pages: Integer
     def self.extended: (Configuration base) -> void
     def key: () -> String?
     def otp: () -> String?
@@ -737,9 +738,9 @@ module Gems
     def client_key: () -> OpenSSL::PKey::PKey?
     def client_key=: (OpenSSL::PKey::PKey? client_key) -> void
 
-    def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
-                | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
-    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> void
+    def self.new: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?max_pages: Integer, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> Client
+                | [T] (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?max_pages: Integer, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) { (Client client) -> T } -> T
+    def initialize: (?host: String, ?key: api_key_identifier?, ?username: String?, ?password: String?, ?otp: String?, ?id_token: String?, ?user_agent: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?write_timeout: Numeric, ?debug_output: IO?, ?proxy_url: String?, ?keep_alive_timeout: Numeric, ?max_redirects: Integer, ?max_retries: Integer, ?max_retry_delay: Numeric, ?max_pages: Integer, ?ca_file: String?, ?ca_path: String?, ?cert_store: OpenSSL::X509::Store?, ?client_cert: OpenSSL::X509::Certificate?, ?client_key: OpenSSL::PKey::PKey?) -> void
     def close: () -> self
     def get: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
     def delete: (String path, ?Hash[Symbol | String, untyped] params, ?headers: Hash[String, String], ?host: String?) -> String
@@ -825,6 +826,9 @@ module Gems
   end
 
   class TooManyRedirects < Error
+  end
+
+  class TooManyPages < Error
   end
 
   class NoLatestVersion < Error
@@ -1066,7 +1070,13 @@ module Gems
   end
 
   module Pagination
+    include Settings
+    extend Settings::Declaration
+
     FIRST_PAGE: Integer
+    DEFAULT_MAX_PAGES: Integer
+
+    attr_accessor max_pages: Integer
 
     private
 

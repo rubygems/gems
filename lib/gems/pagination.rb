@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative "errors/too_many_pages"
+require_relative "settings"
+
 module Gems
   # Walks the pages of the endpoints that answer one page at a time, mixed into the API endpoints
   #
@@ -7,11 +10,41 @@ module Gems
   # requested only when the results of the page before it have been enumerated, and the walk stops at the first
   # empty page.
   #
+  # The page the walk stops at is the host's to answer, so the walk is also given a maximum of its own, the
+  # `max_pages` the module declares and the client an endpoint is mixed into sets: a page past the maximum is
+  # not enumerated, and one that answers with results raises {TooManyPages}, as a redirect past the
+  # `max_redirects` of a client raises {TooManyRedirects}, since a host that answers every page with results —
+  # one that ignores the page a walk asks for — would keep a walk going for as long as the caller keeps
+  # enumerating. The page past the maximum is still asked whether it has results, since the walk stops at the
+  # first empty page and only the host can answer which page that is.
+  #
   # @api private
   module Pagination
     # The page the endpoints number their first page with
     FIRST_PAGE = 1
+    # Default maximum number of pages to enumerate
+    DEFAULT_MAX_PAGES = 1000
     private_constant :FIRST_PAGE
+
+    include Settings
+
+    # @!method max_pages
+    #   The maximum number of pages a page-at-a-time endpoint enumerates
+    #
+    #   @api public
+    #   @return [Integer] the maximum number of pages to enumerate
+    #   @example Get the maximum pages
+    #     client.max_pages
+    # @!method max_pages=(max_pages)
+    #   Set the maximum number of pages a page-at-a-time endpoint enumerates
+    #
+    #   @api public
+    #   @param max_pages [Integer] the maximum number of pages to enumerate
+    #   @return [void]
+    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
+    #   @example Set the maximum pages
+    #     client.max_pages = 100
+    count_setting :max_pages
 
     private
 
@@ -27,10 +60,12 @@ module Gems
     # @yield [page] the page to request
     # @yieldreturn [Array] the results of that page, empty once there are no more
     # @return [Enumerator] the results, which requests each page as it is reached
+    # @raise [TooManyPages] if a page past the `max_pages` of the client answers with results
     def each_page(block)
       enumerator = Enumerator.new do |yielder|
         page = FIRST_PAGE
         until (results = yield(page)).empty?
+          raise TooManyPages, "Too many pages" if page > max_pages
           results.each { |result| yielder << result }
           page += 1
         end

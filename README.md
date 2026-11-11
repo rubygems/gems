@@ -354,6 +354,7 @@ Clients default to the global configuration, which can be set with `Gems.configu
 | `max_redirects` | The maximum number of redirects to follow              | `10`                                   |
 | `max_retries` | The number of times a request that was turned away is sent again | `2`                           |
 | `max_retry_delay` | The longest a request waits before it is sent again, in seconds | `60`               |
+| `max_pages`   | The maximum number of pages a page-at-a-time endpoint enumerates | `1000`                        |
 | `ca_file`     | The path of a file of certificates TLS is verified with  | OpenSSL's own certificates             |
 | `ca_path`     | The path of a directory of certificates TLS is verified with | OpenSSL's own certificates         |
 | `cert_store`  | An `OpenSSL::X509::Store` TLS is verified with           | OpenSSL's own certificates             |
@@ -508,9 +509,10 @@ Network failures raise `Gems::NetworkError`, whose `cause` is the `SystemCallErr
 `EOFError`), `SocketError`, `Timeout::Error`, `OpenSSL::SSL::SSLError`, `Zlib::Error`, `Net::HTTPBadResponse`, or
 `Net::ProtocolError` underneath, so a timeout worth retrying can be told from a refused connection that is not;
 `Gems::NetworkError::WRAPPED` is the list. Redirect loops
-raise `Gems::TooManyRedirects`, and a successful response
+raise `Gems::TooManyRedirects`, a page-at-a-time enumeration that reaches a page past `max_pages` raises
+`Gems::TooManyPages`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
-portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the
+portal, one whose JSON lacks a field the library reads or is not the shape an endpoint reads, or one with a timestamp that cannot be parsed. Asking for the
 latest version of a gem that has none, directly or by omitting the version from `downloads`, raises
 `Gems::NoLatestVersion`.
 

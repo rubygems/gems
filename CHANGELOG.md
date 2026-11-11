@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+* Add a `max_pages` option, set globally or per client: a page-at-a-time enumeration (`search_each`,
+  `timeframe_versions_each`) raises `Gems::TooManyPages` rather than enumerating a page past the maximum, so a
+  host that answers every page with results — one that ignores the page an endpoint asks for — cannot keep an
+  enumeration going for as long as the caller enumerates
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x
