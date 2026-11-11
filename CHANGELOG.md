@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+* Raise `Gems::InvalidResponse`, which carries the body, rather than `NoMethodError` or `TypeError`, when a response body is not the shape an endpoint reads, such as a list endpoint answered with something other than a list, so that a hostile or misbehaving host cannot crash the caller with a raw error
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x

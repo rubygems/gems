@@ -28,7 +28,9 @@ module Gems
       #   Gems.versions "coulda"
       def versions(gem_name)
         name = name_of(gem_name)
-        Version.list(parse_json(get("/api/v1/versions/#{escape(name)}.json")).map { |version| version.merge("name" => name) })
+        Version.list(parse_json(get("/api/v1/versions/#{escape(name)}.json")) { |json|
+          json.map { |version| version.merge("name" => name) }
+        })
       end
 
       # Returns the latest version number of a gem
@@ -142,7 +144,7 @@ module Gems
       #   Gems.timeframe_versions from: Time.now - 86_400
       def timeframe_versions(from:, to: nil, page: nil)
         params = {from: timestamp_of(from), to: timestamp_of(to), page:}.compact
-        Gem.list(parse_json(get("/api/v1/timeframe_versions.json", params)))
+        parse_json(get("/api/v1/timeframe_versions.json", params)) { |json| Gem.list(json) }
       end
 
       # Enumerates the gem versions created within a timeframe, a page at a time

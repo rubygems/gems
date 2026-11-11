@@ -68,6 +68,12 @@ RSpec.describe Gems::API::GemEndpoints do
 
       expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
     end
+
+    it "raises InvalidResponse when the response is not a list of gems" do
+      stub_get("/api/v1/search.json?query=cucumber").to_return(body: '"teapot"')
+
+      expect { client.search("cucumber") }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#search_each" do
@@ -154,6 +160,12 @@ RSpec.describe Gems::API::GemEndpoints do
       client.owned_gems(Gems::Owner.new("id" => 1, "email" => "sferik@gmail.com"))
 
       expect(a_get("/api/v1/owners/1/gems.json")).to have_been_made
+    end
+
+    it "raises InvalidResponse when the response is not a list of gems" do
+      stub_get("/api/v1/owners/sferik/gems.json").to_return(body: '"teapot"')
+
+      expect { client.owned_gems("sferik") }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
     end
 
     context "without a user handle" do

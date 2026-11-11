@@ -17,6 +17,12 @@ RSpec.describe Gems::API::ActivityEndpoints do
 
       expect([gem.class, gem.name]).to eq([Gems::Gem, "jevalyn"])
     end
+
+    it "raises InvalidResponse when the response is not a list of gems" do
+      stub_get("/api/v1/activity/latest.json").to_return(body: '"teapot"')
+
+      expect { client.latest }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#just_updated" do
@@ -32,6 +38,12 @@ RSpec.describe Gems::API::ActivityEndpoints do
       gem = client.just_updated.first
 
       expect([gem.class, gem.name]).to eq([Gems::Gem, "posthog-ruby"])
+    end
+
+    it "raises InvalidResponse when the response is not a list of gems" do
+      stub_get("/api/v1/activity/just_updated.json").to_return(body: '"teapot"')
+
+      expect { client.just_updated }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
     end
   end
 end

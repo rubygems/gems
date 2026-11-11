@@ -97,6 +97,13 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(client.create_api_key("ci-push", scopes: %i[push_rubygem]).name).to eq("ci-push")
     end
 
+    it "raises InvalidResponse when the response is not the key the endpoint answers with" do
+      stub_post("/api/v1/api_key.json").to_return(body: '"teapot"')
+
+      expect { client.create_api_key("ci-push", scopes: %i[push_rubygem]) }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
+
     it "keeps the scopes the key was granted, as the API names them" do
       expect(client.create_api_key("ci-push", scopes: %i[yank_rubygem push_rubygem]).scopes).to eq(%w[push_rubygem yank_rubygem])
     end
@@ -202,6 +209,12 @@ RSpec.describe Gems::API::APIKeyEndpoints do
     it "returns the roles" do
       expect(client.api_key_roles.map(&:token)).to eq(["0123456789abcdef0123456789abcdef"])
     end
+
+    it "raises InvalidResponse when the response is not a list of roles" do
+      stub_get("/api/v1/oidc/api_key_roles.json").to_return(body: '"teapot"')
+
+      expect { client.api_key_roles }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#oidc_providers" do
@@ -219,6 +232,12 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       provider = client.oidc_providers.first
 
       expect([provider.class, provider.issuer]).to eq([Gems::OIDCProvider, "https://token.actions.githubusercontent.com"])
+    end
+
+    it "raises InvalidResponse when the response is not a list of providers" do
+      stub_get("/api/v1/oidc/providers.json").to_return(body: '"teapot"')
+
+      expect { client.oidc_providers }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
     end
   end
 
@@ -268,6 +287,12 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       id_token = client.oidc_id_tokens.first
 
       expect([id_token.class, id_token.api_key_role_token]).to eq([Gems::OIDCIDToken, "0123456789abcdef0123456789abcdef"])
+    end
+
+    it "raises InvalidResponse when the response is not a list of ID tokens" do
+      stub_get("/api/v1/oidc/id_tokens.json").to_return(body: '"teapot"')
+
+      expect { client.oidc_id_tokens }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
     end
   end
 

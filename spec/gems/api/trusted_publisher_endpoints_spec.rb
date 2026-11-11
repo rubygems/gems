@@ -34,6 +34,13 @@ RSpec.describe Gems::API::TrustedPublisherEndpoints do
     it "returns every trusted publisher" do
       expect(client.trusted_publishers("gems").map(&:workflow_filename)).to eq(%w[push_gem.yml release.yml])
     end
+
+    it "raises InvalidResponse when the response is not a list of trusted publishers" do
+      stub_get("/api/v1/gems/gems/trusted_publishers").to_return(body: '"teapot"')
+
+      expect { client.trusted_publishers("gems") }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#trusted_publisher" do

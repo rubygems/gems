@@ -45,6 +45,13 @@ RSpec.describe Gems::API::DownloadEndpoints do
       expect([downloads.class, downloads.total, downloads.version_downloads]).to eq([Gems::Downloads, 3142, 3142])
     end
 
+    it "raises InvalidResponse when the response is not the download counts of a version" do
+      stub_get("/api/v1/downloads/rails_admin-0.0.0.json").to_return(body: '"teapot"')
+
+      expect { client.downloads("rails_admin", "0.0.0") }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
+
     it "names the version the downloads were asked for" do
       expect(client.downloads("rails_admin", "0.0.0").full_name).to eq("rails_admin-0.0.0")
     end

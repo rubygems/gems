@@ -29,7 +29,7 @@ module Gems
       # @example
       #   Gems.trusted_publishers("gems").map(&:name)
       def trusted_publishers(gem_name)
-        TrustedPublisher.list(parse_json(get(trusted_publishers_path(gem_name))))
+        parse_json(get(trusted_publishers_path(gem_name))) { |json| TrustedPublisher.list(json) }
       end
 
       # Return one of the trusted publishers configured for a gem

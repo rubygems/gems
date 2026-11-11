@@ -31,6 +31,12 @@ RSpec.describe Gems::API::OwnerEndpoints do
 
       expect([owner.class, owner.email]).to eq([Gems::Owner, "sferik@gmail.com"])
     end
+
+    it "raises InvalidResponse when the response is not a list of owners" do
+      stub_get("/api/v1/gems/gems/owners.json").to_return(body: '"teapot"')
+
+      expect { client.owners("gems") }.to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#add_owner" do

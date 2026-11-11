@@ -35,6 +35,13 @@ RSpec.describe Gems::API::VersionEndpoints do
 
       expect([version.class, version.number]).to eq([Gems::Version, "0.3.0"])
     end
+
+    it "raises InvalidResponse when the response is not a list of versions" do
+      stub_get("/api/v1/versions/script_helpers.json").to_return(body: '"teapot"')
+
+      expect { client.versions("script_helpers") }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
+    end
   end
 
   describe "#latest_version" do
@@ -389,6 +396,13 @@ RSpec.describe Gems::API::VersionEndpoints do
 
     it "keeps the platform builds of a release distinct" do
       expect(client.timeframe_versions(from:, to:).uniq.map(&:platform)).to eq(%w[aarch64-linux arm64-darwin])
+    end
+
+    it "raises InvalidResponse when the response is not a list of versions" do
+      stub_get("/api/v1/timeframe_versions.json?#{query}").to_return(body: '"teapot"')
+
+      expect { client.timeframe_versions(from:, to:) }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '"teapot"')))
     end
   end
 
