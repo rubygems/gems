@@ -860,13 +860,14 @@ module Gems
     CHUNK_END: String
 
     @output: IO
+    @secrets: Array[String]
     @lines: Array[String]?
     @body: String?
     @reading: bool?
 
     attr_reader output: IO
 
-    def initialize: (IO output) -> void
+    def initialize: (IO output, ?secrets: Array[String]) -> void
     def <<: (String string) -> self
 
     private
@@ -875,6 +876,16 @@ module Gems
     def read: (Array[String] lines, String string) -> void
     def flush: (Array[String] lines) -> void
     def write: (String string) -> void
+  end
+
+  module RequestSecrets
+    private
+
+    def secrets_of: (Net::HTTPRequest request) -> Array[String]
+    def basic_secrets_of: (String? basic) -> Array[String]
+    def body_secrets_of: (Net::HTTPRequest request) -> Array[String]
+    def json_secret_of: (String body) -> untyped
+    def form_secret_of: (String body) -> String?
   end
 
   class ConnectionPool
@@ -901,6 +912,7 @@ module Gems
 
   class Connection
     include CertificateOptions
+    include RequestSecrets
     include Settings
     extend Settings::Declaration
     include URLValidation

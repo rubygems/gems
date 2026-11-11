@@ -10,6 +10,13 @@ module Gems
   # Those values are replaced before they reach the IO, so that debug output can be kept where the credentials
   # should not be.
   #
+  # The values are replaced in two ways. The patterns match the forms the library itself writes the credentials
+  # in, by the name each is written under. The values the request being sent carries, which the connection reads
+  # from it (see {RequestSecrets}), are replaced wherever they appear, so that a host which echoes a credential
+  # back in a response — under a name of its own, or in an encoding of its own — does not carry it past the
+  # patterns, which know the names the library writes. A value is replaced wherever it appears, however short or
+  # however often: better a line that says more than it means to than one that says what it must not.
+  #
   # Net::HTTP writes a response body as it reads it, a line for each read from the socket, so a credential the body
   # carries can be split across two of those lines, where neither half matches the pattern that redacts it. A body
   # sent in chunks is read a chunk at a time, each between the line that says how many bytes it is reading and the
@@ -70,11 +77,16 @@ module Gems
     #
     # @api private
     # @param output [IO] the IO to write the redacted output to
+    # @param secrets [Array<String>] the credential values the request being sent carries, which are redacted
+    #   wherever they appear (defaults to none)
     # @return [RedactedOutput] a new instance
     # @example Wrap an IO
     #   output = Gems::RedactedOutput.new($stderr)
-    def initialize(output)
+    # @example Wrap an IO, redacting the API key of the request being sent
+    #   output = Gems::RedactedOutput.new($stderr, secrets: ["rubygems_701243f217cdf23b1370c7b66b65ca97"])
+    def initialize(output, secrets: [])
       @output = output
+      @secrets = secrets.compact.reject(&:empty?)
     end
 
     # Write debug output, with credentials redacted
@@ -155,11 +167,17 @@ module Gems
     end
 
     # Write a string to the IO, with credentials redacted
+    #
+    # The patterns redact the credentials in the forms the library itself writes them in, and the values the
+    # request being sent carries are redacted wherever they appear after them.
+    #
     # @api private
     # @param string [String] the debug output
     # @return [void]
     def write(string)
-      output << CREDENTIALS.reduce(string) { |redacted, pattern| redacted.gsub(pattern, "\\1#{REDACTION}") }
+      string = CREDENTIALS.reduce(string) { |redacted, pattern| redacted.gsub(pattern, "\\1#{REDACTION}") }
+      @secrets.each { |secret| string = string.gsub(secret, REDACTION) }
+      output << string
     end
   end
 end

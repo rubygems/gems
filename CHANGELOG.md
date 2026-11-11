@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+* Redact the credential values a request carries from `debug_output` wherever they appear, not only in the forms
+  the library itself writes them in, so that a host which echoes a credential back in a response — under a name of
+  its own, or in an encoding of its own — does not carry it past the redaction into the IO
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x

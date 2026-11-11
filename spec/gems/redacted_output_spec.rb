@@ -194,6 +194,40 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq('-> "X-Note: Authorization: not a header\\r\\n"')
     end
 
+    it "redacts a value it is given wherever it appears, under a name of its own" do
+      redacted = described_class.new(io, secrets: ["rubygems_701243f217cdf23b1370c7b66b65ca97"])
+
+      redacted << %(-> "{\\"api_key\\":\\"rubygems_701243f217cdf23b1370c7b66b65ca97\\"}"\n)
+
+      expect(io.string).to eq(%(-> "{\\"api_key\\":\\"[REDACTED]\\"}"\n))
+    end
+
+    it "redacts each of the values it is given, wherever each appears" do
+      redacted = described_class.new(io, secrets: ["KEY", "123456"])
+
+      redacted << "KEY 123456 bytes of KEY\n"
+
+      expect(io.string).to eq("[REDACTED] [REDACTED] bytes of [REDACTED]\n")
+    end
+
+    it "redacts a value it is given split across the parts of a body" do
+      redacted = described_class.new(io, secrets: ["rubygems_701243f2"])
+
+      ["reading 22 bytes...\n", %(-> "{\\"api_key\\":\\"rubygems_"\n), "read 22 bytes\n",
+        "reading 10 bytes...\n", %(-> "701243f2\\"}"\n), "read 10 bytes\n", "Conn close\n"]
+        .each { |string| redacted << string }
+
+      expect(io.string).to include('\\"api_key\\":\\"[REDACTED]\\"}')
+    end
+
+    it "writes output unchanged when the values it is given are empty or nothing" do
+      redacted = described_class.new(io, secrets: ["", nil])
+
+      redacted << "opening connection to rubygems.org:443...\n"
+
+      expect(io.string).to eq("opening connection to rubygems.org:443...\n")
+    end
+
     context "with the debug output of Net::HTTP" do
       let(:body) { %({"name":"ci-push","rubygems_api_key":"rubygems_701243f217cdf23b1370c7b66b65ca97"}) }
       let(:server) { TCPServer.new("127.0.0.1", 0) }
