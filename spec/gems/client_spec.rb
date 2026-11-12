@@ -154,7 +154,7 @@ RSpec.describe Gems::Client do
 
     {open_timeout: 10, read_timeout: 20, write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
      proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3,
-     max_retry_delay: 30, max_pages: 3, ca_file: certificate_path("ca.pem"), ca_path: certificate_path,
+     max_retry_delay: 30, ca_file: certificate_path("ca.pem"), ca_path: certificate_path,
      cert_store: OpenSSL::X509::Store.new, client_cert: test_client_cert,
      client_key: test_client_key}.each do |option, value|
       it "defaults the #{option} to the global configuration" do
@@ -205,10 +205,6 @@ RSpec.describe Gems::Client do
       expect(client.max_retry_delay).to eq(Gems::RetryHandler::DEFAULT_MAX_RETRY_DELAY)
     end
 
-    it "defaults the maximum pages" do
-      expect(client.max_pages).to eq(Gems::Pagination::DEFAULT_MAX_PAGES)
-    end
-
     it "initializes the authenticator from the credentials" do
       client = described_class.new(key: TEST_KEY)
 
@@ -220,7 +216,7 @@ RSpec.describe Gems::Client do
         described_class.new(host: "http://example.com", key: TEST_KEY, username: TEST_USERNAME, password: TEST_PASSWORD,
           otp: "123456", id_token: "ID_TOKEN", user_agent: "Custom User Agent", open_timeout: 10, read_timeout: 20,
           write_timeout: 30, keep_alive_timeout: 40, debug_output: $stderr,
-          proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3, max_retry_delay: 30, max_pages: 3)
+          proxy_url: "http://proxy.example.com:8080", max_redirects: 3, max_retries: 3, max_retry_delay: 30)
       end
 
       it "sets the host" do
@@ -270,10 +266,6 @@ RSpec.describe Gems::Client do
 
       it "sets the maximum retry delay" do
         expect(client.max_retry_delay).to eq(30)
-      end
-
-      it "sets the maximum pages" do
-        expect(client.max_pages).to eq(3)
       end
     end
 
@@ -410,7 +402,7 @@ RSpec.describe Gems::Client do
     end
   end
 
-  %i[open_timeout read_timeout write_timeout keep_alive_timeout max_redirects max_retries max_retry_delay max_pages]
+  %i[open_timeout read_timeout write_timeout keep_alive_timeout max_redirects max_retries max_retry_delay]
     .each do |option|
     describe "##{option}=" do
       it "sets the #{option}" do

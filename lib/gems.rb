@@ -29,8 +29,7 @@ module Gems
   # The settings of the global configuration that are applied to the client the module has, rather than building
   # another one from them
   CONNECTION_SETTINGS = %i[user_agent open_timeout read_timeout write_timeout keep_alive_timeout debug_output
-    proxy_url max_redirects max_retries max_retry_delay max_pages ca_file ca_path cert_store client_cert
-    client_key].freeze
+    proxy_url max_redirects max_retries max_retry_delay ca_file ca_path cert_store client_cert client_key].freeze
   private_constant :CONNECTION_SETTINGS
 
   # @!method self.new(**options)
@@ -47,10 +46,8 @@ module Gems
 
   # The endpoints of {API}, each delegated to the client the module has. They are read from the module as it is
   # loaded rather than written out one by one, so YARD has none of them to document here; {API} documents each of
-  # them in the mixin it belongs to. The `max_pages` the mixins of the API declare is delegated nowhere, since
-  # the configuration of the module is the setting of its own for it, which building a client reads: a client
-  # asked for `max_pages` would be asked for as it is built.
-  def_delegators :client, *(API.public_instance_methods - %i[max_pages max_pages=])
+  # them in the mixin it belongs to.
+  def_delegators :client, *API.public_instance_methods
 
   # The methods of SingleForwardable, which the module delegates with rather than offers, so that `Gems.delegate`
   # and the rest are not mistaken for methods of the API

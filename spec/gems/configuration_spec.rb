@@ -320,7 +320,7 @@ RSpec.describe Gems::Configuration do
     end
   end
 
-  %i[max_redirects max_retries max_pages].each do |setting|
+  %i[max_redirects max_retries].each do |setting|
     describe "##{setting}=" do
       it "assigns a number of times" do
         Gems.public_send(:"#{setting}=", 3)
@@ -379,7 +379,7 @@ RSpec.describe Gems::Configuration do
 
     {host: "https://gems.example.com", proxy_url: "http://proxy.example.com:8080", open_timeout: 10,
      read_timeout: 20, write_timeout: 30, keep_alive_timeout: 5, max_redirects: 3, max_retries: 4,
-     max_retry_delay: 15, max_pages: 6}.each do |key, value|
+     max_retry_delay: 15}.each do |key, value|
       it "sets the #{key} to a value of its own" do
         Gems.configure { |config| config.public_send(:"#{key}=", value) }
 
@@ -407,7 +407,6 @@ RSpec.describe Gems::Configuration do
         config.max_redirects = 3
         config.max_retries = 3
         config.max_retry_delay = 30
-        config.max_pages = 3
         config.ca_file = certificate_path("ca.pem")
         config.ca_path = certificate_path
         config.cert_store = OpenSSL::X509::Store.new
@@ -432,7 +431,6 @@ RSpec.describe Gems::Configuration do
       max_redirects: Gems::RedirectHandler::DEFAULT_MAX_REDIRECTS,
       max_retries: Gems::RetryHandler::DEFAULT_MAX_RETRIES,
       max_retry_delay: Gems::RetryHandler::DEFAULT_MAX_RETRY_DELAY,
-      max_pages: Gems::Pagination::DEFAULT_MAX_PAGES,
       ca_file: nil,
       ca_path: nil,
       cert_store: nil,

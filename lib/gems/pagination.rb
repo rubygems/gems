@@ -1,50 +1,24 @@
 # frozen_string_literal: true
 
-require_relative "errors/too_many_pages"
-require_relative "settings"
-
 module Gems
   # Walks the pages of the endpoints that answer one page at a time, mixed into the API endpoints
   #
-  # The endpoints number their pages from one and answer with an empty list once there are no more, so a page is
-  # requested only when the results of the page before it have been enumerated, and the walk stops at the first
-  # empty page.
+  # The endpoints number their pages from one, so a page is requested only when the results of the page before it
+  # have been enumerated. The walk ends with the last page there is, which is the first page that is:
   #
-  # The page the walk stops at is the host's to answer, so the walk is also given a maximum of its own, the
-  # `max_pages` the module declares and the client an endpoint is mixed into sets: a page past the maximum is
-  # not enumerated, and one that answers with results raises {TooManyPages}, as a redirect past the
-  # `max_redirects` of a client raises {TooManyRedirects}, since a host that answers every page with results —
-  # one that ignores the page a walk asks for — would keep a walk going for as long as the caller keeps
-  # enumerating. The page past the maximum is still asked whether it has results, since the walk stops at the
-  # first empty page and only the host can answer which page that is.
+  # * empty, as the endpoints answer once there are no more results;
+  # * shorter than the first page, since a page is only cut short when it is the last; or
+  # * the same as the page before it, as a host answers that ignores the page it is asked for.
+  #
+  # The size of a full page is taken from the first page rather than fixed, since a host other than RubyGems.org
+  # may serve pages of another size: a walk of such a host neither stops after its first page nor runs past its
+  # last. The walk stops rather than raising, so a caller keeps every result it was given.
   #
   # @api private
   module Pagination
     # The page the endpoints number their first page with
     FIRST_PAGE = 1
-    # Default maximum number of pages to enumerate
-    DEFAULT_MAX_PAGES = 1000
     private_constant :FIRST_PAGE
-
-    include Settings
-
-    # @!method max_pages
-    #   The maximum number of pages a page-at-a-time endpoint enumerates
-    #
-    #   @api public
-    #   @return [Integer] the maximum number of pages to enumerate
-    #   @example Get the maximum pages
-    #     client.max_pages
-    # @!method max_pages=(max_pages)
-    #   Set the maximum number of pages a page-at-a-time endpoint enumerates
-    #
-    #   @api public
-    #   @param max_pages [Integer] the maximum number of pages to enumerate
-    #   @return [void]
-    #   @raise [ArgumentError] if it is not a whole number of times, in which case the maximum is left as it was
-    #   @example Set the maximum pages
-    #     client.max_pages = 100
-    count_setting :max_pages
 
     private
 
@@ -60,18 +34,29 @@ module Gems
     # @yield [page] the page to request
     # @yieldreturn [Array] the results of that page, empty once there are no more
     # @return [Enumerator] the results, which requests each page as it is reached
-    # @raise [TooManyPages] if a page past the `max_pages` of the client answers with results
     def each_page(block)
-      enumerator = Enumerator.new do |yielder|
-        page = FIRST_PAGE
-        until (results = yield(page)).empty?
-          raise TooManyPages, "Too many pages" if page > max_pages
-          results.each { |result| yielder << result }
-          page += 1
-        end
-      end
+      enumerator = Enumerator.new { |yielder| walk_pages(yielder) { |page| yield(page) } }
       enumerator.each(&block) # steep:ignore BlockTypeMismatch
       enumerator
+    end
+
+    # Yield the results of each page to the yielder, until the last page there is
+    #
+    # @api private
+    # @param yielder [Enumerator::Yielder] the yielder of the enumerator the results are enumerated by
+    # @yield [page] the page to request
+    # @yieldreturn [Array] the results of that page
+    # @return [void]
+    def walk_pages(yielder)
+      page = FIRST_PAGE
+      full = (results = yield(page)).size
+      until results.empty?
+        results.each { |result| yielder << result }
+        break if results.size < full
+
+        previous = results
+        break if (results = yield(page += 1)).eql?(previous)
+      end
     end
   end
 end

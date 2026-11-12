@@ -7,11 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-* Add a `max_pages` option, set globally or per client: a page-at-a-time enumeration (`search_each`,
-  `timeframe_versions_each`) raises `Gems::TooManyPages` rather than enumerating a page past the maximum, so a
-  host that answers every page with results — one that ignores the page an endpoint asks for — cannot keep an
-  enumeration going for as long as the caller enumerates
+### Fixed
+- End a page-at-a-time enumeration (`search_each`, `timeframe_versions_each`) at a page shorter than the first, or
+  the same as the page before it, as well as at an empty page, so a host that ignores the page it is asked for
+  cannot keep `to_a`, `each`, or `count` going forever, and a walk whose last page is short makes no further request
 
 ## [3.0.0] - 2026-09-26
 
