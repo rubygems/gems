@@ -6,7 +6,6 @@ require_relative "certificate_options"
 require_relative "connection_pool"
 require_relative "errors/network_error"
 require_relative "redacted_output"
-require_relative "request_secrets"
 require_relative "settings"
 require_relative "url_validation"
 
@@ -20,7 +19,6 @@ module Gems
   # @api private
   class Connection
     include CertificateOptions
-    include RequestSecrets
     include Settings
     include URLValidation
 
@@ -255,22 +253,16 @@ module Gems
     # is written the body as it was sent, and the credentials of a compressed body could not be redacted from it
     # (see {RedactedOutput}).
     #
-    # The debug output is wrapped for the request being sent, which holds the credential values that are redacted
-    # wherever they appear: a connection kept open may be sent a request with credentials other than the request
-    # that opened it, so the wrapper a connection was opened with is not the one to keep.
-    #
     # @api private
     # @param request [Net::HTTPRequest] the HTTP request to send
     # @param opened_with [Hash{Symbol => Object}] the settings a connection must have been opened with to send it on
     # @return [Net::HTTPResponse] the HTTP response
     def send_request(request, opened_with)
       kept_for = opened_with.fetch(:keep_alive_timeout)
-      debug_output = opened_with.fetch(:debug_output)
-      request["Accept-Encoding"] = "identity" if debug_output
+      request["Accept-Encoding"] = "identity" if opened_with.fetch(:debug_output)
       http_client = pool.checkout(request:, settings: opened_with, keep_alive_timeout: kept_for) do
         build_http_client(request.uri, opened_with)
       end
-      http_client.set_debug_output(RedactedOutput.new(debug_output, secrets: secrets_of(request))) if debug_output
       response = request_on(http_client, request)
       pool.checkin(request:, http_client:, settings: opened_with, keep_alive_timeout: kept_for)
       response
