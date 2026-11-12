@@ -18,8 +18,15 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-    - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+    - id: ruby
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+      continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - run: bundle exec rake spec
+    - id: spec
+      run: bundle exec rake spec
+      continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
+    - name: Note an advisory failure
+      if: steps.ruby.outcome == 'failure' || steps.spec.outcome == 'failure'
+      run: echo "::warning title=Advisory failure::A step failed, but this job is allowed to fail, so the build still passes"
