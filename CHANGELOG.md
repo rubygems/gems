@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Redact the ID token, the API key, and the one-time passcode a JSON body carries from the debug output when the body has whitespace around the colon of the field, as a pretty-printed body does
+
 ## [3.0.0] - 2026-09-26
 
 See [UPGRADING.md](https://github.com/rubygems/gems/blob/master/UPGRADING.md) for the changes code written for 2.x
