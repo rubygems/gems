@@ -26,7 +26,7 @@ module Gems
       # @example
       #   Gems.latest
       def latest
-        Gem.list(parse_json(get("/api/v1/activity/latest.json")))
+        parse_json(get("/api/v1/activity/latest.json")) { |json| Gem.list(json) }
       end
 
       # Returns the 50 most recently updated gems
@@ -39,7 +39,7 @@ module Gems
       # @example
       #   Gems.just_updated
       def just_updated
-        Gem.list(parse_json(get("/api/v1/activity/just_updated.json")))
+        parse_json(get("/api/v1/activity/just_updated.json")) { |json| Gem.list(json) }
       end
     end
   end

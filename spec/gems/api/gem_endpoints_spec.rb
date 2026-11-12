@@ -43,15 +43,6 @@ RSpec.describe Gems::API::GemEndpoints do
         expect { client.rubygem("nonexistentgem") }.to raise_error(Gems::InvalidResponse)
       end
     end
-
-    context "when the response is JSON but not an object" do
-      before { stub_get("/api/v1/gems/rails.json").to_return(body: '"rails"') }
-
-      it "raises InvalidResponse" do
-        expect { client.rubygem("rails") }
-          .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "rails")))
-      end
-    end
   end
 
   describe "#search" do

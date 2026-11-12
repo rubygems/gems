@@ -8,10 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-* Raise `Gems::InvalidResponse`, which carries the response, rather than `NoMethodError` or `TypeError`, when the
-  JSON of a response is not the object a resource reads its attributes from — one answered with a scalar, `null`,
-  or a list, such as the single-resource endpoints answer — and when the `dependencies` a response carries are
-  not an object or a list, so that a host which answers one of these cannot crash the caller with a raw error
+- Raise `Gems::InvalidResponse`, with the body the host sent, rather than `NoMethodError` or `TypeError` (or a list built from the pairs of an object, or `[]` for `{}`), when an endpoint answers with JSON that is not the shape its resources are read from: a scalar or `null`, an object where a list is read, a list where an object is read, or a list whose elements are not objects; `runtime_dependencies`, `development_dependencies`, and `APIKey#rubygem` raise it too for nested values of the wrong shape
+- `Gems::Resource.new` raises `TypeError` for attributes that are not a Hash, and `Gems::Resource.list` for a list that is not an Array; `list` takes a block that answers with the attributes of each element
 
 ## [3.0.0] - 2026-09-26
 

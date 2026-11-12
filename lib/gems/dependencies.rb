@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require "json"
 require_relative "dependency"
-require_relative "errors/invalid_response"
 
 module Gems
   # The dependencies a gem or a version carries, included in {Gem} and {Version}
@@ -38,21 +36,19 @@ module Gems
 
     # The dependencies of the given type
     #
-    # A response whose dependencies are not a JSON object, or whose dependencies of the type are not a list, cannot
-    # be read: it raises {InvalidResponse}, which carries the response, rather than the raw `TypeError` or
-    # `NoMethodError` of the misread, as a timestamp that cannot be parsed does (see {Resource#parse_time}). A
-    # dependency the list carries that is not a JSON object raises it too, since there is nothing to read the
-    # attributes of a dependency from (see {Resource#initialize}).
+    # Dependencies that are not a JSON object, dependencies of the type that are not a list, or a dependency that is
+    # not a JSON object cannot be read: they raise {InvalidResponse}, which carries the attributes of the resource,
+    # rather than the raw `TypeError` or `NoMethodError` of the misread.
     #
     # @api private
     # @param type [String] the dependency type ("runtime" or "development")
     # @return [Array<Dependency>] the dependencies
-    # @raise [InvalidResponse] if the dependencies the response carries are not the shape a dependency is read from
+    # @raise [InvalidResponse] if the dependencies are not the shape a dependency is read from
     def dependencies_of(type)
-      Dependency.list(Array(attributes.dig("dependencies", type)))
-    rescue TypeError => e
-      raise InvalidResponse.new(body: JSON.generate(attributes),
-        message: "The response body is not the expected JSON: #{e}")
+      read_nested(attributes) do
+        dependencies = attributes.dig("dependencies", type)
+        dependencies.nil? ? [] : Dependency.list(dependencies)
+      end
     end
   end
 end

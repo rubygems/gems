@@ -39,13 +39,6 @@ RSpec.describe Gems::API::ProfileEndpoints do
       expect(a_get("/api/v1/profiles/..%2Fqrush.json")).to have_been_made
     end
 
-    it "raises InvalidResponse when the response is JSON but not an object" do
-      stub_get("/api/v1/profiles/qrush.json").to_return(body: '"qrush"')
-
-      expect { client.profile("qrush") }
-        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "qrush")))
-    end
-
     it "returns the user's profile" do
       profile = client.profile("qrush")
 

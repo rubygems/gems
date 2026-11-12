@@ -39,14 +39,29 @@ RSpec.describe Gems::Dependencies do
     it "raises InvalidResponse when the dependencies of the type are not a list" do
       resource = resource_class.new("name" => "rails", "dependencies" => {"runtime" => "thor"})
 
-      expect { resource.runtime_dependencies }.to raise_error(Gems::InvalidResponse)
+      expect { resource.runtime_dependencies }
+        .to raise_error(Gems::InvalidResponse, a_string_ending_with("String is not an Array"))
     end
 
-    it "attaches the dependency that cannot be read to the error" do
+    it "raises InvalidResponse when the dependencies of the type are an object rather than a list" do
+      resource = resource_class.new("name" => "rails", "dependencies" => {"runtime" => {"name" => "thor"}})
+
+      expect { resource.runtime_dependencies }
+        .to raise_error(Gems::InvalidResponse, a_string_ending_with("Hash is not an Array"))
+    end
+
+    it "raises InvalidResponse when a dependency is not a JSON object" do
       resource = resource_class.new("name" => "rails", "dependencies" => {"runtime" => ["thor"]})
 
       expect { resource.runtime_dependencies }
-        .to raise_error(having_attributes(body: "thor"))
+        .to raise_error(Gems::InvalidResponse, a_string_ending_with("String is not a Hash"))
+    end
+
+    it "attaches the attributes of the resource, as JSON, to the error" do
+      resource = resource_class.new("name" => "rails", "dependencies" => {"runtime" => ["thor"]})
+
+      expect { resource.runtime_dependencies }
+        .to raise_error(having_attributes(body: '{"name":"rails","dependencies":{"runtime":["thor"]}}'))
     end
   end
 

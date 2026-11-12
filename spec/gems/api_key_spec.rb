@@ -38,6 +38,21 @@ RSpec.describe Gems::APIKey do
     expect(api_key.rubygem).to be_nil
   end
 
+  it "raises InvalidResponse, with the gem but not the key, when the gem is not a JSON object" do
+    api_key = described_class.new("rubygems_api_key" => "secret", "gem" => "gems")
+
+    expect { api_key.rubygem }
+      .to raise_error(an_instance_of(Gems::InvalidResponse)
+        .and(having_attributes(body: '"gems"',
+          message: "The response body is not the expected JSON: String is not a Hash")))
+  end
+
+  it "leaves a gem that is not a JSON object out of a pattern" do
+    api_key = described_class.new("rubygems_api_key" => "secret", "gem" => "gems")
+
+    expect(api_key.deconstruct_keys([:rubygem])).to eq({})
+  end
+
   it "matches a pattern by its key, as it does by the rest of its readers" do
     matched = case api_key
     in {name: String => name, key: String => key} then [name, key]

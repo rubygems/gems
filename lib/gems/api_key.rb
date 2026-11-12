@@ -67,11 +67,12 @@ module Gems
     #
     # @api public
     # @return [Gem, nil] the gem, or nil when the key may act on any gem
+    # @raise [InvalidResponse] if the gem is not a JSON object
     # @example Get the name of the gem an API key is restricted to
     #   api_key.rubygem&.name
     def rubygem
       rubygem = self[:gem]
-      Gem.new(rubygem) if rubygem
+      read_nested(rubygem) { Gem.new(rubygem) } if rubygem
     end
     record_attribute(:rubygem)
 

@@ -32,6 +32,28 @@ RSpec.describe Gems::Resource do
     it "returns an empty array for an empty list" do
       expect(resource_class.list([])).to eq([])
     end
+
+    it "builds each resource from what the block answers with for its element" do
+      list = resource_class.list([{"name" => "rails"}]) { |element| element.merge("yanked" => true) }
+
+      expect(list.map(&:yanked?)).to eq([true])
+    end
+
+    it "accepts an Array of a subclass" do
+      list = Class.new(Array).new([{"name" => "rails"}])
+
+      expect(resource_class.list(list).map(&:name)).to eq(["rails"])
+    end
+
+    [{}, {"name" => "rails"}, "rails", nil, 1].each do |not_a_list|
+      it "raises TypeError for #{not_a_list.inspect}, which is not an Array" do
+        expect { resource_class.list(not_a_list) }.to raise_error(TypeError, "#{not_a_list.class} is not an Array")
+      end
+    end
+
+    it "raises TypeError for an element that is not a Hash" do
+      expect { resource_class.list(["rails"]) }.to raise_error(TypeError, "String is not a Hash")
+    end
   end
 
   describe ".attribute" do
@@ -174,19 +196,10 @@ RSpec.describe Gems::Resource do
       expect(resource_class.new(hash).name).to eq("rails")
     end
 
-    ["rails", nil, [1], 1].each do |not_an_object|
-      it "raises InvalidResponse for #{not_an_object.inspect}, which is not a JSON object" do
-        expect { resource_class.new(not_an_object) }
-          .to raise_error(Gems::InvalidResponse, "#{not_an_object.inspect} is not a JSON object")
+    ["rails", nil, [1], 1].each do |not_a_hash|
+      it "raises TypeError for #{not_a_hash.inspect}, which is not a Hash" do
+        expect { resource_class.new(not_a_hash) }.to raise_error(TypeError, "#{not_a_hash.class} is not a Hash")
       end
-    end
-
-    it "attaches the response the resource was asked for to the error" do
-      expect { resource_class.new("rails") }.to raise_error(having_attributes(body: "rails"))
-    end
-
-    it "attaches a response that is not a String as the String it reads as" do
-      expect { resource_class.new(nil) }.to raise_error(having_attributes(body: ""))
     end
 
     it "leaves the hash it was given mutable" do

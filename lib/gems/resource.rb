@@ -3,6 +3,7 @@
 require "time"
 require_relative "deep_copy"
 require_relative "errors/invalid_response"
+require_relative "nested_reading"
 
 module Gems
   # Base class for objects that wrap RubyGems API responses
@@ -16,6 +17,7 @@ module Gems
   # @api public
   class Resource
     include DeepCopy
+    include NestedReading
 
     # The raw attributes from the API response
     # @api public
@@ -26,13 +28,22 @@ module Gems
 
     # Build a list of resources from a list of attribute hashes
     #
+    # An endpoint builds its resources inside the block of {JSONParsing#parse_json}, which reports the `TypeError`
+    # of a response that is not a list of JSON objects as an {InvalidResponse} that carries the body.
+    #
     # @api public
     # @param list [Array<Hash{String, Symbol => Object}>] the attribute hashes
+    # @yield [element] each element of the list, to answer with the attributes of its resource
     # @return [Array<Resource>] the resources
+    # @raise [TypeError] if the list is not an Array, or an element (or what the block answers with) is not a Hash
     # @example Build a list of gems
     #   Gems::Gem.list(JSON.parse(body))
+    # @example Add a field to each element before it is built
+    #   Gems::Version.list(JSON.parse(body)) { |version| version.merge("name" => "rails") }
     def self.list(list)
-      list.map { |attributes| new(attributes) } #: Array[instance]
+      raise TypeError, "#{list.class} is not an Array" unless list.is_a?(Array)
+
+      list.map { |element| new(block_given? ? yield(element) : element) } #: Array[instance]
     end
 
     # Define a reader for an attribute
@@ -182,12 +193,13 @@ module Gems
     # @api public
     # @param attributes [Hash{String, Symbol => Object}] the raw attributes from the API response
     # @return [Resource] a new instance
-    # @raise [InvalidResponse] if the attributes are not a JSON object, such as the parsed body of a response that
-    #   answered one, since there is nothing to read the attributes of a resource from
+    # @raise [TypeError] if the attributes are not a Hash; an endpoint builds its resource inside the block of
+    #   {JSONParsing#parse_json}, which reports this as an {InvalidResponse} that carries the body
     # @example Wrap a parsed response
     #   Gems::Gem.new(JSON.parse(body))
     def initialize(attributes)
-      raise InvalidResponse.new(body: attributes.to_s, message: "#{attributes.inspect} is not a JSON object") unless attributes.is_a?(Hash)
+      raise TypeError, "#{attributes.class} is not a Hash" unless attributes.is_a?(Hash)
+
       @attributes = deep_freeze(attributes)
     end
 
@@ -198,9 +210,7 @@ module Gems
     # @return [Object, nil] the attribute value
     # @example Read an attribute that has no reader
     #   gem[:dependencies]
-    def [](key)
-      attributes[key.to_s]
-    end
+    def [](key) = attributes[key.to_s]
 
     # Convert the resource to a hash
     #

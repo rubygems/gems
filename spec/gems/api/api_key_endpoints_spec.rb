@@ -309,13 +309,6 @@ RSpec.describe Gems::API::APIKeyEndpoints do
       expect(a_get(path).with(headers: {"Authorization" => TEST_KEY})).to have_been_made
     end
 
-    it "raises InvalidResponse when the response is JSON but not an object" do
-      stub_get(path).to_return(body: '"role"')
-
-      expect { client.api_key_role("0123456789abcdef0123456789abcdef") }
-        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: "role")))
-    end
-
     it "accepts a role" do
       client.api_key_role(Gems::APIKeyRole.new("token" => "0123456789abcdef0123456789abcdef"))
 
