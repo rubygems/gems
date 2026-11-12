@@ -716,6 +716,14 @@ RSpec.describe Gems::Client do
       expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
     end
 
+    it "keeps a path that climbs to the bare prefix the host names" do
+      client.host = "http://example.com/gems/"
+      stub_request(:get, "http://example.com/gems")
+      client.get("../gems")
+
+      expect(a_request(:get, "http://example.com/gems")).to have_been_made
+    end
+
     it "keeps a path that climbs on a host that names no prefix" do
       stub_get("/path")
       client.get("../path")

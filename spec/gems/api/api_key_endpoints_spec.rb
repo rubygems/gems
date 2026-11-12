@@ -164,6 +164,15 @@ RSpec.describe Gems::API::APIKeyEndpoints do
         body: {api_key: "rubygems_701243f217cdf23b1370c7b66b65ca97", **scope_fields(:yank_rubygem)})).to have_been_made
     end
 
+    it "does not send the API key to another origin that a redirect to it answers with a 307" do
+      stub_request(:patch, rubygems_url("/api/v1/api_key")).to_return(status: 302, headers: {"Location" => "https://evil.example/a"})
+      stub_request(:get, "https://evil.example/a").to_return(status: 307, headers: {"Location" => "/b"})
+      stub_request(:any, "https://evil.example/b")
+      client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: %i[yank_rubygem])
+
+      expect(a_request(:any, "https://evil.example/b").with { |req| req.body.to_s.include?("rubygems_7012") }).not_to have_been_made
+    end
+
     it "takes away every scope it is not given" do
       client.update_api_key("rubygems_701243f217cdf23b1370c7b66b65ca97", scopes: [])
 

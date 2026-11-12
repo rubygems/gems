@@ -195,6 +195,14 @@ RSpec.describe Gems::RedirectHandler do
         expect(a_request(:get, "https://example.com/new").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
       end
 
+      it "does not send the body to another origin that answers a redirect to it with a 307" do
+        stub_request(:get, "https://example.com/a").to_return(status: 307, headers: {"Location" => "/b"})
+        stub_request(:any, "https://example.com/b")
+        handler.handle(host: TEST_HOST, response: redirect(302, "https://example.com/a"), request: form_request, body: form_body)
+
+        expect(a_request(:any, "https://example.com/b").with { |req| req.body.to_s.include?("key=value") }).not_to have_been_made
+      end
+
       it "does not restore the credentials on a redirect back" do
         stub_request(:get, "https://example.com/away").to_return(status: 302, headers: {"Location" => "https://rubygems.org/back"})
         stub_request(:get, "https://rubygems.org/back")
@@ -230,6 +238,21 @@ RSpec.describe Gems::RedirectHandler do
 
       it "drops the credentials for the root of the host, which the prefix does not cover" do
         expect(headers_sent_to("/", "https://rubygems.org/").keys).not_to include("Authorization", "Otp")
+      end
+
+      it "keeps the credentials for the bare prefix" do
+        expect(headers_sent_to("/gems", "https://rubygems.org/gems")).to include("Authorization" => TEST_KEY)
+      end
+
+      it "keeps the credentials for the bare prefix of a host spelled with a trailing slash" do
+        stub_request(:get, "https://rubygems.org/gems")
+        handler.handle(host: "#{prefixed_host}/", response: redirect(302, "/gems"), request:, authenticator:)
+
+        expect(a_request(:get, "https://rubygems.org/gems").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+      end
+
+      it "drops the credentials for a sibling of the prefix that starts with it" do
+        expect(headers_sent_to("/gemstash", "https://rubygems.org/gemstash").keys).not_to include("Authorization", "Otp")
       end
 
       it "keeps the credentials for a path within the prefix" do
@@ -358,6 +381,18 @@ RSpec.describe Gems::RedirectHandler do
       handler.handle(host: TEST_HOST, response: redirect(302, "/new"), request: form_request, body: form_body)
 
       expect(a_request(:get, "https://rubygems.org/new").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
+    end
+
+    {302 => Net::HTTPFound, 303 => Net::HTTPSeeOther}.each do |code, klass|
+      {307 => Net::HTTPTemporaryRedirect, 308 => Net::HTTPPermanentRedirect}.each do |later_code, _|
+        it "does not send the body again on a #{later_code} after a #{code} on the same host" do
+          stub_request(:get, "https://rubygems.org/second").to_return(status: later_code, headers: {"Location" => "/third"})
+          stub_request(:get, "https://rubygems.org/third")
+          handler.handle(host: TEST_HOST, response: redirect(code, "/second", klass:), request: form_request, body: form_body)
+
+          expect(a_request(:get, "https://rubygems.org/third").with { |req| req.body.nil? || req.body.empty? }).to have_been_made
+        end
+      end
     end
 
     {307 => Net::HTTPTemporaryRedirect, 308 => Net::HTTPPermanentRedirect}.each do |code, klass|

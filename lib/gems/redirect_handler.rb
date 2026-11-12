@@ -84,6 +84,8 @@ module Gems
     #
     # A 307 or 308 redirect is followed with the method of the request and the body it was built from, which is
     # given as it was given to {RequestBuilder#build}, since a multipart body cannot be read back from the request.
+    # Once another redirect has turned the request into a GET, the body is dropped for the rest of the redirects,
+    # so that a later 307 or 308 cannot send it again.
     # One to another scheme, host, or port, or outside the prefix of the host, is not followed at all when the
     # request has a body, and is returned as a redirect that cannot be followed is: the credentials of a request
     # are not all carried by the headers a redirect that leaves where the request was meant for drops, since
@@ -121,8 +123,11 @@ module Gems
 
     # Send the request again to where a redirect leads
     #
-    # A redirect to another origin, or outside the path prefix of the host, that would replay the body is not
-    # followed, and its response is returned for the caller to raise the HTTPError of (see {#handle}).
+    # Every redirect is checked against the host the request was sent to, rather than against the request it
+    # redirects, so that once a redirect has left the host, another redirect within where it left to cannot count
+    # as staying where the request was meant for. A redirect to another origin, or outside the path prefix of the host, that would replay the
+    # body is not followed, and its response is returned for the caller to raise the HTTPError of (see {#handle}).
+    # A redirect that turns the request into a GET drops the body for the redirects after it.
     #
     # @api private
     # @param response [Net::HTTPResponse] the redirect response
@@ -146,9 +151,9 @@ module Gems
         headers = {} #: Hash[String, String]
       end
       new_request = build_request(request:, uri:, response_code:, authenticator:, body:, content_type:, headers:)
-      new_response = connection.perform(request: new_request)
-      handle(response: new_response, request: new_request, authenticator:, body:, content_type:, headers:, host:,
-        redirect_count: redirect_count + 1)
+      body = content_type = nil unless method_preserving?(response_code)
+      handle(response: connection.perform(request: new_request), request: new_request, authenticator:, body:,
+        content_type:, headers:, host:, redirect_count: redirect_count + 1)
     end
 
     # Whether following a redirect would send the body of the request again
