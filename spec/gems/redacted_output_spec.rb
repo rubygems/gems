@@ -128,6 +128,31 @@ RSpec.describe Gems::RedactedOutput do
       expect(io.string).to eq(%(-> "{\\"status\\":\\"success\\",\\"code\\":\\"[REDACTED]\\"}"))
     end
 
+    it "redacts the ID token of a token exchange body with a space after the colon" do
+      redacted_output << %(<- "{\\"jwt\\": \\"eyJhbGciOiJSUzI1NiJ9\\"}")
+
+      expect(io.string).to eq(%(<- "{\\"jwt\\": \\"[REDACTED]\\"}"))
+    end
+
+    it "redacts the API key a pretty-printed response body carries" do
+      redacted_output << %(-> "{\\n  \\"name\\": \\"ci-push\\",\\n  \\"rubygems_api_key\\": \\"rubygems_701243f2\\"\\n}")
+
+      expect(io.string)
+        .to eq(%(-> "{\\n  \\"name\\": \\"ci-push\\",\\n  \\"rubygems_api_key\\": \\"[REDACTED]\\"\\n}"))
+    end
+
+    it "redacts the one-time passcode a pretty-printed WebAuthn verification status carries" do
+      redacted_output << %(-> "{\\n  \\"status\\": \\"success\\",\\n  \\"code\\": \\"123456\\"\\n}")
+
+      expect(io.string).to eq(%(-> "{\\n  \\"status\\": \\"success\\",\\n  \\"code\\": \\"[REDACTED]\\"\\n}"))
+    end
+
+    it "redacts a value with whitespace on both sides of the colon, escaped tabs, newlines, and carriage returns among it" do
+      redacted_output << %(-> "{\\"rubygems_api_key\\" \\t:\\r\\n \\"rubygems_701243f2\\"}")
+
+      expect(io.string).to eq(%(-> "{\\"rubygems_api_key\\" \\t:\\r\\n \\"[REDACTED]\\"}"))
+    end
+
     it "redacts the API key of a response body read in two parts" do
       ["reading 64 bytes...\n", %(-> "{\\"rubygems_api_key\\":\\"rubygems_70"\n), %(-> "1243f2\\"}"\n), "read 64 bytes\n",
         "Conn keep-alive\n"].each { |string| redacted_output << string }
@@ -206,8 +231,13 @@ RSpec.describe Gems::RedactedOutput do
         server.close
       end
 
+      # The body, pretty-printed
+      def pretty_body
+        JSON.pretty_generate(JSON.parse(body))
+      end
+
       # Answer one request with the body, sent in two parts, so that it is read from the socket in two
-      def serve_in_two_parts
+      def serve_in_two_parts(body = self.body)
         Thread.new do
           socket = server.accept
           nil until socket.gets == "\r\n"
@@ -219,7 +249,7 @@ RSpec.describe Gems::RedactedOutput do
       end
 
       # Answer one request with the body, sent in two chunks split in the middle of the API key
-      def serve_in_two_chunks
+      def serve_in_two_chunks(body = self.body)
         Thread.new do
           socket = server.accept
           nil until socket.gets == "\r\n"
@@ -261,6 +291,20 @@ RSpec.describe Gems::RedactedOutput do
         get
 
         expect(io.string).to include('\\"rubygems_api_key\\":\\"[REDACTED]\\"}')
+      end
+
+      it "writes no part of an API key a pretty-printed response body carries, when the body is sent in two chunks" do
+        serve_in_two_chunks(pretty_body)
+        get
+
+        expect(io.string).not_to include("b1370c7b")
+      end
+
+      it "writes a pretty-printed body with the API key redacted" do
+        serve_in_two_parts(pretty_body)
+        get
+
+        expect(io.string).to include('\\"rubygems_api_key\\": \\"[REDACTED]\\"\\n}')
       end
     end
   end

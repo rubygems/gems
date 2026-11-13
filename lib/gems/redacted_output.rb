@@ -38,13 +38,16 @@ module Gems
     # among the headers of a request sent through an `http://` proxy and is written again in the CONNECT request
     # that opens a TLS connection through one. That CONNECT is dumped as the buffer it is sent as, with newlines of
     # its own rather than escaped ones, so it is matched by a pattern of its own.
+    #
+    # A JSON field may have whitespace on either side of its colon, as a pretty-printed body does, which the escaped
+    # string writes as a space, or as an escaped tab, newline, or carriage return.
     CREDENTIALS = [
       /(\\n(?:Proxy-)?(?:Authorization|OTP): )[^\\]*/i,
       /(\r\n(?:Proxy-)?Authorization: )[^\r\n]*/i,
-      /(\\"jwt\\":\\")[^\\]*/,
+      /(\\"jwt\\"(?: |\\[tnr])*:(?: |\\[tnr])*\\")[^\\]*/,
       /(api_key=)[^&\\"]*/,
-      /(\\"rubygems_api_key\\":\\")[^\\]*/,
-      /(\\"code\\":\\")[^\\]*/
+      /(\\"rubygems_api_key\\"(?: |\\[tnr])*:(?: |\\[tnr])*\\")[^\\]*/,
+      /(\\"code\\"(?: |\\[tnr])*:(?: |\\[tnr])*\\")[^\\]*/
     ].freeze
     private_constant :CREDENTIALS
 
