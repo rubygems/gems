@@ -236,6 +236,32 @@ RSpec.describe Gems::RedirectHandler do
         expect(headers_sent_to("/gems/../admin", "https://rubygems.org/admin").keys).not_to include("Authorization", "Otp")
       end
 
+      it "drops the credentials for an absolute URL that climbs out of the prefix" do
+        expect(headers_sent_to("#{prefixed_host}/../admin/collect", "https://rubygems.org/admin/collect").keys)
+          .not_to include("Authorization", "Otp")
+      end
+
+      ["%2e%2e", "%2E%2E", ".%2e", "%2e."].each do |segment|
+        it "drops the credentials for a path that climbs out of the prefix with #{segment}" do
+          expect(headers_sent_to("#{prefixed_host}/#{segment}/admin", "https://rubygems.org/gems/#{segment}/admin").keys)
+            .not_to include("Authorization", "Otp")
+        end
+      end
+
+      ["/gems/./elsewhere", "/gems/%2e/elsewhere"].each do |location|
+        it "drops the credentials for a path within the prefix that has a dot segment, #{location}" do
+          expect(headers_sent_to("https://rubygems.org#{location}", "https://rubygems.org#{location}").keys)
+            .not_to include("Authorization", "Otp")
+        end
+      end
+
+      ["/gems/...", "/gems/.well-known", "/gems/a..b", "/gems/%2e%2e%2e"].each do |location|
+        it "keeps the credentials for a segment within the prefix that only has dots in it, #{location}" do
+          expect(headers_sent_to("https://rubygems.org#{location}", "https://rubygems.org#{location}"))
+            .to include("Authorization" => TEST_KEY)
+        end
+      end
+
       it "drops the credentials for the root of the host, which the prefix does not cover" do
         expect(headers_sent_to("/", "https://rubygems.org/").keys).not_to include("Authorization", "Otp")
       end

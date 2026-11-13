@@ -1038,6 +1038,8 @@ module Gems
   end
 
   module URLValidation
+    DOT_SEGMENT: Regexp
+
     private
 
     def validate_host: (String host) -> String

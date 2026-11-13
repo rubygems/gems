@@ -82,6 +82,11 @@ module Gems
     # trailing slash, so "https://gems.example.com/tenant-a" is on "https://gems.example.com/tenant-a/". A host
     # that carries no prefix names the whole of its origin, so every URL of that origin is on it.
     #
+    # A URL whose path has a "." or ".." segment, spelled out or percent-encoded, is not on the host. Ruby resolves
+    # those segments only when it joins a relative reference, so an absolute URL such as
+    # "https://gems.example.com/gems/../admin" keeps them, and its path starts with the prefix while a server or a
+    # proxy that resolves them, or decodes "%2e%2e" first, routes it outside.
+    #
     # The paths are read once the origins are known to match, so a URL that has none, such as a "mailto:" URL, is
     # answered by the comparison of the origins rather than by reading the path it does not have.
     #
@@ -92,9 +97,16 @@ module Gems
     def on_host?(uri, host)
       return false unless same_origin?(uri, host)
 
+      path = uri.path #: String
+      return false if path.split("/").any?(DOT_SEGMENT)
+
       prefix = URI(host).path.chomp("/") # steep:ignore NoMethod
-      uri.path.eql?(prefix) || uri.path.start_with?("#{prefix}/") # steep:ignore NoMethod
+      path.eql?(prefix) || path.start_with?("#{prefix}/")
     end
+
+    # A path segment of "." or "..", each dot spelled out or percent-encoded
+    DOT_SEGMENT = /\A(?:\.|%2e){1,2}\z/i
+    private_constant :DOT_SEGMENT
 
     # The origin of a URL, with the scheme and host in lowercase
     # @api private

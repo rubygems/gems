@@ -74,7 +74,7 @@ module Gems
     # browsers do, so that a redirect cannot send them to a host they were not meant for. A redirect to a path
     # outside the prefix the host carries is followed without them as well, since the client was pointed at that
     # prefix and a path that leaves it asks the rest of the host with the credentials resolved for the prefix, as
-    # a request path that climbs out of the prefix is refused for (see {Client#build_uri}). The headers the caller
+    # a request path that climbs out of the prefix is refused (see {Client#build_uri}). The headers the caller
     # asked for are dropped along with them, since a header of the caller's own may carry a credential too. A later
     # redirect back inside does not restore either.
     #

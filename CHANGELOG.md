@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Redact the ID token, the API key, and the one-time passcode a JSON body carries from the debug output when the body has whitespace around the colon of the field, as a pretty-printed body does
 - Check every redirect against the host the request was sent to, rather than against the redirect before it, so that a 302 to another origin followed by a 307 there no longer sends the body of the original request to that origin, where `update_api_key` carries the API key as a form field and the trusted publishing token exchange carries the ID token; once a redirect has turned a request into a GET, a later 307 or 308 no longer sends the body again, even on the same host
-- Follow a redirect outside the path prefix a host carries without the credentials and the headers of the caller, and refuse one that would send the body of the request again, as for a redirect to another scheme, host, or port, since a request path that climbs out of the prefix is refused for the credentials it would take with it
+- Follow a redirect outside the path prefix a host carries, including an absolute one whose path has a `.` or `..` segment, spelled out or percent-encoded, without the credentials and the headers of the caller, and refuse one that would send the body of the request again, as for a redirect to another scheme, host, or port, since a request path that climbs out of the prefix is refused for the credentials it would take with it
 
 ## [3.0.0] - 2026-09-26
 

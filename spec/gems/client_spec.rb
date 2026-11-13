@@ -708,6 +708,13 @@ RSpec.describe Gems::Client do
         .to raise_error(ArgumentError, "Path is not on http://example.com/gems: ../gemsfoo")
     end
 
+    it "refuses a path that climbs out of the prefix the host names with an encoded dot segment" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("%2e%2e/admin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: %2e%2e/admin")
+    end
+
     it "keeps a path that climbs within the prefix the host names" do
       client.host = "http://example.com/gems"
       stub_request(:get, "http://example.com/gems/path")
