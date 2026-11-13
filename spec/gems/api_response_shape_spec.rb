@@ -29,7 +29,7 @@ RSpec.describe Gems::API do
       ['"teapot"', "null", "[]", "{}", '{"gems":{}}', '{"gems":"teapot"}', '{"gems":["teapot"]}', '{"gems":[[1,2]]}'],
       -> { client.most_downloaded }],
     web_hooks: [:get, "/api/v1/web_hooks.json",
-      ['"teapot"', "null", '["teapot"]', '{"a":1}', '{"a":["teapot"]}'], -> { client.web_hooks }],
+      ['"teapot"', "null", '["teapot"]', '{"a":1}', '{"a":["teapot"]}', '{"a":{}}'], -> { client.web_hooks }],
     rubygem: [:get, "/api/v1/gems/rails.json", not_an_object, -> { client.rubygem("rails") }],
     version: [:get, "/api/v2/rubygems/rails/versions/7.0.6.json", not_an_object, -> { client.version("rails", "7.0.6") }],
     downloads: [:get, "/api/v1/downloads/rails-7.0.6.json", not_an_object, -> { client.downloads("rails", "7.0.6") }],

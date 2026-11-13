@@ -47,6 +47,18 @@ RSpec.describe Gems::APIKey do
           message: "The response body is not the expected JSON: String is not a Hash")))
   end
 
+  it "raises InvalidResponse when the gem is false, rather than answering as a key that may act on any gem" do
+    api_key = described_class.new("rubygems_api_key" => "secret", "gem" => false)
+
+    expect { api_key.rubygem }
+      .to raise_error(an_instance_of(Gems::InvalidResponse)
+        .and(having_attributes(body: "false", message: "The response body is not the expected JSON: FalseClass is not a Hash")))
+  end
+
+  it "has no gem when the gem is null" do
+    expect(described_class.new("rubygems_api_key" => "secret", "gem" => nil).rubygem).to be_nil
+  end
+
   it "leaves a gem that is not a JSON object out of a pattern" do
     api_key = described_class.new("rubygems_api_key" => "secret", "gem" => "gems")
 

@@ -27,9 +27,9 @@ module Gems
       #   Gems.web_hooks.map(&:url)
       def web_hooks
         parse_json(get("/api/v1/web_hooks.json")) do |json|
-          WebHook.list(json.flat_map do |gem_name, group|
-            group.map { |hook| hook.merge("gem_name" => WEB_HOOK_GEM_NAMES.fetch(gem_name, gem_name)) }
-          end)
+          json.flat_map do |gem_name, group|
+            WebHook.list(group) { |hook| hook.merge("gem_name" => WEB_HOOK_GEM_NAMES.fetch(gem_name, gem_name)) }
+          end
         end
       end
 

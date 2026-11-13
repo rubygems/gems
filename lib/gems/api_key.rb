@@ -72,7 +72,7 @@ module Gems
     #   api_key.rubygem&.name
     def rubygem
       rubygem = self[:gem]
-      read_nested(rubygem) { Gem.new(rubygem) } if rubygem
+      read_nested(rubygem) { Gem.new(rubygem) } unless rubygem.nil?
     end
     record_attribute(:rubygem)
 
