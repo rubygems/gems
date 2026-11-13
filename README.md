@@ -426,7 +426,8 @@ Debug output is redacted before it reaches the IO `debug_output` is set to, so t
 `Authorization` and `OTP` headers of every request, the `Proxy-Authorization` header the requests sent through a
 proxy carry, the ID token of a trusted publishing token exchange, the API key
 `update_api_key` sends, the API key an API key or token exchange response returns, and the one-time passcode
-`webauthn_verification_status` returns are written as `[REDACTED]`.
+`webauthn_verification_status` returns are written as `[REDACTED]`, whether or not the JSON they are carried in is
+pretty-printed.
 Everything else Net::HTTP writes, including the rest of the headers, is left as it is. A client with a debug output
 asks for its responses uncompressed, since a compressed body would be written as bytes no credential could be found in,
 and a body read from the socket in parts, or sent in chunks, is written as one line once the response is done, so that
