@@ -35,11 +35,20 @@ module Gems
     private
 
     # The dependencies of the given type
+    #
+    # Dependencies that are not a JSON object, dependencies of the type that are not a list, or a dependency that is
+    # not a JSON object cannot be read: they raise {InvalidResponse}, which carries the attributes of the resource,
+    # rather than the raw `TypeError` or `NoMethodError` of the misread.
+    #
     # @api private
     # @param type [String] the dependency type ("runtime" or "development")
     # @return [Array<Dependency>] the dependencies
+    # @raise [InvalidResponse] if the dependencies are not the shape a dependency is read from
     def dependencies_of(type)
-      Dependency.list(attributes.dig("dependencies", type) || [])
+      read_nested(attributes) do
+        dependencies = attributes.dig("dependencies", type)
+        dependencies.nil? ? [] : Dependency.list(dependencies)
+      end
     end
   end
 end

@@ -206,6 +206,13 @@ RSpec.describe Gems::TrustedPublisherAuthenticator do
       expect { authenticator.exchange_token! }.to raise_error(Gems::InvalidResponse)
     end
 
+    it "raises InvalidResponse, with the body attached, when the exchange answers with JSON that is not an object" do
+      stub_request(:post, exchange_url).to_return(body: '["teapot"]')
+
+      expect { authenticator.exchange_token! }
+        .to raise_error(an_instance_of(Gems::InvalidResponse).and(having_attributes(body: '["teapot"]')))
+    end
+
     it "exchanges the token once when a request is being authenticated at the same time" do
       stub_slow_exchange
       exchanges = [Thread.new { authenticator.exchange_token! }, Thread.new { authenticator.header(request) }]

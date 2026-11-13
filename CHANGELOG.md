@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Redact the ID token, the API key, and the one-time passcode a JSON body carries from the debug output when the body has whitespace around the colon of the field, as a pretty-printed body does
+- Raise `Gems::InvalidResponse`, with the body the host sent, rather than `NoMethodError` or `TypeError` (or a list built from the pairs of an object, or `[]` for `{}`), when an endpoint answers with JSON that is not the shape its resources are read from: a scalar or `null`, an object where a list is read, a list where an object is read, or a list whose elements are not objects; `runtime_dependencies`, `development_dependencies`, and `APIKey#rubygem` raise it too for nested values of the wrong shape
+- `Gems::Resource.new` raises `TypeError` for attributes that are not a Hash, and `Gems::Resource.list` for a list that is not an Array; `list` takes a block that answers with the attributes of each element
 
 ## [3.0.0] - 2026-09-26
 

@@ -26,7 +26,7 @@ module Gems
       # @example
       #   Gems.owners "gemcutter"
       def owners(gem_name)
-        Owner.list(parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/owners.json")))
+        parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}/owners.json")) { |json| Owner.list(json) }
       end
 
       # Add an owner to a RubyGem you own, giving that user permission to manage it
