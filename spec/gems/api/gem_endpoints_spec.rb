@@ -86,7 +86,7 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
     end
 
-    it "stops at a page that is the same as the page before it, as a host answers that ignores the page" do
+    it "stops at a page that is the same as the page before it, when a host ignores the page" do
       stub_get("/api/v1/search.json?query=cucumber&page=2").to_return(body: fixture("search.json"))
 
       expect(client.search_each("cucumber").count).to eq(30)

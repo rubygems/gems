@@ -8,7 +8,7 @@ module Gems
   #
   # * empty, as the endpoints answer once there are no more results;
   # * shorter than the first page, since a page is only cut short when it is the last; or
-  # * the same as the page before it, as a host answers that ignores the page it is asked for.
+  # * the same as the page before it, when a host ignores the page it is asked for.
   #
   # The size of a full page is taken from the first page rather than fixed, since a host other than RubyGems.org
   # may serve pages of another size: a walk of such a host neither stops after its first page nor runs past its
