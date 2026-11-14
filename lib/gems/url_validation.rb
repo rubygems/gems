@@ -78,18 +78,71 @@ module Gems
     #
     # The path is compared as well as the origin, so that a URL climbing out of the prefix a host carries, such as
     # "../.." for "https://gems.example.com/rubygems", is told from one the host was pointed at, as a URL of
-    # another scheme, host, or port is. A host that carries no prefix names the whole of its origin, so every URL
-    # of that origin is on it.
+    # another scheme, host, or port is. The prefix itself is on the host, whether or not the host is spelled with a
+    # trailing slash, so "https://gems.example.com/tenant-a" is on "https://gems.example.com/tenant-a/".
     #
-    # The paths are read once the origins are known to match, so a URL that has none, such as a "mailto:" URL, is
-    # answered by the comparison of the origins rather than by reading the path it does not have.
+    # A host that carries no prefix names the whole of its origin, so every URL of that origin is on it: the
+    # credentials of a request to an unprefixed host are the origin's to hold, wherever on the origin a path
+    # climbs to, and a value escaped into a segment of a path (see {PathEscaping}) stays a segment of it.
+    #
+    # A URL whose path has a "." or ".." segment is not on a host that carries a prefix. Ruby resolves those
+    # segments only when it joins a relative reference, so an absolute URL such as
+    # "https://gems.example.com/gems/../admin" keeps them, and its path starts with the prefix while a server or
+    # a proxy that resolves them routes it outside. The segments are read the way a server that decodes the path
+    # reads them: the path is decoded before its segments are read, and each segment is read apart from every
+    # separator it carries, so a segment that decodes to "." or ".." ("%2e%2e"), or to more segments than the
+    # one it spells ("%2e%2e%2f"), or that carries the separator of a server that splits on backslashes or
+    # strips the parameters after a semicolon, is refused rather than read for what it spells. A path that
+    # cannot be decoded is refused the same way, since a server that decodes it may read it another way.
+    #
+    # The paths are read once the origins are known to match, so a URL that has none, such as a "mailto:" URL,
+    # is answered by the comparison of the origins rather than by reading the path it does not have.
     #
     # @api private
     # @param uri [URI::Generic] the URL, as the URI it was read as
     # @param host [String, URI::Generic] the host, optionally carrying a path prefix
     # @return [Boolean] whether the URL is the host's own, at or under the path it names
     def on_host?(uri, host)
-      same_origin?(uri, host) && uri.path.start_with?("#{URI(host).path.chomp("/")}/") # steep:ignore NoMethod
+      return false unless same_origin?(uri, host)
+
+      host_path = URI(host).path #: String
+      prefix = decoded(host_path).chomp("/")
+      return true if prefix.empty?
+
+      uri_path = uri.path #: String
+      path = decoded(uri_path)
+      return false if segments_of(path).any?(DOT_SEGMENT)
+
+      path.eql?(prefix) || path.start_with?("#{prefix}/")
+    end
+
+    # The segments a decoded path is made of
+    #
+    # The path is split on the slashes it carries, and on the backslashes some servers carry as separators of
+    # their own, and each segment is split on the semicolons it carries, as a server that strips the matrix
+    # parameters of a path reads it. The segments a path spells for a server that resolves them are what it is
+    # read by, so every way a segment can carry a separator of its own is split apart.
+    #
+    # @api private
+    # @param path [String] the decoded path
+    # @return [Array<String>] the segments of the path, split apart from every separator
+    def segments_of(path)
+      path.split(SEPARATOR).flat_map { |segment| segment.split(";") }
+    end
+
+    # The separators a decoded path may carry: a slash, and a backslash, each as a segment of its own
+    SEPARATOR = %r{[/\\]}
+    # A segment of "." or "..", which a server that resolves the segments of a path climbs with
+    DOT_SEGMENT = /\A\.{1,2}\z/
+    private_constant :SEPARATOR, :DOT_SEGMENT
+
+    # The path of a URL, percent-decoded, as a server that decodes it reads it
+    #
+    # @api private
+    # @param path [String] the path of the URL, as the URI it was read as
+    # @return [String] the decoded path
+    def decoded(path)
+      URI.decode_uri_component(path)
     end
 
     # The origin of a URL, with the scheme and host in lowercase

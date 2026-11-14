@@ -481,6 +481,24 @@ RSpec.describe Gems::Client do
       expect(a_request(:get, "http://example.com/path")).to have_been_made
     end
 
+    it "follows a redirect within the path prefix of the host with the credentials" do
+      client = described_class.new(host: "https://rubygems.org/gems", key: TEST_KEY)
+      stub_request(:get, "https://rubygems.org/gems/path").to_return(status: 302, headers: {"Location" => "/gems/other"})
+      stub_request(:get, "https://rubygems.org/gems/other")
+      client.get("/path")
+
+      expect(a_request(:get, "https://rubygems.org/gems/other").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+    end
+
+    it "follows a redirect outside the path prefix of the host without the credentials" do
+      client = described_class.new(host: "https://rubygems.org/gems", key: TEST_KEY)
+      stub_request(:get, "https://rubygems.org/gems/path").to_return(status: 302, headers: {"Location" => "/admin"})
+      stub_request(:get, "https://rubygems.org/admin")
+      client.get("/path")
+
+      expect(a_request(:get, "https://rubygems.org/admin").with { |request| !request.headers.key?("Authorization") }).to have_been_made
+    end
+
     it "raises an ArgumentError for an invalid per-request host" do
       expect { client.get("/path", host: "example.com") }.to raise_error(ArgumentError, "Invalid host: example.com")
     end
@@ -499,6 +517,15 @@ RSpec.describe Gems::Client do
 
       expect(a_request(:post, "https://gems.example.com/path")
         .with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
+    end
+
+    it "follows a redirect on the host a request is made to with the credentials of that host" do
+      stub_rubygems_configuration(api_keys: {"https://gems.example.com" => "HOST_KEY"})
+      stub_request(:post, "https://gems.example.com/path").to_return(status: 302, headers: {"Location" => "/moved"})
+      stub_request(:get, "https://gems.example.com/moved")
+      described_class.new.post("/path", host: "https://gems.example.com")
+
+      expect(a_request(:get, "https://gems.example.com/moved").with(headers: {"Authorization" => "HOST_KEY"})).to have_been_made
     end
 
     it "sends the one-time passcode with the key stored for another host" do
@@ -681,12 +708,41 @@ RSpec.describe Gems::Client do
         .to raise_error(ArgumentError, "Path is not on http://example.com/gems: ../gemsfoo")
     end
 
+    it "refuses a path that climbs out of the prefix the host names with an encoded dot segment" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("%2e%2e/admin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: %2e%2e/admin")
+    end
+
+    it "refuses a path that decodes to one climbing out of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("/gems/%2e%2e%2fadmin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/%2e%2e%2fadmin")
+    end
+
+    it "refuses a path a server that strips parameters reads as climbing out of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("/gems/..;/admin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/..;/admin")
+    end
+
     it "keeps a path that climbs within the prefix the host names" do
       client.host = "http://example.com/gems"
       stub_request(:get, "http://example.com/gems/path")
       client.get("api/../path")
 
       expect(a_request(:get, "http://example.com/gems/path")).to have_been_made
+    end
+
+    it "keeps a path that climbs to the bare prefix the host names" do
+      client.host = "http://example.com/gems/"
+      stub_request(:get, "http://example.com/gems")
+      client.get("../gems")
+
+      expect(a_request(:get, "http://example.com/gems")).to have_been_made
     end
 
     it "keeps a path that climbs on a host that names no prefix" do
