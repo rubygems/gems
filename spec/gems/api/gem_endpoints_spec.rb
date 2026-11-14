@@ -86,6 +86,12 @@ RSpec.describe Gems::API::GemEndpoints do
       expect(a_get("/api/v1/search.json?query=cucumber&page=2")).to have_been_made
     end
 
+    it "stops at a page that is the same as the page before it, when a host ignores the page" do
+      stub_get("/api/v1/search.json?query=cucumber&page=2").to_return(body: fixture("search.json"))
+
+      expect(client.search_each("cucumber").count).to eq(30)
+    end
+
     it "returns the gems that match the query" do
       gem = client.search_each("cucumber").first
 

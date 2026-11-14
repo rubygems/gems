@@ -1071,6 +1071,8 @@ module Gems
     private
 
     def each_page: [T] (^(T) -> void | nil block) { (Integer page) -> Array[T] } -> Enumerator[T, void]
+
+    def walk_pages: [T] (Enumerator::Yielder yielder) { (Integer page) -> Array[T] } -> void
   end
 
   interface _Random

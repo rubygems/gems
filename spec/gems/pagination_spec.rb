@@ -36,10 +36,49 @@ RSpec.describe Gems::Pagination do
     expect(subject_with_pages.each_result.to_a).to eq(%w[a b c])
   end
 
-  it "stops at the first empty page" do
+  it "stops at a page shorter than the first, without requesting the page after it" do
     subject_with_pages.each_result.to_a
 
-    expect(subject_with_pages.requested).to eq([1, 2, 3])
+    expect(subject_with_pages.requested).to eq([1, 2])
+  end
+
+  it "stops at the first empty page when every page before it is full" do
+    full = paginated.new({1 => %w[a b], 2 => %w[c d]})
+
+    expect([full.each_result.to_a, full.requested]).to eq([%w[a b c d], [1, 2, 3]])
+  end
+
+  it "requests the page after a first page of any size" do
+    single = paginated.new({1 => %w[a]})
+
+    expect([single.each_result.to_a, single.requested]).to eq([%w[a], [1, 2]])
+  end
+
+  it "walks pages of the size the first page has, rather than a fixed size" do
+    pages = {1 => %w[a b c], 2 => %w[d e f], 3 => %w[g h i], 4 => %w[j]}
+    walk = paginated.new(pages)
+
+    expect([walk.each_result.to_a, walk.requested]).to eq([%w[a b c d e f g h i j], [1, 2, 3, 4]])
+  end
+
+  it "stops at a page that is the same as the page before it, keeping the results already enumerated" do
+    repeating = paginated.new({1 => %w[a b], 2 => %w[a b], 3 => %w[a b]})
+
+    expect([repeating.each_result.to_a, repeating.requested]).to eq([%w[a b], [1, 2]])
+  end
+
+  it "does not stop at a page that is the same as one before the page before it" do
+    pages = {1 => %w[a b], 2 => %w[c d], 3 => %w[a b], 4 => %w[e]}
+    walk = paginated.new(pages)
+
+    expect(walk.each_result.to_a).to eq(%w[a b c d a b e])
+  end
+
+  it "does not stop at a page longer than the first" do
+    pages = {1 => %w[a], 2 => %w[b c], 3 => %w[d]}
+    walk = paginated.new(pages)
+
+    expect(walk.each_result.to_a).to eq(%w[a b c d])
   end
 
   it "requests the first page only once the enumeration starts" do
@@ -57,7 +96,7 @@ RSpec.describe Gems::Pagination do
   it "yields nothing when the first page is empty" do
     empty = paginated.new({})
 
-    expect(empty.each_result.to_a).to be_empty
+    expect([empty.each_result.to_a, empty.requested]).to eq([[], [1]])
   end
 
   it "calls a block with each result" do
@@ -75,6 +114,6 @@ RSpec.describe Gems::Pagination do
     enumerator = subject_with_pages.each_result
     2.times { enumerator.to_a }
 
-    expect(subject_with_pages.requested).to eq([1, 2, 3, 1, 2, 3])
+    expect(subject_with_pages.requested).to eq([1, 2, 1, 2])
   end
 end
