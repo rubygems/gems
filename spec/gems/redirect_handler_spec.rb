@@ -277,6 +277,15 @@ RSpec.describe Gems::RedirectHandler do
         expect(a_request(:get, "https://rubygems.org/gems").with(headers: {"Authorization" => TEST_KEY})).to have_been_made
       end
 
+      it "keeps the credentials for a path within a prefix the host spells percent-encoded" do
+        stub_request(:get, "https://rubygems.org/gems%20dir/elsewhere")
+        handler.handle(host: "https://rubygems.org/gems%20dir", response: redirect(302, "/gems%20dir/elsewhere"),
+          request:, authenticator:)
+
+        expect(a_request(:get, "https://rubygems.org/gems%20dir/elsewhere")
+          .with(headers: {"Authorization" => TEST_KEY})).to have_been_made
+      end
+
       it "drops the credentials for a sibling of the prefix that starts with it" do
         expect(headers_sent_to("/gemstash", "https://rubygems.org/gemstash").keys).not_to include("Authorization", "Otp")
       end
@@ -289,6 +298,25 @@ RSpec.describe Gems::RedirectHandler do
       it "keeps the credentials for the same path within the prefix, spelled absolutely" do
         expect(headers_sent_to("#{prefixed_host}/elsewhere", "https://rubygems.org/gems/elsewhere"))
           .to include("Authorization" => TEST_KEY, "Otp" => "123456")
+      end
+
+      {"/gems/%2e%2e%2fadmin" => "decodes to one climbing out of the prefix",
+       "/gems/%2E%2E%2Fadmin" => "decodes to one climbing out of the prefix",
+       "/gems/..%2fadmin" => "decodes to one climbing out of the prefix",
+       "/gems/..%2f..%2fadmin" => "decodes to one climbing out of the prefix",
+       "/gems/%2e%2e%2f%2e%2e%2fadmin" => "decodes to one climbing out of the prefix",
+       "/gems/..;/admin" => "a server that strips parameters reads as climbing out",
+       "/gems/%2e%2e;/admin" => "a server that strips parameters reads as climbing out",
+       "/gems/..%5cadmin" => "a server that splits on backslashes reads as climbing out",
+       "/gems/%2e%2e%5cadmin" => "a server that splits on backslashes reads as climbing out"}.each do |location, reason|
+        it "drops the credentials for a path that #{reason}, #{location}" do
+          expect(headers_sent_to(location, "https://rubygems.org#{location}").keys).not_to include("Authorization", "Otp")
+        end
+      end
+
+      it "keeps the credentials for a path within the prefix that decodes to stay within it" do
+        expect(headers_sent_to("/gems/rails%20admin.json", "https://rubygems.org/gems/rails%20admin.json"))
+          .to include("Authorization" => TEST_KEY)
       end
 
       it "drops the headers of the caller for a path outside the prefix" do

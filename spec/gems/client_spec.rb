@@ -715,6 +715,20 @@ RSpec.describe Gems::Client do
         .to raise_error(ArgumentError, "Path is not on http://example.com/gems: %2e%2e/admin")
     end
 
+    it "refuses a path that decodes to one climbing out of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("/gems/%2e%2e%2fadmin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/%2e%2e%2fadmin")
+    end
+
+    it "refuses a path a server that strips parameters reads as climbing out of the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("/gems/..;/admin") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/..;/admin")
+    end
+
     it "keeps a path that climbs within the prefix the host names" do
       client.host = "http://example.com/gems"
       stub_request(:get, "http://example.com/gems/path")

@@ -1039,6 +1039,7 @@ module Gems
 
   module URLValidation
     DOT_SEGMENT: Regexp
+    SEPARATOR: Regexp
 
     private
 
@@ -1047,6 +1048,8 @@ module Gems
     def http_url?: (untyped host) -> bool
     def same_origin?: (String | URI::Generic url, String | URI::Generic other) -> bool
     def on_host?: (URI::Generic uri, String | URI::Generic host) -> bool
+    def segments_of: (String path) -> Array[String]
+    def decoded: (String path) -> String
     def origin: (String | URI::Generic url) -> [String?, String?, Integer?]
     def redact: (String? url) -> String?
   end
