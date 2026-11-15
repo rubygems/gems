@@ -248,6 +248,7 @@ module Gems
 
   class Resource
     include DeepCopy
+    include NestedReading
 
     self.@inspect_readers: Array[Symbol]?
     self.@identity_readers: Array[Symbol]?
@@ -255,7 +256,7 @@ module Gems
 
     attr_reader attributes: Hash[String, untyped]
 
-    def self.list: (Array[Hash[String | Symbol, untyped]] list) -> Array[instance]
+    def self.list: (Array[untyped] list) ?{ (untyped element) -> Hash[String | Symbol, untyped] } -> Array[instance]
     def self.inspect_with: (*Symbol readers) -> Array[Symbol]
     def self.inspect_readers: () -> Array[Symbol]
     def self.identified_by: (*Symbol readers) -> Array[Symbol]
@@ -282,6 +283,12 @@ module Gems
     def inspect_values: () -> Hash[Symbol, untyped]
     def value_of: (Array[String] keys) -> untyped
     def parse_time: (untyped value) -> Time
+  end
+
+  module NestedReading
+    private
+
+    def read_nested: [T] (untyped read) { () -> T } -> T
   end
 
   module DeepCopy

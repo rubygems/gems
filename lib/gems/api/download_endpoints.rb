@@ -53,8 +53,9 @@ module Gems
       def downloads(gem_name, version = nil, platform: nil)
         version = version_of(gem_name, version) || latest_version(gem_name)
         full_name = full_name_of(gem_name, version, platform)
-        counts = parse_json(get("/api/v1/downloads/#{escape(full_name)}.json"))
-        Downloads.new({"full_name" => full_name}.merge(counts))
+        parse_json(get("/api/v1/downloads/#{escape(full_name)}.json")) do |json|
+          Downloads.new({"full_name" => full_name}.merge(json))
+        end
       end
 
       # Returns the top 50 downloaded gem versions of all time
@@ -70,12 +71,11 @@ module Gems
       # @example
       #   Gems.most_downloaded.first.full_name
       def most_downloaded
-        versions = parse_json(get("/api/v1/downloads/all.json")) do |json|
-          json.fetch("gems").map do |version, downloads|
+        parse_json(get("/api/v1/downloads/all.json")) do |json|
+          Version.list(json.fetch("gems")) do |version, downloads|
             version.merge("name" => gem_name_from(version), "downloads_count" => downloads)
           end
         end
-        Version.list(versions)
       end
 
       private

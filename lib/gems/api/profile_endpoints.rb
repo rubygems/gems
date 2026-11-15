@@ -25,7 +25,7 @@ module Gems
       # @example
       #   Gems.profile "qrush"
       def profile(user)
-        Profile.new(parse_json(get("/api/v1/profiles/#{escape(slug_of(user))}.json")))
+        parse_json(get("/api/v1/profiles/#{escape(slug_of(user))}.json")) { |json| Profile.new(json) }
       end
 
       # Returns basic information about your account
@@ -42,7 +42,7 @@ module Gems
       #   end
       #   Gems.me.mfa
       def me
-        Profile.new(parse_json(get("/api/v1/profile/me.json")))
+        parse_json(get("/api/v1/profile/me.json")) { |json| Profile.new(json) }
       end
 
       # Start a WebAuthn verification of your account
@@ -58,7 +58,7 @@ module Gems
       # @example
       #   Gems.webauthn_verification.path
       def webauthn_verification
-        WebAuthnVerification.new(parse_json(post("/api/v1/webauthn_verification.json")))
+        parse_json(post("/api/v1/webauthn_verification.json")) { |json| WebAuthnVerification.new(json) }
       end
 
       # Returns the status of a WebAuthn verification of your account
@@ -76,7 +76,7 @@ module Gems
       #   Gems.webauthn_verification_status(verification).code
       def webauthn_verification_status(verification)
         path = "/api/v1/webauthn_verification/#{escape(webauthn_token_of(verification))}/status.json"
-        WebAuthnVerificationStatus.new(parse_json(get(path)))
+        parse_json(get(path)) { |json| WebAuthnVerificationStatus.new(json) }
       end
     end
   end
