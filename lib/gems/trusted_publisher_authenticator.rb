@@ -176,7 +176,7 @@ module Gems
     # @return [APIKey] the exchanged API key, including its name, scopes, and expiry
     # @raise [HTTPError] if the token exchange fails
     def exchange!
-      APIKey.new(parse_json(ResponseParser.new.parse(response: exchange_response)))
+      parse_json(ResponseParser.new.parse(response: exchange_response)) { |json| APIKey.new(json) }
     end
 
     # Send the token exchange request and follow the redirects of its response

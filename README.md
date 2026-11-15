@@ -321,7 +321,8 @@ RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem nam
 
 The endpoints that return one page at a time — `search` and `timeframe_versions` — each have an `_each` counterpart
 that walks the pages. It returns an `Enumerator`, requests a page only once the results of the page before it have
-been enumerated, and stops at the first empty page:
+been enumerated, and stops at the last page there is: the first that is empty, shorter than the first page, or the
+same as the page before it, when a host ignores the page it is asked for:
 
 ```ruby
 Gems.search_each('cucumber').first(100)          # requests only the pages it needs
@@ -511,7 +512,8 @@ Network failures raise `Gems::NetworkError`, whose `cause` is the `SystemCallErr
 `Gems::NetworkError::WRAPPED` is the list. Redirect loops
 raise `Gems::TooManyRedirects`, and a successful response
 that cannot be read raises `Gems::InvalidResponse`: one whose body is not JSON, such as the page of a proxy or captive
-portal, one whose JSON lacks a field the library reads, or one with a timestamp that cannot be parsed. Asking for the
+portal, one whose JSON lacks a field the library reads or is not the shape the library reads it as (such as an object
+where a list of gems is read), or one with a timestamp that cannot be parsed. Asking for the
 latest version of a gem that has none, directly or by omitting the version from `downloads`, raises
 `Gems::NoLatestVersion`.
 

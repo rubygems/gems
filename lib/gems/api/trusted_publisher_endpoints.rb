@@ -29,7 +29,7 @@ module Gems
       # @example
       #   Gems.trusted_publishers("gems").map(&:name)
       def trusted_publishers(gem_name)
-        TrustedPublisher.list(parse_json(get(trusted_publishers_path(gem_name))))
+        parse_json(get(trusted_publishers_path(gem_name))) { |json| TrustedPublisher.list(json) }
       end
 
       # Return one of the trusted publishers configured for a gem
@@ -42,7 +42,7 @@ module Gems
       # @example
       #   Gems.trusted_publisher("gems", 1).workflow_filename
       def trusted_publisher(gem_name, trusted_publisher)
-        TrustedPublisher.new(parse_json(get(trusted_publisher_path(gem_name, trusted_publisher))))
+        parse_json(get(trusted_publisher_path(gem_name, trusted_publisher))) { |json| TrustedPublisher.new(json) }
       end
 
       # Trust a GitHub Actions workflow to publish a gem
@@ -76,7 +76,7 @@ module Gems
                      workflow_repository_owner:, workflow_repository_name:}.compact
         body = JSON.generate({trusted_publisher_type: type, trusted_publisher: publisher})
         response = post(trusted_publishers_path(gem_name), body, content_type: RequestBuilder::APPLICATION_JSON)
-        TrustedPublisher.new(parse_json(response))
+        parse_json(response) { |json| TrustedPublisher.new(json) }
       end
 
       # Stop trusting a publisher to publish a gem

@@ -32,7 +32,7 @@ module Gems
       # @example
       #   Gems.rubygem "rails"
       def rubygem(gem_name)
-        Gem.new(parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}.json")))
+        parse_json(get("/api/v1/gems/#{escape(name_of(gem_name))}.json")) { |json| Gem.new(json) }
       end
 
       # Returns an array of active gems that match the query
@@ -45,13 +45,13 @@ module Gems
       # @example
       #   Gems.search "cucumber", page: 2
       def search(query, page: nil)
-        Gem.list(parse_json(get("/api/v1/search.json", {query:, page:}.compact)))
+        parse_json(get("/api/v1/search.json", {query:, page:}.compact)) { |json| Gem.list(json) }
       end
 
       # Enumerates the active gems that match the query, a page at a time
       #
       # A page is requested only when the gems of the page before it have been enumerated, and the enumeration ends
-      # with the first empty page.
+      # with the first page that is empty, shorter than the first, or the same as the page before it.
       #
       # @api public
       # @authenticated false
@@ -96,7 +96,7 @@ module Gems
         else
           "/api/v1/gems.json"
         end
-        Gem.list(parse_json(get(path)))
+        parse_json(get(path)) { |json| Gem.list(json) }
       end
 
       # Submit a gem to RubyGems.org or another host

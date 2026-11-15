@@ -51,7 +51,7 @@ module Gems
         settings = {expires_at:, rubygem_name:, mfa:}.compact
         requested = {"name" => name, "scopes" => granted_scopes(fields), "expires_at" => expires_at,
                      "gem" => rubygem_name && {"name" => rubygem_name}}.compact
-        APIKey.new(requested.merge(parse_json(post("/api/v1/api_key.json", {**fields, **settings, name:}))))
+        parse_json(post("/api/v1/api_key.json", {**fields, **settings, name:})) { |json| APIKey.new(requested.merge(json)) }
       end
 
       # Update the scopes of an API key using HTTP basic auth
@@ -96,7 +96,7 @@ module Gems
       # @example
       #   Gems.api_key_roles.map(&:name)
       def api_key_roles
-        APIKeyRole.list(parse_json(get("/api/v1/oidc/api_key_roles.json")))
+        parse_json(get("/api/v1/oidc/api_key_roles.json")) { |json| APIKeyRole.list(json) }
       end
 
       # Return one of the API key roles of the user the API key belongs to
@@ -108,7 +108,7 @@ module Gems
       # @example
       #   Gems.api_key_role("0123456789abcdef0123456789abcdef").api_key_permissions
       def api_key_role(token)
-        APIKeyRole.new(parse_json(get("/api/v1/oidc/api_key_roles/#{escape(token_of(token))}.json")))
+        parse_json(get("/api/v1/oidc/api_key_roles/#{escape(token_of(token))}.json")) { |json| APIKeyRole.new(json) }
       end
 
       # List the OIDC providers whose ID tokens RubyGems.org accepts
@@ -119,7 +119,7 @@ module Gems
       # @example
       #   Gems.oidc_providers.map(&:issuer)
       def oidc_providers
-        OIDCProvider.list(parse_json(get("/api/v1/oidc/providers.json")))
+        parse_json(get("/api/v1/oidc/providers.json")) { |json| OIDCProvider.list(json) }
       end
 
       # Return one of the OIDC providers whose ID tokens RubyGems.org accepts
@@ -132,7 +132,7 @@ module Gems
       # @example
       #   Gems.oidc_provider(Gems.api_key_role("0123456789abcdef0123456789abcdef").provider_id).issuer
       def oidc_provider(provider)
-        OIDCProvider.new(parse_json(get("/api/v1/oidc/providers/#{escape(id_of(provider))}.json")))
+        parse_json(get("/api/v1/oidc/providers/#{escape(id_of(provider))}.json")) { |json| OIDCProvider.new(json) }
       end
 
       # List the OIDC ID tokens the API key roles of the user have accepted
@@ -143,7 +143,7 @@ module Gems
       # @example
       #   Gems.oidc_id_tokens.map { |id_token| id_token.jwt["claims"]["repository"] }
       def oidc_id_tokens
-        OIDCIDToken.list(parse_json(get("/api/v1/oidc/id_tokens.json")))
+        parse_json(get("/api/v1/oidc/id_tokens.json")) { |json| OIDCIDToken.list(json) }
       end
 
       # Return one of the OIDC ID tokens the API key roles of the user have accepted
@@ -157,7 +157,7 @@ module Gems
       # @example
       #   Gems.oidc_id_token(42).api_key_role_token
       def oidc_id_token(id)
-        OIDCIDToken.new(parse_json(get("/api/v1/oidc/id_tokens/#{escape(id)}.json")))
+        parse_json(get("/api/v1/oidc/id_tokens/#{escape(id)}.json")) { |json| OIDCIDToken.new(json) }
       end
 
       # Exchange an OIDC ID token for an API key by assuming an API key role
