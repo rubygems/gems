@@ -729,6 +729,13 @@ RSpec.describe Gems::Client do
         .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/..;/admin")
     end
 
+    it "refuses a path that does not decode to UTF-8 under the prefix the host names" do
+      client.host = "http://example.com/gems"
+
+      expect { client.get("/gems/%ff") }
+        .to raise_error(ArgumentError, "Path is not on http://example.com/gems: /gems/%ff")
+    end
+
     it "keeps a path that climbs within the prefix the host names" do
       client.host = "http://example.com/gems"
       stub_request(:get, "http://example.com/gems/path")

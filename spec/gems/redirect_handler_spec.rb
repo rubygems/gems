@@ -248,6 +248,13 @@ RSpec.describe Gems::RedirectHandler do
         end
       end
 
+      ["%ff", "%c3%28", "elsewhere%80"].each do |segment|
+        it "drops the credentials for a path within the prefix that does not decode to UTF-8, #{segment}" do
+          expect(headers_sent_to("#{prefixed_host}/#{segment}", "https://rubygems.org/gems/#{segment}").keys)
+            .not_to include("Authorization", "Otp")
+        end
+      end
+
       ["/gems/./elsewhere", "/gems/%2e/elsewhere"].each do |location|
         it "drops the credentials for a path within the prefix that has a dot segment, #{location}" do
           expect(headers_sent_to("https://rubygems.org#{location}", "https://rubygems.org#{location}").keys)

@@ -111,6 +111,7 @@ module Gems
 
       uri_path = uri.path #: String
       path = decoded(uri_path)
+      return false unless path.valid_encoding?
       return false if segments_of(path).any?(DOT_SEGMENT)
 
       path.eql?(prefix) || path.start_with?("#{prefix}/")
