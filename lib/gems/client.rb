@@ -314,7 +314,7 @@ module Gems
       uri = build_uri(host, path)
       authenticator = password_authenticator_for(uri) || authenticator_for(host)
       response = @retry_handler.handle(retry_unanswered: safe?(http_method)) do
-        perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
+        perform(http_method:, uri:, host:, params:, body:, content_type:, headers:, authenticator:)
       end
       @response_parser.parse(response:)
     end
@@ -324,6 +324,9 @@ module Gems
     # This is what a retry sends again, so that a request that was redirected is followed again from the start
     # rather than sent straight to where the redirect led the first time.
     #
+    # The host the request was sent to is given to the redirect handler, which keeps the credentials of the request
+    # on the redirects that stay on that host and within the path prefix it carries (see {RedirectHandler#handle}).
+    #
     # The request is built here rather than once for every attempt, so that a body read as a stream is sent from
     # the start each time: an open file, or a multipart field holding one, is left at its end by the attempt
     # before, and {RequestBuilder#build} rewinds the body it builds a request from.
@@ -331,16 +334,18 @@ module Gems
     # @api private
     # @param http_method [Symbol] the HTTP method
     # @param uri [URI::Generic] the request URI
+    # @param host [String] the host the request is sent to, which bounds where its redirects keep the credentials
+    #   of the request
     # @param params [Hash] the query parameters
     # @param body [Hash, Array, String, nil] the request body
     # @param content_type [String, nil] the content type for a String body
     # @param headers [Hash{String => String}] the headers to send with the request
     # @param authenticator [Authenticator] the authenticator for the request
     # @return [Net::HTTPResponse] the response
-    def perform(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
+    def perform(http_method:, uri:, host:, params:, body:, content_type:, headers:, authenticator:)
       request = @request_builder.build(http_method:, uri:, params:, body:, content_type:, headers:, authenticator:)
       response = @connection.perform(request:)
-      @redirect_handler.handle(response:, request:, authenticator:, body:, content_type:, headers:)
+      @redirect_handler.handle(response:, request:, host:, authenticator:, body:, content_type:, headers:)
     end
 
     # Join a host and a request path, keeping any path prefix on the host
