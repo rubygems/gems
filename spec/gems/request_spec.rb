@@ -25,6 +25,64 @@ describe Gems::Request do
     end
   end
 
+  describe 'credentials on a redirect' do
+    before do
+      Gems.configure do |config|
+        config.key = '701243f217cdf23b1370c7b66b65ca97'
+        config.username = 'nick@gemcutter.org'
+        config.password = 'schwwwwing'
+      end
+    end
+
+    def redirect(from, to)
+      stub_request(:get, from).to_return(:status => 302, :headers => {:location => to})
+    end
+
+    def authorization_sent_to(url)
+      WebMock::RequestRegistry.instance.requested_signatures.hash.keys.
+        select { |signature| signature.uri == WebMock::Util::URI.normalize_uri(url) }.
+        map { |signature| signature.headers && signature.headers['Authorization'] }
+    end
+
+    it 'keeps the credentials for a redirect to the same origin' do
+      redirect('https://rubygems.org/api/v1/gems/rails.json', 'https://rubygems.org/api/v1/gems/rails2.json')
+      stub_get('/api/v1/gems/rails2.json').to_return(:body => fixture('rails.json'))
+      Gems.info 'rails'
+      expect(authorization_sent_to('https://rubygems.org/api/v1/gems/rails2.json')).to eq ['Basic bmlja0BnZW1jdXR0ZXIub3JnOnNjaHd3d3dpbmc=']
+    end
+
+    {
+      'another host' => 'https://evil.example/collect',
+      'another scheme' => 'http://rubygems.org/collect',
+    }.each do |change, location|
+      it "drops the credentials for a redirect to #{change}" do
+        redirect('https://rubygems.org/api/v1/gems/rails.json', location)
+        stub_request(:get, location).to_return(:body => fixture('rails.json'))
+        Gems.info 'rails'
+        expect(authorization_sent_to(location)).to eq [nil]
+      end
+    end
+
+    it 'drops the API key for a redirect to another host' do
+      Gems.configure do |config|
+        config.username = nil
+        config.password = nil
+      end
+      redirect('https://rubygems.org/api/v1/gems/rails.json', 'https://evil.example/collect')
+      stub_request(:get, 'https://evil.example/collect').to_return(:body => fixture('rails.json'))
+      Gems.info 'rails'
+      expect(authorization_sent_to('https://evil.example/collect')).to eq [nil]
+    end
+
+    it 'does not restore the credentials for a redirect back to the origin' do
+      redirect('https://rubygems.org/api/v1/gems/rails.json', 'https://evil.example/collect')
+      redirect('https://evil.example/collect', 'https://rubygems.org/api/v1/gems/rails2.json')
+      stub_get('/api/v1/gems/rails2.json').to_return(:body => fixture('rails.json'))
+      Gems.info 'rails'
+      expect(authorization_sent_to('https://rubygems.org/api/v1/gems/rails2.json')).to eq [nil]
+    end
+  end
+
   describe '#get with 404' do
     before do
       response_body = 'This rubygem could not be found.'
