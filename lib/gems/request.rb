@@ -51,7 +51,7 @@ module Gems
       if uri.scheme == 'https'
         require 'net/https'
         @connection.use_ssl = true
-        @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        @connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
       end
       @connection.start
       response = @connection.request request
