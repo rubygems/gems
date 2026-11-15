@@ -23,16 +23,17 @@ module Gems
 
   private
 
-    def request(method, path, data, content_type, request_host = host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
+    def request(method, path, data, content_type, request_host = host, origin = request_host) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, ParameterLists, PerceivedComplexity
       path += hash_to_query_string(data) if %i[delete get].include? method
       uri = URI.parse [request_host, path].join
       request_class = Net::HTTP.const_get method.to_s.capitalize
       request = request_class.new uri.request_uri
-      request.add_field 'Authorization', key if key
+      credentials = same_origin?(uri, origin)
+      request.add_field 'Authorization', key if key && credentials
       request.add_field 'Connection', 'keep-alive'
       request.add_field 'Keep-Alive', '30'
       request.add_field 'User-Agent', user_agent
-      request.basic_auth username, password if username && password
+      request.basic_auth username, password if username && password && credentials
       request.content_type = content_type
       case content_type
       when 'application/x-www-form-urlencoded'
@@ -54,7 +55,7 @@ module Gems
       end
       @connection.start
       response = @connection.request request
-      body_from_response(response, method, content_type)
+      body_from_response(response, method, content_type, (origin if credentials))
     end
 
     def hash_to_query_string(hash)
@@ -63,12 +64,22 @@ module Gems
       '?' + URI.encode_www_form(hash)
     end
 
-    def body_from_response(response, method, content_type)
+    # The credentials of a request are sent only to the scheme, host, and port
+    # it was made to. A redirect anywhere else is followed without them, and
+    # so is every redirect after it, even one that leads back.
+    def same_origin?(uri, origin)
+      return false unless origin
+
+      origin = URI.parse(origin)
+      [uri.scheme, uri.host.to_s.downcase, uri.port] == [origin.scheme, origin.host.to_s.downcase, origin.port]
+    end
+
+    def body_from_response(response, method, content_type, origin)
       case response
       when Net::HTTPRedirection
         uri = URI.parse(response['location'])
         host_with_scheme = [uri.scheme, uri.host].join('://')
-        request(method, uri.request_uri, {}, content_type, host_with_scheme)
+        request(method, uri.request_uri, {}, content_type, host_with_scheme, origin)
       when Net::HTTPNotFound
         raise Gems::NotFound.new(response.body)
       when Net::HTTPSuccess
