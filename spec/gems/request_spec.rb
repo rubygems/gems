@@ -127,4 +127,13 @@ describe Gems::Request do
     it { expect(@connection.proxy_pass).to eq 'proxy_pass' }
     it { expect(@connection.proxy_port).to eq 9999 }
   end
+
+  describe 'request over HTTPS' do
+    it 'verifies the certificate of the host' do
+      stub_get('/api/v1/gems/rails.json').to_return(:body => fixture('rails.json'))
+      gems = Gems.new
+      gems.info 'rails'
+      expect(gems.instance_variable_get(:@connection).verify_mode).to eq OpenSSL::SSL::VERIFY_PEER
+    end
+  end
 end
