@@ -51,7 +51,7 @@ module Gems
       # Enumerates the active gems that match the query, a page at a time
       #
       # A page is requested only when the gems of the page before it have been enumerated, and the enumeration ends
-      # with the first empty page.
+      # with the first page that is empty, shorter than the first, or the same as the page before it.
       #
       # @api public
       # @authenticated false

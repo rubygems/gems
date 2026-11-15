@@ -3,9 +3,16 @@
 module Gems
   # Walks the pages of the endpoints that answer one page at a time, mixed into the API endpoints
   #
-  # The endpoints number their pages from one and answer with an empty list once there are no more, so a page is
-  # requested only when the results of the page before it have been enumerated, and the walk stops at the first
-  # empty page.
+  # The endpoints number their pages from one, so a page is requested only when the results of the page before it
+  # have been enumerated. The walk ends with the last page there is, which is the first page that is:
+  #
+  # * empty, as the endpoints answer once there are no more results;
+  # * shorter than the first page, since a page is only cut short when it is the last; or
+  # * the same as the page before it, when a host ignores the page it is asked for.
+  #
+  # The size of a full page is taken from the first page rather than fixed, since a host other than RubyGems.org
+  # may serve pages of another size: a walk of such a host neither stops after its first page nor runs past its
+  # last. The walk stops rather than raising, so a caller keeps every result it was given.
   #
   # @api private
   module Pagination
@@ -28,15 +35,28 @@ module Gems
     # @yieldreturn [Array] the results of that page, empty once there are no more
     # @return [Enumerator] the results, which requests each page as it is reached
     def each_page(block)
-      enumerator = Enumerator.new do |yielder|
-        page = FIRST_PAGE
-        until (results = yield(page)).empty?
-          results.each { |result| yielder << result }
-          page += 1
-        end
-      end
+      enumerator = Enumerator.new { |yielder| walk_pages(yielder) { |page| yield(page) } }
       enumerator.each(&block) # steep:ignore BlockTypeMismatch
       enumerator
+    end
+
+    # Yield the results of each page to the yielder, until the last page there is
+    #
+    # @api private
+    # @param yielder [Enumerator::Yielder] the yielder of the enumerator the results are enumerated by
+    # @yield [page] the page to request
+    # @yieldreturn [Array] the results of that page
+    # @return [void]
+    def walk_pages(yielder)
+      page = FIRST_PAGE
+      full = (results = yield(page)).size
+      until results.empty?
+        results.each { |result| yielder << result }
+        break if results.size < full
+
+        previous = results
+        break if (results = yield(page += 1)).eql?(previous)
+      end
     end
   end
 end

@@ -321,7 +321,8 @@ RubyGems.org. `reverse_dependencies` and `autocomplete` return arrays of gem nam
 
 The endpoints that return one page at a time — `search` and `timeframe_versions` — each have an `_each` counterpart
 that walks the pages. It returns an `Enumerator`, requests a page only once the results of the page before it have
-been enumerated, and stops at the first empty page:
+been enumerated, and stops at the last page there is: the first that is empty, shorter than the first page, or the
+same as the page before it, when a host ignores the page it is asked for:
 
 ```ruby
 Gems.search_each('cucumber').first(100)          # requests only the pages it needs
